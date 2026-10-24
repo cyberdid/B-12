@@ -149,3 +149,43 @@ R13 включає tool argument validation, prompt injection у tool output/doc
 8. Robot/Jetson, довготривалі спостереження й фінальний requirement audit.
 
 Цей порядок не зменшує обсяг цілі. Кожна наступна сесія продовжує незавершені R01–R17 за evidence й execution ledger; ціль залишається active до завершення повної матриці або явної зміни вимог власником.
+
+## 15. Уточнення після незалежного architecture review
+
+Ці контракти є обов’язковими для відповідних tasks; вони усувають прогалини плану, не звужують full-host scope.
+
+### 15.1. Server-owned control та execution provenance
+
+Actor — внутрішній resolved DTO, не доказ авторизації сам по собі. CLI/API/application factory отримують actor з ControlStore/SessionStore; request body не приймає owner/consent/grant. Операція має ExecutionContext: actor_id, session_id, turn_id, optional task_id, grant_id, control_revision, monotonic deadline і cancellation event. Session має точний actor binding. Перед кожним effect/persistence control resolver перевіряє current revision, consent/capability та expiry/revocation. Відкликання consent забороняє нові записи; забуття старих записів — окрема явна операція.
+
+ToolCall містить optional application UUID turn_id/task_id; registry заповнює/перевіряє їх із trusted context. ToolResult має side_effects, outcome_unknown та machine error_code. Provider call ID залишається opaque. Durable/wire envelopes schema_version=1; MemoryRecord created_at — ISO8601 UTC, memory/evidence IDs — application UUID.
+
+### 15.2. Local delete та global purge
+
+MemoryStore.forget(id, actor) — storage primitive лише для власних canonical payload/FTS/evidence tables; його bool ніколи не означає завершення R05 в усьому application. До публічного memory_forget підключається PurgeCoordinator.
+
+PurgeReceipt: operation_id UUID, target_ids tuple UUID, state pending|complete|failed, pending_stores tuple strings, error_code optional. Canonical transaction спочатку фіксує payload-free tombstone/outbox та transitive dependency IDs, потім приховує/видаляє payload. Registered managed stores (canonical, knowledge, sessions, goals, backups, active turns) отримують idempotent purge hooks. Complete можливе лише після їхнього acknowledgement та фізичного canonical checkpoint/cleanup. Busy WAL reader або failed hook залишає pending/failed з чесним результатом. Startup відновлює pending operations до видачі affected data.
+
+Deletion revision інвалідовує контекст активних turns; late tool/reflection commit зі старою revision відхиляється. Backup restore replay-ить deletion ledger перед доступом до відновленого payload. Source files поза керованими stores не видаляються автоматично; re-ingestion forgotten source потребує нового explicit control рішення. Audit не містить user text, paths, arguments, raw actor display names або payload hashes як підміни payload erasure.
+
+### 15.3. Evidence identity і index namespace
+
+EvidenceRef: opaque UUID, owner scope ID, kind memory|document|tool_result, source opaque ID, revision/content identity, locator, active flag. Shared resolver перевіряє scope/revision/deletion до запису reflection й видачі контексту. Canonical memory IDs можуть одночасно бути evidence IDs; knowledge rowids не використовуються як stable references.
+
+Окремий archive Store file на actor scope усуває global path UNIQUE collision; actor scope maps до server-generated filename, не raw user path. Candidate authorization відбувається до top-k. Source update/delete інвалідовує old revision references та dependent projections за явним правилом.
+
+### 15.4. Arbitrary code, approvals та uncertain outcomes
+
+Typed tools використовують уже надані task/session capabilities без повторного підтвердження. Arbitrary executable/interpreter у full-host mode чесно має будь-які effects у межах OS permissions; argv не є sandbox. Для конкретного execution потрібен чинний explicit arbitrary-execution task grant або reviewable approval exact executable/argv/cwd/declared effects. Не стверджувати, що blacklist команд гарантує заборону destructive/network effects. Для enforceable narrower mode потрібен OS boundary; коли він недоступний, відмова або explicit full-execution approval, а не удавана ізоляція. MCP capabilities задає trusted local catalog.
+
+Approval записує actor/session/turn/call, canonical arguments hash, capability, expiry і одноразове рішення; після approve повторно перевіряється grant/revision. Tool lifecycle persist-ить proposed/approved/started/completed/failed/cancelled/unknown. Non-idempotent call після crash або timeout з можливими effects не повторюється автоматично; reconciliation використовує operation key або контрольне рішення. Outcome_unknown не маскується як clean failure без effects.
+
+### 15.5. Immutable admitted request та terminal events
+
+ContextBuilder повертає AdmittedRequest з messages, tools, num_ctx, output_reserve, input_upper_bound, template/model revision, request fingerprint і dropped IDs. Model adapter відправляє саме цей snapshot; інша serialisation/schema анулює admission. Required active user і tool-call/result groups атомарні; overflow required data повертає structured error або explicit bounded result, не silent eviction. Profile/template/model changes інвалідовують tokenizer/overhead calibration.
+
+TurnResult та events спільні для CLI/API/Web/audio: turn_started, text_delta, tool_started, tool_result, approval_pending, turn_completed, turn_failed, turn_cancelled. Кожен event має turn/session IDs, monotonic sequence, payload ownership; рівно один terminal event. Waiting approval не є завершеним turn; resume/cancel зберігає call identity. CancelToken/asyncio.Event та monotonic deadline передаються через model, tool і background paths.
+
+### 15.6. Durable goals
+
+Goal зберігає actor/scope, grant reference, immutable original intent, acceptance criteria/evidence IDs, checkpoint/next action, consumed budgets і status reason. Restart не дублює effect і не скидає budget. Achieved потребує перевіреного evidence, не лише model proposal. Quiet mode керує initiative speech окремо від execution pause. Один scheduler з process ownership guard; goal/checkpoint payload підпорядковується consent/forget.

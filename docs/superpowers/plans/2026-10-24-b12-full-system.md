@@ -80,24 +80,31 @@
 
 ```python
 class Actor(BaseModel):
+    schema_version: Literal[1] = 1
     id: str  # 1..128 chars, nonempty after whitespace validation
     owner: bool = False
     consent: bool = False
     # frozen=True; strict=True; extra='forbid'
 
 class MemoryRecord(BaseModel):
+    schema_version: Literal[1] = 1
     id: str; owner_id: str; kind: str; text: str
     source: str; created_at: str; evidence_ids: tuple[str, ...] = ()
 
 class ToolCall(BaseModel):
+    schema_version: Literal[1] = 1
     id: str; name: str; arguments: dict[str, Any]
+    turn_id: str | None = None; task_id: str | None = None
 
 class ToolResult(BaseModel):
+    schema_version: Literal[1] = 1
     call_id: str; name: str; status: str
     content: dict[str, Any]; duration_ms: float = 0
     error_code: str | None = None; truncated: bool = False
+    side_effects: tuple[dict[str, Any], ...] = (); outcome_unknown: bool = False
 
 class ModelReply(BaseModel):
+    schema_version: Literal[1] = 1
     content: str = ''; tool_calls: tuple[ToolCall, ...] = ()
     metrics: dict[str, Any] = {}; finish_reason: str = 'stop'
 
@@ -111,6 +118,8 @@ class Settings(BaseModel):
     @classmethod
     def from_env(cls, environ: Mapping[str, str] | None = None) -> 'Settings': ...
 ```
+
+MemoryRecord IDs/evidence and non-null ToolCall turn/task IDs are application UUIDs; Actor/provider call IDs are opaque. `created_at` is validated ISO8601 UTC. Actor is a DTO: routes must derive trusted actor/consent from authenticated server state.
 
 - [ ] RED: reject Actor `id=''`, unknown fields and string booleans; reject negative rounds/output reserve >= context, malformed URLs. Confirm no cross-instance mutable defaults.
 - [ ] Run `uv run pytest tests/unit/test_contracts.py tests/unit/test_config.py -q`; missing import/validation must fail before production methods exist.
@@ -135,12 +144,24 @@ def test_text_cannot_turn_into_control_consent():
 ```python
 MemoryStore(path: Path)
 MemoryStore.remember(text: str, actor: Actor, *, kind: str = 'fact',
-                     source: str = 'user', evidence_ids: tuple[str, ...] = ()) -> MemoryRecord
+                     source: str = 'user', evidence_ids: tuple[str, ...] = (),
+                     expected_deletion_revision: int | None = None) -> MemoryRecord
 MemoryStore.search(query: str, actor: Actor, *, limit: int = 8) -> list[MemoryRecord]
 MemoryStore.forget(memory_id: str, actor: Actor) -> bool
 MemoryStore.audit_events(actor: Actor, *, limit: int = 100) -> list[dict]
 MemoryStore.close() -> None
+MemoryStore.deletion_revision(actor: Actor) -> int
+MemoryStore.begin_purge(memory_id: str, actor: Actor,
+                        *, stores: tuple[str, ...] = ('canonical',)) -> PurgeReceipt
+MemoryStore.acknowledge_purge(operation_id: str, store: str, actor: Actor,
+                              *, error_code: str | None = None) -> PurgeReceipt
+MemoryStore.pending_purges(actor: Actor) -> list[PurgeReceipt]
+MemoryStore.resume_purges(actor: Actor) -> list[PurgeReceipt]
 ```
+
+PurgeReceipt is a new strict schema_version=1 DTO in contracts.py: operation_id UUID, target_ids tuple UUID, state pending|complete|failed, pending_stores tuple nonblank strings, error_code optional nonblank string. Storage primitive forget bool describes canonical state only, never global R05. begin_purge persists payload-free operation/closure before deleting allowed payload; canonical acknowledgement occurs only after physical cleanup/checkpoint. Busy checkpoint remains pending. Other hook acknowledgements are idempotent and actor-scoped; resume_purges retries canonical cleanup without pretending to execute external hooks. Retain IDs/deletion revision after restart. expected_deletion_revision rejects a late memory write after forget; no extra payload is stored in rejection or audit.
+
+Tests include: denied consent leaves no payload bytes; exact owner/guest isolation; cross-scope evidence rejection; restart; transitive reflection purge; unrelated memory retained; audit has no text/source/path/arguments and is tamper-evident; SQL injection-like queries safe; pending external hooks survive restart; acknowledgement completes only after every required store; held WAL reader cannot produce a false physical complete; stale expected deletion revision denied. Existing permissions of unrelated parent directories are not changed. Future/newer schema rejected before data mutation. Use SQLite temporary files and actual independent connections/threads for concurrency, not mocked SQL.
 
 - [ ] RED: store an allowed memory, close/reopen, retrieve exact text/source/ID; no-consent raises PermissionError before any payload persistence.
 - [ ] RED: owner/guest namespaces exact; evidence from another actor rejected; forgetting cascades dependent reflections while leaving unrelated memory.
@@ -357,3 +378,15 @@ def test_restart_retains_allowed_memory(tmp_path):
 - Task 2 спершу canonical FTS, Task 3 pinned archive reuse; це не два конкуруючі авторитетні сховища.
 - Task 4 context default 4096 допускається лише після реального resource/admission тесту; baseline alias 2048 не змінюється мовчки.
 - Tests містять реальні side effects і зовнішні boundaries; model fakes використовуються тільки для детерміністичного protocol/fault coverage, реальний Bolt має окремі gates.
+
+## Binding review amendments (24.10.2026)
+
+Architecture review is captured in the execution ledger. Spec §15 overrides earlier abbreviated interfaces where needed.
+
+- Task 2 keeps local MemoryStore.forget bool explicitly local. Also create PurgeReceipt and persisted payload-free purge outbox/tombstone primitives; busy checkpoint must not claim physical completion. Application PurgeCoordinator is wired in Tasks 7/9 and backup hook in Task 13. Audit actor IDs are internal opaque IDs, never display names; evidence resolver must reject cross-scope/revoked references.
+- Task 3 uses per-actor derived archive Store files and revision-aware UUID EvidenceRef, not global path identity or mutable rowids. Registration/lookup/update/delete authorizes before top-k. Contract fixture uses two actors indexing the same absolute source path.
+- Tasks 5–7 add ExecutionContext/ControlStore revision checks, exact one-shot approval binding, persistent tool lifecycle and unknown-outcome handling; no automatic replay of non-idempotent effects.
+- Task 4 produces immutable AdmittedRequest; exact tokenizer or validated template-specific conservative overhead includes tool schemas. Model adapter cannot accept post-admission schema changes. Real prompt counts alone do not prove absence of truncation; boundary instructions/output are checked independently.
+- Tasks 7–10 share TurnResult/event fixtures and authenticated application factory. Client DTO fields never establish owner/consent/grants. Late persistence after revoke/delete revision is rejected.
+- Task 11 keeps immutable original intent/criteria, checkpoints, consumed budgets and evidence-verified completion; quiet speech and execution pause differ.
+- Tasks 13/15 test purge hook failure, restart/restore with deletion replay, held WAL reader and late reflection; all managed copies must be acknowledged before global complete.
