@@ -56,8 +56,8 @@ class Settings(BaseModel):
             or not parsed.hostname
             or parsed.username is not None
             or parsed.password is not None
-            or parsed.query
-            or parsed.fragment
+            or "?" in value
+            or "#" in value
             or parsed.netloc.endswith(":")
         ):
             raise ValueError("ollama_url must be an HTTP(S) endpoint without credentials or query")

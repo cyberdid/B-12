@@ -24,6 +24,7 @@ def test_invalid_resource_limits_are_rejected(tmp_path, changes):
     "localhost:11434", "http://", "file:///tmp/ollama", "ftp://localhost:11434",
     "http://user:secret@localhost:11434", "http://localhost:99999", "http://local host:11434",
     "http://localhost:11434?token=secret", "http://localhost:11434#fragment",
+    "http://localhost:11434?", "http://localhost:11434#",
     "http://localhost:11434\\evil", "http://[broken", "http://localhost:bad",
     "http://localhost:", "http://bad\x7fhost:11434",
 ])
@@ -34,6 +35,7 @@ def test_invalid_ollama_endpoint_is_rejected(tmp_path, url):
 
 @pytest.mark.parametrize("url", [
     "http://127.0.0.1:11434", "http://[::1]:11434", "https://inference.example.org/ollama",
+    "https://inference.example.org/ollama%3F%23",
 ])
 def test_explicit_http_endpoints_are_supported(tmp_path, url):
     assert Settings(state_dir=tmp_path, ollama_url=url).ollama_url == url
