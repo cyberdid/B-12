@@ -1,0 +1,12 @@
+# Ці параметри можна передати Settings(**tomllib.loads(...)).
+# B12_<FIELD> задає відповідне значення через Settings.from_env().
+state_dir = "~/.local/state/b12"
+model = "b12-bolt-e4b:q4km"
+ollama_url = "http://127.0.0.1:11434"
+# Кандидат default; deployment потребує вимірювання ресурсів реальної моделі.
+num_ctx = 4096
+output_tokens = 512
+max_rounds = 8
+max_tool_calls = 16
+tool_timeout_s = 30.0
+host_access = "full"
