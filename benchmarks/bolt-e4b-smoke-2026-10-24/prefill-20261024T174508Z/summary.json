@@ -1,0 +1,57 @@
+{
+  "model": "b12-bolt-e4b:q4km",
+  "purpose": "Warm runtime, unique system prefix per request to reduce prompt-cache reuse; actual cached token counts recorded; synthetic Ukrainian text; no audio.",
+  "groups": [
+    {
+      "synthetic_lines": 20,
+      "n": 3,
+      "input_tokens": [
+        443,
+        443,
+        444
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.16970116299944493,
+      "ttft_content_min_s": 0.16740543300056743,
+      "ttft_content_max_s": 0.1919441279997045
+    },
+    {
+      "synthetic_lines": 60,
+      "n": 3,
+      "input_tokens": [
+        1162,
+        1160,
+        1163
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.41850861400052963,
+      "ttft_content_min_s": 0.40653939100047864,
+      "ttft_content_max_s": 0.4230422239998006
+    },
+    {
+      "synthetic_lines": 120,
+      "n": 3,
+      "input_tokens": [
+        1027,
+        1027,
+        1027
+      ],
+      "cached_tokens": [
+        0,
+        1026,
+        1026
+      ],
+      "ttft_content_p50_s": 0.03546066000035353,
+      "ttft_content_min_s": 0.03522355499990226,
+      "ttft_content_max_s": 1.381302825999228
+    }
+  ]
+}

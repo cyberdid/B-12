@@ -1,0 +1,27 @@
+# Local runtime state and private recordings must stay outside version control.
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+.obsidian/workspace*.json
+.obsidian/cache/
+models/
+recordings/
+runtime-data/
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+.worktrees/
+.superpowers/
+.ruff_cache/
+.coverage
+htmlcov/
+artifacts/
+.uv-cache/

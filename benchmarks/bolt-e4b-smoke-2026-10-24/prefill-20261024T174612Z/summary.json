@@ -1,0 +1,23 @@
+{
+  "model": "b12-bolt-e4b:q4km",
+  "purpose": "Warm runtime, unique system prefix per request to reduce prompt-cache reuse; actual cached token counts recorded; synthetic Ukrainian text; no audio.",
+  "groups": [
+    {
+      "synthetic_lines": 90,
+      "n": 3,
+      "input_tokens": [
+        1702,
+        1705,
+        1702
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.5644465369996396,
+      "ttft_content_min_s": 0.5643049020000035,
+      "ttft_content_max_s": 0.6090974139997343
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "valid_line_groups": [
+    20,
+    60
+  ],
+  "excluded_line_groups": [
+    120
+  ],
+  "reason": "120 lines exceeded the context budget; instructions and unique prefix were truncated, actual input became 1027 tokens and repeated requests reused 1026 cached tokens. Exclude this group from uncached-prefill comparison; retain as evidence of truncation risk.",
+  "expected_response": "ГОТОВО",
+  "observed_120_line_responses": "Truncated prose at output limit instead of expected acknowledgement."
+}

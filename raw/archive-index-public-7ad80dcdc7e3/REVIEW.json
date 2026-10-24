@@ -1,0 +1,63 @@
+{
+  "checked_at": "2026-10-24",
+  "repository": "https://github.com/cyberdid/archive-index-public",
+  "commit": "7ad80dcdc7e327b7dd1b352ab5e6dc38a00d784a",
+  "selected_snapshot_files": 16,
+  "upstream_blob_verification": "all 16 files exact Git blob SHA1 and sizes matched",
+  "core_tests": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONPATH=<snapshot>/src <existing-venv>/bin/python -m pytest -q -p no:cacheprovider <snapshot>/tests/test_core.py",
+    "exit_code": 0,
+    "passed": 17,
+    "observed_stdout": "................. [100%]\n17 passed in 0.39s",
+    "scope": "core tests only; not full test suite or model benchmark"
+  },
+  "isolation": {
+    "imported_package_path": "/home/cyberdid/Projects/B-12/raw/archive-index-public-7ad80dcdc7e3/src/archive_index/__init__.py",
+    "python": "3.13.14 (main, Jul 23 2026, 14:44:45) [Clang 22.1.3 ]",
+    "numpy_version": "2.5.4",
+    "production_archive_database_opened": false,
+    "embedding_model_loaded": false,
+    "source_code_or_services_modified": false,
+    "private_corpus_imported": false
+  },
+  "cache_probe": {
+    "dataset": "two synthetic documents, two-dimensional vectors, temporary SQLite database",
+    "without_refresh": [
+      {
+        "path": "/synthetic/B-12/old.md",
+        "locator": "event-synthetic",
+        "similarity": 0.0,
+        "via": "semantic"
+      }
+    ],
+    "lexical_after_insert": [
+      {
+        "path": "/synthetic/B-12/new.md",
+        "locator": "event-synthetic",
+        "similarity": null,
+        "via": "lexical"
+      }
+    ],
+    "after_refresh": [
+      {
+        "path": "/synthetic/B-12/new.md",
+        "locator": "event-synthetic",
+        "similarity": 1.0,
+        "via": "semantic"
+      }
+    ],
+    "conclusion": "VectorCache needs explicit refresh to include newly inserted vectors; current persistent adapters must arrange invalidation."
+  },
+  "local_installation": {
+    "archive_entrypoint": "/home/cyberdid/.local/bin/archive",
+    "editable_source": "/home/cyberdid/Projects/llm/archive-index",
+    "version": "0.1.0",
+    "source_files_differ_from_public_snapshot": true,
+    "production_queries_executed": false
+  },
+  "not_established": [
+    "This is not proof that the previous B-12 memory kernel was found.",
+    "No B-12 runtime integration, policy enforcement, consent or owner/guest model verified.",
+    "No joint EmbeddingGemma/Bolt memory or latency measurements performed."
+  ]
+}

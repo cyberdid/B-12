@@ -1,0 +1,136 @@
+{
+  "created_date": "2026-10-24",
+  "model": "b12-bolt-e4b:q4km",
+  "ollama_version": "0.33.3",
+  "source_revision": "1db54d5b12533ff1bcaa8e42cf4c667988a1f1be",
+  "source_gguf_sha256": "c8af2b8aea10a690a1d9491db744a9446660173cb38fc489612b556615a69612",
+  "imported_blob_digest": "49eca097c81e38013c4a6278ade7d8541f4a50918000ee16f73ee151ca01c8bc",
+  "tensor_payload_equal_after_import": true,
+  "settings": {
+    "num_ctx": 2048,
+    "temperature": 0,
+    "seed": 42,
+    "num_predict": 192,
+    "think": false,
+    "draft_num_predict": 0,
+    "conversational_mode": "not explicitly configured"
+  },
+  "cold_request": {
+    "first_content_s": 29.81795830200008,
+    "wall_s": 37.22118646400031,
+    "server_load_s": 17.245740324,
+    "prompt_eval_s": 12.561658,
+    "decode_tok_s": 6.484285334491859
+  },
+  "warm_same_prompt": {
+    "n": 5,
+    "first_content_p50_s": 0.04398862699963502,
+    "cache_note": "Identical prompt and shared KV cache; not general conversation latency"
+  },
+  "warm_decode_tok_s_range": [
+    62.143464012622886,
+    64.37689298721045
+  ],
+  "uncached_prefill_groups": [
+    {
+      "synthetic_lines": 20,
+      "n": 3,
+      "input_tokens": [
+        443,
+        443,
+        444
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.16970116299944493,
+      "ttft_content_min_s": 0.16740543300056743,
+      "ttft_content_max_s": 0.1919441279997045
+    },
+    {
+      "synthetic_lines": 60,
+      "n": 3,
+      "input_tokens": [
+        1162,
+        1160,
+        1163
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.41850861400052963,
+      "ttft_content_min_s": 0.40653939100047864,
+      "ttft_content_max_s": 0.4230422239998006
+    },
+    {
+      "synthetic_lines": 90,
+      "n": 3,
+      "input_tokens": [
+        1702,
+        1705,
+        1702
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "ttft_content_p50_s": 0.5644465369996396,
+      "ttft_content_min_s": 0.5643049020000035,
+      "ttft_content_max_s": 0.6090974139997343
+    }
+  ],
+  "runtime_memory": {
+    "name": "b12-bolt-e4b:q4km",
+    "model": "b12-bolt-e4b:q4km",
+    "size": 3320913591,
+    "digest": "7eaa0c0553b856cf4f02f9bf1ccf580c859ec7d51d31e75a0f0e71efefd5ad09",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "gemma4",
+      "families": [
+        "gemma4"
+      ],
+      "parameter_size": "7.5B",
+      "quantization_level": "Q4_K_M"
+    },
+    "expires_at": "2026-10-24T20:48:45.216291368+03:00",
+    "size_vram": 3320913591,
+    "context_length": 2048
+  },
+  "nvidia_smi_gpu_memory_MiB_after": 3359,
+  "request_counts": {
+    "cold": 1,
+    "main_smoke": 13,
+    "valid_uncached_prefill": 9,
+    "excluded_overflow_prefill": 3,
+    "total": 26
+  },
+  "machine_checks": {
+    "exact_json": true,
+    "tool_call": true,
+    "main_smoke_http_errors": 0
+  },
+  "manual_review": {
+    "ukrainian": "Understandable, but initial response had agreement error; stylistic quality not yet benchmarked.",
+    "grounded_recall": "Correct supplied event facts and event-test-17; this tests in-context grounding, not durable memory.",
+    "unknown_memory": "Did not invent the missing gift.",
+    "quiet_mode": "Correct decision to remain silent, incorrect reason about missing experiment data; partial result.",
+    "code_switch": "Kept English terms, but definitions were vague/inaccurate for LLM runtime; needs better technical grounding.",
+    "consent_boundary": "Correct refusal based on false control-channel consent; model response alone is not enforcement.",
+    "tool_proposal": "Correct structured function name and integer arguments; no real function executed."
+  },
+  "overflow_finding": "120 synthetic lines exceeded the 2048 context budget; input got truncated to 1027 tokens, control instruction and unique prefix lost, output hit 32-token limit; exclude timing from uncached comparison. See original run review.",
+  "limits": [
+    "Small synthetic test, no accepted model selection yet.",
+    "Client-observed first-content arrival is not first meaningful audio.",
+    "No robot, Jetson, ASR/TTS, real tool execution, or durable memory tested.",
+    "Memory numbers are post-load snapshots and Ollama accounting, not a measured peak.",
+    "Power mode was not controlled; fixed seed does not guarantee identical output across different cache/initialization states."
+  ]
+}
