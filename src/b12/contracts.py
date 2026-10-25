@@ -105,6 +105,37 @@ class MemoryRecord(_Contract):
         return value
 
 
+class PurgeReceipt(_Contract):
+    """Стан purge primitives; complete не означає глобальну гарантію R05."""
+
+    operation_id: str
+    target_ids: tuple[str, ...]
+    state: Literal["pending", "complete", "failed"]
+    pending_stores: tuple[str, ...]
+    error_code: Identifier | None = None
+
+    _validate_operation = field_validator("operation_id")(_uuid)
+
+    @field_validator("target_ids")
+    @classmethod
+    def _targets_are_uuid(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        for target in value:
+            _uuid(target)
+        return value
+
+    @field_validator("pending_stores")
+    @classmethod
+    def _stores_are_identifiers(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        for store in value:
+            _identifier(store)
+        return value
+
+    @field_validator("error_code")
+    @classmethod
+    def _error_is_identifier(cls, value: str | None) -> str | None:
+        return _identifier(value) if value is not None else None
+
+
 class ToolCall(_Contract):
     id: Identifier
     name: Identifier
