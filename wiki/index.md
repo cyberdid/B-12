@@ -32,6 +32,7 @@ tags: [navigation]
 | [archive-index для B-12](topics/archive-retrieval.md) | Повторне використання retrieval, окремий ledger, scope/cache/token boundaries |
 | [Ініціатива й рефлексія](topics/autonomy.md) | Цілі, доречність втручання, self-model |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
+| [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Моделі й benchmark](topics/models.md) | Кандидати, оцінювання, ризик TTFT |
 | [Reachy і Jetson](topics/hardware.md) | Варіанти обладнання, transport і deployment |
 

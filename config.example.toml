@@ -10,3 +10,8 @@ max_rounds = 8
 max_tool_calls = 16
 tool_timeout_s = 30.0
 host_access = "full"
+# Admission requires an explicit calibrated profile and local pinned tokenizer assets.
+# Set absolute paths for your deployment (or B12_MODEL_PROFILE / B12_TOKENIZER_DIR).
+# model_profile = "/absolute/B-12/profiles/bolt-e4b-ollama-0.33.3.json"
+# tokenizer_dir = "/absolute/pinned-tokenizer-assets"
+model_timeout_s = 120.0

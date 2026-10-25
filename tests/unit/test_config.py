@@ -83,6 +83,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "output_tokens": 1024, "max_rounds": 3, "max_tool_calls": 6,
         "tool_timeout_s": 2.5, "host_access": "full",
         "ollama_url": "https://inference.example.org",
+        "model_profile": None, "tokenizer_dir": None, "model_timeout_s": 120,
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 

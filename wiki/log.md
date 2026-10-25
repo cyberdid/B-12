@@ -76,3 +76,11 @@ tags: [history]
 ## [2026-10-25] lint | Теми після Tasks 2–3
 
 Актуалізовано теми memory/retrieval за кодом, tests і незалежними review; історичний kernel не ототожнено з новим MemoryStore. Перевірено 25 wiki-сторінок, frontmatter/source paths, індекс і локальні посилання без помилок; `git diff --check` clean, master brief SHA-256 незмінний. Відкриті shared-resolver/control/global-purge залежності явно збережено в execution ledger і тематичних сторінках.
+
+## [2026-10-25] implementation | Model admission і streaming
+
+**Перевірений факт:** Task 4 додає immutable admitted request, explicit pinned tokenizer/profile, native Ollama JSONL streaming, structured errors, bounded output та shared event/deadline cancellation. 47 focused tests; full ordinary suite 179 passed / 1 skipped. Real run2: 15/15, exact prompt counts і independent boundary instructions при 4096; alias default2048 незмінний. [API, докази й межі](topics/model-transport.md). Tool/agent execution і provider-cache purge не оголошені готовими.
+
+## [2026-10-25] lint | Model transport docs
+
+Перевірено 26 wiki-сторінок: required frontmatter/source paths, індекс і 211 локальних Markdown-посилань — без помилок. SHA-256 master brief незмінний; SHA manifests обох нових calibration runs перевірені. Суперечності про завершення agent/tool loop або provider-cache erase не додані; ці межі явні в тематичній сторінці. Central status/implementation ledger оновлює coordinator після commit/report.

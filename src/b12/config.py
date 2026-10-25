@@ -16,6 +16,9 @@ class Settings(BaseModel):
     state_dir: Path
     model: str = "b12-bolt-e4b:q4km"
     ollama_url: str = "http://127.0.0.1:11434"
+    model_profile: Path | None = None
+    tokenizer_dir: Path | None = None
+    model_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 120
     num_ctx: Annotated[int, Field(gt=0)] = 4096
     output_tokens: Annotated[int, Field(gt=0)] = 512
     max_rounds: Annotated[int, Field(gt=0)] = 8
@@ -36,6 +39,18 @@ class Settings(BaseModel):
             raise ValueError("state_dir must identify a dedicated directory")
         if any(parent.exists() and not parent.is_dir() for parent in path.parents):
             raise ValueError("state_dir ancestors must be directories")
+        return path
+
+    @field_validator("model_profile", "tokenizer_dir", mode="before")
+    @classmethod
+    def _profile_path(cls, value: Any) -> Path | None:
+        if value is None:
+            return None
+        if not isinstance(value, str | Path) or not str(value).strip():
+            raise ValueError("profile paths must be nonempty")
+        path = Path(value).expanduser()
+        if not path.is_absolute():
+            raise ValueError("profile paths must be absolute")
         return path
 
     @field_validator("model")
@@ -94,7 +109,7 @@ class Settings(BaseModel):
             value: Any = env[key]
             if field in integers:
                 value = int(value)
-            elif field == "tool_timeout_s":
+            elif field in {"tool_timeout_s", "model_timeout_s"}:
                 value = float(value)
             values[field] = value
         return cls(**values)
