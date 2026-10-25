@@ -105,6 +105,28 @@ class MemoryRecord(_Contract):
         return value
 
 
+class EvidenceRef(_Contract):
+    """Стабільна identity доказу; resolver перевіряє актуальність окремо."""
+
+    id: str
+    owner_id: Identifier
+    kind: Literal["memory", "document", "tool_result"]
+    source_id: str
+    revision: str
+    locator: Annotated[str, Field(min_length=1)]
+    active: bool
+
+    _validate_uuids = field_validator("id", "source_id", "revision")(_uuid)
+    _validate_owner = field_validator("owner_id")(_identifier)
+
+    @field_validator("locator")
+    @classmethod
+    def _locator_has_content(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("evidence locator must be nonblank")
+        return value
+
+
 class PurgeReceipt(_Contract):
     """Стан purge primitives; complete не означає глобальну гарантію R05."""
 

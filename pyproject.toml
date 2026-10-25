@@ -31,6 +31,8 @@ asyncio_mode = "auto"
 markers = ["real_model: requires an explicitly enabled local model", "hardware: requires physical hardware"]
 
 [tool.ruff]
+# Preserve exact reviewed upstream bytes; adapter remains linted.
+extend-exclude = ["src/b12/_vendor/archive_index"]
 target-version = "py312"
 line-length = 100
 
