@@ -1,6 +1,6 @@
 ---
 type: execution
-updated: 2026-10-24
+updated: 2026-10-25
 status: active
 sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md]
 tags: [implementation, plan, acceptance]
@@ -15,5 +15,15 @@ tags: [implementation, plan, acceptance]
 - Task progress ledger: `.worktrees/runtime/.superpowers/sdd/2026-10-24-b12-full-system/progress.md`; фактичний шлях підтверджується output `sdd-workspace` і `git worktree list`.
 
 Поточна послідовність: contracts/config/package → canonical memory → retrieval → model/context → tools → agent loop → CLI/API/Web → autonomy/MCP/service → великі evals/soak → voice/duplex → hardware/long-horizon evidence.
+
+## Перевірений checkpoint
+
+**Перевірений факт:** Task 1 реалізовано в `4cf5e79`, URL edge cases виправлено в `4c455b5`; незалежні spec/quality review пройдені, coordinator повторив 94 passing tests. Є package `b12`, strict versioned contracts і перевірювані Settings. Це foundation, не готовий agent.
+
+**Перевірений факт:** Task 2 canonical memory збережено в `d18441c`; незалежні spec/quality review пройдені, coordinator повторив 117 tests і Ruff без помилок. Є consent/actor isolation, restart, transitive forget, tombstones/outbox, deletion revision, payload-free audit і checkpoint-aware receipts. Локальний `forget` не означає global R05: coordinator та hooks для sessions/goals/backups ще попереду.
+
+**Наступний крок:** Task 3 — derived retrieval із pinned archive components, окремими actor stores та revision-aware evidence.
+
+**Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
 Goal залишається active до перевірки всього scope. Mock hardware, короткий smoke test або наявність плану не закривають фізичні/тривалі вимоги. Доступність відсутнього обладнання фіксується як dependency, не як привід зупинити desktop реалізацію.

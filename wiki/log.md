@@ -48,3 +48,15 @@ tags: [history]
 ## [2026-10-24] plan | Повна реалізація B-12
 
 Власник авторизував повний implementation/test цикл і host access. Збережено spec R01–R17 та план із 20 task gates: core, memory, retrieval, real tools, agent, UI/API, autonomy, MCP, operations, large evals, soak, voice/duplex, hardware і long-horizon acceptance. Обсяг не звужено до chat wrapper чи попереднього model smoke test. [Execution entry](project/implementation.md). Створюється local checkpoint baseline та isolated runtime worktree; remote publication не виконується.
+
+## [2026-10-25] implementation | Foundation і відновлення роботи
+
+**Перевірений факт:** baseline `78daaef` збережено, робота ведеться у `feat/b12-runtime`. Task 1: `4cf5e79` та `4c455b5`, strict contracts/config/package, 94 passing tests і незалежні spec/quality review. `b16917b` уточнює план/spec за architecture review; це вимоги до наступних tasks, не звіт про готові функції. Після явної паузи власник доручив продовжити; незавершений Task 2 відновлено з наявного коду. [Поточний checkpoint](project/implementation.md).
+
+## [2026-10-25] lint | Checkpoint реалізації
+
+Перевірено 24 wiki-сторінки: required frontmatter, source paths, охоплення індексом і 188 локальних Markdown-посилань — без помилок. SHA-256 master brief незмінний. Застаріле твердження про Git без commit замінено посиланням на фактичний baseline; історичні записи журналу збережено.
+
+## [2026-10-25] implementation | Canonical memory
+
+**Перевірений факт:** `d18441c` реалізує Task 2; незалежні spec/quality review без findings. Coordinator: `uv run --no-sync pytest -q` — 117 passed; `ruff check src tests` — clean. Перевірені real SQLite boundaries: restart, exact actor isolation, consent denial, transitive deletion, durable pending/failed receipts, busy WAL checkpoint, stale-writer rejection і audit corruption. Global R05 для sessions/goals/backups/active turns ще потребує application hooks; локальний bool `forget` не доводить його завершення. [Checkpoint](project/implementation.md).
