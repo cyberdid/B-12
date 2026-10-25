@@ -22,7 +22,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 2 canonical memory збережено в `d18441c`; незалежні spec/quality review пройдені, coordinator повторив 117 tests і Ruff без помилок. Є consent/actor isolation, restart, transitive forget, tombstones/outbox, deletion revision, payload-free audit і checkpoint-aware receipts. Локальний `forget` не означає global R05: coordinator та hooks для sessions/goals/backups ще попереду.
 
-**Наступний крок:** Task 3 — derived retrieval із pinned archive components, окремими actor stores та revision-aware evidence.
+**Перевірений факт:** Task 3 (`e33b926`) реалізує lexical derived retrieval із pinned archive components, окремими actor stores та revision-aware UUID evidence. 15 нових integration tests, full suite 132 passed, independent review пройдено; wheel містить exact upstream modules та LICENSE/NOTICE. Update/delete мають durable invalidation receipts і чесний pending/failed cleanup. [Подробиці й межі](../topics/archive-retrieval.md).
+
+**Наступний крок:** Task 4 — streaming model adapter, cancellation та immutable context admission; потім tools/control і agent integration.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 

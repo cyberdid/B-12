@@ -60,3 +60,19 @@ tags: [history]
 ## [2026-10-25] implementation | Canonical memory
 
 **Перевірений факт:** `d18441c` реалізує Task 2; незалежні spec/quality review без findings. Coordinator: `uv run --no-sync pytest -q` — 117 passed; `ruff check src tests` — clean. Перевірені real SQLite boundaries: restart, exact actor isolation, consent denial, transitive deletion, durable pending/failed receipts, busy WAL checkpoint, stale-writer rejection і audit corruption. Global R05 для sessions/goals/backups/active turns ще потребує application hooks; локальний bool `forget` не доводить його завершення. [Checkpoint](project/implementation.md).
+
+## [2026-10-25] ingest | Native Ollama transport docs
+
+Прочитано selected streaming, single-tool wire example та `/api/chat` request/response sections. [Картка](sources/runtime-api-docs.md) містить прямі URL; [metadata](../raw/runtime-api-docs-2026-10-25/SOURCE.json) фіксує межі. HTML snapshot не збережено. Wire documentation використовується для Task 4 tests, не як заміна перевірки встановленого сервера або evidence відсутності truncation.
+
+## [2026-10-25] lint | Transport source card
+
+Після додавання джерела перевірено 25 wiki-сторінок, required frontmatter/source paths, охоплення індексом і 194 локальні посилання — без помилок. Master brief SHA-256 незмінний. Новим URL не приписано повного охоплення; межі читання та відсутність HTML snapshot явні.
+
+## [2026-10-25] implementation | Derived lexical retrieval
+
+**Перевірений факт:** `e33b926` реалізує Task 3; незалежні spec/quality review без findings. Coordinator full suite — 132 passed; 15 нових real SQLite/FTS tests. Перевірені same-path actor isolation, current evidence revision, update/delete freshness, explicit re-ingest, pending/failed physical cleanup і crash-safe invalidation receipts. Wheel inspection підтверджує exact pinned upstream bytes і LICENSE/NOTICE/SOURCE.json. UTF-8 ingest наразі має один chunk; semantic search, context/agent та cross-store purge ще попереду. [Тематична сторінка](topics/archive-retrieval.md).
+
+## [2026-10-25] lint | Теми після Tasks 2–3
+
+Актуалізовано теми memory/retrieval за кодом, tests і незалежними review; історичний kernel не ототожнено з новим MemoryStore. Перевірено 25 wiki-сторінок, frontmatter/source paths, індекс і локальні посилання без помилок; `git diff --check` clean, master brief SHA-256 незмінний. Відкриті shared-resolver/control/global-purge залежності явно збережено в execution ledger і тематичних сторінках.

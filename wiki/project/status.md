@@ -25,7 +25,7 @@ tags: [progress, next]
 
 ## Активний етап
 
-**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** foundation і canonical memory завершені в межах Tasks 1–2, незалежні review пройдені, 117 tests passed. Global purge hooks ще не підключені. Наступний gate — derived retrieval. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають попередній дослідницький baseline.
+**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** foundation, canonical memory і lexical derived retrieval завершені в межах Tasks 1–3, незалежні review пройдені, 132 tests passed. Global purge hooks і agent integration ще не підключені. Наступний gate — streaming model/context admission. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають попередній дослідницький baseline.
 
 **M0 — частково:** вимоги систематизовані; контракти лише перелічено, права/retention потребують рішення, software-only heartbeat не реалізований. Для M1 виконано початкову model evaluation, але ядро й порівняльний A/B не реалізовані. M2–M6 не початі.
 

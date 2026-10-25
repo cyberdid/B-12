@@ -45,6 +45,7 @@ tags: [navigation]
 | [Аудит локальної системи](sources/system-audit-2026-10-24.md) | Сирі докази hardware/tools та межі перевірки |
 | [Докази запуску Bolt](sources/bolt-smoke-2026-10-24.md) | Походження 26 запитів, перевірка ваг, валідні та виключені вимірювання |
 | [archive-index-public](sources/archive-index-public.md) | Pinned source review, 17 core tests і локальна інсталяція |
+| [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
 Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 116 URL](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).

@@ -1,13 +1,15 @@
 ---
 type: topic
-updated: 2026-10-24
-status: proposed
-sources: [raw/B-12_Master_Project_2026-10-24.md]
+updated: 2026-10-25
+status: partially_implemented
+sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/memory.py, tests/integration/test_memory_restart.py, tests/security/test_memory_isolation.py]
 tags: [memory, privacy, consent]
 ---
 # Пам’ять і приватність
 
 **Зі слів brief §5:** ранній SQLite append-only kernel і заміри retrieval існували. У цій теці немає їхнього коду, схеми чи логів. Не використовувати згадані 150 мс або ~1 с на 200 спогадах як наш baseline.
+
+**Перевірений факт, нова реалізація:** Task 2 (`d18441c`) створює власний canonical MemoryStore; старий історичний kernel цим не знайдено й не імпортовано. Independent spec/quality review пройдені; 23 storage tests і загальний suite 117 пройшли на цьому checkpoint. [Реалізація та межі](../project/implementation.md).
 
 **Пропозиція:** observations → policy/identity/consent → дозволені durable events → candidate memories → контрольований запис → lexical/metadata index → за потреби semantic index → consolidation/reflection. Наявність спостереження не створює дозволу на довготривале збереження.
 
@@ -15,9 +17,9 @@ Working, episodic, semantic, autobiographical, procedural, social, research і s
 
 **Інваріанти з brief:** `consent_given` походить з контрольного/апаратного шляху; OWNER/GUEST не визначається лише текстом; гості не отримують постійного voiceprint за замовчуванням; raw mic не архівується автоматично. Speaker verification не є самодостатньою авторизацією. Власне TTS і фонове медіа фільтруються перед записом.
 
-## Суперечності, які потрібно закрити
+## Суперечності та стан вирішення
 
-1. **Append-only і видалення.** Brief вимагає зберігати первинні події й підтримувати забуття. Tombstone приховує запис у відповіді, але не видаляє payload. Потрібне рішення про очищення змісту, індексів, кешів, рефлексій і резервних копій; варіанти — контрольована redaction/compaction або криптографічне стирання з відповідною політикою ключів. Це варіанти дизайну, а не реалізоване рішення.
+1. **Append-only і видалення.** У новому canonical store append-only стосується payload-free audit; персональний payload/evidence/FTS фізично очищується через secure delete, FTS rebuild та WAL checkpoint. Durable tombstone/outbox фіксуються перед очищенням; busy/failed cleanup не стає complete. Це перевірено локально, а global purge для sessions/goals/backups/active turns ще потребує hooks за spec §15.2. Початкові варіанти redaction/cryptographic erasure замінено цим конкретним storage рішенням; SSD remanence і зовнішні snapshots тестами не доведені.
 2. **Short-term log і відсутність згоди.** Назва «короткотривалий» не гарантує volatile storage. До перевірки політики персональний observation має лишатися в пам’яті процесу з TTL; durable ledger не повинен отримувати заборонений зміст навіть тимчасово. Це запропоноване уточнення контракту.
 3. **Успадковані дані.** Рефлексія або embedding також може містити видалену інформацію. Потрібні залежності від evidence IDs та перевірка каскадного видалення.
 

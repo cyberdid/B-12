@@ -1,13 +1,17 @@
 ---
 type: integration-proposal
-updated: 2026-10-24
-status: proposed_not_integrated
-sources: [wiki/sources/archive-index-public.md, raw/archive-index-public-7ad80dcdc7e3/REVIEW.json]
+updated: 2026-10-25
+status: partially_implemented
+sources: [wiki/sources/archive-index-public.md, raw/archive-index-public-7ad80dcdc7e3/REVIEW.json, src/b12/retrieval.py, src/b12/retrieval_storage.py, tests/integration/test_retrieval.py]
 tags: [retrieval, memory, integration]
 ---
 # Повторне використання archive-index у B-12
 
-**Висновок review:** можемо повторно використати готовий пошук, не починаючи retrieval layer з нуля. Це уточнює план текстового B-12; runtime integration ще не виконано. [Докази та pinned source](../sources/archive-index-public.md).
+**Початковий висновок review:** повторно використати готовий пошук. [Докази та pinned source](../sources/archive-index-public.md).
+
+**Перевірений факт, новий checkpoint:** `e33b926` реалізує lexical KnowledgeIndex на exact pinned upstream modules. 15 real SQLite/FTS tests і coordinator full suite 132 пройшли; незалежні spec/quality review пройдені без findings. Agent/context і спільний canonical/document evidence resolver ще не підключені. [Execution state](../project/implementation.md).
+
+Адаптер використовує окремий UUID-named Store для кожного exact actor, UUID evidence/source/revision та перевірку active revision до top-k. Update/remove повертає persisted invalidation receipts; їх можна відновити через `operation_receipts(actor)` після crash. Busy/failed physical cleanup не відкриває affected evidence. Після remove re-ingest потребує нового explicit control рішення; external original не видаляється. Це локальний derived-store стан, не global purge completion.
 
 ## Розподіл відповідальності
 
@@ -23,7 +27,7 @@ tags: [retrieval, memory, integration]
 
 ## Що використати спочатку
 
-Почати з lexical retrieval без embedding GPU load. Система вже має потрібне середовище для перевірених core модулів. Source paths, locators і hashes придатні для посилань на докази; canonical event IDs слід передавати явно. Для semantic stage потрібен окремий joint benchmark з Bolt на 8GB VRAM.
+Перший lexical adapter реалізовано без embedding GPU load: явний UTF-8 ingest одного файла/одного chunk, без implicit scan. Source paths та locators доступні тільки в actor-owned live hits; зовнішні evidence references мають UUID/revision, не rowid. Token selection/context admission — Task 4; canonical integration — Task 7. Для semantic stage потрібен окремий joint benchmark з Bolt на 8GB VRAM.
 
 Не направляти робота за замовчуванням у весь персональний archive DB. Для першого PoC — окрема B-12 DB і синтетичні або явно дозволені матеріали. Існування приватного документа в глобальному індексі не створює дозволу використовувати його у відповіді гостю.
 
