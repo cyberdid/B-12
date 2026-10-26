@@ -16,6 +16,7 @@ async def wire_server(profile_settings):
     state = {
         "chunks": [],
         "requests": [],
+        "paths": [],
         "closed": asyncio.Event(),
         "chat_started": asyncio.Event(),
         "version": "test-1",
@@ -32,6 +33,7 @@ async def wire_server(profile_settings):
         try:
             header = await reader.readuntil(b"\r\n\r\n")
             path = header.split(b" ")[1].decode()
+            state["paths"].append(path)
             length = next(
                 (
                     int(line.split(b":")[1])
@@ -181,7 +183,7 @@ async def test_cancel_while_blocked_on_next_chunk_closes_socket_promptly(wire_se
     event = asyncio.Event()
     seen = asyncio.Event()
 
-    def callback(text):
+    async def callback(text):
         seen.set()
 
     deadline = time.monotonic() + 0.15 if mode == "deadline" else None
@@ -256,8 +258,12 @@ async def test_unterminated_inline_thinking_does_not_leak(wire_server):
     state, settings, request = wire_server
     state["chunks"] = [delta("<think>secret"), done(request.input_tokens)]
     received = []
+
+    async def collect(text):
+        received.append(text)
+
     with pytest.raises(ModelError, match="unterminated_reasoning"):
-        await OllamaModel(settings).chat(request, on_delta=received.append)
+        await OllamaModel(settings).chat(request, on_delta=collect)
     assert received == []
 
 
@@ -272,8 +278,12 @@ async def test_public_output_is_bounded_before_callback(wire_server):
     state, settings, request = wire_server
     state["chunks"] = [delta("x" * 100), done(request.input_tokens)]
     received = []
+
+    async def collect(text):
+        received.append(text)
+
     with pytest.raises(ModelError, match="output_limit"):
-        await OllamaModel(settings).chat(request, on_delta=received.append)
+        await OllamaModel(settings).chat(request, on_delta=collect)
     assert received == []
 
 
@@ -289,7 +299,7 @@ async def test_callback_exception_closes_stream_and_is_sanitized(wire_server):
     state, settings, request = wire_server
     state["chunks"] = [delta("hi"), 10.0]
 
-    def callback(text):
+    async def callback(text):
         raise ValueError("private callback state")
 
     with pytest.raises(ModelError, match="callback_error") as result:
@@ -337,7 +347,117 @@ async def test_unbounded_stream_of_small_frames_is_bounded(wire_server):
     frame = delta(thinking="x" * 65536)
     state["chunks"] = [frame] * 129 + [10.0]
     received = []
+
+    async def collect(text):
+        received.append(text)
+
     with pytest.raises(ModelError, match="output_limit"):
-        await OllamaModel(settings).chat(request, on_delta=received.append)
+        await OllamaModel(settings).chat(request, on_delta=collect)
     assert received == []
+    await asyncio.wait_for(state["closed"].wait(), 1)
+
+
+@pytest.mark.parametrize("malformation", ["images", "orphan"])
+async def test_forged_snapshot_is_rejected_before_http_post(wire_server, malformation):
+    state, settings, request = wire_server
+    messages = request.payload()["messages"]
+    if malformation == "images":
+        messages[-1]["images"] = ["unbudgeted"]
+    else:
+        messages.append({"role": "tool", "tool_name": "run", "content": "result"})
+    count = ContextBuilder(settings).profile.count(messages, [])
+    request = replace(request, messages=messages, input_tokens=count, input_upper_bound=count + 8)
+    request = replace(request, fingerprint=request._fingerprint())
+    state["chunks"] = [done(count)]
+    with pytest.raises(ModelError, match="admission_invalid"):
+        await OllamaModel(settings).chat(request)
+    assert state["requests"] == []
+
+
+async def test_sync_callback_is_rejected_without_execution_or_http(wire_server):
+    state, settings, request = wire_server
+    state["chunks"] = [delta("hi"), done(request.input_tokens)]
+    executed = []
+
+    def callback(text):
+        executed.append(text)
+        time.sleep(0.3)
+
+    with pytest.raises(ModelError, match="invalid_callback"):
+        await OllamaModel(settings).chat(
+            request, on_delta=callback, deadline=time.monotonic() + 0.1
+        )
+    assert executed == []
+    assert state["paths"] == []
+
+
+@pytest.mark.parametrize("mode", ["event", "deadline", "task"])
+async def test_cooperative_async_callback_is_cancelled_and_joined(wire_server, mode):
+    state, settings, request = wire_server
+    state["chunks"] = [delta("hi"), done(request.input_tokens), 10.0]
+    cancel, started, stopped = asyncio.Event(), asyncio.Event(), asyncio.Event()
+    effects = []
+
+    async def callback(text):
+        started.set()
+        try:
+            await asyncio.Event().wait()
+            effects.append("late side effect")
+        finally:
+            stopped.set()
+
+    deadline = time.monotonic() + 0.2 if mode == "deadline" else None
+    task = asyncio.create_task(
+        OllamaModel(settings).chat(request, on_delta=callback, cancel=cancel, deadline=deadline)
+    )
+    await asyncio.wait_for(started.wait(), 1)
+    if mode == "event":
+        cancel.set()
+    elif mode == "task":
+        task.cancel()
+    expected = asyncio.CancelledError if mode == "task" else ModelError
+    with pytest.raises(expected) as result:
+        await asyncio.wait_for(task, 1)
+    if mode != "task":
+        assert result.value.code == ("cancelled" if mode == "event" else "deadline_exceeded")
+    assert stopped.is_set()
+    assert effects == []
+    await asyncio.wait_for(state["closed"].wait(), 1)
+
+
+async def test_deadline_is_rechecked_before_success_even_if_async_callback_misbehaves(wire_server):
+    state, settings, request = wire_server
+    state["chunks"] = [delta("hi") + done(request.input_tokens)]
+
+    async def callback(text):
+        # Violates cooperative contract deliberately: late SUCCESS must still be impossible.
+        time.sleep(0.2)
+
+    with pytest.raises(ModelError, match="deadline_exceeded"):
+        await OllamaModel(settings).chat(
+            request, on_delta=callback, deadline=time.monotonic() + 0.1
+        )
+
+
+async def test_callback_cancellation_prevents_later_buffered_callbacks(wire_server):
+    state, settings, request = wire_server
+    state["chunks"] = [delta("first") + delta("later") + done(request.input_tokens)]
+    cancel, received = asyncio.Event(), []
+
+    async def callback(text):
+        received.append(text)
+        cancel.set()
+
+    with pytest.raises(ModelError, match="cancelled"):
+        await OllamaModel(settings).chat(request, on_delta=callback, cancel=cancel)
+    assert received == ["first"]
+
+
+@pytest.mark.parametrize("reason", [[], {}, True])
+async def test_malformed_terminal_reason_is_structured_and_closes_transport(wire_server, reason):
+    state, settings, request = wire_server
+    state["chunks"] = [done(request.input_tokens, done_reason=reason), 10.0]
+    with pytest.raises(ModelError) as result:
+        await OllamaModel(settings).chat(request)
+    assert result.value.code == "invalid_terminal"
     await asyncio.wait_for(state["closed"].wait(), 1)

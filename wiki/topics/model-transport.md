@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-10-25
+updated: 2026-10-26
 status: implemented_task4
 sources: [src/b12/context.py, src/b12/model.py, src/b12/model_profile.py, profiles/bolt-e4b-ollama-0.33.3.json, tests/unit/test_context.py, tests/integration/test_ollama_transport.py, tests/e2e/test_real_ollama.py]
 tags: [model, context, streaming, cancellation]
@@ -9,7 +9,7 @@ tags: [model, context, streaming, cancellation]
 
 **Перевірений факт:** Task 4 реалізує окремі context/transport primitives. Agent loop, tool execution, consent resolver та global purge сюди не входять. [Контракти майбутньої системи](../../docs/superpowers/specs/2026-10-24-b12-system-design.md), [стан реалізації](../project/implementation.md).
 
-`ContextBuilder(settings).build(system, messages, evidence=(), tools=())` повертає `AdmittedRequest`. Усі вкладені messages/tools immutable; caller-owned dict/list не зберігаються. Snapshot містить context/output budgets, точний rendered token count із додатковим margin, model manifest/template/profile identity, fingerprint і dropped message IDs. `payload()` повертає окрему копію; зміни цієї копії не змінюють snapshot.
+`ContextBuilder(settings).build(system, messages, evidence=(), tools=())` повертає `AdmittedRequest`. Усі вкладені messages/tools immutable; caller-owned dict/list не зберігаються. Спільний structural validator перевіряє допустимі fields/roles, leading system, required user, повні tool groups і native function schemas як у builder, так і при кожному snapshot validation/send. Реконструйований DTO з перерахованим fingerprint не обходить ці перевірки. Snapshot містить context/output budgets, точний rendered token count із додатковим margin, model manifest/template/profile identity, fingerprint і dropped message IDs. `payload()` повертає окрему копію; зміни цієї копії не змінюють snapshot.
 
 Останній user turn, усі його assistant/tool-call/result rounds, system text, evidence та tools — обов’язкові. Старі user turns можна видалити лише цілком, oldest first. Incomplete, orphan або ambiguous tool results відхиляються. Evidence входить як `{id, text}`; його авторизацію, актуальність і відповідність `EvidenceRef` перевіряє майбутній shared resolver. Текст evidence позначений як недовірені дані; це не механізм control permissions.
 
@@ -23,11 +23,11 @@ tags: [model, context, streaming, cancellation]
 
 ## Streaming і shared cancellation
 
-API: `await OllamaModel(settings).chat(request, on_delta=None, cancel=None, deadline=None) -> ModelReply`. Пізніх messages/tools/options параметрів немає. `on_delta` має контракт `(str) -> None | Awaitable[None]`; callbacks послідовні. `cancel` — shared `asyncio.Event`; `deadline` — абсолютний `time.monotonic()` timestamp. Діє також `model_timeout_s`. Event/deadline охоплюють connection, очікування chunks і callbacks; `Task.cancel()` зберігає `CancelledError`. Transport закривається перед завершенням. Тести перевіряють server-side socket EOF, а не лише факт встановлення event.
+API: `await OllamaModel(settings).chat(request, on_delta=None, cancel=None, deadline=None) -> ModelReply`. Пізніх messages/tools/options параметрів немає. `on_delta` має контракт `(str) -> Awaitable[None]`; дозволені лише async functions/callables, sync callback дає `invalid_callback` до будь-якого HTTP. Callbacks послідовні й мають бути cooperative/nonblocking та пропускати cancellation. Thread offload немає. `cancel` — shared `asyncio.Event`; `deadline` — абсолютний `time.monotonic()` timestamp. Діє також `model_timeout_s`. Event/deadline охоплюють connection, очікування chunks і callbacks; `Task.cancel()` зберігає `CancelledError`. Перед callback, кожним buffered frame і successful return повторно перевіряються event/monotonic deadline. Callback cancellation завершується до повернення `chat`. Неправильний async callback, який блокує loop або поглинає cancellation, порушує контракт: Python не може примусово preempt-ити довільний callback; bounded latency гарантується для cooperative callbacks. Late success після deadline не допускається. Transport закривається перед завершенням. Тести перевіряють server-side socket EOF, а не лише факт встановлення event.
 
 Native `message.thinking` відкидається. Профіль може дозволити лише підтриману пару inline delimiters `<think>` / `</think>`; parser тримає часткові delimiters між chunks і не передає прихований текст callbacks. Незавершений блок або неоднозначний частковий delimiter дає `unterminated_reasoning`. Інші довільні provider prose/tags не отримують статусу довіреного reasoning/control protocol.
 
-Native tool-call `function.index` / opaque provider ID пов’язують object-argument chunks. Конфлікти відхиляються, stringified JSON arguments не є native object protocol. Відсутні IDs отримують стабільний у межах відповіді `call-<response nonce>-<ordinal>`; tool call сам по собі нічого не виконує. Terminal stop/length зберігається в `finish_reason`.
+Native tool-call `function.index` / opaque provider ID пов’язують object-argument chunks. Конфлікти відхиляються, stringified JSON arguments не є native object protocol. Відсутні IDs отримують стабільний у межах відповіді `call-<response nonce>-<ordinal>`; tool call сам по собі нічого не виконує. Terminal stop/length зберігається в `finish_reason`; reason спочатку перевіряється як string, malformed list/object/bool дає `invalid_terminal`.
 
 Wire обмежено 8 MiB загалом і 1 MiB на JSONL frame; public text token count перевіряється до callback, provider `eval_count` — на terminal event. Metrics містять лише whitelisted числові поля й timing, без копії content/reasoning. `ttft_s` включає повторне локальне profile loading/verification та deployment requests; для відповіді лише з tool calls він `None`.
 
@@ -35,7 +35,7 @@ Wire обмежено 8 MiB загалом і 1 MiB на JSONL frame; public tex
 
 ## Перевірки
 
-**Перевірений факт:** 47 focused context/transport tests, ordinary full suite 179 passed / 1 real-model test skipped; локальні socket fixtures не використовують моделі/GPU. Перевірені overflow, schema budget, atomic groups, exact boundary, nested immutability, profile invalidation, fragmented UTF-8/NDJSON, provider/HTTP/malformed/missing-done errors, output limits, callbacks, blocked-read cancellation і reasoning stripping.
+**Перевірений факт:** 76 focused context/transport tests, ordinary full suite 208 passed / 1 real-model test skipped; локальні socket fixtures не використовують моделі/GPU. Перевірені overflow, schema budget, atomic groups, exact boundary, nested immutability, profile invalidation, fragmented UTF-8/NDJSON, provider/HTTP/malformed/missing-done errors, output limits, callbacks, blocked-read cancellation і reasoning stripping. Fix round 1 (26.10) додатково перевіряє reconstructed snapshots із перерахованими hash/count, unsupported fields/schema, pre-HTTP sync-callback rejection, cooperative async callback cancellation, buffered-callback stop і malformed terminal reasons. Попередній широкий sync/async callback contract замінено async-only API після review.
 
 Real run1: 12/12 запитів; run2: 15/15 при context 4096/output reserve 128. [Run2 metadata](../../artifacts/task4-calibration-2026-10-25-run2/metadata.json), [summary](../../artifacts/task4-calibration-2026-10-25-run2/summary.json), [hashes](../../artifacts/task4-calibration-2026-10-25-run2/SHA256.json). Повторів по 3; UA/emoji, 12 schemas, дві tool rounds, near-boundary і native generated tool call. Token counts відповідно 51/968/183/3928/108; усі збігаються з Ollama. Boundary 3928 + margin 16 + reserve 128 = 4072 ≤ 4096; обидва коди на початку/кінці контексту повернуто незалежно від count check. Жодного tool effect не виконано.
 

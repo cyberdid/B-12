@@ -175,3 +175,79 @@ def test_revision_identity_is_checked_even_with_recomputed_fingerprint(profile_s
     changed = replace(changed, fingerprint=changed._fingerprint())
     with pytest.raises(ModelError, match="admission_invalid"):
         changed.validate(builder.profile)
+
+
+@pytest.mark.parametrize(
+    "malformation",
+    [
+        "images",
+        "orphan",
+        "incomplete",
+        "missing_system",
+        "missing_user",
+        "tools_schema",
+    ],
+)
+def test_reconstructed_snapshot_cannot_bypass_structural_admission(profile_settings, malformation):
+    builder = ContextBuilder(profile_settings)
+    request = builder.build("S", [{"role": "user", "content": "hi"}])
+    payload = request.payload()
+    if malformation == "images":
+        payload["messages"][-1]["images"] = ["unbudgeted"]
+    elif malformation == "orphan":
+        payload["messages"].append({"role": "tool", "tool_name": "run", "content": "result"})
+    elif malformation == "incomplete":
+        payload["messages"].append(
+            {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [{"function": {"name": "run", "arguments": {}}}],
+            }
+        )
+    elif malformation == "missing_system":
+        payload["messages"].pop(0)
+    elif malformation == "missing_user":
+        payload["messages"].pop()
+    else:
+        payload["tools"] = [{"type": "not_function", "function": {"name": "run"}}]
+    # Deliberately defeat the count/hash gates: this regression isolates structural admission.
+    count = builder.profile.count(payload["messages"], payload["tools"])
+    forged = replace(
+        request,
+        messages=payload["messages"],
+        tools=payload["tools"],
+        input_tokens=count,
+        input_upper_bound=count + 8,
+        num_ctx=1024,
+    )
+    forged = replace(forged, fingerprint=forged._fingerprint())
+    with pytest.raises(ModelError, match="admission_invalid"):
+        forged.validate(builder.profile)
+
+
+@pytest.mark.parametrize(
+    "bad_function",
+    [
+        {"name": "run", "parameters": {}, "unsupported": "unbudgeted"},
+        {"name": "run", "description": [], "parameters": {"type": "object"}},
+        {"name": "run", "parameters": {"type": "string"}},
+        {"name": "run", "parameters": {"type": "object", "properties": []}},
+        {"name": "run", "parameters": {"type": "object", "required": "argument"}},
+        {"name": "run", "parameters": {"type": "object", "required": ["unknown"]}},
+    ],
+)
+@pytest.mark.parametrize("entrypoint", ["builder", "snapshot"])
+def test_tool_schema_validation_is_shared(profile_settings, bad_function, entrypoint):
+    profile_settings.num_ctx = 1024
+    builder = ContextBuilder(profile_settings)
+    tools = [{"type": "function", "function": bad_function}]
+    if entrypoint == "builder":
+        with pytest.raises(ModelError, match="invalid_request"):
+            builder.build("S", [{"role": "user", "content": "hi"}], tools=tools)
+    else:
+        request = builder.build("S", [{"role": "user", "content": "hi"}])
+        count = builder.profile.count(request.payload()["messages"], tools)
+        forged = replace(request, tools=tools, input_tokens=count, input_upper_bound=count + 8)
+        forged = replace(forged, fingerprint=forged._fingerprint())
+        with pytest.raises(ModelError, match="admission_invalid"):
+            forged.validate(builder.profile)

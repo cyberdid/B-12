@@ -88,3 +88,11 @@ tags: [history]
 ## [2026-10-25] verification | Task 4 committed calibration
 
 **Перевірений факт:** commit `4e3cc06` перевірено окремим final marked run3: 15/15 synthetic запитів, exact prompt counts, independent boundary і native-tool assertions; 1 test passed за 24.90 s. Metadata містить committed revision, empty dirty-diff hash і SHA-256 production/test/dependency files. Finished run3 manifest і code hashes перевірені; run1/run2/preflight не переписано. Provider-cache purge залишається окремою залежністю Task 7.
+
+## [2026-10-26] implementation | Task 4 review fixes, round 1
+
+**Перевірений факт:** виправлено три Important findings: structural admission повторюється для reconstructed snapshots; callback API звужено до cooperative async-only із pre-HTTP sync rejection і final deadline check; malformed terminal reason повертає structured error. Попередній sync/async callback contract замінено, історичні calibration runs збережені. 76 focused tests і full ordinary suite 208 passed / 1 skipped. Новий committed model run4 виконується окремо після fix commit; provider-cache purge залишається Task 7 dependency.
+
+## [2026-10-26] lint | Task 4 fix round 1
+
+Перевірено 26 wiki-сторінок, required frontmatter/source paths, index coverage і 214 локальних посилань без помилок. Raw master brief байтово тотожний committed original; finished run1–3 SHA manifests незмінні. Async-only API та cooperative cancellation limits узгоджені між кодом і тематичною сторінкою; старе правило sync callbacks явно замінено.

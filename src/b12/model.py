@@ -1,7 +1,8 @@
 """Native Ollama streaming with immutable admission and cooperative cancellation.
 
 chat accepts only AdmittedRequest, never late messages/tools/options. on_delta is
-(str) -> None | Awaitable[None]; it receives public text only. asyncio.Event and
+(str) -> Awaitable[None]; only async functions/callables are accepted.
+Callbacks must remain cooperative/nonblocking and propagate cancellation. asyncio.Event and
 an absolute time.monotonic() deadline cover connection, reads and callbacks.
 Task.cancel() propagates CancelledError after closing transport. Callbacks are
 provisional until ModelReply: a later protocol/budget error cannot retract text.
@@ -28,7 +29,7 @@ from b12.contracts import ModelReply, ToolCall, _json_value
 from b12.model_errors import ModelError as ModelError
 from b12.model_profile import ModelProfile, canonical, sha256
 
-DeltaCallback = Callable[[str], None | Awaitable[None]]
+DeltaCallback = Callable[[str], Awaitable[None]]
 _MAX_WIRE_BYTES = 8 * 1024 * 1024
 _MAX_LINE_BYTES = 1024 * 1024
 _METRICS = {
@@ -144,6 +145,13 @@ class _Calls:
         )
 
 
+def _check_cancel(cancel: asyncio.Event | None, deadline: float) -> None:
+    if cancel is not None and cancel.is_set():
+        raise ModelError("cancelled", "request cancelled")
+    if time.monotonic() >= deadline:
+        raise ModelError("deadline_exceeded", "request deadline elapsed")
+
+
 class OllamaModel:
     def __init__(self, settings: Settings):
         self.settings = settings.model_copy(deep=True)
@@ -156,13 +164,18 @@ class OllamaModel:
         cancel: asyncio.Event | None = None,
         deadline: float | None = None,
     ) -> ModelReply:
+        if on_delta is not None and not (
+            inspect.iscoroutinefunction(on_delta)
+            or (callable(on_delta) and inspect.iscoroutinefunction(on_delta.__call__))
+        ):
+            raise ModelError("invalid_callback", "on_delta must be an async callable")
         if cancel is not None and cancel.is_set():
             raise ModelError("cancelled", "request cancelled")
         now = time.monotonic()
         if deadline is not None and (not math.isfinite(deadline) or deadline <= now):
             raise ModelError("deadline_exceeded", "request deadline elapsed")
         deadline = min(deadline or math.inf, now + self.settings.model_timeout_s)
-        operation = asyncio.create_task(self._chat(request, on_delta))
+        operation = asyncio.create_task(self._chat(request, on_delta, cancel, deadline))
         cancellation = asyncio.create_task(cancel.wait()) if cancel is not None else None
         tasks = [operation] + ([cancellation] if cancellation is not None else [])
         try:
@@ -175,14 +188,22 @@ class OllamaModel:
                 raise ModelError("cancelled", "request cancelled")
             if operation not in finished:
                 raise ModelError("deadline_exceeded", "request deadline elapsed")
-            return operation.result()
+            result = operation.result()
         finally:
             for task in tasks:
                 if not task.done():
                     task.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
+        _check_cancel(cancel, deadline)
+        return result
 
-    async def _chat(self, request: AdmittedRequest, on_delta: DeltaCallback | None) -> ModelReply:
+    async def _chat(
+        self,
+        request: AdmittedRequest,
+        on_delta: DeltaCallback | None,
+        cancel: asyncio.Event | None,
+        deadline: float,
+    ) -> ModelReply:
         started = time.monotonic()
         # Loading/hash checks are bounded local work, off the event loop for cancellation.
         profile = await asyncio.to_thread(ModelProfile, self.settings)
@@ -194,6 +215,7 @@ class OllamaModel:
             or request.output_reserve != self.settings.output_tokens
         ):
             raise ModelError("admission_invalid", "settings changed after admission")
+        _check_cancel(cancel, deadline)
         try:
             async with httpx.AsyncClient(
                 base_url=self.settings.ollama_url.rstrip("/") + "/",
@@ -214,6 +236,7 @@ class OllamaModel:
                     text_filter = _PublicText(bool(profile.spec.inline_reasoning))
                     calls, content, metrics, first = _Calls(), [], {}, None
                     async for item in self._objects(response):
+                        _check_cancel(cancel, deadline)
                         if "error" in item:
                             raise ModelError("provider_error", "provider reported an error")
                         if type(item.get("done")) is not bool:
@@ -236,11 +259,10 @@ class OllamaModel:
                                 )
                             first = first if first is not None else time.monotonic() - started
                             content.append(public)
-                            if on_delta:
+                            if on_delta is not None:
+                                _check_cancel(cancel, deadline)
                                 try:
-                                    result = on_delta(public)
-                                    if inspect.isawaitable(result):
-                                        await result
+                                    await on_delta(public)
                                 except Exception as exc:
                                     raise ModelError(
                                         "callback_error", "delta callback failed"
@@ -259,7 +281,8 @@ class OllamaModel:
                             if (
                                 "prompt_eval_count" not in metrics
                                 or "eval_count" not in metrics
-                                or item.get("done_reason") not in {"stop", "length"}
+                                or type(item.get("done_reason")) is not str
+                                or item["done_reason"] not in {"stop", "length"}
                             ):
                                 raise ModelError("invalid_terminal", "missing terminal metadata")
                             if metrics["prompt_eval_count"] != request.input_tokens:
@@ -270,6 +293,7 @@ class OllamaModel:
                             if metrics["eval_count"] > request.output_reserve:
                                 raise ModelError("output_limit", "provider exceeded output reserve")
                             metrics.update(ttft_s=first, elapsed_s=time.monotonic() - started)
+                            _check_cancel(cancel, deadline)
                             return ModelReply(
                                 content="".join(content),
                                 tool_calls=calls.finish(),

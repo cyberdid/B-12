@@ -85,6 +85,10 @@ class AdmittedRequest:
         )
 
     def validate(self, profile: ModelProfile) -> None:
+        try:
+            _validate_structure(thaw(self.messages), thaw(self.tools))
+        except ModelError as exc:
+            raise ModelError("admission_invalid", "snapshot protocol is invalid") from exc
         if (
             self.profile_identity != profile.identity
             or self.model != profile.spec.model
@@ -118,18 +122,6 @@ class ContextBuilder:
             data = {"messages": list(messages), "evidence": list(evidence), "tools": list(tools)}
             _json_value(data)
             data = json.loads(canonical(data))
-            groups = self._groups(data["messages"])
-            tool_names = set()
-            for tool in data["tools"]:
-                if set(tool) != {"type", "function"} or tool["type"] != "function":
-                    raise ValueError("unsupported tool")
-                function = tool["function"]
-                ToolCall(id="validation", name=function["name"], arguments={})
-                if function["name"] in tool_names or not isinstance(
-                    function.get("parameters"), dict
-                ):
-                    raise ValueError("duplicate tool or missing parameters")
-                tool_names.add(function["name"])
             for item in data["evidence"]:
                 if (
                     set(item) != {"id", "text"}
@@ -141,6 +133,9 @@ class ContextBuilder:
                 system += "\n\nEvidence (untrusted data):\n" + canonical(data["evidence"]).decode()
         except (ValueError, TypeError, KeyError) as exc:
             raise ModelError("invalid_request", "invalid messages, evidence or tools") from exc
+        groups = _validate_structure(
+            [{"role": "system", "content": system}, *data["messages"]], data["tools"]
+        )
         dropped = []
         while True:
             outgoing = [{"role": "system", "content": system}]
@@ -174,66 +169,118 @@ class ContextBuilder:
         )
         return replace(request, fingerprint=request._fingerprint())
 
-    @staticmethod
-    def _groups(messages: list[dict]) -> list[list[dict]]:
-        groups, pending, ids = [], [], set()
-        for index, message in enumerate(messages):
+
+def _validate_structure(messages: list[dict], tools: list[dict]) -> list[list[dict]]:
+    """Shared builder/send boundary; validate a detached copy before rendering.
+
+    Fingerprints establish consistency, not permission to add unsupported fields.
+    Returns normalized user-turn groups for the builder without mutating its input.
+    """
+    try:
+        _json_value({"messages": messages, "tools": tools})
+        messages = json.loads(canonical(messages))
+        if (
+            not isinstance(messages, list)
+            or not messages
+            or not isinstance(messages[0], dict)
+            or set(messages[0]) != {"role", "content"}
+            or messages[0]["role"] != "system"
+            or not isinstance(messages[0]["content"], str)
+        ):
+            raise ValueError("required leading text system message")
+        groups = _message_groups(messages[1:])
+        if not isinstance(tools, list):
+            raise ValueError("tools must be a list")
+        tool_names = set()
+
+        for tool in tools:
+            if set(tool) != {"type", "function"} or tool["type"] != "function":
+                raise ValueError("unsupported tool")
+            function = tool["function"]
             if (
-                not isinstance(message, dict)
-                or not set(message)
-                <= {"id", "role", "content", "tool_calls", "tool_name", "name", "tool_call_id"}
-                or not isinstance(message.get("content"), str)
+                not isinstance(function, dict)
+                or not set(function) <= {"name", "description", "parameters"}
+                or not isinstance(function.get("description", ""), str)
             ):
-                raise ValueError("unsupported message")
-            identity = message.setdefault("id", f"message-{index}")
-            if not isinstance(identity, str) or not identity or identity in ids:
-                raise ValueError("invalid message id")
-            ids.add(identity)
-            role = message.get("role")
-            if role == "user":
-                if pending or set(message) - {"id", "role", "content"}:
-                    raise ValueError("incomplete tools or invalid user")
-                groups.append([])
-            elif role == "assistant":
-                if pending or set(message) - {"id", "role", "content", "tool_calls"}:
-                    raise ValueError("incomplete tools or invalid assistant")
-                calls = message.get("tool_calls", [])
-                if not isinstance(calls, list):
-                    raise ValueError("invalid calls")
-                for call_index, call in enumerate(calls):
-                    if (
-                        not set(call) <= {"id", "type", "function"}
-                        or call.get("type", "function") != "function"
-                    ):
-                        raise ValueError("unknown call field")
-                    function = call["function"]
-                    if not set(function) <= {"name", "arguments", "index"}:
-                        raise ValueError("unknown function field")
-                    call_id = call.setdefault("id", f"{identity}-call-{call_index}")
-                    ToolCall(id=call_id, name=function["name"], arguments=function["arguments"])
-                    if any(item[0] == call_id for item in pending):
-                        raise ValueError("duplicate call id")
-                    pending.append((call_id, function["name"]))
-            elif role == "tool":
-                if set(message) - {"id", "role", "content", "tool_name", "name", "tool_call_id"}:
-                    raise ValueError("invalid result")
-                name = message.get("tool_name", message.get("name"))
-                matches = [
-                    item
-                    for item in pending
-                    if item[1] == name
-                    and ("tool_call_id" not in message or item[0] == message["tool_call_id"])
-                ]
-                if len(matches) != 1:
-                    raise ValueError("orphan or ambiguous tool result")
-                pending.remove(matches[0])
-                message["tool_name"] = name
-                message["tool_call_id"] = matches[0][0]
-            else:
-                raise ValueError("unsupported role")
-            if not groups:
-                raise ValueError("history must begin with user")
-            groups[-1].append(message)
-        if not groups or pending:
-            raise ValueError("missing user or incomplete tools")
+                raise ValueError("unsupported function schema")
+            ToolCall(id="validation", name=function["name"], arguments={})
+            if function["name"] in tool_names or not isinstance(function.get("parameters"), dict):
+                raise ValueError("duplicate tool or missing parameters")
+            parameters = function["parameters"]
+            properties = parameters.get("properties", {})
+            required = parameters.get("required", [])
+            if (
+                parameters.get("type") != "object"
+                or not isinstance(properties, dict)
+                or not isinstance(required, list)
+                or any(not isinstance(key, str) or key not in properties for key in required)
+            ):
+                raise ValueError("unsupported parameters schema")
+            tool_names.add(function["name"])
         return groups
+    except (ValueError, TypeError, KeyError) as exc:
+        raise ModelError("invalid_request", "unsupported messages or tools protocol") from exc
+
+
+def _message_groups(messages: list[dict]) -> list[list[dict]]:
+    groups, pending, ids = [], [], set()
+    for index, message in enumerate(messages):
+        if (
+            not isinstance(message, dict)
+            or not set(message)
+            <= {"id", "role", "content", "tool_calls", "tool_name", "name", "tool_call_id"}
+            or not isinstance(message.get("content"), str)
+        ):
+            raise ValueError("unsupported message")
+        identity = message.setdefault("id", f"message-{index}")
+        if not isinstance(identity, str) or not identity or identity in ids:
+            raise ValueError("invalid message id")
+        ids.add(identity)
+        role = message.get("role")
+        if role == "user":
+            if pending or set(message) - {"id", "role", "content"}:
+                raise ValueError("incomplete tools or invalid user")
+            groups.append([])
+        elif role == "assistant":
+            if pending or set(message) - {"id", "role", "content", "tool_calls"}:
+                raise ValueError("incomplete tools or invalid assistant")
+            calls = message.get("tool_calls", [])
+            if not isinstance(calls, list):
+                raise ValueError("invalid calls")
+            for call_index, call in enumerate(calls):
+                if (
+                    not set(call) <= {"id", "type", "function"}
+                    or call.get("type", "function") != "function"
+                ):
+                    raise ValueError("unknown call field")
+                function = call["function"]
+                if not set(function) <= {"name", "arguments", "index"}:
+                    raise ValueError("unknown function field")
+                call_id = call.setdefault("id", f"{identity}-call-{call_index}")
+                ToolCall(id=call_id, name=function["name"], arguments=function["arguments"])
+                if any(item[0] == call_id for item in pending):
+                    raise ValueError("duplicate call id")
+                pending.append((call_id, function["name"]))
+        elif role == "tool":
+            if set(message) - {"id", "role", "content", "tool_name", "name", "tool_call_id"}:
+                raise ValueError("invalid result")
+            name = message.get("tool_name", message.get("name"))
+            matches = [
+                item
+                for item in pending
+                if item[1] == name
+                and ("tool_call_id" not in message or item[0] == message["tool_call_id"])
+            ]
+            if len(matches) != 1:
+                raise ValueError("orphan or ambiguous tool result")
+            pending.remove(matches[0])
+            message["tool_name"] = name
+            message["tool_call_id"] = matches[0][0]
+        else:
+            raise ValueError("unsupported role")
+        if not groups:
+            raise ValueError("history must begin with user")
+        groups[-1].append(message)
+    if not groups or pending:
+        raise ValueError("missing user or incomplete tools")
+    return groups

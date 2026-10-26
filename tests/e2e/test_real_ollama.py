@@ -190,7 +190,13 @@ async def test_real_profile_calibration_and_boundary_instructions(tmp_path):
     for name, system, messages, tools, expected in cases:
         for repetition in range(3):
             request = ContextBuilder(settings).build(system, messages, [], tools)
-            reply = await OllamaModel(settings).chat(request)
+            public_deltas = []
+
+            async def on_delta(text, deltas=public_deltas):
+                deltas.append(text)
+
+            reply = await OllamaModel(settings).chat(request, on_delta=on_delta)
+            assert "".join(public_deltas) == reply.content
             row = {
                 "case": name,
                 "repeat": repetition,
@@ -200,6 +206,7 @@ async def test_real_profile_calibration_and_boundary_instructions(tmp_path):
                 "input_upper_bound": request.input_upper_bound,
                 "output_reserve": request.output_reserve,
                 "reply": reply.model_dump(),
+                "public_deltas_match_reply": "".join(public_deltas) == reply.content,
                 "expected": expected,
                 "boundary_instruction_passed": (
                     reply.content.strip() == expected
