@@ -14,51 +14,53 @@
 
 ```mermaid
 flowchart LR
-    subgraph UI["Інтерфейси"]
-        CLI["b12 CLI"]
-        WEB["Web UI"]
-        API["Loopback API<br/>bearer token, Host/Origin guard"]
+    subgraph UI [Інтерфейси]
+        CLI[b12 CLI]
+        WEB[Web UI]
+        API[Loopback API · bearer token]
     end
-
-    subgraph CORE["Runtime — open_runtime()"]
-        AGENT["Agent loop<br/>model → tools → results"]
-        CTX["ContextBuilder<br/>exact token admission"]
-        CONTROL["ControlStore<br/>actors · grants · approvals"]
-        REG["ToolRegistry<br/>strict schemas · lifecycle"]
-        SCHED["Scheduler<br/>goals · reflection"]
-        ATT["AttentionPolicy<br/>quiet · cooldown · cap"]
-        PURGE["PurgeCoordinator<br/>global forget"]
+    subgraph CORE [Runtime]
+        AGENT[Agent loop · model → tools → results]
+        CTX[ContextBuilder · exact token admission]
+        CONTROL[ControlStore · grants · approvals]
+        REG[ToolRegistry · strict schemas]
+        SCHED[Scheduler · goals · reflection]
+        ATT[AttentionPolicy · quiet · cooldown]
+        PURGE[PurgeCoordinator · global forget]
     end
-
-    subgraph DATA["Приватні сховища"]
-        MEM[("Canonical memory<br/>audit hash-chain")]
-        SES[("Sessions<br/>evidence tags")]
-        KNOW[("Knowledge<br/>per-actor index")]
-        GOALS[("Goals · proposals<br/>preferences")]
-        SNAP[("Snapshots<br/>deletion ledger")]
+    subgraph DATA [Приватні сховища]
+        MEM[Canonical memory · audit chain]
+        SES[Sessions · evidence tags]
+        KNOW[Knowledge · per-actor index]
+        GOALS[Goals · proposals · preferences]
+        SNAP[Snapshots · deletion ledger]
     end
-
-    subgraph EXT["Локальні сервіси"]
-        OLLAMA["Ollama<br/>Bolt E4B"]
-        HOST["Host tools<br/>files · processes · HTTP"]
-        MCP["MCP servers<br/>archive-index"]
-        EMB["EmbeddingGemma 2<br/>bridge"]
+    subgraph EXT [Локальні сервіси]
+        OLLAMA[Ollama · Bolt E4B]
+        HOST[Host tools · files · processes · HTTP]
+        MCP[MCP servers · archive-index]
+        EMB[EmbeddingGemma 2 bridge]
     end
-
     CLI --> AGENT
-    WEB --> API --> AGENT
+    WEB --> API
+    API --> AGENT
     SCHED --> AGENT
     ATT --> SCHED
-    AGENT --> CTX --> OLLAMA
-    AGENT --> REG --> CONTROL
+    AGENT --> CTX
+    CTX --> OLLAMA
+    AGENT --> REG
+    REG --> CONTROL
     REG --> HOST
     REG --> MCP
+    REG --> KNOW
     AGENT --> MEM
     AGENT --> SES
-    AGENT -. semantic recall .-> EMB
-    REG --> KNOW
+    AGENT -.-> EMB
     SCHED --> GOALS
-    PURGE --> MEM & SES & GOALS & SNAP
+    PURGE --> MEM
+    PURGE --> SES
+    PURGE --> GOALS
+    PURGE --> SNAP
 ```
 
 Інваріанти з brief: **local-first**, модель змінна, дозволи й згода приходять лише з контрольного каналу (ніколи з тексту моделі), один writer приводів, джерела пам’яті простежувані. Детально — у [специфікації](docs/superpowers/specs/2026-10-24-b12-system-design.md).
@@ -93,19 +95,26 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    F["forget(memory)"] --> L["Deletion ledger<br/>payload-free, durable"]
-    L --> T["Tombstone + transitive closure<br/>deletion revision++"]
-    T --> C1["canonical: payload + FTS + WAL checkpoint"]
-    T --> C2["sessions: усі tagged turns"]
-    T --> C3["goals / proposals / preferences"]
-    T --> C4["semantic vectors"]
-    T --> C5["active turns: cancel + invalidate"]
-    T --> C6["managed backups"]
-    T --> C7["snapshots: purge + reseal manifest"]
-    T --> C8["provider cache: model unload"]
-    C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 --> R{"усі hooks<br/>підтверджені?"}
-    R -- так --> OK["receipt: complete"]
-    R -- ні --> P["receipt: pending<br/>retry на старті"]
+    F[forget memory] --> L[Deletion ledger · payload-free · durable]
+    L --> T[Tombstone · transitive closure · revision++]
+    T --> C1[canonical · payload · FTS · WAL checkpoint]
+    T --> C2[sessions · tagged turns]
+    T --> C3[goals · proposals · preferences]
+    T --> C4[semantic vectors]
+    T --> C5[active turns · cancel and invalidate]
+    T --> C6[managed backups]
+    T --> C7[snapshots · purge and reseal]
+    T --> C8[provider cache · model unload]
+    C1 --> R{усі hooks підтверджені?}
+    C2 --> R
+    C3 --> R
+    C4 --> R
+    C5 --> R
+    C6 --> R
+    C7 --> R
+    C8 --> R
+    R -->|так| OK[receipt complete]
+    R -->|ні| P[receipt pending · retry на старті]
 ```
 
 Restore зі snapshot відтворює deletion ledger, перш ніж стан починає відповідати. Оригінальні файли поза керованими сховищами не видаляються.
