@@ -27,6 +27,25 @@ Handler = Callable[[BaseModel, EffectGuard], Awaitable[HandlerOutcome]]
 _UNCALIBRATED_SCHEMA = frozenset({"anyOf", "oneOf", "allOf", "$ref", "$defs", "not"})
 
 
+def _state_limits(node) -> None:
+    """Append numeric limits to descriptions: the pinned chat template renders only
+    type/description, so a model never sees `maximum` and asks for e.g. 10000 > 8192."""
+    if isinstance(node, dict):
+        properties = node.get("properties")
+        if isinstance(properties, dict):
+            for spec in properties.values():
+                if not isinstance(spec, dict):
+                    continue
+                if "maximum" in spec:
+                    base = str(spec.get("description", "")).rstrip(". ")
+                    spec["description"] = (base + ". " if base else "") + f"Max {spec['maximum']}"
+        for child in node.values():
+            _state_limits(child)
+    elif isinstance(node, list):
+        for child in node:
+            _state_limits(child)
+
+
 @dataclass(frozen=True)
 class _Tool:
     name: str
@@ -101,6 +120,7 @@ class ToolRegistry:
                     check_nested_schema(child)
 
         check_nested_schema(parameters)
+        _state_limits(parameters)
         if risk == Risk.ARBITRARY and not {
             "executable",
             "argv",
