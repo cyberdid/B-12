@@ -148,3 +148,7 @@ tags: [history]
 ## [2026-10-26] implementation | Task 11 автономність
 
 **Перевірений факт:** `71fba28` додає GoalStore (незмінний намір, бюджет, achieved тільки з довіреною перевіркою та live evidence), AttentionPolicy (quiet hours/mode, cooldown/backoff, ліміт 3 на годину, owner stop), Reflector і Scheduler (flock). 10 мутацій спіймано. `71fba28` на короткий час містив 1 тест конфігурації, що падав; виправлено в `3b47f39`. Реальний Bolt (`6032a15`): ціль-експеримент 3/3, рефлексія 3/3 з evidence. [Тема](topics/autonomy.md).
+
+## [2026-10-26] ingest | Стаття власника про archive-index (посилання)
+
+Власник повідомив, що про archive-index є окрема стаття з вимірами. Зафіксовано розташування (гілка `paper`, коміт `4fd5084`, SHA-256 обох PDF) у [картці](sources/archive-index-paper.md). Статтю не читали; її бенчмарки — першоджерело, B-12 їх не переміряє. Того ж дня за рішенням власника прибрано завантажену в Ollama `embeddinggemma`. Semantic recall і пошук в архіві підключено до його встановленого archive-index (міст і MCP, owner-only, read-only).
