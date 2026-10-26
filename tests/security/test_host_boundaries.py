@@ -194,3 +194,35 @@ async def test_purged_turn_cannot_create_another_managed_staging_copy(host_facto
     denied = await rig.invoke("file_write", path=str(path), text="no late copy")
     assert denied.status == "failed" and not path.exists()
     assert rig.backups.inventory(rig.actor.id) == []
+
+
+@pytest.mark.parametrize("invalid_revision", [None, False, True, -1, 0.0, "0"])
+async def test_invalid_origin_revision_cannot_disable_stale_write_guard(
+    host_factory, invalid_revision
+):
+    rig = host_factory(revision=lambda context: invalid_revision)
+    original = rig.memory.remember("synthetic original before purge", rig.actor)
+    assert rig.memory.forget(original.id, rig.actor)
+    assert rig.memory.deletion_revision(rig.actor) > 0
+    before = rig.memory.audit_events(rig.actor)
+    result = await rig.invoke("memory_store", text="synthetic stale resurrection")
+    assert result.status == "failed" and result.error_code == "coordinator_unavailable"
+    assert not result.side_effects and not result.outcome_unknown
+    assert rig.memory.search("resurrection", rig.actor) == []
+    assert rig.memory.audit_events(rig.actor) == before
+
+
+async def test_origin_revision_resolver_exception_is_sanitized_before_write(host_factory):
+    def missing_snapshot(context):
+        raise RuntimeError("synthetic private turn path")
+
+    rig = host_factory(revision=missing_snapshot)
+    original = rig.memory.remember("synthetic deleted original", rig.actor)
+    assert rig.memory.forget(original.id, rig.actor)
+    before = rig.memory.audit_events(rig.actor)
+    result = await rig.invoke("memory_store", text="synthetic unresolved snapshot")
+    assert result.status == "failed" and result.error_code == "coordinator_unavailable"
+    assert not result.side_effects and not result.outcome_unknown
+    assert rig.memory.search("snapshot", rig.actor) == []
+    assert rig.memory.audit_events(rig.actor) == before
+    assert "private turn path" not in json.dumps(rig.control.audit_events())

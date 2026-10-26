@@ -98,7 +98,12 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
             return failure("coordinator_unavailable")
         guard.check()
         actor = guard.store.resolve_actor(guard.context.actor_id)
-        expected_revision = memory_revision(guard.context)
+        try:
+            expected_revision = memory_revision(guard.context)
+        except Exception:
+            return failure("coordinator_unavailable")
+        if type(expected_revision) is not int or expected_revision < 0:
+            return failure("coordinator_unavailable")
         guard.check()
         try:
             record = memory.remember(

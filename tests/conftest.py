@@ -102,7 +102,9 @@ def host_factory(tmp_path):
             memory=memory,
             knowledge=knowledge,
             purge=purge,
-            memory_revision=(lambda context: captured_revision) if revision else None,
+            memory_revision=revision
+            if callable(revision)
+            else ((lambda context: captured_revision) if revision else None),
         )
 
         async def invoke(name, *, call_id=None, **arguments):
