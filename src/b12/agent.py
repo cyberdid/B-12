@@ -94,6 +94,19 @@ class _Active:
 EventCallback = Callable[[TurnEvent], Awaitable[None]]
 
 
+def reply_language(text: str) -> str | None:
+    """Deterministic script detection for the turn's reply-language instruction."""
+    letters = [c for c in text if c.isalpha()]
+    if len(letters) < 3:
+        return None
+    cyrillic = sum("\u0400" <= c <= "\u04ff" for c in letters) / len(letters)
+    if cyrillic >= 0.6:
+        return "Мова відповіді в цьому ході: українська."
+    if cyrillic <= 0.1:
+        return "Reply language for this turn: English. Answer in English."
+    return None  # mixed / code-switched: the model follows the general rule
+
+
 def _tags_from(result: ToolResult) -> dict[str, str]:
     tags = {}
     for effect in result.side_effects:
@@ -232,6 +245,7 @@ class Agent:
                 "tags": {},
                 "revision": self.memory.deletion_revision(actor),
                 "turn_messages": [{"id": str(uuid4()), "role": "user", "content": text}],
+                "language": reply_language(text),
                 "evidence": [],
             }
             for item in await self._recall(text, actor):
@@ -388,7 +402,10 @@ class Agent:
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]
                 ]
-                request = self.builder.build(self.system_prompt, messages, state["evidence"], tools)
+                system = self.system_prompt
+                if state.get("language"):
+                    system += "\n" + state["language"]
+                request = self.builder.build(system, messages, state["evidence"], tools)
 
                 async def delta(text):
                     await emit("text_delta", {"text": text})

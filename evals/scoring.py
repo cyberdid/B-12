@@ -7,7 +7,7 @@ from pathlib import Path
 def _script(text: str, kind: str) -> bool:
     letters = [c for c in text if c.isalpha()]
     if not letters:
-        return False
+        return True  # a bare number has no script; the language check does not apply
     cyrillic = sum("Ѐ" <= c <= "ӿ" for c in letters) / len(letters)
     return cyrillic >= 0.6 if kind == "cyrillic" else cyrillic <= 0.2
 

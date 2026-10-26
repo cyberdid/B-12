@@ -419,3 +419,17 @@ async def test_resume_of_cancelled_or_revoked_turn_ends_without_model_call(runti
             "turn_failed" if revoke else "turn_cancelled"
         ]
         assert runtime.memory.is_live(record.id, who.actor)
+
+
+async def test_reply_language_follows_the_user_message_script(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "ok"}, {"content": "ок"}, {"content": "ok"}]
+    await run_turn(runtime, who, "Explain in one sentence what a CPU does.")
+    await run_turn(runtime, who, "Поясни одним реченням, що таке процесор.")
+    await run_turn(runtime, who, "42")
+    systems = [r["messages"][0]["content"] for r in state["requests"]]
+    assert systems[0].endswith("Answer in English.")
+    assert systems[1].endswith("українська.")
+    assert not systems[2].endswith(("English.", "українська."))
