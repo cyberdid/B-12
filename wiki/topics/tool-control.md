@@ -2,7 +2,7 @@
 type: topic
 updated: 2026-10-26
 status: compiled
-sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/tools/outcomes.py, tests/security/test_tool_policy.py, tests/unit/test_registry.py]
+sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/tools/outcomes.py, src/b12/tools/filesystem.py, src/b12/tools/process.py, src/b12/tools/network.py, src/b12/tools/memory.py, tests/security/test_tool_policy.py, tests/unit/test_registry.py, tests/integration/test_host_tools.py, tests/security/test_host_boundaries.py]
 tags: [tools, control, approval, provenance]
 ---
 # Контроль і результати інструментів
@@ -27,8 +27,19 @@ Approval атомарно прив’язаний до actor/session/turn/call, 
 
 `SideEffect` має фіксований `kind`, стан `completed|possible` та UUID evidence/artifact references. Шляхи, stdout, секрети й display names не записуються в lifecycle/audit. При timeout або cancellation handler може завершити прибирання вже запущених ресурсів і повернути `unknown`; це не дозволяє запускати нові дії чи перетворює запізнілий результат на успіх.
 
+## Реальні host tools (Task 6)
+
+**Перевірений факт:** commits `012f248`, `f0f8ea2`, `7d7809e` реєструють 13 tools: `current_time`, `system_info`, `process_list`, `file_list`, `file_read`, `file_search`, `file_write`, `shell_exec`, `http_fetch`, `memory_search`, `memory_store`, `memory_forget`, `knowledge_search`. Усі проходять Task 5 registry зі strict schemas і capabilities; `shell_exec` — `Risk.ARBITRARY`, `memory_forget` — `Risk.DESTRUCTIVE` через injected coordinator. Full suite на `7d7809e`: 318 passed / 1 skipped.
+
+- **Файли:** pinned parent dirfd, відмова для leaf symlink/non-regular target, новий inode з mode/owner/xattrs/POSIX ACL до install. Overwrite спершу робить приватну managed backup copy: fsync copy → fsync `objects/` → стан `ready` → `os.replace` → fsync parent. Purge/cleanup durably фіксує `deleting` до unlink і підтверджує `complete` лише після fsync каталогу; інакше `pending`, що переживає restart. `file_search` має depth cap 8 і позначає неповне охоплення `truncated`.
+- **Процеси:** argv без shell-інтерпретації; stdout/stderr дренуються паралельно з bounded prefixes; timeout/cancel — TERM→KILL усієї process group, перевірено на child/grandchild. `setsid`-escape не є sandbox guarantee.
+- **HTTP:** без proxy/auth з environment, без redirects, ліміт на raw wire bytes; `Content-Encoding` повертається окремо.
+- **Memory:** `memory_store` вимагає exact non-negative int deletion revision від trusted resolver; None/невалідне/виняток → `coordinator_unavailable` без запису (закриває stale-turn resurrection).
+
+Review: перший незалежний review знайшов I1 (resolver None), I2 (directory durability ordering), M1 (depth truncation); scoped rereview `task-6-rereview.md` — усі ADDRESSED. Rereview виконав coordinator, а не окремий агент; межа зафіксована в артефакті.
+
 ## Межі та наступний крок
 
-Task 5 реалізував registry і серверний control layer, але **не** реальні OS handlers, API authentication або UI owner review. Task 6 має додати filesystem/process/network handlers, process-group cleanup, output bounds та реальні effects лише у temp/local fixtures. `memory_forget` чекає на global `PurgeCoordinator` Task 7; backup copies мають бути зареєстровані для purge. API authentication лишається Task 9. Код і тести не доводять 24/7 або physical hardware acceptance.
+Реальні effects перевірено лише на temp/local fixtures; production файли користувача не змінювались. **Не реалізовано:** global `PurgeCoordinator` і original-revision lookup (Task 7), agent/session loop (Task 7), API authentication (Task 9), загальний service backup (Task 13). Blocking OS/Python I/O не має hard preemption. Staging, батьківський каталог якого видалено поза B-12, лишається `pending` — coordinator має показувати причину. Код і тести не доводять 24/7 або physical hardware acceptance.
 
 Див. [план усієї реалізації](../project/implementation.md), [стан](../project/status.md), [пам’ять і приватність](memory.md) та [архітектуру](architecture.md).

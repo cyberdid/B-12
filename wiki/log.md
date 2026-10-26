@@ -116,3 +116,11 @@ tags: [history]
 ## [2026-10-26] lint | Tool-control checkpoint
 
 Перевірено 27 wiki-сторінок, 230 локальних Markdown-посилань, required frontmatter/source paths і index coverage — без помилок. SHA-256 оригіналу master brief збігається з `raw/source-manifest.json`: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`. `git diff --check` clean; тема `tool-control.md` фіксує межі reviewed Task5 і не оголошує реальні host tools готовими.
+
+## [2026-10-26] implementation | Task 6 host tools
+
+**Перевірений факт:** `012f248` додає 13 реальних host tools із private managed backup/staging inventory, process-group cancel, raw-bounded HTTP і actor/revision memory ports. Незалежний review знайшов I1 (resolver `None` вимикав stale-turn guard), I2 (не було directory fsync перед `ready`/purge ack) і M1 (depth cap без `truncated`). Fix `f0f8ea2` закрив I1; fix `7d7809e` — I2/M1. Codex coordinator зупинився на usage limit до commit fix round 2; Claude Code coordinator перевірив дерево, закомітив і виконав scoped rereview (`task-6-rereview.md`) — це не окремий агент. Full suite 318 passed / 1 skipped, Ruff і diff check clean. [Тема](topics/tool-control.md).
+
+## [2026-10-26] lint | Task 6 checkpoint
+
+Перевірено 27 wiki-сторінок, 232 локальні Markdown-посилання, required frontmatter/source paths і index coverage — без помилок. SHA-256 master brief збігається з `raw/source-manifest.json`. Тема `tool-control.md` не оголошує global purge, API authentication чи agent loop готовими.

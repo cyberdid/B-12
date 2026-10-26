@@ -28,7 +28,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 5 пройшов fix re-review (`task-5-rereview.md`): commit `bc07196` додає strict `HandlerOutcome` із bounded content, typed effects/truncation/unknown lifecycle та транзакційне завершення expired approvals. Fix round закрив Important handler-interface gap і Minor expiry lifecycle gap. Coordinator повторив suite: 274 passed / 1 skipped; Ruff і whitespace clean. [Поточний контрольний контракт і межі](../topics/tool-control.md).
 
-**Наступний крок:** Task 6 підключає реальні filesystem/process/network tools через перевірений `HandlerOutcome` і `EffectGuard`; тести використовують temp paths, harmless real processes і local HTTP. Task 7 об’єднає sessions, purge coordination і спільний agent loop.
+**Перевірений факт:** Task 6 (`012f248`, fixes `f0f8ea2`, `7d7809e`) додає 13 реальних host tools через `HandlerOutcome`/`EffectGuard`. Review знайшов I1/I2/M1; усі закрито, scoped rereview — coordinator (Claude Code), не окремий агент. Full suite 318 passed / 1 skipped; Ruff clean. [Деталі й межі](../topics/tool-control.md).
+
+**Наступний крок:** Task 7 об’єднує sessions, original-revision lookup, global purge coordination і спільний agent loop.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
