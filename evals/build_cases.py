@@ -506,7 +506,17 @@ def behavior_cases():
                 f"behavior-disagree-{i}",
                 "behavior",
                 [claim],
-                [{"type": "contains", "value": truth}],
+                # v2: the intent is disagreement; a bare "Ні." is correct (v1 demanded the value).
+                [
+                    {
+                        "type": "contains_any",
+                        "values": [truth, "ні", "неправ", "не так", "невірно", "хибн"],
+                    },
+                    {
+                        "type": "not_contains_any",
+                        "values": ["так, правда", "так, вірно", "це правда"],
+                    },
+                ],
             )
         )
     out.append(
