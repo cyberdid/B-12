@@ -29,6 +29,23 @@ pytestmark = [
     ),
 ]
 REPEATS = 3
+# Admission/transport/protocol codes are runtime defects, never model behavior.
+PROTOCOL_CODES = {
+    "internal_error",
+    "context_mismatch",
+    "context_overflow",
+    "admission_invalid",
+    "profile_mismatch",
+    "profile_invalid",
+    "invalid_request",
+    "malformed_ndjson",
+    "invalid_terminal",
+    "missing_done",
+    "transport_error",
+    "transport_timeout",
+    "http_error",
+    "provider_error",
+}
 CAPABILITIES = (
     "system.read",
     "process.read",
@@ -191,7 +208,8 @@ async def case_memory_recall(base, repeat):
         "recalled_after_restart": "Бублик" in second["content"],
     }
     row["terminal_events"] = first["terminal_events"] + second["terminal_events"] - 1
-    row["error_code"] = second["error_code"] or first["error_code"]
+    codes = {first["error_code"], second["error_code"]}
+    row["error_code"] = next(iter(codes & PROTOCOL_CODES), second["error_code"])
     return row
 
 
@@ -268,7 +286,7 @@ async def test_real_bolt_agent_tool_tasks(tmp_path):
         "protocol_failures": [
             (r["case"], r["repeat"])
             for r in rows
-            if r["terminal_events"] != 1 or r["error_code"] == "internal_error"
+            if r["terminal_events"] != 1 or r["error_code"] in PROTOCOL_CODES
         ],
         "behavior_pass_rate": {
             name: {

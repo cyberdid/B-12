@@ -24,6 +24,7 @@ from b12.tools.outcomes import HandlerOutcome, validated_outcome
 from b12.tools.policy import EffectGuard, Risk
 
 Handler = Callable[[BaseModel, EffectGuard], Awaitable[HandlerOutcome]]
+_UNCALIBRATED_SCHEMA = frozenset({"anyOf", "oneOf", "allOf", "$ref", "$defs", "not"})
 
 
 @dataclass(frozen=True)
@@ -81,6 +82,10 @@ class ToolRegistry:
             if isinstance(node, dict):
                 if "properties" in node and node.get("additionalProperties") is not False:
                     raise ValueError("nested argument models must forbid extras")
+                # Exact admission needs both renderers to agree; Ollama renders these
+                # constructs differently from the pinned template (observed +6 tokens).
+                if _UNCALIBRATED_SCHEMA & node.keys():
+                    raise ValueError("schema construct outside calibrated renderer subset")
                 for child in node.values():
                     check_nested_schema(child)
             elif isinstance(node, list):

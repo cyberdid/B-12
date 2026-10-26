@@ -394,3 +394,10 @@ async def test_file_search_reports_truncation_when_depth_cap_hides_match(host_fa
     result = await rig.invoke("file_search", path=str(root), query="needle")
     assert result.status == "completed" and result.content["matches"] == []
     assert result.truncated
+
+
+def test_registered_host_schemas_stay_in_calibrated_renderer_subset(host_factory):
+    rig = host_factory()
+    text = json.dumps(rig.registry.schemas(rig.context))
+    for construct in ('"anyOf"', '"oneOf"', '"allOf"', '"$ref"', '"$defs"', '"not"'):
+        assert construct not in text

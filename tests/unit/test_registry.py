@@ -187,7 +187,7 @@ async def test_blocking_async_handler_cannot_claim_late_success(rig):
     assert not path.exists()
 
 
-@pytest.mark.parametrize("kind", ["sync", "lax", "extras", "nested"])
+@pytest.mark.parametrize("kind", ["sync", "lax", "extras", "nested", "optional", "union"])
 def test_registration_rejects_unsafe_contract(rig, kind):
     _, registry, _, _ = rig
 
@@ -209,7 +209,22 @@ def test_registration_rejects_unsafe_contract(rig, kind):
     async def handler(args, effect):
         return HandlerOutcome()
 
-    model = {"lax": Lax, "extras": Extras, "nested": Nested}.get(kind, WriteArgs)
+    class Optional(BaseModel):
+        # anyOf renders differently in Ollama vs the pinned template (+6 tokens observed).
+        model_config = ConfigDict(strict=True, extra="forbid")
+        number: int | None = None
+
+    class Union(BaseModel):
+        model_config = ConfigDict(strict=True, extra="forbid")
+        value: int | str
+
+    model = {
+        "lax": Lax,
+        "extras": Extras,
+        "nested": Nested,
+        "optional": Optional,
+        "union": Union,
+    }.get(kind, WriteArgs)
     selected = (lambda args, effect: {}) if kind == "sync" else handler
     with pytest.raises(ValueError):
         registry.register("unsafe", "Unsafe", model, selected, "host.write")

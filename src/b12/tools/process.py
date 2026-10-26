@@ -19,7 +19,7 @@ from b12.tools.policy import Risk
 
 class ProcessListArgs(Args):
     limit: int = Field(default=50, ge=1, le=200)
-    pid: int | None = Field(default=None, ge=1)
+    pid: int = Field(default=0, ge=0, description="0 lists all processes")
 
 
 class ExecArgs(Args):
@@ -76,7 +76,7 @@ async def process_list(args, guard):
     with os.scandir("/proc") as iterator:
         names = (
             (str(args.pid),)
-            if args.pid is not None
+            if args.pid
             else (entry.name for entry in iterator if entry.name.isdigit())
         )
         for pid in names:
