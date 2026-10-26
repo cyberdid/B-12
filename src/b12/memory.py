@@ -88,10 +88,38 @@ class MemoryStore:
                 self._connection.rollback()
                 raise
 
-    def _verify_audit(self) -> None:
-        previous_hash = ""
-        sequence = 0
-        for row in self._connection.execute("SELECT * FROM audit ORDER BY sequence"):
+    def _verify_audit(self, *, full: bool = False) -> None:
+        """Chain check. Full on open/verify_full; otherwise incremental from a cursor.
+
+        Incremental mode re-hashes the cursor row and every newer row. Any commit by
+        another connection (process or tamperer) forces a full check, so edits of old
+        rows are still caught; our own commits keep cost independent of history.
+        """
+        # data_version changes only when ANOTHER connection commits (another process or
+        # tampering): then re-verify everything; our own commits keep the cheap path.
+        version = self._connection.execute("PRAGMA data_version").fetchone()[0]
+        if version != getattr(self, "_data_version", None):
+            full = True
+        self._data_version = version
+        cursor = None if full else getattr(self, "_audit_cursor", None)
+        sequence, previous_hash = (0, "") if cursor is None else cursor
+        start = 0 if cursor is None else sequence - 1
+        if cursor is not None and sequence:
+            rows = self._connection.execute(
+                "SELECT * FROM audit WHERE sequence>=? ORDER BY sequence", (sequence,)
+            ).fetchall()
+            event = dict(rows[0]) if rows else None
+            if event is None or event["sequence"] != sequence:
+                raise RuntimeError("memory audit chain is corrupt")
+            actual = event.pop("hash")
+            if actual != previous_hash or actual != _digest(event):
+                raise RuntimeError("memory audit chain is corrupt")
+            rows = rows[1:]
+        else:
+            rows = self._connection.execute(
+                "SELECT * FROM audit WHERE sequence>? ORDER BY sequence", (start,)
+            ).fetchall()
+        for row in rows:
             event = dict(row)
             actual_hash = event.pop("hash")
             if (
@@ -105,6 +133,17 @@ class MemoryStore:
         head = self._connection.execute("SELECT sequence, hash FROM audit_head").fetchall()
         if len(head) != 1 or tuple(head[0]) != (sequence, previous_hash):
             raise RuntimeError("memory audit head is corrupt")
+        self._audit_cursor = (sequence, previous_hash)
+
+    def verify_full(self) -> int:
+        """Re-verify the whole audit chain; returns the number of events."""
+        with self._lock:
+            self._connection.execute("BEGIN")
+            try:
+                self._verify_audit(full=True)
+            finally:
+                self._connection.rollback()
+            return self._audit_cursor[0]
 
     def _audit(
         self,
