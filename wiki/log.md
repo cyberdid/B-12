@@ -144,3 +144,7 @@ tags: [history]
 ## [2026-10-26] implementation | Task 10 Web UI
 
 **Перевірений факт:** `6610f85` додає українську Web UI (`/`) зі строгим CSP і без inline script/style. Текст моделі й tools рендериться лише через textContent; токен зберігається в sessionStorage і передається тільки заголовком. Розширення Claude in Chrome не було підключене, тому приймання виконано headless Chrome 153 через CDP (`scripts/web_acceptance.mjs`) проти живого `b12 serve` з реальним Bolt. Run1 — 18/19: один хибний FAIL перевірки і знайдена вада прив’язки результату resume до tool-картки; її виправлено. Run2 — 20/20. Скриншоти світлої, темної та mobile-версії переглянуто; artifacts — `artifacts/task10-web-acceptance-2026-10-26`. Full suite 385 passed / 2 skipped.
+
+## [2026-10-26] implementation | Task 11 автономність
+
+**Перевірений факт:** `71fba28` додає GoalStore (незмінний намір, бюджет, achieved тільки з довіреною перевіркою та live evidence), AttentionPolicy (quiet hours/mode, cooldown/backoff, ліміт 3 на годину, owner stop), Reflector і Scheduler (flock). 10 мутацій спіймано. `71fba28` на короткий час містив 1 тест конфігурації, що падав; виправлено в `3b47f39`. Реальний Bolt (`6032a15`): ціль-експеримент 3/3, рефлексія 3/3 з evidence. [Тема](topics/autonomy.md).

@@ -38,7 +38,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 10 (`6610f85`) — українська Web UI, яку API віддає зі строгим CSP; весь текст рендериться через textContent. Headless Chrome через CDP (`scripts/web_acceptance.mjs`) із живим сервером і реальним Bolt пройшов 20/20 перевірок: tools, пам’ять, approval→resume, cancel, consent, mobile і dark. Розширення Claude in Chrome не було підключене.
 
-**Наступний крок:** Task 11 — goals, attention, initiative і evidence-backed reflection.
+**Перевірений факт:** Task 11 (`71fba28`, `3b47f39`, `6032a15`) — goals, AttentionPolicy, Reflector і Scheduler; 404 passed / 2 skipped. Реальний Bolt досяг цілі-експерименту 3/3 за довіреною перевіркою і записав рефлексію 3/3. [Деталі й межі](../topics/autonomy.md).
+
+**Наступний крок:** Task 13 — сервіс, backup/restore, потім 8-годинний soak (Task 15).
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
