@@ -35,6 +35,8 @@ tags: [navigation]
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Контроль і результати інструментів](topics/tool-control.md) | Server-owned grants, exact approval, lifecycle, bounded effects і unknown outcomes |
 | [Agent loop і глобальне забуття](topics/agent-loop.md) | Model→tools→results, events, sessions/provenance, PurgeCoordinator, реальний Bolt |
+| [Експлуатація: snapshots, soak, ріст](topics/operations.md) | Backup/restore, deletion replay, сервіс, знайдені деградації, long-horizon драйвер |
+| [Eval: корпус і результати](topics/evals.md) | 109 сценаріїв, runner, результати Bolt і знайдені дефекти |
 | [Моделі й benchmark](topics/models.md) | Кандидати, оцінювання, ризик TTFT |
 | [Reachy і Jetson](topics/hardware.md) | Варіанти обладнання, transport і deployment |
 

@@ -1,7 +1,7 @@
 ---
 type: topic
-updated: 2026-10-24
-status: proposed
+updated: 2026-10-26
+status: partially_implemented
 sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/sources/external-checks.md]
 tags: [reachy, jetson, deployment]
 ---
@@ -24,3 +24,8 @@ tags: [reachy, jetson, deployment]
 Wireless transport спочатку перевіряти без LLM. При втраті host/Wi-Fi потрібні визначені safe motor state, mute/stop, стан пам’яті та reconnect без повторного виконання старих команд. Рішення про authoritative memory host і автономний degraded mode ще відкрите.
 
 Ціни та строки продавців у master brief — історичні відомості без повторної перевірки. Ця сторінка не є рекомендацією придбати конкретний пристрій. [Питання Q3–Q7](../project/open-questions.md) та [M4–M5](../project/roadmap.md) визначають потрібні докази.
+
+## Адаптер руху (Task 18, лише протокол)
+
+**Перевірений факт:** `src/b12/robotics` має `MotionController` з єдиним writer (lease), жорсткими межами кутів і швидкості (команди поза межами відхиляються, а не обрізаються), миттєвим `stop()` зі збереженням пози, `sleep/wake` і безпечною позою після розриву з'єднання без відновлення перерваного руху. `SimulatedRobot` інтегрує рух у часі; 10 протокольних тестів. **Не доведено:** справжній транспорт Reachy Mini (SDK), Jetson-вимірювання та фізичне приймання — пристрою в цій роботі не було; тести на симуляторі доводять лише протокольну поведінку.
+

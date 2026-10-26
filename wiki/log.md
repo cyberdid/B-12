@@ -168,3 +168,11 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-10-26] lint | Пауза
 
 Перевірено 29 wiki-сторінок і 252 локальні посилання, frontmatter/source paths та index coverage — без помилок.
+
+## [2026-10-26] implementation | Wiki для Tasks 12–19, виправлення витоку control state
+
+**Перевірений факт:** додано теми [operations](topics/operations.md) і [evals](topics/evals.md), оновлено [archive-retrieval](topics/archive-retrieval.md) (semantic bridge, MCP) та [hardware](topics/hardware.md) (адаптер руху на симуляторі). Виправлено витік `ControlStore._runtime` (`2b1a4b5`: по Event на кожен turn); решту росту RSS зменшує `MALLOC_ARENA_MAX=2` (`bc9f46f`). Після виправлень запущено повторний eval на HEAD (`artifacts/task14-eval-2026-10-26-head`) і повний 8-годинний soak (`artifacts/task15-soak-2026-10-26-run2`, seed 21); їхні результати ще не записані.
+
+## [2026-10-26] lint | Теми operations/evals
+
+Перевірено 31 wiki-сторінку, 260 локальних посилань, frontmatter/source paths та index coverage — без помилок.
