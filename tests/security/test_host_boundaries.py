@@ -226,3 +226,196 @@ async def test_origin_revision_resolver_exception_is_sanitized_before_write(host
     assert rig.memory.search("snapshot", rig.actor) == []
     assert rig.memory.audit_events(rig.actor) == before
     assert "private turn path" not in json.dumps(rig.control.audit_events())
+
+
+def directory_identity(path):
+    info = path.stat()
+    return info.st_dev, info.st_ino
+
+
+def reject_directory_sync(monkeypatch, directory):
+    identity = directory_identity(directory)
+    original = os.fsync
+
+    def fsync(fd):
+        info = os.fstat(fd)
+        if (info.st_dev, info.st_ino) == identity:
+            raise OSError("synthetic directory sync failure")
+        return original(fd)
+
+    monkeypatch.setattr(os, "fsync", fsync)
+    return original
+
+
+async def test_backup_object_directory_sync_precedes_ready_and_target_install(
+    host_factory, monkeypatch
+):
+    rig = host_factory()
+    target = rig.root / "original"
+    target.write_text("old durable bytes")
+    identity = directory_identity(rig.backups.objects)
+    original = os.fsync
+    observed = []
+
+    def observe(fd):
+        info = os.fstat(fd)
+        if (info.st_dev, info.st_ino) == identity:
+            copies = rig.backups.inventory(rig.actor.id)
+            observed.append((tuple(sorted(item["state"] for item in copies)), target.read_text()))
+        return original(fd)
+
+    monkeypatch.setattr(os, "fsync", observe)
+    result = await rig.invoke("file_write", path=str(target), text="new bytes", overwrite=True)
+    assert result.status == "completed"
+    assert observed == [(("copying", "staging"), "old durable bytes")]
+
+
+async def test_failed_object_directory_sync_keeps_tracked_copy_and_old_target(
+    host_factory, monkeypatch
+):
+    rig = host_factory()
+    target = rig.root / "original"
+    target.write_text("old durable bytes")
+    original = reject_directory_sync(monkeypatch, rig.backups.objects)
+    result = await rig.invoke("file_write", path=str(target), text="new bytes", overwrite=True)
+    assert result.status == "unknown" and target.read_text() == "old durable bytes"
+    inventory = rig.backups.inventory(rig.actor.id)
+    assert len(inventory) == 1 and inventory[0]["state"] == "deleting"
+    monkeypatch.setattr(os, "fsync", original)
+    rig.backups.close()
+    from b12.tools.filesystem import BackupStore
+
+    rig.backups = BackupStore(rig.root / "backups")
+    assert rig.backups.inventory(rig.actor.id)[0]["state"] == "deleting"
+    assert rig.backups.purge(rig.actor.id, turn_ids=(rig.context.turn_id,))["state"] == "complete"
+    assert rig.backups.inventory(rig.actor.id) == []
+
+
+async def test_backup_purge_directory_sync_failure_is_pending_across_reopen(
+    host_factory, monkeypatch
+):
+    rig = host_factory()
+    target = rig.root / "original"
+    target.write_text("old")
+    result = await rig.invoke("file_write", path=str(target), text="new", overwrite=True)
+    artifact = result.content["backup_id"]
+    original = reject_directory_sync(monkeypatch, rig.backups.objects)
+    receipt = rig.backups.purge(rig.actor.id, artifact_ids=(artifact,))
+    assert receipt["state"] == "pending" and receipt["pending_ids"] == [artifact]
+    assert rig.backups.inventory(rig.actor.id)[0]["state"] == "deleting"
+    monkeypatch.setattr(os, "fsync", original)
+    rig.backups.close()
+    from b12.tools.filesystem import BackupStore
+
+    rig.backups = BackupStore(rig.root / "backups")
+    assert rig.backups.inventory(rig.actor.id)[0]["state"] == "deleting"
+    assert rig.backups.purge(rig.actor.id, artifact_ids=(artifact,))["state"] == "complete"
+    assert target.read_text() == "new"
+
+
+async def pending_staging(rig, monkeypatch):
+    import asyncio
+
+    parent = rig.root / "staging-parent"
+    parent.mkdir()
+    target = parent / "target"
+    target.write_text("unmanaged original")
+    reached = asyncio.Event()
+
+    async def pause(*args):
+        reached.set()
+        await asyncio.Event().wait()
+
+    original = os.unlink
+
+    def denied(name, *args, **kwargs):
+        if str(name).startswith(".b12-"):
+            raise PermissionError("synthetic staging unlink denial")
+        return original(name, *args, **kwargs)
+
+    with monkeypatch.context() as patches:
+        patches.setattr(rig.backups, "capture", pause)
+        patches.setattr(os, "unlink", denied)
+        task = asyncio.create_task(
+            rig.invoke("file_write", path=str(target), text="staging payload", overwrite=True)
+        )
+        await asyncio.wait_for(reached.wait(), 1)
+        rig.context.cancel.set()
+        assert (await task).status == "unknown"
+    return target, next(parent.glob(".b12-*"))
+
+
+async def test_staging_purge_dir_sync_failure_retains_inventory_for_retry(
+    host_factory, monkeypatch
+):
+    rig = host_factory()
+    target, temp = await pending_staging(rig, monkeypatch)
+    artifact = rig.backups.inventory(rig.actor.id)[0]["artifact_id"]
+    original = reject_directory_sync(monkeypatch, temp.parent)
+    receipt = rig.backups.purge(rig.actor.id, artifact_ids=(artifact,))
+    assert receipt["state"] == "pending" and receipt["pending_ids"] == [artifact]
+    assert rig.backups.inventory(rig.actor.id)[0]["state"] == "deleting"
+    monkeypatch.setattr(os, "fsync", original)
+    rig.backups.close()
+    from b12.tools.filesystem import BackupStore
+
+    rig.backups = BackupStore(rig.root / "backups")
+    assert rig.backups.purge(rig.actor.id, artifact_ids=(artifact,))["state"] == "complete"
+    assert not temp.exists() and target.read_text() == "unmanaged original"
+
+
+async def test_staging_cleanup_dir_sync_failure_keeps_persisted_pending_row(
+    host_factory, monkeypatch
+):
+    import asyncio
+
+    rig = host_factory()
+    target = rig.root / "original"
+    target.write_text("old")
+    reached = asyncio.Event()
+
+    async def pause(*args):
+        reached.set()
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(rig.backups, "capture", pause)
+    original = reject_directory_sync(monkeypatch, rig.root)
+    task = asyncio.create_task(
+        rig.invoke("file_write", path=str(target), text="new", overwrite=True)
+    )
+    await asyncio.wait_for(reached.wait(), 1)
+    rig.context.cancel.set()
+    result = await task
+    assert result.status == "unknown"
+    inventory = rig.backups.inventory(rig.actor.id)
+    assert len(inventory) == 1 and inventory[0]["state"] == "deleting"
+    monkeypatch.setattr(os, "fsync", original)
+    assert rig.backups.purge(rig.actor.id, turn_ids=(rig.context.turn_id,))["state"] == "complete"
+    assert target.read_text() == "old"
+
+
+async def test_staging_purge_unlinks_through_identity_checked_pinned_parent(
+    host_factory, monkeypatch
+):
+    rig = host_factory()
+    target, temp = await pending_staging(rig, monkeypatch)
+    parent = temp.parent
+    moved = rig.root / "moved-parent"
+    original = os.unlink
+    switched = False
+
+    def switch_at_unlink(name, *args, **kwargs):
+        nonlocal switched
+        if not switched and (str(name) == temp.name or str(name) == str(temp)):
+            switched = True
+            parent.rename(moved)
+            parent.mkdir()
+            (parent / temp.name).write_text("unrelated replacement sentinel")
+        return original(name, *args, **kwargs)
+
+    monkeypatch.setattr(os, "unlink", switch_at_unlink)
+    receipt = rig.backups.purge(rig.actor.id, turn_ids=(rig.context.turn_id,))
+    assert receipt["state"] == "complete" and switched
+    assert (parent / temp.name).read_text() == "unrelated replacement sentinel"
+    assert not (moved / temp.name).exists()
+    assert (moved / target.name).read_text() == "unmanaged original"

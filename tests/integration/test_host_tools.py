@@ -380,3 +380,17 @@ async def test_purge_exception_after_local_effect_remains_unknown_with_provenanc
     assert result.status == "unknown"
     assert result.side_effects[0]["kind"] == "memory_forget"
     assert rig.memory.search("exceptional", rig.actor) == []
+
+
+async def test_file_search_reports_truncation_when_depth_cap_hides_match(host_factory):
+    rig = host_factory()
+    root = rig.root / "tree"
+    root.mkdir()
+    deep = root
+    for index in range(9):
+        deep = deep / str(index)
+        deep.mkdir()
+    (deep / "needle").write_text("synthetic hidden deep needle")
+    result = await rig.invoke("file_search", path=str(root), query="needle")
+    assert result.status == "completed" and result.content["matches"] == []
+    assert result.truncated

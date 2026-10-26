@@ -40,12 +40,27 @@ def _metadata(fd):
     return info, attrs
 
 
+def _sync_directory(path):
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 class BackupStore:
     def __init__(self, path: Path):
         self.path = Path(path).absolute()
         if self.path.is_symlink():
             raise ValueError("managed root cannot be symlink")
-        self.path.mkdir(mode=0o700, parents=True, exist_ok=True)
+        missing = []
+        parent = self.path
+        while not parent.exists():
+            missing.append(parent)
+            parent = parent.parent
+        for directory in reversed(missing):
+            directory.mkdir(mode=0o700)
+            _sync_directory(directory.parent)
         self.path.chmod(0o700)
         self.objects = self.path / "objects"
         if self.objects.is_symlink():
@@ -76,13 +91,31 @@ class BackupStore:
             if not self.db.execute("SELECT 1 FROM secret").fetchone():
                 self.db.execute("INSERT INTO secret VALUES (?)", (secrets.token_bytes(32),))
         self._key = self.db.execute("SELECT key FROM secret").fetchone()[0]
+        _sync_directory(self.path)
+        self._objects_fd = os.open(self.objects, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        info = os.fstat(self._objects_fd)
+        self._objects_identity = info.st_dev, info.st_ino
 
     def close(self):
         self.db.close()
+        if self._objects_fd is not None:
+            os.close(self._objects_fd)
+            self._objects_fd = None
 
-    def _file(self, artifact_id):
+    def _object_directory(self):
+        info = os.fstat(self._objects_fd)
+        if (info.st_dev, info.st_ino) != self._objects_identity:
+            raise PermissionError("managed directory identity changed")
+        return self._objects_fd
+
+    def _unlink_copy(self, artifact_id):
         UUID(artifact_id)
-        return self.objects / artifact_id
+        directory = self._object_directory()
+        try:
+            os.unlink(artifact_id, dir_fd=directory)
+        except FileNotFoundError:
+            pass
+        os.fsync(directory)
 
     def inventory(self, actor_id: str) -> list[dict]:
         """Trusted control inventory: opaque provenance only, no paths or payload."""
@@ -153,7 +186,10 @@ class BackupStore:
         ).fetchone()
         if not row or row[0] != "ready":
             raise PermissionError("copy unavailable")
-        return os.fdopen(os.open(self._file(artifact_id), os.O_RDONLY | os.O_NOFOLLOW), "rb")
+        UUID(artifact_id)
+        return os.fdopen(
+            os.open(artifact_id, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=self._object_directory()), "rb"
+        )
 
     def copy_metadata(self, actor_id, artifact_id):
         row = self.db.execute(
@@ -207,9 +243,13 @@ class BackupStore:
                 ),
             )
         output = None
+        durability_failed = False
         try:
             guard.check()
-            output = os.open(self._file(artifact), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            directory = self._object_directory()
+            output = os.open(
+                artifact, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600, dir_fd=directory
+            )
             count = 0
             os.lseek(source_fd, 0, os.SEEK_SET)
             while True:
@@ -230,6 +270,11 @@ class BackupStore:
             os.fsync(output)
             os.close(output)
             output = None
+            try:
+                os.fsync(directory)
+            except OSError:
+                durability_failed = True
+                raise
             guard.check()
             with self.db:
                 self.db.execute(
@@ -239,18 +284,21 @@ class BackupStore:
         except BaseException:
             if output is not None:
                 os.close(output)
-            # Cleanup of an already-created managed copy is allowed after cancellation.
+            # Persist deletion intent before cleanup. A directory-sync failure
+            # must retain inventory even if an unlink appears successful in RAM.
+            with self.db:
+                self.db.execute(
+                    "UPDATE copies SET state='deleting',source_path=NULL WHERE artifact_id=?",
+                    (artifact,),
+                )
             try:
-                self._file(artifact).unlink(missing_ok=True)
+                self._unlink_copy(artifact)
             except OSError:
-                with self.db:
-                    self.db.execute(
-                        "UPDATE copies SET state='deleting',source_path=NULL WHERE artifact_id=?",
-                        (artifact,),
-                    )
+                pass  # Row remains deleting; explicit purge retries and reports pending.
             else:
-                with self.db:
-                    self.db.execute("DELETE FROM copies WHERE artifact_id=?", (artifact,))
+                if not durability_failed:
+                    with self.db:
+                        self.db.execute("DELETE FROM copies WHERE artifact_id=?", (artifact,))
             raise
 
     def purge(self, actor_id: str, *, artifact_ids=(), source_ids=(), turn_ids=()) -> dict:
@@ -268,6 +316,13 @@ class BackupStore:
             or r["source_id"] in source_ids
             or r["turn_id"] in turn_ids
         ]
+        stages = [
+            row
+            for row in self.db.execute("SELECT * FROM staging WHERE owner=?", (actor_id,))
+            if row["artifact_id"] in artifact_ids
+            or row["source_id"] in source_ids
+            or row["turn_id"] in turn_ids
+        ]
         with self.db:
             self.db.executemany(
                 "INSERT OR IGNORE INTO tombstones VALUES (?,?,?)",
@@ -282,35 +337,41 @@ class BackupStore:
                     "UPDATE copies SET state='deleting',source_path=NULL WHERE artifact_id=?",
                     (row["artifact_id"],),
                 )
+            for row in stages:
+                self.db.execute(
+                    "UPDATE staging SET state='deleting' WHERE artifact_id=?", (row["artifact_id"],)
+                )
         deleted, pending = [], []
         for row in selected:
             try:
-                self._file(row["artifact_id"]).unlink(missing_ok=True)
+                self._unlink_copy(row["artifact_id"])
             except OSError:
                 pending.append(row["artifact_id"])
             else:
                 with self.db:
                     self.db.execute("DELETE FROM copies WHERE artifact_id=?", (row["artifact_id"],))
                 deleted.append(row["artifact_id"])
-        stages = [
-            r
-            for r in self.db.execute("SELECT * FROM staging WHERE owner=?", (actor_id,))
-            if r["artifact_id"] in artifact_ids
-            or r["source_id"] in source_ids
-            or r["turn_id"] in turn_ids
-        ]
         for row in stages:
+            directory = None
             try:
-                parent = Path(row["path"]).parent.stat()
-                if (parent.st_dev, parent.st_ino) != (row["parent_dev"], row["parent_ino"]):
+                path = Path(row["path"])
+                directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                info = os.fstat(directory)
+                if (info.st_dev, info.st_ino) != (row["parent_dev"], row["parent_ino"]):
                     raise PermissionError("staging parent relocated")
-                Path(row["path"]).unlink(missing_ok=True)
+                try:
+                    os.unlink(path.name, dir_fd=directory)
+                except FileNotFoundError:
+                    pass
+                os.fsync(directory)
             except OSError:
-                self.finish_stage(row["artifact_id"], removed=False)
                 pending.append(row["artifact_id"])
             else:
                 self.finish_stage(row["artifact_id"], removed=True)
                 deleted.append(row["artifact_id"])
+            finally:
+                if directory is not None:
+                    os.close(directory)
         return {
             "state": "pending" if pending else "complete",
             "deleted_ids": deleted,
@@ -406,8 +467,11 @@ async def file_search(args, guard):
                         stack.clear()
                         break
                     guard.check()
-                    if entry.is_dir(follow_symlinks=False) and depth < 8:
-                        stack.append((Path(entry.path), depth + 1))
+                    if entry.is_dir(follow_symlinks=False):
+                        if depth < 8:
+                            stack.append((Path(entry.path), depth + 1))
+                        else:
+                            truncated = True
                     elif entry.is_file(follow_symlinks=False):
                         try:
                             fd = os.open(entry.path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
@@ -444,13 +508,23 @@ async def file_write(args, guard, backups):
     parent_fd = source_fd = temp_fd = None
     temp_name = stage_id = None
     started = replaced = False
+    cleanup_attempted = False
+    cleanup_result = False
 
     def cleanup_temp():
-        nonlocal temp_fd, temp_name, stage_id
+        nonlocal temp_fd, temp_name, stage_id, cleanup_attempted, cleanup_result
+        if cleanup_attempted:
+            return cleanup_result
+        cleanup_attempted = True
         removed = True
         if temp_fd is not None:
             os.close(temp_fd)
             temp_fd = None
+        if stage_id:
+            try:
+                backups.finish_stage(stage_id, removed=False)
+            except sqlite3.Error:
+                return False
         if temp_name and parent_fd is not None:
             try:
                 os.unlink(temp_name, dir_fd=parent_fd)
@@ -461,12 +535,15 @@ async def file_write(args, guard, backups):
             else:
                 temp_name = None
         if stage_id:
-            try:
-                backups.finish_stage(stage_id, removed=removed)
-            except sqlite3.Error:
-                removed = False
             if removed:
-                stage_id = None
+                try:
+                    os.fsync(parent_fd)
+                    backups.finish_stage(stage_id, removed=True)
+                except (OSError, sqlite3.Error):
+                    removed = False
+                else:
+                    stage_id = None
+        cleanup_result = removed
         return removed
 
     def uncertain(code):
