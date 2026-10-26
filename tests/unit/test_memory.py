@@ -225,3 +225,22 @@ def test_inflection_expansion_keeps_operators_literal(tmp_path):
     assert store.search('текст" OR "кава', actor) == []  # OR is a literal word, ANDed
     assert store.search("NEAR(текст)", actor) == []
     store.close()
+
+
+def test_purge_keeps_fts_index_consistent_and_repairs_secure_delete(tmp_path):
+    from b12.memory import MemoryStore
+
+    actor = Actor(id="owner", consent=True)
+    path = tmp_path / "memory.sqlite3"
+    store = MemoryStore(path)
+    store._connection.execute(
+        "INSERT INTO memory_fts(memory_fts, rank) VALUES ('secure-delete', 1)"
+    )
+    store.close()
+    store = MemoryStore(path)  # reopening repairs a store left in secure-delete mode
+    first = store.remember("перший запис", actor)
+    store.remember("другий запис", actor)
+    store.begin_purge(first.id, actor)
+    assert store._connection.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+    assert [r.text for r in store.search("запис", actor)] == ["другий запис"]
+    store.close()

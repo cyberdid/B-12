@@ -91,24 +91,25 @@ class MemoryStore:
             self._connection.execute("PRAGMA journal_mode=WAL")
             self._connection.execute("PRAGMA synchronous=FULL")
             migrate(self._connection)
-            self._enable_fts_secure_delete()
+            self._disable_fts_secure_delete()
             with self._transaction():
                 pass
         except BaseException:
             self._connection.close()
             raise
 
-    def _enable_fts_secure_delete(self) -> None:
-        """One-time: secure-delete mode, then a rebuild to drop pre-existing delete markers."""
+    def _disable_fts_secure_delete(self) -> None:
+        """Repair stores opened by 25c0db6: FTS5 secure-delete with this external-content
+        index fails integrity_check on SQLite 3.45.1. Turn it off and rebuild once."""
         enabled = self._connection.execute(
             "SELECT v FROM memory_fts_config WHERE k='secure-delete'"
         ).fetchone()
-        if enabled and enabled[0] == 1:
+        if not enabled or enabled[0] != 1:
             return
         self._connection.execute("BEGIN IMMEDIATE")
         try:
             self._connection.execute(
-                "INSERT INTO memory_fts(memory_fts, rank) VALUES ('secure-delete', 1)"
+                "INSERT INTO memory_fts(memory_fts, rank) VALUES ('secure-delete', 0)"
             )
             self._connection.execute("INSERT INTO memory_fts(memory_fts) VALUES ('rebuild')")
             self._connection.commit()
@@ -518,8 +519,12 @@ class MemoryStore:
                            AND id IN (SELECT value FROM json_each(?))""",
                         (actor.id, _encoded(receipt.target_ids)),
                     )
-                    # FTS5 secure-delete (enabled on open) removes the deleted rows' terms
-                    # from the index itself; no O(n) rebuild per purge.
+                    # Rebuild removes obsolete FTS segments, not only query-visible rows.
+                    # O(store) per purge (~1 s at 200k records): FTS5 secure-delete would
+                    # avoid it but corrupts this external-content index on SQLite 3.45.1.
+                    self._connection.execute(
+                        "INSERT INTO memory_fts(memory_fts) VALUES ('rebuild')"
+                    )
                     self._connection.execute(
                         "UPDATE purge_operations SET payload_deleted=1 WHERE operation_id=?",
                         (operation_id,),
