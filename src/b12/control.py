@@ -216,6 +216,14 @@ class ControlStore:
         ).fetchone()
         return dict(row) if row else None
 
+    def sessions_for(self, actor_id: str) -> list[str]:
+        return [
+            row[0]
+            for row in self.db.execute(
+                "SELECT id FROM sessions WHERE actor_id=? ORDER BY rowid", (actor_id,)
+            )
+        ]
+
     def session_actor(self, session_id: str) -> str | None:
         row = self.db.execute("SELECT actor_id FROM sessions WHERE id=?", (session_id,)).fetchone()
         return row[0] if row else None

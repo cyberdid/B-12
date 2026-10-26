@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>B-12</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <section id="login" class="login" hidden>
+    <form id="login-form" class="card">
+      <h1>B-12</h1>
+      <p>Вставте токен власника з файла <code>state/api/owner.token</code>. Токен зберігається лише в цій вкладці.</p>
+      <label for="token-input">Токен</label>
+      <input id="token-input" type="password" autocomplete="off" required>
+      <button type="submit">Увійти</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+  </section>
+
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <div class="brand"><span id="health" class="dot" title="Стан сервера"></span> B-12</div>
+      <label class="switch" title="Згода на збереження пам’яті">
+        <input id="consent" type="checkbox"> Пам’ять
+      </label>
+      <select id="session-select" aria-label="Сесія"></select>
+      <button id="new-session" type="button">Нова сесія</button>
+      <button id="logout" type="button" class="ghost">Вийти</button>
+    </header>
+
+    <main class="layout">
+      <section class="chat" aria-label="Розмова">
+        <div id="messages" class="messages" aria-live="polite"></div>
+        <p id="empty" class="empty">Почніть розмову. Інструменти виконуються реально у межах ваших дозволів.</p>
+        <form id="composer" class="composer">
+          <textarea id="input" rows="2" placeholder="Повідомлення (Enter — надіслати, Shift+Enter — новий рядок)" required></textarea>
+          <button id="send" type="submit">Надіслати</button>
+          <button id="cancel" type="button" class="danger" hidden>Скасувати</button>
+        </form>
+        <p id="status" class="status" role="status"></p>
+      </section>
+
+      <aside class="side">
+        <nav class="tabs" role="tablist">
+          <button type="button" role="tab" data-tab="approvals" aria-selected="true">Підтвердження <span id="approval-count"></span></button>
+          <button type="button" role="tab" data-tab="memory">Пам’ять</button>
+          <button type="button" role="tab" data-tab="tools">Інструменти</button>
+        </nav>
+        <section id="tab-approvals" class="tab">
+          <ul id="approvals" class="list"></ul>
+          <p class="hint">Руйнівні дії чекають вашого рішення; після нього turn продовжується.</p>
+        </section>
+        <section id="tab-memory" class="tab" hidden>
+          <form id="memory-search" class="row">
+            <input id="memory-query" placeholder="Пошук у пам’яті" required>
+            <button type="submit">Шукати</button>
+          </form>
+          <ul id="memories" class="list"></ul>
+          <form id="memory-add" class="row">
+            <input id="memory-text" placeholder="Запам’ятати факт" required>
+            <button type="submit">Зберегти</button>
+          </form>
+        </section>
+        <section id="tab-tools" class="tab" hidden>
+          <ul id="tools" class="list"></ul>
+        </section>
+      </aside>
+    </main>
+  </div>
+</body>
+</html>

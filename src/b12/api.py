@@ -10,10 +10,11 @@ disconnect cancels the turn.
 import asyncio
 import json
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from b12.auth import GUEST_CAPABILITIES, HOST_CAPABILITIES, Caller, bearer, owner_token
@@ -226,9 +227,44 @@ def create_app(
         if identity is None or identity["actor_id"] != who.actor.id:
             raise HTTPException(404, "turn_not_found")
 
+    web = Path(__file__).parent / "web"
+    security_headers = {
+        "Content-Security-Policy": (
+            "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; "
+            "img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        ),
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "no-referrer",
+    }
+
+    @app.get("/")
+    async def index():
+        return FileResponse(web / "index.html", headers=security_headers)
+
+    @app.get("/static/{name}")
+    async def static(name: str):
+        types = {"app.js": "text/javascript", "style.css": "text/css"}
+        if name not in types:
+            raise HTTPException(404, "not_found")
+        return FileResponse(web / name, media_type=types[name], headers=security_headers)
+
     @app.get("/api/health")
     async def health():
         return {"ok": True}
+
+    @app.get("/api/me")
+    async def me(request: Request, who: Identity):
+        actor = runtime_of(request).control.resolve_actor(who.actor.id)
+        return {
+            "actor_id": actor.id,
+            "owner": actor.owner,
+            "consent": actor.consent,
+            "capabilities": list(who.capabilities),
+        }
+
+    @app.get("/api/sessions")
+    async def session_list(request: Request, who: Identity):
+        return runtime_of(request).control.sessions_for(who.actor.id)
 
     @app.get("/api/tools")
     async def tools(request: Request, who: Identity):
@@ -274,9 +310,7 @@ def create_app(
         own_turn(request, who, turn_id)
         runtime = runtime_of(request)
         return stream_turn(
-            lambda cancel, on_event: runtime.agent.resume(
-                turn_id, on_event=on_event, cancel=cancel
-            )
+            lambda cancel, on_event: runtime.agent.resume(turn_id, on_event=on_event, cancel=cancel)
         )
 
     @app.post("/api/turns/{turn_id}/cancel")
