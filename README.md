@@ -1,41 +1,189 @@
 # B-12
 
-Локальний ШІ-компаньйон з автобіографічною пам’яттю, доречною ініціативою, українською й англійською мовами та майбутньою фізичною присутністю через Reachy Mini.
+Локальний ШІ-компаньйон з автобіографічною пам’яттю, реальними інструментами комп’ютера, доречною ініціативою та українською й англійською мовами. Надалі — фізична присутність через Reachy Mini.
 
-**Стан на 26.10.2026:** у гілці `feat/b12-runtime` є робочий desktop runtime: пам’ять зі згодою й глобальним забуттям, lexical knowledge, змінний Ollama adapter (поточний кандидат — Bolt E4B), 13 реальних host tools під серверним контролем, agent loop і CLI. API/Web, автономність, голос і апаратна частина ще попереду; [поточний стан](wiki/project/status.md).
+Працює повністю локально: Ollama з моделлю NVIDIA **Nemotron Bolt E4B** (кандидат, модель змінна) на RTX 4060 Laptop 8 GB. Дані — у приватних SQLite-сховищах під контролем власника.
 
-## Запуск CLI
+<p align="center">
+  <img src="docs/images/web-dark.png" alt="Web UI B-12: tool-виклики, підтвердження і скасування" width="900">
+</p>
 
-Потрібні Ollama з alias `b12-bolt-e4b:q4km`, calibrated profile та pinned tokenizer assets (див. `config.example.toml`).
+> **Стан на 26.10.2026 (пауза):** desktop runtime працює end-to-end з реальною моделлю. Реалізовано: пам’ять зі згодою та глобальним забуттям, 13 host tools + MCP, agent loop, CLI/API/Web, автономність, backup/restore. Голос, Reachy/Jetson і тривалі (8 год / 30 днів) докази ще відкриті. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
+
+## Архітектура
+
+```mermaid
+flowchart LR
+    subgraph UI["Інтерфейси"]
+        CLI["b12 CLI"]
+        WEB["Web UI"]
+        API["Loopback API<br/>bearer token, Host/Origin guard"]
+    end
+
+    subgraph CORE["Runtime — open_runtime()"]
+        AGENT["Agent loop<br/>model → tools → results"]
+        CTX["ContextBuilder<br/>exact token admission"]
+        CONTROL["ControlStore<br/>actors · grants · approvals"]
+        REG["ToolRegistry<br/>strict schemas · lifecycle"]
+        SCHED["Scheduler<br/>goals · reflection"]
+        ATT["AttentionPolicy<br/>quiet · cooldown · cap"]
+        PURGE["PurgeCoordinator<br/>global forget"]
+    end
+
+    subgraph DATA["Приватні сховища"]
+        MEM[("Canonical memory<br/>audit hash-chain")]
+        SES[("Sessions<br/>evidence tags")]
+        KNOW[("Knowledge<br/>per-actor index")]
+        GOALS[("Goals · proposals<br/>preferences")]
+        SNAP[("Snapshots<br/>deletion ledger")]
+    end
+
+    subgraph EXT["Локальні сервіси"]
+        OLLAMA["Ollama<br/>Bolt E4B"]
+        HOST["Host tools<br/>files · processes · HTTP"]
+        MCP["MCP servers<br/>archive-index"]
+        EMB["EmbeddingGemma 2<br/>bridge"]
+    end
+
+    CLI --> AGENT
+    WEB --> API --> AGENT
+    SCHED --> AGENT
+    ATT --> SCHED
+    AGENT --> CTX --> OLLAMA
+    AGENT --> REG --> CONTROL
+    REG --> HOST
+    REG --> MCP
+    AGENT --> MEM
+    AGENT --> SES
+    AGENT -. semantic recall .-> EMB
+    REG --> KNOW
+    SCHED --> GOALS
+    PURGE --> MEM & SES & GOALS & SNAP
+```
+
+Інваріанти з brief: **local-first**, модель змінна, дозволи й згода приходять лише з контрольного каналу (ніколи з тексту моделі), один writer приводів, джерела пам’яті простежувані. Детально — у [специфікації](docs/superpowers/specs/2026-10-24-b12-system-design.md).
+
+### Один хід із tool-викликом і підтвердженням
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Власник
+    participant A as Agent
+    participant M as Bolt (Ollama)
+    participant R as ToolRegistry
+    participant C as ControlStore
+    U->>A: «Знайди запис про шафку і забудь його»
+    A->>M: admitted request (exact tokens ≤ 4096)
+    M-->>A: tool_call memory_search
+    A->>R: execute(call, ExecutionContext)
+    R->>C: check grant · consent · revision
+    R-->>A: ToolResult (completed)
+    A->>M: результат як недовірені дані
+    M-->>A: tool_call memory_forget
+    R->>C: DESTRUCTIVE → approval_pending
+    A-->>U: approval_pending (не terminal)
+    U->>C: approve(operation)
+    U->>A: resume(turn) — той самий call ID
+    R-->>A: purge receipt: complete
+    A-->>U: turn_completed (рівно один terminal)
+```
+
+### Глобальне забуття
+
+```mermaid
+flowchart TD
+    F["forget(memory)"] --> L["Deletion ledger<br/>payload-free, durable"]
+    L --> T["Tombstone + transitive closure<br/>deletion revision++"]
+    T --> C1["canonical: payload + FTS + WAL checkpoint"]
+    T --> C2["sessions: усі tagged turns"]
+    T --> C3["goals / proposals / preferences"]
+    T --> C4["semantic vectors"]
+    T --> C5["active turns: cancel + invalidate"]
+    T --> C6["managed backups"]
+    T --> C7["snapshots: purge + reseal manifest"]
+    T --> C8["provider cache: model unload"]
+    C1 & C2 & C3 & C4 & C5 & C6 & C7 & C8 --> R{"усі hooks<br/>підтверджені?"}
+    R -- так --> OK["receipt: complete"]
+    R -- ні --> P["receipt: pending<br/>retry на старті"]
+```
+
+Restore зі snapshot відтворює deletion ledger, перш ніж стан починає відповідати. Оригінальні файли поза керованими сховищами не видаляються.
+
+## Інтерфейс
+
+| Підтвердження руйнівної дії | Мобільна ширина, темна тема |
+|---|---|
+| <img src="docs/images/web-approval.png" alt="Черга підтверджень і resume turn" width="560"> | <img src="docs/images/web-mobile.png" alt="Web UI на 390 px" width="220"> |
+
+Web UI обслуговується тим самим API зі строгим CSP (без inline-скриптів). Весь текст моделі й tools відображається через `textContent`. Приймання — headless Chrome через CDP ([`scripts/web_acceptance.mjs`](scripts/web_acceptance.mjs)), 20/20 перевірок із реальним Bolt.
+
+## Результати вимірювань
+
+**Великий eval** — 109 сценаріїв (43 tool-задачі, з них 30 багатокрокових; пам’ять, adversarial, UA/EN, розмова на 60 turns) × 5 повторів на реальному Bolt: 541 прогін, 81 %, **0 протокольних помилок**, TTFT P50 1.39 с. Eval знайшов дефекти мови відповіді й морфології пошуку. Їх виправлено, і повторний EN/UA-прогін дав 15/15 і 19/20. Повний повторний прогін на поточному коді ще попереду.
+
+<img src="docs/images/eval-by-category.png" alt="Eval за категоріями" width="760">
+
+**Soak і ріст пам’яті.** Software soak (1 год 19 хв із запланованих 8 год) виявив лінійний ріст затримки: кожна транзакція перевіряла весь audit-ланцюжок. Це виправлено просто під час прогону. Growth-бенчмарк до 200k записів знайшов і закрив ще одну O(n)-ділянку.
+
+<img src="docs/images/soak-latency.png" alt="Затримка під час soak до і після виправлення" width="760">
+<img src="docs/images/memory-growth.png" alt="Growth-бенчмарк пам’яті 200–200k" width="760">
+
+Графіки відтворюються з локальних артефактів: `/usr/bin/python3 scripts/make_readme_charts.py artifacts docs/images`.
+
+## Стан реалізації
+
+План — [20 задач](docs/superpowers/plans/2026-10-24-b12-full-system.md), журнал виконання — [`docs/superpowers/sdd/`](docs/superpowers/sdd/progress.md).
+
+| # | Задача | Стан |
+|---|---|---|
+| 1–6 | Контракти, canonical memory, retrieval, model/context admission, контроль tools, 13 host tools | ✅ |
+| 7 | Agent loop, сесії, evidence, глобальне забуття | ✅ |
+| 8–10 | CLI, автентифікований API, Web UI | ✅ |
+| 11 | Цілі, ініціатива, рефлексія, уподобання | ✅ реальний Bolt 3/3 |
+| 12 | MCP-міст, archive-index, semantic recall (EmbeddingGemma 2) | ✅ |
+| 13 | Snapshots, deletion replay, restore, user service | ✅ (службу вмикає власник) |
+| 14 | Великий eval | 🟡 ctx 4096 готово; повтор на HEAD і ctx 8192 — далі |
+| 15 | Stress / growth / 8 год soak | 🟡 1 год 19 хв; відкритий ріст RSS |
+| 16–17 | Голос, full-duplex | ⏸ відкладено |
+| 18 | Reachy / Jetson | 🟡 протокол на симуляторі; фізичне приймання — з пристроєм |
+| 19 | Пам’ять 1/7/30 днів | 🟡 драйвер готовий; потрібен реальний час |
+| 20 | Фінальний аудит R01–R17 | ⏳ |
+
+Тести: `uv run --no-sync pytest -q` — 450 passed, 3 skipped. Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
+
+## Швидкий старт
+
+Потрібні Ollama з alias `b12-bolt-e4b:q4km`, calibrated profile і pinned tokenizer assets (див. `config.example.toml`).
 
 ```bash
-uv sync --extra dev          # або: uv pip install -e .
+uv sync --extra dev
 export B12_MODEL_PROFILE=$PWD/profiles/bolt-e4b-ollama-0.33.3.json
 export B12_TOKENIZER_DIR=/absolute/pinned/tokenizer-assets
 b12 doctor --json            # модель, профіль, сховища, pending purge
-b12 init                     # owner + сесія CLI; --no-consent вимикає збереження пам’яті
+b12 init                     # owner + сесія; --no-consent вимикає збереження пам’яті
 b12 chat                     # інтерактивно; Ctrl-C скасовує поточний turn
 b12 chat -m "…" --json       # один turn, машиночитний результат
+b12 serve --port 8712        # API + Web UI лише на loopback, scheduler увімкнено
 b12 approvals | b12 approve <operation_id> | b12 resume <turn_id>
 b12 memory remember|search|forget|pending …
-b12 tools                    # каталог із capability та risk
-b12 serve --port 8712        # локальний API лише на loopback
+b12 goals add "…" --check-file /abs/path --check-text "…"
+b12 quiet on|off · b12 stop on|off · b12 autonomy [--reflect]
+b12 backup create|list|verify|restore <id> · b12 status
+b12 mcp add archive --capability archive.read --read-only --timeout-s 180 -- /path/python -m archive_index.mcp_server
 ```
 
-API: токен власника — у `$B12_STATE_DIR/api/owner.token` (0600), передається тільки заголовком `Authorization: Bearer …`. `POST /api/sessions`, `POST /api/chat` (NDJSON-стрім подій; розрив з’єднання скасовує turn), `/api/approvals`, `/api/memory`, `/api/guests` (гостьові токени зі scoped typed capabilities), `/api/control/consent`, `/api/turns/{id}/resume|cancel`, `/api/tools`, `/api/health`.
+- **API:** токен власника лежить у `$B12_STATE_DIR/api/owner.token` (0600) і передається лише заголовком `Authorization: Bearer …`.
+- **Коди виходу:** 0 — готово, 1 — помилка, 2 — чекає approval, 3 — purge ще pending, 130 — скасовано.
+- **Host access:** `host_access="full"` дає моделі реальний доступ до файлів і команд у межах прав Linux вашого користувача; руйнівні дії потребують approval.
+- **Сервіс:** `scripts/install-user-service.sh` встановлює systemd user unit без root і без автозапуску.
 
-Коди виходу: 0 — готово, 1 — помилка, 2 — чекає approval, 3 — purge ще pending, 130 — скасовано. Стан зберігається в `$XDG_STATE_HOME/b12` (або `B12_STATE_DIR`). Режим `host_access="full"` дає моделі реальний доступ до файлів і команд у межах прав Linux вашого користувача; руйнівні дії (forget) потребують approval.
+## Документація
 
-- [Індекс wiki](wiki/index.md) — точка входу до всіх матеріалів.
-- [Аналіз master brief](wiki/project/analysis.md) — висновки, суперечності та критичний шлях.
-- [Статус і наступний крок](wiki/project/status.md).
-- [Результати тесту Bolt](wiki/project/bolt-first-test.md) і [відтворювані артефакти](benchmarks/bolt-e4b-smoke-2026-10-24/README.md).
-- [Дорожня карта](wiki/project/roadmap.md) — етапи та докази завершення.
-- [Оригінальний master brief](raw/B-12_Master_Project_2026-10-24.md) — незмінена копія наданого документа.
-- [Правила роботи агента](AGENTS.md) та [журнал wiki](wiki/log.md).
+- [Індекс wiki](wiki/index.md) — точка входу; ведеться за [LLM Wiki Андрія Карпаті](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+- [Специфікація](docs/superpowers/specs/2026-10-24-b12-system-design.md) і [план](docs/superpowers/plans/2026-10-24-b12-full-system.md).
+- Теми: [agent loop і забуття](wiki/topics/agent-loop.md), [контроль tools](wiki/topics/tool-control.md), [автономність](wiki/topics/autonomy.md), [model transport](wiki/topics/model-transport.md), [пам’ять](wiki/topics/memory.md).
+- [Статус](wiki/project/status.md), [дорожня карта](wiki/project/roadmap.md), [журнал](wiki/log.md), [правила агента](AGENTS.md).
+- [Оригінальний master brief](raw/B-12_Master_Project_2026-10-24.md) — незмінена копія.
 
-Проєкт ведеться за [LLM Wiki Андрія Карпаті](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): джерела зберігаються у `raw/`, висновки накопичуються у пов’язаних сторінках `wiki/`, правила підтримки описані в `AGENTS.md`. Markdown можна читати без спеціальних інструментів або відкрити цю теку в Obsidian.
-
-Wiki цього проєкту — документація для розробки B-12. Майбутня пам’ять самого робота матиме власне сховище й політики; це окремі системи.
-
-Зовнішні матеріали зберігають права й ліцензії своїх авторів. Ліцензію майбутнього власного коду ще не обрано.
+Зовнішні матеріали зберігають права й ліцензії своїх авторів; vendored-компоненти archive-index — з їхніми LICENSE/NOTICE. Ліцензію власного коду ще не обрано.
