@@ -22,7 +22,9 @@ class Risk(StrEnum):
 class EffectGuard:
     """Task6 handlers must check immediately before EACH effect/persistence.
 
-    Async handlers must be cooperative/nonblocking and propagate cancellation.
+    Async handlers must be cooperative/nonblocking. Propagate cancellation, or
+    finish bounded resource cleanup and return HandlerOutcome(status="unknown").
+    Never resume user effects after cancellation; cleanup only closes/stops resources.
     A check cannot revoke an already-running OS operation or rollback its effect.
     """
 

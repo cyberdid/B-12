@@ -43,6 +43,7 @@ _ERROR_CODES = frozenset(
         "operation_not_active",
         "handler_failed",
         "interrupted",
+        "invalid_handler_outcome",
     }
 )
 
@@ -374,10 +375,19 @@ class ControlStore:
         )
 
     def _expire_approvals(self):
+        now = time.time()
+        expired = self.db.execute(
+            "SELECT o.id FROM operations o JOIN approvals a ON a.operation_id=o.id "
+            "WHERE a.expires_at<=? AND a.decision IN ('pending','approved','expired') "
+            "AND o.state IN ('proposed','approved')",
+            (now,),
+        ).fetchall()
+        for row in expired:
+            self._transition(row["id"], "failed", "approval_expired")
         self.db.execute(
             "UPDATE approvals SET digest=NULL,decision='expired' "
             "WHERE expires_at<=? AND digest IS NOT NULL",
-            (time.time(),),
+            (now,),
         )
 
     def expire_approvals(self):
@@ -404,8 +414,8 @@ class ControlStore:
             row = self.db.execute("SELECT * FROM operations WHERE call_key=?", (key,)).fetchone()
             if row and row["state"] not in ("proposed", "approved"):
                 raise ControlError(
-                    "approval_denied"
-                    if row["error_code"] == "approval_denied"
+                    row["error_code"]
+                    if row["error_code"] in ("approval_denied", "approval_expired")
                     else "replay_blocked"
                 )
             if row and row["name"] != call.name:

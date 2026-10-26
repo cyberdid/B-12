@@ -2,7 +2,7 @@
 
 schemas(ctx) returns fresh JSON copies for ContextBuilder BEFORE admission.
 execute(call, ctx) replaces the old Actor/grant dict sketch: DTOs are not proof.
-Handlers are trusted async (args, EffectGuard) -> finite-JSON dict, cooperative,
+Handlers are trusted async (args, EffectGuard) -> HandlerOutcome, cooperative,
 nonblocking, and must recheck guard before each additional effect/persistence.
 There is no late model request mutation, sync thread offload or auto-resume here.
 """
@@ -15,15 +15,15 @@ import re
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
 from b12.contracts import ToolCall, ToolResult
 from b12.control import ControlError, ControlStore, ExecutionContext, arguments_digest
+from b12.tools.outcomes import HandlerOutcome, validated_outcome
 from b12.tools.policy import EffectGuard, Risk
 
-Handler = Callable[[BaseModel, EffectGuard], Awaitable[dict[str, Any]]]
+Handler = Callable[[BaseModel, EffectGuard], Awaitable[HandlerOutcome]]
 
 
 @dataclass(frozen=True)
@@ -119,8 +119,9 @@ class ToolRegistry:
         start = time.monotonic()
         operation = None
         unknown = False
+        task = None
 
-        def result(status, code=None, content=None, *, uncertain=False):
+        def result(status, code=None, content=None, *, uncertain=False, outcome=None):
             return ToolResult(
                 call_id=call.id,
                 name=call.name,
@@ -129,6 +130,13 @@ class ToolRegistry:
                 error_code=code,
                 duration_ms=(time.monotonic() - start) * 1000,
                 outcome_unknown=uncertain,
+                truncated=outcome.truncated if outcome else False,
+                side_effects=tuple(
+                    {**effect.model_dump(mode="json"), "operation_id": operation}
+                    for effect in outcome.side_effects
+                )
+                if outcome
+                else (),
             )
 
         try:
@@ -181,17 +189,26 @@ class ToolRegistry:
                     raise ControlError("cancelled")
                 if task not in done or time.monotonic() >= deadline:
                     raise ControlError("deadline_exceeded")
-                content = task.result()
+                try:
+                    returned = task.result()
+                    outcome = validated_outcome(returned)
+                except (ValidationError, ValueError, TypeError, OverflowError, RecursionError):
+                    raise ControlError("invalid_handler_outcome") from None
                 guard.check()
-                # Result validation is part of dispatch: invalid outputs never claim success.
-                reply = result("completed", content=content)
+                reply = result(
+                    outcome.status,
+                    outcome.error_code,
+                    outcome.content,
+                    uncertain=outcome.status == "unknown",
+                    outcome=outcome,
+                )
             finally:
                 for pending in (task, cancelled):
                     if not pending.done():
                         pending.cancel()
                 await asyncio.gather(task, cancelled, return_exceptions=True)
             guard.check()
-            if not self.control.finish(operation, "completed"):
+            if not self.control.finish(operation, outcome.status, outcome.error_code):
                 raise ControlError("operation_not_active")
             return reply
         except asyncio.CancelledError:
@@ -208,7 +225,34 @@ class ToolRegistry:
                     unknown = prior is not None and prior["state"] in ("unknown", "started")
                 except ControlError:
                     unknown = True
-            return result("unknown" if unknown else "denied", exc.code, uncertain=unknown)
+            evidence = None
+            if operation and exc.code in ("cancelled", "deadline_exceeded") and task is not None:
+                # Cooperative cleanup may return bounded evidence after interruption.
+                # It can never turn timeout/cancel into success or authorize new effects.
+                try:
+                    try:
+                        self.control.check(context, tool.capability)
+                    except ControlError as current:
+                        if current.code not in ("cancelled", "deadline_exceeded"):
+                            raise
+                    if task.done() and not task.cancelled() and task.exception() is None:
+                        evidence = validated_outcome(task.result())
+                except (
+                    ControlError,
+                    ValidationError,
+                    ValueError,
+                    TypeError,
+                    OverflowError,
+                    RecursionError,
+                ):
+                    evidence = None
+            return result(
+                "unknown" if unknown else "denied",
+                exc.code,
+                evidence.content if evidence else None,
+                uncertain=unknown,
+                outcome=evidence,
+            )
         except Exception:
             if operation:
                 self.control.finish(operation, "unknown", "handler_failed")

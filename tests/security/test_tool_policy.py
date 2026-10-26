@@ -10,6 +10,7 @@ import pytest
 from pydantic import BaseModel, ConfigDict
 
 from b12.contracts import ToolCall
+from b12.tools.outcomes import HandlerOutcome
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def policy_rig(tmp_path):
     async def effect(args, guard):
         guard.check()
         path.write_text("effect")
-        return {"done": True}
+        return HandlerOutcome(content={"done": True})
 
     registry.register("exec", "Виконання", Args, effect, "host.exec", risk="arbitrary")
     registry.register("typed", "Запис", Args, effect, "host.write")
@@ -168,7 +169,7 @@ async def test_revision_checked_at_effect_and_audit_has_no_payload(policy_rig):
         await proceed.wait()
         guard.check()
         path.write_text(args.text)
-        return {}
+        return HandlerOutcome()
 
     registry = ToolRegistry(store)
     registry.register("late", "Пізній запис", Args, late, "host.write")
@@ -226,7 +227,7 @@ async def test_restart_keeps_pending_and_unknown_without_automatic_effect(policy
     async def handler(args, guard):
         guard.check()
         path.write_text("executed")
-        return {}
+        return HandlerOutcome()
 
     recovered.register(
         "exec", "Виконання", registry._tools["exec"].model, handler, "host.exec", risk="arbitrary"
@@ -270,7 +271,7 @@ async def test_capability_does_not_imply_messaging_or_other_tools(policy_rig):
     async def send(args, guard):
         guard.check()
         path.write_text("should not happen")
-        return {}
+        return HandlerOutcome()
 
     registry.register(
         "message", "Зовнішній tool", registry._tools["exec"].model, send, "external.message"
@@ -331,3 +332,31 @@ async def test_control_can_issue_separate_typed_guest_grant(policy_rig):
         await registry.execute(request.model_copy(update={"name": "typed"}), ctx)
     ).status == "completed"
     assert path.exists()
+
+
+@pytest.mark.parametrize("decision", ["pending", "approved"])
+async def test_expiry_terminal_state_and_audit_survive_restart(policy_rig, decision):
+    store, registry, ctx, request, path, _ = policy_rig
+    pending = await registry.execute(request, ctx)
+    operation = pending.content["operation_id"]
+    if decision == "approved":
+        store.decide_approval(operation, True)
+    store.db.execute("UPDATE approvals SET expires_at=0")
+    store.db.commit()
+    store.expire_approvals()
+    row = store.db.execute(
+        "SELECT state,error_code FROM operations WHERE id=?", (operation,)
+    ).fetchone()
+    assert tuple(row) == ("failed", "approval_expired")
+    assert store.audit_events()[-1]["state"] == "failed"
+    assert store.audit_events()[-1]["error_code"] == "approval_expired"
+    assert store.db.execute("SELECT digest FROM approvals").fetchone()[0] is None
+    from b12.control import ControlStore
+
+    location = store.path
+    store.close()
+    reopened = ControlStore(location)
+    assert reopened.audit_events()[-1]["state"] == "failed"
+    assert reopened.audit_events()[-1]["operation_id"] == operation
+    assert not path.exists()
+    reopened.close()
