@@ -40,7 +40,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 11 (`71fba28`, `3b47f39`, `6032a15`) — goals, AttentionPolicy, Reflector і Scheduler; 404 passed / 2 skipped. Реальний Bolt досяг цілі-експерименту 3/3 за довіреною перевіркою і записав рефлексію 3/3. [Деталі й межі](../topics/autonomy.md).
 
-**Наступний крок:** Task 13 — сервіс, backup/restore, потім 8-годинний soak (Task 15).
+**Стан на паузі (26.10.2026):** Tasks 12–13 завершено; Task 14 ctx4096 зроблено (81%), ctx8192 частковий; Task 15 soak 1 год 19 хв, відкритий ріст RSS; Tasks 16–17 відкладено власником; Tasks 18–19 — протокол і драйвер без фізичних і тривалих доказів; Task 20 попереду. Ledger скопійовано в [docs/superpowers/sdd](../../docs/superpowers/sdd/progress.md).
+
+**Наступний крок:** пошук і виправлення росту RSS → повторний eval на HEAD → повний 8-годинний soak → фінальний аудит Task 20.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
