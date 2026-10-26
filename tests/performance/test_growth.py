@@ -51,3 +51,32 @@ def test_appends_by_another_connection_are_still_verified(tmp_path):
         first.search("один", actor)
     first.close()
     second.close()
+
+
+def test_recent_and_purge_cost_is_independent_of_size(tmp_path):
+    from b12.memory import MemoryStore
+
+    actor = Actor(id="owner", consent=True)
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+
+    def measure():
+        started = time.perf_counter()
+        for _ in range(10):
+            store.recent(actor, limit=20, exclude_kinds=("reflection",))
+        recent = (time.perf_counter() - started) / 10 * 1000
+        victims = [store.remember("тимчасовий запис для видалення", actor) for _ in range(3)]
+        started = time.perf_counter()
+        for victim in victims:
+            store.begin_purge(victim.id, actor)
+        purge = (time.perf_counter() - started) / 3 * 1000
+        return recent, purge
+
+    for index in range(300):
+        store.remember(f"запис номер {index} про кота і сервер", actor)
+    small = measure()
+    for index in range(300, 8000):
+        store.remember(f"запис номер {index} про кота і сервер", actor)
+    large = measure()
+    store.close()
+    assert large[0] < max(3 * small[0], 2.0), ("recent", small, large)
+    assert large[1] < max(3 * small[1], 15.0), ("purge", small, large)

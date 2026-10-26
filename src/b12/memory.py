@@ -91,10 +91,29 @@ class MemoryStore:
             self._connection.execute("PRAGMA journal_mode=WAL")
             self._connection.execute("PRAGMA synchronous=FULL")
             migrate(self._connection)
+            self._enable_fts_secure_delete()
             with self._transaction():
                 pass
         except BaseException:
             self._connection.close()
+            raise
+
+    def _enable_fts_secure_delete(self) -> None:
+        """One-time: secure-delete mode, then a rebuild to drop pre-existing delete markers."""
+        enabled = self._connection.execute(
+            "SELECT v FROM memory_fts_config WHERE k='secure-delete'"
+        ).fetchone()
+        if enabled and enabled[0] == 1:
+            return
+        self._connection.execute("BEGIN IMMEDIATE")
+        try:
+            self._connection.execute(
+                "INSERT INTO memory_fts(memory_fts, rank) VALUES ('secure-delete', 1)"
+            )
+            self._connection.execute("INSERT INTO memory_fts(memory_fts) VALUES ('rebuild')")
+            self._connection.commit()
+        except BaseException:
+            self._connection.rollback()
             raise
 
     @contextmanager
@@ -298,15 +317,16 @@ class MemoryStore:
         """Newest live records in the exact actor namespace (consent required)."""
         self._consent(actor)
         self._limit(limit)
+        excluded = list(exclude_kinds)
         with self._transaction():
             rows = self._connection.execute(
                 """SELECT m.* FROM memories m WHERE actor_id=?
+                   AND kind NOT IN (SELECT value FROM json_each(?))
                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
-                   ORDER BY m.rowid DESC""",
-                (actor.id,),
-            )
-            records = [self._record(row) for row in rows if row["kind"] not in exclude_kinds]
-            return records[:limit]
+                   ORDER BY m.rowid DESC LIMIT ?""",
+                (actor.id, _encoded(excluded), limit),
+            ).fetchall()
+            return [self._record(row) for row in rows]
 
     def _record(self, row: sqlite3.Row) -> MemoryRecord:
         evidence = tuple(
@@ -498,10 +518,8 @@ class MemoryStore:
                            AND id IN (SELECT value FROM json_each(?))""",
                         (actor.id, _encoded(receipt.target_ids)),
                     )
-                    # Rebuild removes obsolete FTS segments, not only query-visible rows.
-                    self._connection.execute(
-                        "INSERT INTO memory_fts(memory_fts) VALUES ('rebuild')"
-                    )
+                    # FTS5 secure-delete (enabled on open) removes the deleted rows' terms
+                    # from the index itself; no O(n) rebuild per purge.
                     self._connection.execute(
                         "UPDATE purge_operations SET payload_deleted=1 WHERE operation_id=?",
                         (operation_id,),
