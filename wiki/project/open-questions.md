@@ -1,6 +1,6 @@
 ---
 type: questions
-updated: 2026-10-24
+updated: 2026-10-26
 status: open
 sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md]
 tags: [unknowns, validation]
@@ -25,10 +25,10 @@ Q1–Q12 зберігають порядок §14 master brief; Q13–Q18 дод
 | Q12 | Який баланс тиші й ініціативи? | Quiet-mode policy і оцінка доречних/небажаних втручань |
 | Q13 | Як реалізувати забуття при append-only? | Payload/index/reflection/cache/backup lifecycle і deletion verification |
 | Q14 | Що живе volatile до дозволу на запис? | Event flow з TTL/retention та тест відсутності durable витоку |
-| Q15 | Який локальний host доступний зараз? | **Закрито для характеристик:** [аудит 24.10.2026](model-test-readiness.md) встановив CPU/GPU/RAM/ОС/runtime/storage. Продуктивність і прийнятний бюджет під навантаженням ще не виміряні |
+| Q15 | Який локальний host доступний зараз? | **Закрито для характеристик:** [аудит 24.10.2026](model-test-readiness.md) встановив CPU/GPU/RAM/ОС/runtime/storage. Є одиночна Bolt latency calibration; combined voice/VLM load, довготривалий ресурсний бюджет і прийнятні service SLO залишаються невідомі |
 | Q16 | Що саме означає voice <1,5 с? | Початок/кінець виміру, перцентиль, сценарій, число повторів |
 | Q17 | Які точні версії та ліцензії кандидатів? | Для першого Bolt тесту pinned GGUF/revision/hash, Ollama 0.33.3 та tensor equivalence перевірено. Повний license inventory, голоси й інші кандидати ще відкриті |
-| Q18 | Як запобігти втраті instructions при context overflow? | [Тест 2048](bolt-first-test.md) виявив truncation з утратою інструкцій; потрібні явний token budget, контроль відмови/скорочення й regression tests до довгих діалогів |
+| Q18 | Як запобігти втраті instructions при context overflow? | **Частково закрито для pinned Bolt/Ollama 0.33.3 profile:** `AdmittedRequest` рахує цілі messages/tools, відхиляє обов’язковий overflow і перевіряє native prompt count. Run4 при 3928 tokens зберіг обидві межові інструкції. Інші моделі/templates, загальний model corpus та race зі зміною alias не доведені; див. [transport](../topics/model-transport.md) |
 
 Q1/Q2/Q13/Q14 залишаються фундаментальними для runtime. Перший Bolt smoke test завершено; наступні дослідження мають уточнювати Q6/Q17/Q18. Конкретний [наступний крок](status.md), [аналіз ризиків](analysis.md) та [дорожня карта](roadmap.md) пов’язують питання з роботою.
 

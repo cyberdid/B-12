@@ -1,13 +1,13 @@
 ---
 type: topic
-updated: 2026-10-24
+updated: 2026-10-26
 status: candidates
 sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/sources/external-checks.md]
 tags: [models, benchmark]
 ---
 # Моделі та план порівняння
 
-За brief §8 основний новий кандидат — Nemotron 3.5 Bolt E4B Q4; comparators — Gemma 4 E4B/E2B, Qwen 3.5 4B і lightweight Gemma 3 1B. Bolt встановлено як тестовий Ollama alias та [вперше виміряно](../project/bolt-first-test.md); остаточний вибір і інтеграція в когнітивне ядро B-12 ще не зроблені. [Аудит системи](../project/model-test-readiness.md) також виявив наявні поза проєктом Gemma E2B/E4B для можливого порівняння.
+За brief §8 основний новий кандидат — Nemotron 3.5 Bolt E4B Q4; comparators — Gemma 4 E4B/E2B, Qwen 3.5 4B і lightweight Gemma 3 1B. Bolt встановлено як тестовий Ollama alias, [перший smoke test](../project/bolt-first-test.md) виявив truncation на 2048, а [Task 4 transport calibration](model-transport.md) протестувала pinned profile на 4096. Остаточний вибір моделі, поведінкова regression corpus та інтеграція з tools/agent ще не завершені. [Аудит системи](../project/model-test-readiness.md) також виявив наявні поза проєктом Gemma E2B/E4B для можливого порівняння.
 
 [Незалежна перевірка](../sources/external-checks.md) підтвердила опубліковані NVIDIA 5 785 мс TTFT для Bolt на Nano 8GB при 3K нових токенів без кешу. **Інженерний висновок:** цей режим не вкладається у голосову ціль 1,5 с, навіть до ASR/TTS. Це не доводить неможливість іншої конфігурації: менший prompt, кеш, reasoning settings і інший host потребують власних замірів.
 

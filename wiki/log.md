@@ -100,3 +100,11 @@ tags: [history]
 ## [2026-10-26] verification | Task 4 fix commit calibration
 
 **Перевірений факт:** commit `46b374c` пройшов новий marked run4: 15/15 synthetic requests, exact token counts, independent boundary/tool assertions та public async deltas/reply equality; 1 passed за 26.37 s. Metadata фіксує fix HEAD, empty tracked diff і code hashes. Усі code/artifact hashes перевірені; alias параметри, raw і finished run1–3 незмінні. Coordinator re-review — окремий gate.
+
+## [2026-10-26] review | Task 4 fix round 1
+
+Початковий Task 4 reviewer виявив три Important findings: structural snapshot bypass, blocking sync callback після deadline, malformed terminal TypeError. Fix `46b374c` додає спільний structural validator, async-only cooperative callbacks із final deadline guard та перевірку типу done_reason. Scoped re-review `task-4-rereview.md` підтвердила всі findings ADDRESSED без нових Critical/Important. Coordinator повторив suite: 208 passed/1 skipped, Ruff clean; окремо перевірив усі 17 run4 artifact hashes, 14 code hashes і 15 recorded replies. Документальний commit `f3dee60` відображає поточні Task4 обмеження та наступний control/tools gate. [Execution status](project/implementation.md).
+
+## [2026-10-26] lint | Статус після Task 4
+
+Оновлено Q15/Q18, status, roadmap і пов’язані теми згідно зі scope Tasks 1–4. Pinned Bolt profile truncation gate закрито для перевірених сценаріїв; voice SLO, model A/B та повна українська якість відкриті. Локальні посилання/source paths/frontmatter/index і master brief checksum перевірено окремим lint нижче; global purge/tool control не позначені як готові.

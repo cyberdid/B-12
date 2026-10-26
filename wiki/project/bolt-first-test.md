@@ -56,9 +56,13 @@ Ollama показав **100% GPU**, context 2048 і runtime allocation 3 320 913
 
 **Наслідок для runtime — пропозиція:** до inference рахувати token budget для system/tools/memory/user/output, не допускати мовчазного видалення контрольних інструкцій; виносити дозволи у детерміністичний шар. У контекстному вікні 2048 не можна без перевірки подавати довгу історію. Див. [Q18](open-questions.md).
 
-## Що далі
+## Подальші результати та відкриті тести
 
-Модель залишити кандидатом. Наступний корисний крок — версійований UA/EN набір з quiet-mode reason checks, технічним grounding і multi-turn tools, а також контрольований тест context 4096/8192 з token-budget validation та VRAM snapshots. Це пропозиції, ще не виконані тести. Порівняння з Gemma, voice SLO, ASR/TTS, Jetson, robot і довготривала пам’ять залишаються відкритими.
+**Оновлення 26.10.2026:** запропоновану нижче 4096 token-admission перевірку виконано в Task 4 через explicit pinned tokenizer profile і real-model regression run4. [Новий звіт](../topics/model-transport.md). Це закриває truncation control тільки для перевірених Bolt/Ollama 0.33.3 сценаріїв. Повний UA/EN behavioral corpus, A/B, більші soak-навантаження й голосовий SLO лишаються відкритими.
+
+## Історична пропозиція наступних тестів
+
+Модель залишити кандидатом. Наступними лишаються версійований UA/EN набір із quiet-mode reason checks, technical grounding і реальними multi-turn tool effects; model A/B із Gemma; joint GPU/voice workloads. Попередня пропозиція про context 4096 з admission validation виконана лише для Task 4 calibration; 8192 для цього pinned profile не потрібен як підстава змінювати explicit default. Порівняння з Gemma, voice SLO, ASR/TTS, Jetson, robot і довготривала пам’ять залишаються відкритими.
 
 Інтерактивний запуск на цьому комп’ютері:
 

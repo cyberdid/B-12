@@ -43,4 +43,4 @@ System 1 виконує barge-in, mute, обмеження приводів і �
 
 Модель, транспорт і корпус змінюються через адаптери. Вибір процесів/IPC/фреймворку ще відкритий: для першого PoC не потрібні всі каталоги зі структури §13 brief. [Голос](voice.md), [автономність](autonomy.md) і [обладнання](hardware.md) описують окремі обмеження. Статуси принципів — у [реєстрі рішень](../project/decisions.md).
 
-Для retrieval з’явився [перевірений кандидат archive-index](archive-retrieval.md): пошук стає derived компонентом під memory policy, а context builder забезпечує token budget перед Bolt. Це пропозиція повторного використання, не виконане підключення глобального архіву чи MCP.
+Для retrieval реалізовано [pinned actor-scoped lexical adapter](archive-retrieval.md); context builder рахує повний запит до pinned Bolt profile. Це не підключає приватний глобальний архів, semantic embedding або MCP.

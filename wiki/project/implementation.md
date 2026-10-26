@@ -1,6 +1,6 @@
 ---
 type: execution
-updated: 2026-10-25
+updated: 2026-10-26
 status: active
 sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md]
 tags: [implementation, plan, acceptance]
@@ -24,7 +24,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 3 (`e33b926`) реалізує lexical derived retrieval із pinned archive components, окремими actor stores та revision-aware UUID evidence. 15 нових integration tests, full suite 132 passed, independent review пройдено; wheel містить exact upstream modules та LICENSE/NOTICE. Update/delete мають durable invalidation receipts і чесний pending/failed cleanup. [Подробиці й межі](../topics/archive-retrieval.md).
 
-**Наступний крок:** Task 4 — streaming model adapter, cancellation та immutable context admission; потім tools/control і agent integration.
+**Перевірений факт:** Task 4 завершено після fix review: commit `46b374c`, run4 із 15/15 реальними Bolt-запитами, full suite 208 passed / 1 real-model skip, fix re-review пройдено. Snapshot validation тепер спільна для builder і send; callbacks awaitable-only; malformed terminal дає typed error. [Докази та обмеження](../topics/model-transport.md).
+
+**Наступний крок:** Task 5 — server-owned control, grant revision, tool registry та approval/lifecycle policy. Після нього Task 6 підключить реальні host effects, Task 7 — sessions, purge coordination і спільний agent loop.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
