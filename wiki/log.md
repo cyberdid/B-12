@@ -140,3 +140,7 @@ tags: [history]
 ## [2026-10-26] implementation | Task 9 local API та auth
 
 **Перевірений факт:** `9632cdc` додає FastAPI loopback API (`b12 serve`), owner/guest bearer tokens (лише digest), Host/Origin/body guard, NDJSON streaming turn events і скасування при disconnect. Гості не отримують host capabilities; consent надає тільки owner, а гість може лише відкликати власний. 11 security + 5 ASGI + 1 live-process test; 8 мутацій спіймано; full 382 passed / 2 skipped. Живий сервер з реальним Bolt виконав `current_time`; без токена — 401, чужий Origin — 403.
+
+## [2026-10-26] implementation | Task 10 Web UI
+
+**Перевірений факт:** `6610f85` додає українську Web UI (`/`) зі строгим CSP і без inline script/style. Текст моделі й tools рендериться лише через textContent; токен зберігається в sessionStorage і передається тільки заголовком. Розширення Claude in Chrome не було підключене, тому приймання виконано headless Chrome 153 через CDP (`scripts/web_acceptance.mjs`) проти живого `b12 serve` з реальним Bolt. Run1 — 18/19: один хибний FAIL перевірки і знайдена вада прив’язки результату resume до tool-картки; її виправлено. Run2 — 20/20. Скриншоти світлої, темної та mobile-версії переглянуто; artifacts — `artifacts/task10-web-acceptance-2026-10-26`. Full suite 385 passed / 2 skipped.

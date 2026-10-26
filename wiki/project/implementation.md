@@ -36,7 +36,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 9 (`9632cdc`) — loopback API з owner/guest bearer tokens (лише digest у ControlStore), Host/Origin guard, ліміт тіла, NDJSON streaming і скасуванням turn при disconnect; `b12 serve`. 17 API tests + 8 мутацій; full 382 passed / 2 skipped; живий uvicorn із реальним Bolt. [Межі](../topics/tool-control.md#api-і-автентифікація).
 
-**Наступний крок:** Task 10 — Web UI поверх цього API.
+**Перевірений факт:** Task 10 (`6610f85`) — українська Web UI, яку API віддає зі строгим CSP; весь текст рендериться через textContent. Headless Chrome через CDP (`scripts/web_acceptance.mjs`) із живим сервером і реальним Bolt пройшов 20/20 перевірок: tools, пам’ять, approval→resume, cancel, consent, mobile і dark. Розширення Claude in Chrome не було підключене.
+
+**Наступний крок:** Task 11 — goals, attention, initiative і evidence-backed reflection.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
