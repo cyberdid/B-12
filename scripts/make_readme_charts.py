@@ -24,24 +24,40 @@ def eval_chart(artifacts: Path, out: Path):
     data = summary["by_ctx"]["4096"]["by_category"]
     names = ["tools", "memory", "adversarial", "behavior", "ua", "en", "conversation"]
     labels = {
-        "tools": "tools\n(43)", "memory": "memory\n(14)", "adversarial": "adversarial\n(9)",
-        "behavior": "behavior\n(7)", "ua": "ua\n(20)", "en": "en\n(15)", "conversation": "60-turn\n(1)",
+        "tools": "tools\n(43)",
+        "memory": "memory\n(14)",
+        "adversarial": "adversarial\n(9)",
+        "behavior": "behavior\n(7)",
+        "ua": "ua\n(20)",
+        "en": "en\n(15)",
+        "conversation": "60-turn\n(1)",
     }
     rates = [data[n]["passed"] / data[n]["runs"] * 100 for n in names]
     fig, ax = plt.subplots(figsize=(9, 4))
     bars = ax.bar([labels[n] for n in names], rates, color=BLUE)
     for bar, n in zip(bars, names):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-                f"{data[n]['passed']}/{data[n]['runs']}", ha="center", fontsize=9, color=GREY)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1,
+            f"{data[n]['passed']}/{data[n]['runs']}",
+            ha="center",
+            fontsize=9,
+            color=GREY,
+        )
     ax.set_ylim(0, 110)
     ax.set_ylabel("pass rate, %")
-    ax.set_title("Real Bolt E4B eval, ctx 4096, 109 cases × 5 repeats (before language/morphology fixes)")
+    ax.set_title(
+        "Real Bolt E4B eval, ctx 4096, 109 cases × 5 repeats (before language/morphology fixes)"
+    )
     fig.tight_layout()
     fig.savefig(out / "eval-by-category.png", dpi=130)
 
 
 def soak_chart(artifacts: Path, out: Path):
-    rows = [json.loads(l) for l in (artifacts / "task15-soak-2026-10-26/metrics.jsonl").read_text().splitlines()]
+    rows = [
+        json.loads(l)
+        for l in (artifacts / "task15-soak-2026-10-26/metrics.jsonl").read_text().splitlines()
+    ]
     start = datetime.fromisoformat(rows[0]["at"])
     fig, ax = plt.subplots(figsize=(9, 4))
     pids = []
@@ -75,7 +91,9 @@ def growth_chart(artifacts: Path, out: Path):
         ("recent_20", ORANGE, "recent(20) before fix 25c0db6"),
         ("purge_one", GREY, "purge one record (FTS rebuild, by design)"),
     ]:
-        ax.plot(sizes, [r[key]["p50_ms"] for r in results], marker="o", color=color, label=label, lw=2)
+        ax.plot(
+            sizes, [r[key]["p50_ms"] for r in results], marker="o", color=color, label=label, lw=2
+        )
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("canonical memories")
