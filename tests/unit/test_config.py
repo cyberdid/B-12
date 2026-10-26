@@ -84,6 +84,8 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "tool_timeout_s": 2.5, "host_access": "full",
         "ollama_url": "https://inference.example.org",
         "model_profile": None, "tokenizer_dir": None, "model_timeout_s": 120,
+        "timezone": "Europe/Kyiv", "quiet_start": "23:00", "quiet_end": "08:00",
+        "initiative_hour_cap": 3, "initiative_cooldown_s": 600, "scheduler_tick_s": 60,
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 
