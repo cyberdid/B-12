@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS operations(id TEXT PRIMARY KEY, call_key TEXT UNIQUE 
 CREATE TABLE IF NOT EXISTS approvals(operation_id TEXT PRIMARY KEY, digest TEXT,
  capability TEXT NOT NULL, revision INTEGER NOT NULL, expires_at REAL NOT NULL,
  decision TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS audit(sequence INTEGER PRIMARY KEY,
  operation_id TEXT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL, error_code TEXT);
 CREATE TRIGGER IF NOT EXISTS audit_no_update BEFORE UPDATE ON audit
@@ -164,6 +165,27 @@ class ControlStore:
                 "INSERT INTO actors VALUES (?,?,?,1)", (actor.id, actor.owner, actor.consent)
             )
         return actor
+
+    def get_meta(self, key: str) -> str | None:
+        row = self.db.execute("SELECT value FROM meta WHERE key=?", (key,)).fetchone()
+        return row[0] if row else None
+
+    def set_meta(self, key: str, value: str):
+        """Trusted local bootstrap metadata (e.g. owner/default session IDs)."""
+        with self._atomic():
+            self.db.execute("INSERT OR REPLACE INTO meta VALUES (?,?)", (key, value))
+
+    def pending_approvals(self) -> list[dict]:
+        """Owner review queue: generated IDs and trusted tool names, never arguments."""
+        self.expire_approvals()
+        return [
+            dict(row)
+            for row in self.db.execute(
+                "SELECT a.operation_id, o.name, o.turn_id, t.actor_id, t.session_id, "
+                "a.expires_at FROM approvals a JOIN operations o ON o.id=a.operation_id "
+                "JOIN turns t ON t.id=o.turn_id WHERE a.decision='pending' ORDER BY o.rowid"
+            )
+        ]
 
     def actor_ids(self) -> list[str]:
         return [row[0] for row in self.db.execute("SELECT id FROM actors ORDER BY rowid")]

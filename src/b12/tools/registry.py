@@ -108,6 +108,17 @@ class ToolRegistry:
             name, description, argument_model, handler, capability, risk, schema
         )
 
+    def catalog(self) -> list[dict]:
+        return [
+            {
+                "name": tool.name,
+                "description": tool.description,
+                "capability": tool.capability,
+                "risk": tool.risk.value,
+            }
+            for tool in self._tools.values()
+        ]
+
     def schemas(self, context: ExecutionContext) -> list[dict]:
         result = []
         for tool in self._tools.values():
