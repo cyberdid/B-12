@@ -41,6 +41,7 @@ class SideEffect(BaseModel):
         "memory_write",
         "memory_forget",
         "knowledge_write",
+        "mcp_call",
     ]
     state: Literal["completed", "possible"]
     evidence_ids: tuple[str, ...] = Field(default=(), max_length=64)

@@ -4,7 +4,7 @@ Layout under Settings.state_dir (private): control/, memory/, knowledge/, backup
 sessions/. CLI/API/scheduler/audio share this object instead of building their own.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from b12.agent import Agent
 from b12.attention import AttentionPolicy
@@ -38,8 +38,11 @@ class Runtime:
     goals: GoalStore
     attention: AttentionPolicy
     operations: Operations
+    mcp_servers: list = field(default_factory=list)
 
     def close(self):
+        for server in self.mcp_servers:
+            server.close()
         for store in (
             self.attention,
             self.goals,

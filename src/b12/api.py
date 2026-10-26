@@ -216,6 +216,9 @@ def create_app(
             if owner_id is None:
                 raise RuntimeError("owner not initialized: run b12 init")
             await runtime.purge.resume()
+            from b12.tools.mcp import attach_catalog
+
+            await attach_catalog(runtime)
             owner_token(
                 runtime.control,
                 settings.state_dir,

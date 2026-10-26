@@ -222,6 +222,9 @@ async def cmd_chat(args, settings) -> int:
     try:
         owner = require_owner(runtime)
         await runtime.purge.resume()
+        from b12.tools.mcp import attach_catalog
+
+        await attach_catalog(runtime)
         if args.message is not None:
             grant, task = owner.grant(args.timeout)
             console = Console(quiet=args.json)
