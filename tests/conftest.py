@@ -270,8 +270,8 @@ async def scripted_ollama(profile_settings):
 @pytest.fixture
 async def api(scripted_ollama, tmp_path):
     import httpx
-    from b12.api import create_app
 
+    from b12.api import create_app
     from b12.cli import Owner
     from b12.runtime import open_runtime
 

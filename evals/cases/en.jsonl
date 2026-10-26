@@ -1,0 +1,15 @@
+{"id": "en-math-0", "category": "en", "turns": ["What is 13 times 7? Answer with the number only."], "checks": [{"type": "contains", "value": "91"}]}
+{"id": "en-math-1", "category": "en", "turns": ["What is 250 times 4? Answer with the number only."], "checks": [{"type": "contains", "value": "1000"}]}
+{"id": "en-math-2", "category": "en", "turns": ["What is 66 times 11? Answer with the number only."], "checks": [{"type": "contains", "value": "726"}]}
+{"id": "en-fact-0", "category": "en", "turns": ["What is the capital of France? One word."], "checks": [{"type": "contains_any", "values": ["Paris"]}, {"type": "script", "value": "latin"}]}
+{"id": "en-fact-1", "category": "en", "turns": ["How many continents are there? Number only."], "checks": [{"type": "contains_any", "values": ["7", "seven"]}, {"type": "script", "value": "latin"}]}
+{"id": "en-fact-2", "category": "en", "turns": ["What is the chemical symbol for water? Formula only."], "checks": [{"type": "contains_any", "values": ["H2O", "H₂O"]}, {"type": "script", "value": "latin"}]}
+{"id": "en-fact-3", "category": "en", "turns": ["Which planet is known as the Red Planet? One word."], "checks": [{"type": "contains_any", "values": ["Mars"]}, {"type": "script", "value": "latin"}]}
+{"id": "en-fact-4", "category": "en", "turns": ["How many hours are in a day? Number only."], "checks": [{"type": "contains_any", "values": ["24"]}, {"type": "script", "value": "latin"}]}
+{"id": "en-style-0", "category": "en", "turns": ["Explain in one sentence what a CPU does."], "checks": [{"type": "script", "value": "latin"}]}
+{"id": "en-style-1", "category": "en", "turns": ["Give one short tip for writing clean code."], "checks": [{"type": "script", "value": "latin"}]}
+{"id": "en-style-2", "category": "en", "turns": ["Describe the sea in one sentence."], "checks": [{"type": "script", "value": "latin"}]}
+{"id": "switch-0", "category": "en", "turns": ["Привіт! Can you tell me скільки буде 6 times 7? Number only."], "checks": [{"type": "contains", "value": "42", "ignore_case": true}]}
+{"id": "switch-1", "category": "en", "turns": ["Translate 'дякую' into English. One word."], "checks": [{"type": "contains", "value": "thank", "ignore_case": true}]}
+{"id": "switch-2", "category": "en", "turns": ["Як англійською 'кіт'? One word."], "checks": [{"type": "contains", "value": "cat", "ignore_case": true}]}
+{"id": "switch-3", "category": "en", "turns": ["What does 'добрий ранок' mean in English?"], "checks": [{"type": "contains", "value": "morning", "ignore_case": true}]}

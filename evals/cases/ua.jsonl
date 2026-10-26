@@ -1,0 +1,20 @@
+{"id": "ua-math-0", "category": "ua", "turns": ["Скільки буде 17 помножити на 23? Відповідай лише числом."], "checks": [{"type": "contains", "value": "391"}, {"type": "tool_not_called"}]}
+{"id": "ua-math-1", "category": "ua", "turns": ["Скільки буде 48 помножити на 12? Відповідай лише числом."], "checks": [{"type": "contains", "value": "576"}, {"type": "tool_not_called"}]}
+{"id": "ua-math-2", "category": "ua", "turns": ["Скільки буде 125 помножити на 8? Відповідай лише числом."], "checks": [{"type": "contains", "value": "1000"}, {"type": "tool_not_called"}]}
+{"id": "ua-math-3", "category": "ua", "turns": ["Скільки буде 99 помножити на 99? Відповідай лише числом."], "checks": [{"type": "contains", "value": "9801"}, {"type": "tool_not_called"}]}
+{"id": "ua-math-4", "category": "ua", "turns": ["Скільки буде 314 помножити на 3? Відповідай лише числом."], "checks": [{"type": "contains", "value": "942"}, {"type": "tool_not_called"}]}
+{"id": "ua-fact-0", "category": "ua", "turns": ["Яка столиця України? Одне слово."], "checks": [{"type": "contains_any", "values": ["Київ"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-1", "category": "ua", "turns": ["Скільки днів у тижні? Відповідай числом."], "checks": [{"type": "contains_any", "values": ["7", "сім"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-2", "category": "ua", "turns": ["Яка найдовша річка в Україні? Одне слово."], "checks": [{"type": "contains_any", "values": ["Дніпро"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-3", "category": "ua", "turns": ["Як українською буде англійське слово 'apple'? Одне слово."], "checks": [{"type": "contains_any", "values": ["яблук"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-4", "category": "ua", "turns": ["Скільки хвилин в одній годині? Число."], "checks": [{"type": "contains_any", "values": ["60"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-5", "category": "ua", "turns": ["Яке число йде після дев'яносто дев'яти? Цифрами."], "checks": [{"type": "contains_any", "values": ["100"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-6", "category": "ua", "turns": ["Назви колір неба в ясний день одним словом."], "checks": [{"type": "contains_any", "values": ["блакит", "синій", "синє"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-fact-7", "category": "ua", "turns": ["Скільки сторін у трикутника? Числом."], "checks": [{"type": "contains_any", "values": ["3", "три"]}, {"type": "script", "value": "cyrillic"}]}
+{"id": "ua-reverse-0", "category": "ua", "turns": ["Запиши ці слова у зворотному порядку через пробіл, без нічого іншого: кіт пес миша"], "checks": [{"type": "contains", "value": "миша пес кіт"}]}
+{"id": "ua-reverse-1", "category": "ua", "turns": ["Запиши ці слова у зворотному порядку через пробіл, без нічого іншого: один два три"], "checks": [{"type": "contains", "value": "три два один"}]}
+{"id": "ua-style-0", "category": "ua", "turns": ["Поясни одним реченням, що таке оперативна пам'ять."], "checks": [{"type": "script", "value": "cyrillic"}, {"type": "max_chars", "value": 600}]}
+{"id": "ua-style-1", "category": "ua", "turns": ["Дай одну коротку пораду, як краще спати."], "checks": [{"type": "script", "value": "cyrillic"}, {"type": "max_chars", "value": 600}]}
+{"id": "ua-style-2", "category": "ua", "turns": ["Опиши осінь одним реченням."], "checks": [{"type": "script", "value": "cyrillic"}, {"type": "max_chars", "value": 600}]}
+{"id": "ua-style-3", "category": "ua", "turns": ["Що таке Linux? Одне речення."], "checks": [{"type": "script", "value": "cyrillic"}, {"type": "max_chars", "value": 600}]}
+{"id": "ua-style-4", "category": "ua", "turns": ["Навіщо робити резервні копії? Одне речення."], "checks": [{"type": "script", "value": "cyrillic"}, {"type": "max_chars", "value": 600}]}

@@ -78,6 +78,7 @@ class TurnResult:
     persisted: bool = False
     evidence_ids: tuple[str, ...] = ()
     events: tuple[TurnEvent, ...] = ()
+    model_metrics: tuple[Mapping, ...] = ()  # per model round: token counts, ttft, elapsed
 
 
 @dataclass
@@ -345,6 +346,7 @@ class Agent:
                 persisted=persisted,
                 evidence_ids=tuple(state["tags"]),
                 events=tuple(events),
+                model_metrics=tuple(state.get("model_metrics", ())),
             )
 
         try:
@@ -382,6 +384,7 @@ class Agent:
                     reply = await self.model.chat(
                         request, on_delta=delta, cancel=context.cancel, deadline=context.deadline
                     )
+                state.setdefault("model_metrics", []).append(dict(reply.metrics))
                 if not reply.tool_calls:
                     state["turn_messages"].append(
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
