@@ -176,3 +176,7 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-10-26] lint | Теми operations/evals
 
 Перевірено 31 wiki-сторінку, 260 локальних посилань, frontmatter/source paths та index coverage — без помилок.
+
+## [2026-10-26] implementation | Розширений доступ власника
+
+**Перевірений факт:** за рішенням власника додано `forget_requires_approval` і `sudo_access` (`0aef1b8`, гілка `feat/b12-access`), створено реальний стан і конфіг власника та project-local permissions для Claude Code. Sudo на хості потребує пароль, тому `sudo_exec` поки повертає чесну помилку; sudoers змінює власник. Злиття в `feat/b12-runtime`/`main` відкладено до завершення soak, бо воркери soak щоразу імпортують свіжий код. [Деталі](topics/tool-control.md).

@@ -42,6 +42,21 @@ Review: перший незалежний review знайшов I1 (resolver Non
 
 **Перевірений факт:** Task 9 (`9632cdc`) відкриває host tools через API лише після автентифікації. Owner bearer token лежить у `state_dir/api/owner.token` (0600); ControlStore зберігає тільки HMAC digest. Токен приймається лише з заголовка, не з URL. Гостьові токени видає owner, з typed capabilities без filesystem/process/network/forget і без full execution. Guard відхиляє чужий Host (DNS rebinding), чужий Origin для змін стану і тіла понад 64 KiB. Поля actor/consent/grant у тілі дають 422. Розрив NDJSON-стріму скасовує turn. Не реалізовано: TLS (лише loopback), rate limiting, UI.
 
+## Розширений доступ власника (26.10.2026)
+
+**Рішення власника:** «повний доступ до всього для B-12» — у runtime і для Claude Code. Реалізовано як налаштування контрольного каналу (`~/.config/b12/config.toml` або `B12_*`), яких модель змінити не може. Типові значення консервативні.
+
+| Налаштування | Дія | Межа |
+|---|---|---|
+| `forget_requires_approval=false` | `memory_forget` виконується на grant власника без підтвердження | Виняток лише для цього tool (`registry.approval_exempt`); решта DESTRUCTIVE tools, включно з `sudo_exec`, і далі чекають approval. Гості не мають `memory.forget` |
+| `sudo_access="approval"` | реєструється `sudo_exec` (capability `process.sudo`, лише `host_access="full"`) | Одна точна абсолютна команда через `sudo -n --`; кожен виклик потребує exact approval, навіть під full-execution grant. Ні гості, ні фонові цілі за замовчуванням `process.sudo` не отримують |
+
+**Межа sudo:** на хості власника sudo вимагає пароль (`sudo: a password is required`), а B-12 паролів не вводить і не зберігає, тому доти `sudo_exec` чесно повертає помилку. Дозволити конкретні команди без пароля може лише власник через sudoers — це зміна системної безпеки, яку B-12 не виконує сам.
+
+**Реальний стан:** B-12 ініціалізовано на `~/.local/state/b12`; archive-index власника підключено read-only через довірений MCP-каталог. Живий прогін з реальним Bolt: forget без запиту (receipt complete), `mcp.archive.archive_search` у реальному архіві, `sudo_exec` зупинився на `approval_pending` (запит відхилено, команду не виконано). Тести: 9 нових (мутації: виняток ігнорується, виняток для всіх, sudo без `-n`, sudo без capability, sudo як TYPED, capability без налаштування — усі спіймані).
+
+**Claude Code:** project-local `.claude/settings.local.json` (поза git) дозволяє Bash, Edit/Write, Read, WebFetch, WebSearch та каталоги стану B-12. Глобальні налаштування не змінювалися.
+
 ## Межі та наступний крок
 
 Реальні effects перевірено лише на temp/local fixtures; production файли користувача не змінювались. **Не реалізовано:** global `PurgeCoordinator` і original-revision lookup (Task 7), agent/session loop (Task 7), загальний service backup (Task 13). Blocking OS/Python I/O не має hard preemption. Staging, батьківський каталог якого видалено поза B-12, лишається `pending` — coordinator має показувати причину. Код і тести не доводять 24/7 або physical hardware acceptance.
