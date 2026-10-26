@@ -371,7 +371,7 @@ def tool_cases():
                 f"tool-append-check-{i}",
                 "tools",
                 [
-                    f"Створи {{sandbox}}/{name} з текстом {text}.",
+                    f"Створи {{sandbox}}/{name} з текстом «{text}» (без лапок і крапки у файлі).",
                     f"Тепер прочитай {{sandbox}}/{name} і скажи, що там.",
                 ],
                 [
