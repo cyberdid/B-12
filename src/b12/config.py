@@ -25,6 +25,11 @@ class Settings(BaseModel):
     max_tool_calls: Annotated[int, Field(gt=0)] = 16
     tool_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 30
     host_access: Literal["full", "read_only", "none"] = "full"
+    # Owner-chosen wide access. Both are control-channel settings; model output cannot set them.
+    # forget_requires_approval=False lets memory_forget run on the owner's grant alone.
+    forget_requires_approval: bool = True
+    # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
+    sudo_access: Literal["off", "approval"] = "off"
     # Initiative policy (local wall clock). Quiet hours block nonurgent speech only.
     timezone: str = "Europe/Kyiv"
     quiet_start: Annotated[str, Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")] = "23:00"
@@ -126,6 +131,8 @@ class Settings(BaseModel):
             value: Any = env[key]
             if field in integers:
                 value = int(value)
+            elif field == "forget_requires_approval":
+                value = value.strip().lower() in ("1", "true", "yes", "on")
             elif field in {
                 "tool_timeout_s",
                 "model_timeout_s",

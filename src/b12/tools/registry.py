@@ -45,6 +45,8 @@ class ToolRegistry:
             raise ValueError("positive finite timeout required")
         self.control, self.timeout_s = control, timeout_s
         self._tools: dict[str, _Tool] = {}
+        # Owner-configured DESTRUCTIVE tools that run on the grant alone (never from model text).
+        self.approval_exempt: set[str] = set()
 
     def register(
         self,
@@ -196,7 +198,8 @@ class ToolRegistry:
                 call,
                 tool.capability,
                 tool.risk == Risk.ARBITRARY,
-                approval_required=tool.risk == Risk.DESTRUCTIVE,
+                approval_required=tool.risk == Risk.DESTRUCTIVE
+                and tool.name not in self.approval_exempt,
             )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})

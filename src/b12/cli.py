@@ -377,7 +377,10 @@ async def cmd_goals(args, settings) -> int:
                     session,
                     args.value,
                     args.criteria,
-                    allowed_tools=tuple(args.tools or owner_capabilities(settings)),
+                    allowed_tools=tuple(
+                        args.tools
+                        or (c for c in owner_capabilities(settings) if c != "process.sudo")
+                    ),
                     budget_turns=args.budget,
                     review_interval_s=args.interval,
                     check=check,

@@ -46,6 +46,8 @@ def owner_capabilities(settings) -> tuple[str, ...]:
     from b12.tools.mcp import catalog_capabilities
 
     extra = catalog_capabilities(settings.state_dir) if settings.host_access != "none" else ()
+    if settings.host_access == "full" and settings.sudo_access == "approval":
+        extra = (*extra, "process.sudo")
     return tuple(dict.fromkeys((*HOST_CAPABILITIES[settings.host_access], *extra)))
 
 

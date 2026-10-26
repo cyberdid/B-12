@@ -108,7 +108,10 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         knowledge=knowledge,
         purge=purge,
         memory_revision=agent.memory_revision,
+        sudo=settings.host_access == "full" and settings.sudo_access == "approval",
     )
+    if not settings.forget_requires_approval:
+        registry.approval_exempt.add("memory_forget")
     return Runtime(
         settings,
         control,

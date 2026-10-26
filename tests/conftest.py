@@ -56,7 +56,15 @@ def host_factory(tmp_path):
 
     rigs = []
 
-    def factory(*, timeout_s=2, full_execution=True, capabilities=None, purge=None, revision=True):
+    def factory(
+        *,
+        timeout_s=2,
+        full_execution=True,
+        capabilities=None,
+        purge=None,
+        revision=True,
+        sudo_path=None,
+    ):
         assert importlib.util.find_spec("b12.tools.filesystem") is not None, (
             "host tools are missing"
         )
@@ -102,6 +110,7 @@ def host_factory(tmp_path):
             memory=memory,
             knowledge=knowledge,
             purge=purge,
+            sudo_path=sudo_path,
             memory_revision=revision
             if callable(revision)
             else ((lambda context: captured_revision) if revision else None),

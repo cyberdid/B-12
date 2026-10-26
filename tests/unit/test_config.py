@@ -87,6 +87,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "timezone": "Europe/Kyiv", "quiet_start": "23:00", "quiet_end": "08:00",
         "initiative_hour_cap": 3, "initiative_cooldown_s": 600, "scheduler_tick_s": 60,
         "embedding_python": None, "embedding_backend": "archive_index.embed:Embedder",
+        "forget_requires_approval": True, "sudo_access": "off",
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 
