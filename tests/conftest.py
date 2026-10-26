@@ -44,3 +44,88 @@ def profile_settings(tmp_path):
         num_ctx=256,
         output_tokens=32,
     )
+
+
+@pytest.fixture
+def host_factory(tmp_path):
+    """Real stores and owner control; host effects stay in this test's temp root."""
+    import importlib.util
+    import time
+    from types import SimpleNamespace
+    from uuid import uuid4
+
+    rigs = []
+
+    def factory(*, timeout_s=2, full_execution=True, capabilities=None, purge=None, revision=True):
+        assert importlib.util.find_spec("b12.tools.filesystem") is not None, (
+            "host tools are missing"
+        )
+        from b12.contracts import ToolCall
+        from b12.control import ControlStore
+        from b12.memory import MemoryStore
+        from b12.retrieval import KnowledgeIndex
+        from b12.tools import register_host_tools
+        from b12.tools.filesystem import BackupStore
+        from b12.tools.registry import ToolRegistry
+
+        root = tmp_path / str(uuid4())
+        root.mkdir()
+        control = ControlStore(root / "control")
+        actor = control.create_actor(owner=True, consent=True)
+        session = control.create_session(actor.id)
+        task = control.create_task(session)
+        caps = capabilities or (
+            "system.read",
+            "process.read",
+            "filesystem.read",
+            "filesystem.write",
+            "process.execute",
+            "network.http",
+            "memory.read",
+            "memory.write",
+            "memory.forget",
+            "knowledge.read",
+            "time.read",
+        )
+        grant = control.issue_grant(
+            actor.id, session, caps, task_id=task, full_execution=full_execution
+        )
+        ctx = control.begin_turn(session, grant, task_id=task, deadline=time.monotonic() + 10)
+        memory = MemoryStore(root / "memory.sqlite3")
+        knowledge = KnowledgeIndex(root / "knowledge")
+        backups = BackupStore(root / "backups")
+        captured_revision = memory.deletion_revision(actor)
+        registry = ToolRegistry(control, timeout_s=timeout_s)
+        register_host_tools(
+            registry,
+            backups=backups,
+            memory=memory,
+            knowledge=knowledge,
+            purge=purge,
+            memory_revision=(lambda context: captured_revision) if revision else None,
+        )
+
+        async def invoke(name, *, call_id=None, **arguments):
+            call = ToolCall(id=call_id or str(uuid4()), name=name, arguments=arguments)
+            return await registry.execute(call, ctx)
+
+        rig = SimpleNamespace(
+            root=root,
+            control=control,
+            actor=actor,
+            context=ctx,
+            registry=registry,
+            memory=memory,
+            knowledge=knowledge,
+            backups=backups,
+            invoke=invoke,
+        )
+        rigs.append(rig)
+        return rig
+
+    yield factory
+    for rig in reversed(rigs):
+        rig.backups.close()
+        rig.knowledge.close()
+        rig.memory.close()
+        rig.control.close()
