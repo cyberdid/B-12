@@ -30,7 +30,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 6 (`012f248`, fixes `f0f8ea2`, `7d7809e`) додає 13 реальних host tools через `HandlerOutcome`/`EffectGuard`. Review знайшов I1/I2/M1; усі закрито, scoped rereview — coordinator (Claude Code), не окремий агент. Full suite 318 passed / 1 skipped; Ruff clean. [Деталі й межі](../topics/tool-control.md).
 
-**Наступний крок:** Task 7 об’єднує sessions, original-revision lookup, global purge coordination і спільний agent loop.
+**Перевірений факт:** Task 7 (`d885d49`, `9b4f31a`, `2d6ee36`, `740629a`) — agent loop, sessions, EvidenceResolver, PurgeCoordinator, application factory. Full suite 350 passed / 2 skipped. Реальний Bolt run2/run3 без protocol failures; run1 (`context_mismatch` через anyOf) збережено як негативний результат. Review: coordinator self-review і мутації, без окремого агента. [Деталі й межі](../topics/agent-loop.md).
+
+**Наступний крок:** Task 8 — CLI (`b12 init/doctor/chat/memory/tools/approve/resume`) на спільному `open_runtime`.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 

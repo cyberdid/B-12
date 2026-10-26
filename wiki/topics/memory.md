@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-10-25
+updated: 2026-10-26
 status: partially_implemented
 sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/memory.py, tests/integration/test_memory_restart.py, tests/security/test_memory_isolation.py]
 tags: [memory, privacy, consent]
@@ -19,7 +19,7 @@ Working, episodic, semantic, autobiographical, procedural, social, research і s
 
 ## Суперечності та стан вирішення
 
-1. **Append-only і видалення.** У новому canonical store append-only стосується payload-free audit; персональний payload/evidence/FTS фізично очищується через secure delete, FTS rebuild та WAL checkpoint. Durable tombstone/outbox фіксуються перед очищенням; busy/failed cleanup не стає complete. Це перевірено локально, а global purge для sessions/goals/backups/active turns ще потребує hooks за spec §15.2. Початкові варіанти redaction/cryptographic erasure замінено цим конкретним storage рішенням; SSD remanence і зовнішні snapshots тестами не доведені.
+1. **Append-only і видалення.** У новому canonical store append-only стосується payload-free audit; персональний payload/evidence/FTS фізично очищується через secure delete, FTS rebuild та WAL checkpoint. Durable tombstone/outbox фіксуються перед очищенням; busy/failed cleanup не стає complete. Це перевірено локально. Task 7 додав global `PurgeCoordinator` із hooks sessions/active turns/backups/provider cache ([деталі й межі](agent-loop.md)); goals hook з’явиться разом із goals (Task 11). Початкові варіанти redaction/cryptographic erasure замінено цим конкретним storage рішенням; SSD remanence і зовнішні snapshots тестами не доведені.
 2. **Short-term log і відсутність згоди.** Назва «короткотривалий» не гарантує volatile storage. До перевірки політики персональний observation має лишатися в пам’яті процесу з TTL; durable ledger не повинен отримувати заборонений зміст навіть тимчасово. Це запропоноване уточнення контракту.
 3. **Успадковані дані.** Рефлексія або embedding також може містити видалену інформацію. Потрібні залежності від evidence IDs та перевірка каскадного видалення.
 

@@ -124,3 +124,11 @@ tags: [history]
 ## [2026-10-26] lint | Task 6 checkpoint
 
 Перевірено 27 wiki-сторінок, 232 локальні Markdown-посилання, required frontmatter/source paths і index coverage — без помилок. SHA-256 master brief збігається з `raw/source-manifest.json`. Тема `tool-control.md` не оголошує global purge, API authentication чи agent loop готовими.
+
+## [2026-10-26] implementation | Task 7 agent loop і global purge
+
+**Перевірений факт:** `d885d49` додає `Agent`/`TurnEvent`/`TurnResult`, `SessionStore`, `EvidenceResolver`, `PurgeCoordinator`, `open_runtime` і `OllamaModel.unload`. 16 agent integration tests на реальних stores/host tools/HTTP NDJSON; 10 мутацій ключових гарантій спіймані. Реальний Bolt run1 (`9b4f31a`) — 12/12 `context_mismatch`; причина — `anyOf` у `process_list` (Ollama +6 токенів проти pinned template), виправлено в `2d6ee36` разом із надто м’яким gate. Run2/run3 — 0 protocol failures; write/read, system_info і memory recall після restart по 3/3. shell_exec — поведінкові промахи моделі (argv/cwd), модель чесно повідомляє про невдачу. Review виконав coordinator, не окремий агент. [Тема](topics/agent-loop.md).
+
+## [2026-10-26] lint | Task 7 checkpoint
+
+Перевірено 28 wiki-сторінок, 241 локальне посилання, frontmatter/source paths і index coverage — без помилок. SHA-256 master brief незмінний (`e2b0c4c3…`). Нова тема `agent-loop.md` фіксує межі: provider unload ≠ per-actor erasure, turn-level provenance, відсутній окремий незалежний review. Memory/roadmap/status/implementation узгоджено з Task 7.

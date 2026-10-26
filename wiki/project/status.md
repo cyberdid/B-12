@@ -7,7 +7,7 @@ tags: [progress, next]
 ---
 # Стан проєкту
 
-На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control і 13 реальних host tools; agent loop, API, голос і фізичні acceptance ще попереду.
+На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control, 13 реальних host tools, agent loop із sessions і global purge; CLI/API, голос і фізичні acceptance ще попереду.
 
 ## Наявне
 
@@ -19,6 +19,7 @@ tags: [progress, next]
 - [Перший smoke test Bolt](bolt-first-test.md): SHA-256 перевірено; alias `b12-bolt-e4b:q4km`, context 2048; 26 запитів, з них 3 overflow timing observations виключені. Warm decode ~62–64 tok/s; є поведінкові недоліки. Пізніше truncation risk закрито лише для pinned profile, див. наступний пункт; модель лишається кандидатом.
 - [Review archive-index-public](../sources/archive-index-public.md): 16 source files за pinned commit, 17 core tests passed; synthetic lexical/provenance і cache-refresh probe виконані без production DB/embedding load. Pinned lexical modules тепер інтегровані через actor-scoped derived index; приватний production archive не імпортовано.
 - [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
+- [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
 - [Tool control](../topics/tool-control.md): Task 5 reviewed у `bc07196`; Task 6 host tools — `7d7809e` після двох fix rounds. Filesystem/process/HTTP/memory handlers перевірені на temp/local fixtures. API authentication і глобальний purge ще не реалізовано.
 
 ## Не підтверджено
@@ -27,7 +28,7 @@ tags: [progress, next]
 
 ## Активний етап
 
-**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–6 реалізовані та reviewed; Task 6 fix commit `7d7809e`, coordinator full suite — 318 passed / 1 skipped, Ruff clean. Agent loop ще немає; наступний gate — Task 7. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
+**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–7 реалізовані; Task 7 `740629a`, full suite 350 passed / 2 skipped, Ruff clean; реальний Bolt виконує file write/read, system_info і memory recall після restart (3/3 у run2/run3). Наступний gate — Task 8 CLI. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
 
 **M0 — частково:** versioned contracts, canonical memory/revocation primitives, server-owned owner/guest control та grant/approval lifecycle є. System heartbeat і retention/global-purge coordinators ще потрібні. Для M1 є memory, lexical retrieval, pinned Bolt transport і strict tool policy/registry, реальні host handlers; agent/session loop, idle reflection та A/B ще немає. M2–M6 не початі.
 

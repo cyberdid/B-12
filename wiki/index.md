@@ -34,6 +34,7 @@ tags: [navigation]
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Контроль і результати інструментів](topics/tool-control.md) | Server-owned grants, exact approval, lifecycle, bounded effects і unknown outcomes |
+| [Agent loop і глобальне забуття](topics/agent-loop.md) | Model→tools→results, events, sessions/provenance, PurgeCoordinator, реальний Bolt |
 | [Моделі й benchmark](topics/models.md) | Кандидати, оцінювання, ризик TTFT |
 | [Reachy і Jetson](topics/hardware.md) | Варіанти обладнання, transport і deployment |
 
