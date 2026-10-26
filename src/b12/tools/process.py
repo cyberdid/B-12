@@ -5,6 +5,7 @@ escape its group; this is not a sandbox or a guarantee against detached daemons.
 """
 
 import asyncio
+import ctypes
 import os
 import platform
 import signal
@@ -15,6 +16,18 @@ from pydantic import Field, field_validator
 from b12.tools._common import AbsolutePath, Args, EmptyArgs, clip, failure
 from b12.tools.outcomes import HandlerOutcome, SideEffect
 from b12.tools.policy import Risk
+
+
+_LIBC = ctypes.CDLL(None, use_errno=True)
+_PR_SET_PDEATHSIG = 1
+
+
+def _die_with_parent():
+    """Runs in the forked child: SIGKILL it if the B-12 process dies abruptly.
+
+    Covers the direct child only; detached grandchildren remain an OS-level limit.
+    """
+    _LIBC.prctl(_PR_SET_PDEATHSIG, signal.SIGKILL)
 
 
 class ProcessListArgs(Args):
@@ -175,6 +188,7 @@ async def shell_exec(args, guard):
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 start_new_session=True,
+                preexec_fn=_die_with_parent,
                 env={"PATH": os.defpath, "LANG": "C.UTF-8"},
             )
         )

@@ -242,7 +242,14 @@ async def test_abrupt_kill_recovers_integrity_and_marks_started_unknown(ops, tmp
     await server.wait()
     request.cancel()
     await client.aclose()
-    os.kill(child, signal.SIGKILL)  # orphan from SIGKILL: no in-process cleanup is possible
+    # PR_SET_PDEATHSIG: the direct child dies with the killed server, no orphan remains.
+    for _ in range(50):
+        if not alive(child):
+            break
+        await asyncio.sleep(0.1)
+    if alive(child):
+        os.kill(child, signal.SIGKILL)
+        pytest.fail("child process outlived SIGKILL of the server")
     runtime = open_one()
     states = [e["state"] for e in runtime.control.audit_events()]
     assert states[-1] == "unknown" and "started" in states
