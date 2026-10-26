@@ -4,6 +4,7 @@
 runtime tasks і зовнішні індекси має координувати майбутній application layer.
 """
 
+import functools
 import hashlib
 import json
 import os
@@ -18,6 +19,26 @@ from uuid import UUID, uuid4
 
 from b12.contracts import Actor, MemoryRecord, PurgeReceipt, _identifier
 from b12.migrations import check_schema, migrate
+
+
+@functools.lru_cache(maxsize=50_000)
+def _forms(term: str) -> tuple[str, ...]:
+    """The term plus inflections of its dictionary lemmas (uk; ru only without uk letters)."""
+    forms = {term}
+    if any("\u0400" <= ch <= "\u04ff" for ch in term):
+        from b12._vendor.archive_index.lexical import _analyzer
+
+        languages = ["uk"] if any(ch in "іїєґ" for ch in term) else ["uk", "ru"]
+        for language in languages:
+            try:
+                parses = [p for p in _analyzer(language).parse(term) if p.is_known]
+            except Exception:  # missing dictionary: keep the literal term
+                continue
+            for parse in parses[:3]:
+                forms.update(f.word for f in parse.lexeme)
+            if parses:
+                break
+    return tuple(sorted(forms, key=lambda f: (f != term, f)))[:48]
 
 
 def _now() -> str:
@@ -311,7 +332,12 @@ class MemoryStore:
             raise TypeError("query must be text")
         # Only literal Unicode alphanumeric tokens; no FTS operators or SQL syntax.
         terms = re.findall(r"[^\W_]+", query, flags=re.UNICODE)[:64]
-        expression = " AND ".join('"' + term + '"' for term in terms)
+        # Each term matches any inflection of its lemma (шафку ~ шафки); every form is a
+        # quoted literal, so the query can never inject FTS operators.
+        expression = " AND ".join(
+            "(" + " OR ".join('"' + form + '"' for form in _forms(term.lower())) + ")"
+            for term in terms
+        )
         with self._transaction():
             if not terms or not limit:
                 return []

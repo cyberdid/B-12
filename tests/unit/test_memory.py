@@ -201,3 +201,27 @@ def test_deleted_audit_tail_is_detected_via_persisted_head(tmp_path):
     with pytest.raises(RuntimeError, match="audit"):
         store.remember("never persisted", actor)
     store.close()
+
+
+@pytest.mark.parametrize("query", ["шафку", "шафках", "шафкою", "кодом шафки"])
+def test_search_matches_ukrainian_inflections(tmp_path, query):
+    from b12.memory import MemoryStore
+
+    actor = Actor(id="owner", consent=True)
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    record = store.remember("Тестовий код шафки 3355", actor)
+    store.remember("Кава без цукру", actor)
+    assert [r.id for r in store.search(query, actor)] == [record.id]
+    store.close()
+
+
+def test_inflection_expansion_keeps_operators_literal(tmp_path):
+    from b12.memory import MemoryStore
+
+    actor = Actor(id="owner", consent=True)
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    store.remember("звичайний текст", actor)
+    assert store.search("текст", actor)[0].text == "звичайний текст"
+    assert store.search('текст" OR "кава', actor) == []  # OR is a literal word, ANDed
+    assert store.search("NEAR(текст)", actor) == []
+    store.close()
