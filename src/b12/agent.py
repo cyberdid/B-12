@@ -418,7 +418,10 @@ class Agent:
             call = ToolCall.model_validate_json(json.dumps(state["queue"][0]))
             if state.get("announced") != call.id:
                 state["announced"] = call.id
-                await emit("tool_started", {"call_id": call.id, "name": call.name})
+                await emit(
+                    "tool_started",
+                    {"call_id": call.id, "name": call.name, "arguments": call.arguments},
+                )
             if call.id in state["call_ids"]:
                 result = ToolResult(
                     call_id=call.id,
