@@ -132,3 +132,7 @@ tags: [history]
 ## [2026-10-26] lint | Task 7 checkpoint
 
 Перевірено 28 wiki-сторінок, 241 локальне посилання, frontmatter/source paths і index coverage — без помилок. SHA-256 master brief незмінний (`e2b0c4c3…`). Нова тема `agent-loop.md` фіксує межі: provider unload ≠ per-actor erasure, turn-level provenance, відсутній окремий незалежний review. Memory/roadmap/status/implementation узгоджено з Task 7.
+
+## [2026-10-26] implementation | Task 8 owner CLI
+
+**Перевірений факт:** `964709b` додає `b12` (init/doctor/chat/resume/approve/deny/approvals/memory/session/tools). Локальний CLI — owner control channel: owner/session зберігаються в ControlStore metadata, grant видається на кожен виклик за `host_access`, а pending purge завершується до першого turn. SIGINT скасовує поточний turn (exit 130) без пошкодження стану. 11 subprocess e2e tests і 4 мутації; full suite 361 passed / 2 skipped. Живий запуск встановленого entry point з реальним Bolt записав і прочитав файл. `serve`/`eval` не імітуються — вони належать Task 9/14.

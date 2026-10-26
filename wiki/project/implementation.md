@@ -32,7 +32,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 7 (`d885d49`, `9b4f31a`, `2d6ee36`, `740629a`) — agent loop, sessions, EvidenceResolver, PurgeCoordinator, application factory. Full suite 350 passed / 2 skipped. Реальний Bolt run2/run3 без protocol failures; run1 (`context_mismatch` через anyOf) збережено як негативний результат. Review: coordinator self-review і мутації, без окремого агента. [Деталі й межі](../topics/agent-loop.md).
 
-**Наступний крок:** Task 8 — CLI (`b12 init/doctor/chat/memory/tools/approve/resume`) на спільному `open_runtime`.
+**Перевірений факт:** Task 8 (`964709b`) — owner CLI `b12` (init/doctor/chat/resume/approve/deny/approvals/memory/session/tools) на спільному `open_runtime`; 11 subprocess e2e tests, 361 passed / 2 skipped. Живий запуск встановленого `b12` з реальним Bolt записав і прочитав файл. Команди — у [README](../../README.md).
+
+**Наступний крок:** Task 9 — локальний API з owner-token auth, Origin check і streaming подій.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
