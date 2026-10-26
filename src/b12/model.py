@@ -306,6 +306,43 @@ class OllamaModel:
         except httpx.HTTPError as exc:
             raise ModelError("transport_error", "provider transport failed") from exc
 
+    async def unload(self, *, timeout_s: float = 10) -> bool:
+        """Model-level provider state reset for the dedicated alias, not per-actor erasure.
+
+        The caller guarantees no in-flight or new request for this model. True only when
+        the provider acknowledged keep_alive=0 and /api/ps no longer lists the model.
+        """
+        model = self.settings.model
+        deadline = time.monotonic() + timeout_s
+        try:
+            async with httpx.AsyncClient(
+                base_url=self.settings.ollama_url.rstrip("/") + "/",
+                timeout=timeout_s,
+                trust_env=False,
+            ) as client:
+                response = await client.post(
+                    "api/generate", json={"model": model, "keep_alive": 0, "stream": False}
+                )
+                if response.status_code != 200:
+                    return False
+                while True:
+                    running = await client.get("api/ps")
+                    if running.status_code != 200:
+                        return False
+                    names = {
+                        item.get(key)
+                        for item in running.json().get("models", [])
+                        if isinstance(item, dict)
+                        for key in ("name", "model")
+                    }
+                    if model not in names:
+                        return True
+                    if time.monotonic() >= deadline:
+                        return False
+                    await asyncio.sleep(0.1)
+        except (httpx.HTTPError, ValueError, AttributeError):
+            return False
+
     @staticmethod
     async def _check_deployment(client: httpx.AsyncClient, profile: ModelProfile):
         async def read(method, path, **kwargs):

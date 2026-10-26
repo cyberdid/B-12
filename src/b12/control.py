@@ -165,6 +165,9 @@ class ControlStore:
             )
         return actor
 
+    def actor_ids(self) -> list[str]:
+        return [row[0] for row in self.db.execute("SELECT id FROM actors ORDER BY rowid")]
+
     def resolve_actor(self, actor_id: str) -> Actor:
         row = self.db.execute("SELECT * FROM actors WHERE id=?", (actor_id,)).fetchone()
         if row is None:

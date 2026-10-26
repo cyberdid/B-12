@@ -139,6 +139,9 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
         try:
             receipt = await purge.purge(args.memory_id, guard.context, guard)
             receipt = PurgeReceipt.model_validate(receipt.model_dump(mode="python"), strict=True)
+        except KeyError:
+            # Coordinator rejected an unknown/foreign ID before any tombstone or hook.
+            return failure("not_found")
         except (Exception, asyncio.CancelledError) as exc:
             return HandlerOutcome(
                 status="unknown",

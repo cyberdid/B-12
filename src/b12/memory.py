@@ -158,6 +158,21 @@ class MemoryStore:
         with self._transaction():
             return self._revision(actor)
 
+    def is_live(self, memory_id: str, actor: Actor) -> bool:
+        """Payload-free liveness for trusted resolvers; tombstoned IDs are never live."""
+        try:
+            UUID(memory_id)
+        except (ValueError, TypeError, AttributeError):
+            return False
+        with self._transaction():
+            return bool(
+                self._connection.execute(
+                    """SELECT 1 FROM memories m WHERE id=? AND actor_id=?
+                       AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                    (memory_id, actor.id),
+                ).fetchone()
+            )
+
     def remember(
         self,
         text: str,
@@ -462,6 +477,11 @@ class MemoryStore:
                 return self._receipt(operation_id, actor)
         # External acknowledgements cannot bypass a blocked canonical checkpoint.
         return self._cleanup_canonical(operation_id, actor)
+
+    def purge_receipt(self, operation_id: str, actor: Actor) -> PurgeReceipt:
+        UUID(operation_id)
+        with self._transaction():
+            return self._receipt(operation_id, actor)
 
     def pending_purges(self, actor: Actor) -> list[PurgeReceipt]:
         with self._transaction():

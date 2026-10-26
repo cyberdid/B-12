@@ -131,3 +131,137 @@ def host_factory(tmp_path):
         rig.knowledge.close()
         rig.memory.close()
         rig.control.close()
+
+
+@pytest.fixture
+async def scripted_ollama(profile_settings):
+    """Real loopback HTTP + NDJSON Ollama stand-in driven by a per-request script.
+
+    Each script entry is a dict {"content", "tool_calls", "delay", "hang"} or a callable
+    (request_payload) -> dict. Prompt counts use the same pinned synthetic profile.
+    """
+    import asyncio
+    import inspect
+
+    from b12.model_profile import ModelProfile
+
+    settings = profile_settings.model_copy(update={"num_ctx": 32768, "output_tokens": 512})
+    profile = ModelProfile(settings)
+    state = {
+        "script": [],
+        "requests": [],
+        "loaded": False,
+        "unloads": 0,
+        "unload_status": 200,
+        "chat_started": asyncio.Event(),
+    }
+    handlers = set()
+
+    def frame(value):
+        return json.dumps(value, ensure_ascii=False).encode() + b"\n"
+
+    async def respond(writer, status, payload):
+        body = json.dumps(payload).encode()
+        writer.write(
+            f"HTTP/1.1 {status} OK\r\nContent-Length: {len(body)}\r\n"
+            "Connection: close\r\n\r\n".encode()
+            + body
+        )
+        await writer.drain()
+
+    async def handle(reader, writer):
+        handlers.add(asyncio.current_task())
+        try:
+            header = await reader.readuntil(b"\r\n\r\n")
+            path = header.split(b" ")[1].decode()
+            length = next(
+                (
+                    int(line.split(b":")[1])
+                    for line in header.split(b"\r\n")
+                    if line.lower().startswith(b"content-length:")
+                ),
+                0,
+            )
+            body = json.loads(await reader.readexactly(length)) if length else {}
+            if path.endswith("/api/version"):
+                await respond(writer, 200, {"version": "test-1"})
+            elif path.endswith("/api/tags"):
+                await respond(writer, 200, {"models": [{"name": "test-model", "digest": "a" * 64}]})
+            elif path.endswith("/api/show"):
+                await respond(writer, 200, {"template": "{{ .Prompt }}"})
+            elif path.endswith("/api/ps"):
+                running = [{"name": "test-model", "model": "test-model"}] if state["loaded"] else []
+                await respond(writer, 200, {"models": running})
+            elif path.endswith("/api/generate"):
+                if state["unload_status"] == 200 and body.get("keep_alive") == 0:
+                    state["loaded"] = False
+                    state["unloads"] += 1
+                await respond(writer, state["unload_status"], {"done_reason": "unload"})
+            elif path.endswith("/api/chat"):
+                state["requests"].append(body)
+                state["loaded"] = True
+                state["chat_started"].set()
+                step = state["script"].pop(0) if state["script"] else {"content": "Готово."}
+                if callable(step):
+                    step = step(body)
+                    if inspect.isawaitable(step):
+                        step = await step
+                writer.write(b"HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n")
+                content = step.get("content", "")
+                for piece in [content[i : i + 8] for i in range(0, len(content), 8)]:
+                    writer.write(
+                        frame({"message": {"role": "assistant", "content": piece}, "done": False})
+                    )
+                    await writer.drain()
+                if step.get("hang"):
+                    await reader.read(1)
+                    return
+                if step.get("tool_calls"):
+                    calls = [
+                        {
+                            "function": {"name": call[0], "arguments": call[1]},
+                            **({"id": call[2]} if len(call) > 2 else {}),
+                        }
+                        for call in step["tool_calls"]
+                    ]
+                    writer.write(
+                        frame(
+                            {
+                                "message": {
+                                    "role": "assistant",
+                                    "content": "",
+                                    "tool_calls": calls,
+                                },
+                                "done": False,
+                            }
+                        )
+                    )
+                count = profile.count(body["messages"], body.get("tools", []))
+                writer.write(
+                    frame(
+                        {
+                            "message": {"role": "assistant", "content": ""},
+                            "done": True,
+                            "done_reason": "stop",
+                            "prompt_eval_count": count,
+                            "eval_count": 3,
+                        }
+                    )
+                )
+                await writer.drain()
+        except (ConnectionError, asyncio.IncompleteReadError):
+            pass
+        finally:
+            writer.close()
+            handlers.discard(asyncio.current_task())
+
+    server = await asyncio.start_server(handle, "127.0.0.1", 0)
+    settings = settings.model_copy(
+        update={"ollama_url": f"http://127.0.0.1:{server.sockets[0].getsockname()[1]}"}
+    )
+    yield state, settings
+    server.close()
+    for task in list(handlers):
+        task.cancel()
+    await asyncio.gather(*handlers, return_exceptions=True)
+    await server.wait_closed()
