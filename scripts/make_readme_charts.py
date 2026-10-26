@@ -35,7 +35,7 @@ def eval_chart(artifacts: Path, out: Path):
     rates = [data[n]["passed"] / data[n]["runs"] * 100 for n in names]
     fig, ax = plt.subplots(figsize=(9, 4))
     bars = ax.bar([labels[n] for n in names], rates, color=BLUE)
-    for bar, n in zip(bars, names):
+    for bar, n in zip(bars, names, strict=True):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 1,
@@ -55,8 +55,8 @@ def eval_chart(artifacts: Path, out: Path):
 
 def soak_chart(artifacts: Path, out: Path):
     rows = [
-        json.loads(l)
-        for l in (artifacts / "task15-soak-2026-10-26/metrics.jsonl").read_text().splitlines()
+        json.loads(line)
+        for line in (artifacts / "task15-soak-2026-10-26/metrics.jsonl").read_text().splitlines()
     ]
     start = datetime.fromisoformat(rows[0]["at"])
     fig, ax = plt.subplots(figsize=(9, 4))
