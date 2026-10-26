@@ -544,6 +544,14 @@ class ControlStore:
             self._transition(operation, "started")
             return operation, "started"
 
+    def release_turn(self, turn_id: str):
+        """Drop in-process runtime state of a finished/suspended turn (no DB change).
+
+        A later check() with the old context fails closed (invalid_context); a waiting
+        turn continues through resume_turn with a fresh deadline and cancel event.
+        """
+        self._runtime.pop(turn_id, None)
+
     def cancel_turn(self, turn_id: str):
         """Trusted durable cancellation; also erase pending private approvals."""
         with self._atomic():

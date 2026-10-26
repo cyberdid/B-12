@@ -433,3 +433,18 @@ async def test_reply_language_follows_the_user_message_script(runtime_factory):
     assert systems[0].endswith("Answer in English.")
     assert systems[1].endswith("українська.")
     assert not systems[2].endswith(("English.", "українська."))
+
+
+async def test_finished_turns_release_runtime_control_state(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "ok"} for _ in range(5)]
+    for _ in range(5):
+        await run_turn(runtime, who, "привіт")
+    assert runtime.control._runtime == {} and runtime.agent.active == {}
+    record = runtime.memory.remember("не чіпати", who.actor)
+    state["script"] = [{"tool_calls": [("memory_forget", {"memory_id": record.id})]}]
+    waiting, _ = await run_turn(runtime, who, "забудь")
+    assert waiting.state == "awaiting_approval"
+    assert runtime.control._runtime == {}  # waiting turns are resumed with a fresh context

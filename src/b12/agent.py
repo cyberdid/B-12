@@ -452,6 +452,7 @@ class Agent:
             active.done.set()
             self.active.pop(context.turn_id, None)
             self._revisions.pop(context.turn_id, None)
+            self.control.release_turn(context.turn_id)
 
     async def _run_calls(self, context, actor, state, emit) -> bool:
         """Execute queued calls in order; True when waiting for an approval decision."""
