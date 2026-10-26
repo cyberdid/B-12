@@ -7,6 +7,8 @@ After=network.target
 [Service]
 Type=simple
 EnvironmentFile=@ENV_FILE@
+# Fewer glibc malloc arenas: measured RSS growth 153 MB -> 125 MB over 2500 turns.
+Environment=MALLOC_ARENA_MAX=2
 ExecStart=@B12_BIN@ serve --port ${B12_PORT}
 Restart=on-failure
 RestartSec=5

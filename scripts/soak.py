@@ -426,7 +426,10 @@ def drive(out: Path, hours: float, seed: int):
     while time.monotonic() < deadline:
         log = (out / "worker.log").open("a")
         process = subprocess.Popen(
-            [sys.executable, __file__, "worker", "--out", str(out)], stdout=log, stderr=log
+            [sys.executable, __file__, "worker", "--out", str(out)],
+            stdout=log,
+            stderr=log,
+            env={**os.environ, "MALLOC_ARENA_MAX": "2"},
         )
         run_for = min(rng.uniform(900, 2700), max(5, deadline - time.monotonic()))
         try:
