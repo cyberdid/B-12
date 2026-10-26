@@ -17,7 +17,6 @@ from b12.tools._common import AbsolutePath, Args, EmptyArgs, clip, failure
 from b12.tools.outcomes import HandlerOutcome, SideEffect
 from b12.tools.policy import Risk
 
-
 _LIBC = ctypes.CDLL(None, use_errno=True)
 _PR_SET_PDEATHSIG = 1
 
