@@ -19,6 +19,7 @@ tags: [navigation]
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |
 | [Дорожня карта](project/roadmap.md) | M0–M6, залежності й критерії завершення |
+| [Аудит вимог R01–R17 (чернетка)](project/requirements-audit.md) | Статус кожної вимоги з доказами й межами; відкриті рішення |
 | [Реєстр рішень](project/decisions.md) | ADR-001–010 з оригінального brief та їхній статус |
 | [Відкриті питання](project/open-questions.md) | Невідоме та спосіб отримати відповідь |
 
