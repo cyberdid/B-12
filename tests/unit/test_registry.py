@@ -1,6 +1,7 @@
 """Real temporary effects exercise validation, dispatch and result association."""
 
 import asyncio
+import json
 import time
 from dataclasses import replace
 from pathlib import Path
@@ -461,3 +462,18 @@ async def test_interrupted_cleanup_preserves_bounded_handler_evidence(rig, inter
     assert result.error_code == ("cancelled" if interruption == "cancel" else "deadline_exceeded")
     assert store.audit_events()[-1]["state"] == "unknown"
     assert "partial-output" not in str(store.audit_events())
+
+
+async def test_invalid_arguments_name_fields_without_echoing_values(rig):
+    _, registry, context, path = rig
+    secret = "PRIVATE-VALUE-not-to-echo"
+    request = ToolCall(
+        id="bad-args",
+        name="write",
+        arguments={"path": str(path), "number": secret, "surplus": secret},
+    )
+    result = await registry.execute(request, context)
+    assert (result.status, result.error_code) == ("denied", "invalid_arguments")
+    fields = {(item["field"], item["error"]) for item in result.content["invalid_fields"]}
+    assert ("number", "int_type") in fields and ("surplus", "extra_forbidden") in fields
+    assert secret not in json.dumps(result.model_dump()) and not path.exists()

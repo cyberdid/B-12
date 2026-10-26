@@ -23,10 +23,14 @@ class ProcessListArgs(Args):
 
 
 class ExecArgs(Args):
-    executable: AbsolutePath
-    argv: list[str] = Field(max_length=128)
-    cwd: AbsolutePath
-    declared_effects: list[str] = Field(min_length=1, max_length=16)
+    executable: AbsolutePath = Field(description="Absolute program path, e.g. /usr/bin/ls")
+    argv: list[str] = Field(
+        max_length=128, description="Arguments after the program, without the program itself"
+    )
+    cwd: AbsolutePath = Field(description="Absolute working directory")
+    declared_effects: list[str] = Field(
+        min_length=1, max_length=16, description="Expected effects, e.g. read-only listing"
+    )
     max_output_bytes: int = Field(default=4096, ge=1, le=4096)
 
     @field_validator("argv", "declared_effects")

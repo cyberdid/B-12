@@ -123,6 +123,7 @@ class ToolRegistry:
     ) -> ToolResult:
         start = time.monotonic()
         operation = None
+        invalid_fields = None
         unknown = False
         task = None
 
@@ -161,7 +162,14 @@ class ToolRegistry:
             try:
                 arguments_digest(raw)
                 args = tool.model.model_validate(raw, strict=True)
-            except (ValidationError, ValueError, TypeError, OverflowError):
+            except ValidationError as exc:
+                # Field locations and fixed error types only; never echo input values.
+                invalid_fields = [
+                    {"field": ".".join(map(str, error["loc"]))[:64], "error": error["type"]}
+                    for error in exc.errors(include_url=False, include_input=False)[:8]
+                ]
+                raise ControlError("invalid_arguments") from None
+            except (ValueError, TypeError, OverflowError):
                 raise ControlError("invalid_arguments") from None
             call = call.model_copy(
                 update={"arguments": raw, "turn_id": context.turn_id, "task_id": context.task_id}
@@ -254,7 +262,11 @@ class ToolRegistry:
             return result(
                 "unknown" if unknown else "denied",
                 exc.code,
-                evidence.content if evidence else None,
+                evidence.content
+                if evidence
+                else {"invalid_fields": invalid_fields}
+                if invalid_fields
+                else None,
                 uncertain=unknown,
                 outcome=evidence,
             )
