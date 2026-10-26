@@ -20,6 +20,7 @@ from uuid import uuid4
 from b12.contracts import Actor
 from b12.memory import MemoryStore
 
+QUERIES = ["шафку", "кота логи", "мікрофоном", "сервер звіт ранок"]
 WORDS = "кіт пес сервер шафка код кава ранок звіт логи робот мікрофон камера дім сад ліс".split()
 
 
@@ -56,19 +57,18 @@ def main():
             store.remember(text(rng, count), actor)
             count += 1
         inserted = time.perf_counter() - started
-        queries = ["шафку", "кота логи", "мікрофоном", "сервер звіт ранок"]
         row = {
             "size": size,
             "insert_per_s_last_batch": round(
                 (size - (results[-1]["size"] if results else 0)) / inserted, 1
             ),
-            "search": timed(lambda: store.search(rng.choice(queries), actor, limit=8), 40),
+            "search": timed(lambda: store.search(rng.choice(QUERIES), actor, limit=8), 40),
             "is_live": timed(lambda: store.is_live(str(uuid4()), actor), 200),
             "recent_20": timed(lambda: store.recent(actor, limit=20), 40),
             "db_bytes": sum(p.stat().st_size for p in root.iterdir()),
         }
         victims = [store.remember(text(rng, -1), actor) for _ in range(5)]
-        row["purge_one"] = timed(lambda: store.begin_purge(victims.pop().id, actor), 5)
+        row["purge_one"] = timed(lambda pool=victims: store.begin_purge(pool.pop().id, actor), 5)
         row["verify_full_ms"] = timed(store.verify_full, 1)["p50_ms"]
         results.append(row)
         print(json.dumps(row), flush=True)
