@@ -13,6 +13,7 @@ import json
 import logging
 import re
 import time
+from collections import deque
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 from types import MappingProxyType
@@ -133,6 +134,8 @@ class Agent:
         self._volatile: dict[str, list[dict]] = {}
         self._waiting: dict[str, dict] = {}
         self._revisions: dict[str, int] = {}
+        self.started_at = time.time()
+        self.metrics = {"turns": 0, "by_state": {}, "latency_ms": deque(maxlen=1000)}
 
     # Trusted port for memory_store: the ORIGINAL turn's canonical deletion revision.
     def memory_revision(self, context: ExecutionContext) -> int:
@@ -287,6 +290,7 @@ class Agent:
     async def _drive(self, context, actor, state, on_event, *, started) -> TurnResult:
         events: list[TurnEvent] = []
         consumer = [on_event]
+        turn_started = time.monotonic()
         self._revisions[context.turn_id] = state["revision"]
         active = _Active(actor.id, context.cancel)
         self.active[context.turn_id] = active
@@ -310,6 +314,9 @@ class Agent:
                     consumer[0] = None
 
         async def finish(status, *, content="", code=None):
+            self.metrics["turns"] += 1
+            self.metrics["by_state"][status] = self.metrics["by_state"].get(status, 0) + 1
+            self.metrics["latency_ms"].append((time.monotonic() - turn_started) * 1000)
             persisted = False
             if status == "completed":
                 persisted = self._commit(context, state, active)

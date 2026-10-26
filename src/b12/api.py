@@ -206,7 +206,10 @@ def create_app(
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         from b12.runtime import open_runtime
+        from b12.service import RuntimeLock, configure_logging
 
+        configure_logging(settings.state_dir)
+        lock = RuntimeLock(settings.state_dir)
         runtime = open_runtime(settings)
         try:
             owner_id = runtime.control.get_meta("owner_actor")
@@ -238,7 +241,13 @@ def create_app(
         finally:
             for turn_id in list(runtime.agent.active):
                 runtime.control.cancel_turn(turn_id)
+                runtime.agent.active[turn_id].cancel.set()
+            for _ in range(100):  # graceful: let cancelled turns stop their children
+                if not runtime.agent.active:
+                    break
+                await asyncio.sleep(0.05)
             runtime.close()
+            lock.release()
 
     app = FastAPI(title="B-12", lifespan=lifespan, docs_url=None, redoc_url=None)
 
@@ -427,6 +436,23 @@ def create_app(
             raise HTTPException(403, "owner_token_not_revocable_here")
         control.revoke_tokens(actor_id)
         return {"revoked": actor_id}
+
+    @app.get("/api/status")
+    async def service_status(request: Request, who: Identity):
+        from b12.telemetry import status
+
+        require_owner(who)
+        return status(runtime_of(request))
+
+    @app.get("/api/backups")
+    async def backups_list(request: Request, who: Identity):
+        require_owner(who)
+        return runtime_of(request).operations.inventory()
+
+    @app.post("/api/backups")
+    async def backups_create(request: Request, who: Identity):
+        require_owner(who)  # synchronous copy inside the event loop: consistent across stores
+        return runtime_of(request).operations.create_snapshot()
 
     @app.get("/api/goals")
     async def goal_list(request: Request, who: Identity):

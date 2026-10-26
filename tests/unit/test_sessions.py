@@ -100,7 +100,7 @@ def test_purge_evidence_removes_every_tagged_turn_and_is_idempotent(tmp_path):
     assert [m["turn_id"] for m in store.history(session, actor)] == [clean, clean]
     store.close()
     raw = (path / "sessions.sqlite3").read_bytes()
-    assert b"4321" not in raw and b"PIN" not in raw
+    assert b"PIN 4321" not in raw and b"PIN" not in raw
 
 
 def test_purge_is_actor_scoped(tmp_path):

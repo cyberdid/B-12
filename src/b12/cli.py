@@ -425,6 +425,44 @@ async def cmd_autonomy(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_backup(args, settings) -> int:
+    from b12.service import Operations
+
+    operations = Operations(settings.state_dir)
+    if args.action == "list":
+        emit_json(operations.inventory())
+        return 0
+    if args.action == "create":
+        emit_json(operations.create_snapshot())
+        return 0
+    if args.action == "verify":
+        report = operations.verify(args.snapshot_id)
+        emit_json(report)
+        return 0 if report["ok"] else 1
+    if args.action == "delete":
+        operations.delete_snapshot(args.snapshot_id)
+        emit_json({"deleted": args.snapshot_id})
+        return 0
+    try:
+        emit_json(await operations.restore(args.snapshot_id, settings))
+    except RuntimeError as exc:
+        emit_json({"error": str(exc)})
+        return 1
+    return 0
+
+
+async def cmd_status(args, settings) -> int:
+    from b12.telemetry import status
+
+    runtime = open_or_fail(settings)
+    try:
+        require_owner(runtime)
+        emit_json(status(runtime))
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -437,7 +475,14 @@ async def cmd_serve(args, settings) -> int:
         return 1
     app = create_app(settings, port=args.port, autonomy=not args.no_autonomy)
     server = uvicorn.Server(
-        uvicorn.Config(app, host=args.host, port=args.port, log_level="warning", access_log=False)
+        uvicorn.Config(
+            app,
+            host=args.host,
+            port=args.port,
+            log_level="warning",
+            access_log=False,
+            timeout_graceful_shutdown=5,  # then open streams are cancelled -> turns cancel
+        )
     )
     print(
         json.dumps(
@@ -494,6 +539,10 @@ def parser() -> argparse.ArgumentParser:
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
         ).add_argument("value", choices=("on", "off"))
+    backup = sub.add_parser("backup", help="керовані знімки стану")
+    backup.add_argument("action", choices=("create", "list", "verify", "restore", "delete"))
+    backup.add_argument("snapshot_id", nargs="?")
+    sub.add_parser("status", help="метрики й ресурси")
     autonomy = sub.add_parser("autonomy", help="один прохід scheduler")
     autonomy.add_argument("--reflect", action="store_true", help="лише idle рефлексія")
     return root
@@ -522,6 +571,8 @@ def main(argv=None) -> int:
         "quiet": cmd_flag,
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,
+        "backup": cmd_backup,
+        "status": cmd_status,
     }
     try:
         return asyncio.run(handlers[args.command](args, settings))

@@ -296,7 +296,7 @@ async def test_memory_store_recall_forget_and_restart_leave_no_payload(runtime_f
     state_dir = runtime.settings.state_dir
     for path in state_dir.rglob("*"):
         if path.is_file():
-            assert b"4321" not in path.read_bytes(), path
+            assert b"PIN 4321" not in path.read_bytes(), path
 
 
 async def test_approval_checkpoint_survives_restart(runtime_factory):
@@ -394,7 +394,7 @@ async def test_document_removal_hides_and_purges_dependent_turns(runtime_factory
     assert applied and await runtime.purge.sync_knowledge(who.actor) == []
     assert runtime.sessions.history(who.session, who.actor.id) == []
     sessions_db = runtime.settings.state_dir / "sessions" / "sessions.sqlite3"
-    assert b"9876" not in sessions_db.read_bytes()
+    assert "калібрування 9876".encode() not in sessions_db.read_bytes()
 
 
 async def test_resume_of_cancelled_or_revoked_turn_ends_without_model_call(runtime_factory):

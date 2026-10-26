@@ -14,14 +14,24 @@ from b12.contracts import Actor, PurgeReceipt
 
 log = logging.getLogger(__name__)
 
-STORES = ("sessions", "goals", "active_turns", "backups", "provider_cache")
+STORES = ("sessions", "goals", "active_turns", "backups", "snapshots", "provider_cache")
 
 
 class PurgeCoordinator:
     def __init__(
-        self, *, control, memory, sessions, backups=None, knowledge=None, agent=None, goals=None
+        self,
+        *,
+        control,
+        memory,
+        sessions,
+        backups=None,
+        knowledge=None,
+        agent=None,
+        goals=None,
+        operations=None,
     ):
         self.control, self.memory, self.sessions, self.goals = control, memory, sessions, goals
+        self.operations = operations
         self.backups, self.knowledge, self.agent = backups, knowledge, agent
 
     async def purge(self, memory_id: str, context, guard) -> PurgeReceipt:
@@ -68,6 +78,10 @@ class PurgeCoordinator:
             turns = self.sessions.purge_evidence(receipt.operation_id, actor.id, ())
             result = self.backups.purge(actor.id, turn_ids=tuple(turns))
             return result["state"] == "complete"
+        if store == "snapshots":
+            if self.operations is not None:
+                self.operations.purge_snapshots(receipt.operation_id, actor.id, targets)
+            return True
         if store == "provider_cache":
             if self.agent is None:
                 return True
@@ -76,6 +90,9 @@ class PurgeCoordinator:
 
     async def _run(self, receipt: PurgeReceipt, actor: Actor, *, origin_turn) -> PurgeReceipt:
         operation = receipt.operation_id
+        if self.operations is not None:
+            # Durable payload-free ledger first: restores replay it before serving data.
+            self.operations.record_deletion(operation, actor.id, receipt.target_ids)
         for store in receipt.pending_stores:
             if store == "canonical":
                 receipt = self.memory.acknowledge_purge(operation, "canonical", actor)

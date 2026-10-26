@@ -16,6 +16,7 @@ from b12.memory import MemoryStore
 from b12.model import OllamaModel
 from b12.purge import PurgeCoordinator
 from b12.retrieval import KnowledgeIndex
+from b12.service import Operations
 from b12.sessions import SessionStore
 from b12.tools import register_host_tools
 from b12.tools.filesystem import BackupStore
@@ -36,6 +37,7 @@ class Runtime:
     purge: PurgeCoordinator
     goals: GoalStore
     attention: AttentionPolicy
+    operations: Operations
 
     def close(self):
         for store in (
@@ -63,6 +65,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     sessions = SessionStore(root / "sessions")
     goals = GoalStore(root / "goals")
     attention = AttentionPolicy(root / "attention", settings)
+    operations = Operations(root)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)
     model = model or OllamaModel(settings)
     agent = Agent(
@@ -82,6 +85,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         knowledge=knowledge,
         agent=agent,
         goals=goals,
+        operations=operations,
     )
     agent.purge = purge
     register_host_tools(
@@ -105,4 +109,5 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         purge,
         goals,
         attention,
+        operations,
     )

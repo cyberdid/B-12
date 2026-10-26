@@ -1,0 +1,20 @@
+# B-12 user service (no root). Installed by scripts/install-user-service.sh, which
+# replaces @B12_BIN@ and @ENV_FILE@. Settings come from the 0600 environment file.
+[Unit]
+Description=B-12 local companion (loopback API, Web UI, scheduler)
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=@ENV_FILE@
+ExecStart=@B12_BIN@ serve --port ${B12_PORT}
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+KillSignal=SIGTERM
+TimeoutStopSec=30
+NoNewPrivileges=yes
+UMask=0077
+
+[Install]
+WantedBy=default.target
