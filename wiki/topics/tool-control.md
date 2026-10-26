@@ -38,8 +38,12 @@ Approval атомарно прив’язаний до actor/session/turn/call, 
 
 Review: перший незалежний review знайшов I1 (resolver None), I2 (directory durability ordering), M1 (depth truncation); scoped rereview `task-6-rereview.md` — усі ADDRESSED. Rereview виконав coordinator, а не окремий агент; межа зафіксована в артефакті.
 
+## API і автентифікація
+
+**Перевірений факт:** Task 9 (`9632cdc`) відкриває host tools через API лише після автентифікації. Owner bearer token лежить у `state_dir/api/owner.token` (0600); ControlStore зберігає тільки HMAC digest. Токен приймається лише з заголовка, не з URL. Гостьові токени видає owner, з typed capabilities без filesystem/process/network/forget і без full execution. Guard відхиляє чужий Host (DNS rebinding), чужий Origin для змін стану і тіла понад 64 KiB. Поля actor/consent/grant у тілі дають 422. Розрив NDJSON-стріму скасовує turn. Не реалізовано: TLS (лише loopback), rate limiting, UI.
+
 ## Межі та наступний крок
 
-Реальні effects перевірено лише на temp/local fixtures; production файли користувача не змінювались. **Не реалізовано:** global `PurgeCoordinator` і original-revision lookup (Task 7), agent/session loop (Task 7), API authentication (Task 9), загальний service backup (Task 13). Blocking OS/Python I/O не має hard preemption. Staging, батьківський каталог якого видалено поза B-12, лишається `pending` — coordinator має показувати причину. Код і тести не доводять 24/7 або physical hardware acceptance.
+Реальні effects перевірено лише на temp/local fixtures; production файли користувача не змінювались. **Не реалізовано:** global `PurgeCoordinator` і original-revision lookup (Task 7), agent/session loop (Task 7), загальний service backup (Task 13). Blocking OS/Python I/O не має hard preemption. Staging, батьківський каталог якого видалено поза B-12, лишається `pending` — coordinator має показувати причину. Код і тести не доводять 24/7 або physical hardware acceptance.
 
 Див. [план усієї реалізації](../project/implementation.md), [стан](../project/status.md), [пам’ять і приватність](memory.md) та [архітектуру](architecture.md).

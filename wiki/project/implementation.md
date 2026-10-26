@@ -34,7 +34,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 8 (`964709b`) — owner CLI `b12` (init/doctor/chat/resume/approve/deny/approvals/memory/session/tools) на спільному `open_runtime`; 11 subprocess e2e tests, 361 passed / 2 skipped. Живий запуск встановленого `b12` з реальним Bolt записав і прочитав файл. Команди — у [README](../../README.md).
 
-**Наступний крок:** Task 9 — локальний API з owner-token auth, Origin check і streaming подій.
+**Перевірений факт:** Task 9 (`9632cdc`) — loopback API з owner/guest bearer tokens (лише digest у ControlStore), Host/Origin guard, ліміт тіла, NDJSON streaming і скасуванням turn при disconnect; `b12 serve`. 17 API tests + 8 мутацій; full 382 passed / 2 skipped; живий uvicorn із реальним Bolt. [Межі](../topics/tool-control.md#api-і-автентифікація).
+
+**Наступний крок:** Task 10 — Web UI поверх цього API.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 

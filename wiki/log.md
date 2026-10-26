@@ -136,3 +136,7 @@ tags: [history]
 ## [2026-10-26] implementation | Task 8 owner CLI
 
 **Перевірений факт:** `964709b` додає `b12` (init/doctor/chat/resume/approve/deny/approvals/memory/session/tools). Локальний CLI — owner control channel: owner/session зберігаються в ControlStore metadata, grant видається на кожен виклик за `host_access`, а pending purge завершується до першого turn. SIGINT скасовує поточний turn (exit 130) без пошкодження стану. 11 subprocess e2e tests і 4 мутації; full suite 361 passed / 2 skipped. Живий запуск встановленого entry point з реальним Bolt записав і прочитав файл. `serve`/`eval` не імітуються — вони належать Task 9/14.
+
+## [2026-10-26] implementation | Task 9 local API та auth
+
+**Перевірений факт:** `9632cdc` додає FastAPI loopback API (`b12 serve`), owner/guest bearer tokens (лише digest), Host/Origin/body guard, NDJSON streaming turn events і скасування при disconnect. Гості не отримують host capabilities; consent надає тільки owner, а гість може лише відкликати власний. 11 security + 5 ASGI + 1 live-process test; 8 мутацій спіймано; full 382 passed / 2 skipped. Живий сервер з реальним Bolt виконав `current_time`; без токена — 401, чужий Origin — 403.

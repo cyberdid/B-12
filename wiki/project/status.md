@@ -7,7 +7,7 @@ tags: [progress, next]
 ---
 # Стан проєкту
 
-На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control, 13 реальних host tools, agent loop із sessions і global purge; owner CLI; API/Web, голос і фізичні acceptance ще попереду.
+На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control, 13 реальних host tools, agent loop із sessions і global purge; owner CLI, автентифікований loopback API; Web UI, автономність, голос і фізичні acceptance ще попереду.
 
 ## Наявне
 
@@ -28,7 +28,7 @@ tags: [progress, next]
 
 ## Активний етап
 
-**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–7 реалізовані; Task 7 `740629a`, full suite 350 passed / 2 skipped, Ruff clean; реальний Bolt виконує file write/read, system_info і memory recall після restart (3/3 у run2/run3). Task 8 owner CLI `964709b` (361 passed / 2 skipped; живий запуск із реальним Bolt). Наступний gate — Task 9 API/auth. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
+**Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–7 реалізовані; Task 7 `740629a`, full suite 350 passed / 2 skipped, Ruff clean; реальний Bolt виконує file write/read, system_info і memory recall після restart (3/3 у run2/run3). Task 8 owner CLI `964709b` (361 passed / 2 skipped; живий запуск із реальним Bolt). Task 9 API/auth `9632cdc` (382 passed / 2 skipped). Наступний gate — Task 10 Web UI. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
 
 **M0 — частково:** versioned contracts, canonical memory/revocation primitives, server-owned owner/guest control та grant/approval lifecycle є. System heartbeat і retention/global-purge coordinators ще потрібні. Для M1 є memory, lexical retrieval, pinned Bolt transport і strict tool policy/registry, реальні host handlers; agent/session loop, idle reflection та A/B ще немає. M2–M6 не початі.
 
