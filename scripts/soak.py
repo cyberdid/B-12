@@ -415,15 +415,57 @@ def verify(out: Path) -> dict:
     return report
 
 
-def drive(out: Path, hours: float, seed: int):
+def read_events(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text().splitlines() if line]
+
+
+def drive(out: Path, hours: float, seed: int, resume: bool = False):
+    """Run (or resume) the soak. SIGTERM/SIGINT pause it cleanly: the worker is stopped
+    gracefully, verified, and a soak_paused event records the active seconds of this
+    segment. A resumed run only needs the REMAINING active time; the final event states
+    the number of segments, so a segmented run is never presented as one continuous run."""
     out.mkdir(parents=True, exist_ok=True)
-    rng = random.Random(seed)
-    begin = time.monotonic()
-    deadline = begin + hours * 3600
     events = out / "events.jsonl"
-    append(events, {"at": now(), "event": "soak_started", "hours": hours, "seed": seed})
-    cycles = 0
-    while time.monotonic() < deadline:
+    history = read_events(events)
+    prior = sum(e["segment_s"] for e in history if e["event"] == "soak_paused")
+    segments = sum(e["event"] in ("soak_started", "soak_resumed") for e in history)
+    if resume and not prior:
+        raise SystemExit("nothing to resume: no soak_paused event in " + str(events))
+    if not resume and history:
+        raise SystemExit("events.jsonl already exists: pass --resume or choose a new --out")
+    rng = random.Random(seed + segments)
+    begin = time.monotonic()
+    remaining = max(0.0, hours * 3600 - prior)
+    deadline = begin + remaining
+    if resume:
+        append(
+            events,
+            {
+                "at": now(),
+                "event": "soak_resumed",
+                "hours": hours,
+                "seed": seed,
+                "done_s": round(prior),
+                "remaining_s": round(remaining),
+            },
+        )
+        append(out / "verify.jsonl", verify(out))  # state must be sound before new load
+    else:
+        append(events, {"at": now(), "event": "soak_started", "hours": hours, "seed": seed})
+    state = {"stop": False, "process": None}
+
+    def request_stop(signum, frame):
+        state["stop"] = True
+        process = state["process"]
+        if process is not None and process.poll() is None:
+            process.send_signal(signal.SIGTERM)  # worker shuts down gracefully
+
+    signal.signal(signal.SIGTERM, request_stop)
+    signal.signal(signal.SIGINT, request_stop)
+    cycles = sum(e["event"] == "worker_stopped" for e in history)
+    while time.monotonic() < deadline and not state["stop"]:
         log = (out / "worker.log").open("a")
         process = subprocess.Popen(
             [sys.executable, __file__, "worker", "--out", str(out)],
@@ -431,6 +473,9 @@ def drive(out: Path, hours: float, seed: int):
             stderr=log,
             env={**os.environ, "MALLOC_ARENA_MAX": "2"},
         )
+        state["process"] = process
+        if state["stop"]:
+            process.send_signal(signal.SIGTERM)
         run_for = min(rng.uniform(900, 2700), max(5, deadline - time.monotonic()))
         try:
             process.wait(timeout=run_for)
@@ -445,16 +490,36 @@ def drive(out: Path, hours: float, seed: int):
                 process.wait()
                 mode += "+forced"
             append(events, {"at": now(), "event": "worker_stopped", "mode": mode})
+        state["process"] = None
         log.close()
         time.sleep(2)
         report = verify(out)
         append(out / "verify.jsonl", report)
         cycles += 1
-    elapsed = time.monotonic() - begin
-    append(
-        events,
-        {"at": now(), "event": "soak_finished", "elapsed_h": elapsed / 3600, "cycles": cycles},
-    )
+    segment = time.monotonic() - begin
+    if state["stop"]:
+        append(
+            events,
+            {
+                "at": now(),
+                "event": "soak_paused",
+                "segment_s": round(segment, 1),
+                "active_total_s": round(prior + segment, 1),
+                "remaining_s": round(max(0.0, hours * 3600 - prior - segment)),
+            },
+        )
+    else:
+        append(
+            events,
+            {
+                "at": now(),
+                "event": "soak_finished",
+                "active_h": round((prior + segment) / 3600, 3),
+                "segments": segments + 1,
+                "continuous": segments == 0,
+                "cycles": cycles,
+            },
+        )
 
 
 def main():
@@ -463,10 +528,11 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--hours", type=float, default=8.0)
     parser.add_argument("--seed", type=int, default=12)
+    parser.add_argument("--resume", action="store_true", help="continue a paused soak in --out")
     args = parser.parse_args()
     out = Path(args.out).absolute()
     if args.mode == "drive":
-        drive(out, args.hours, args.seed)
+        drive(out, args.hours, args.seed, args.resume)
     elif args.mode == "worker":
         asyncio.run(worker(out))
     else:
