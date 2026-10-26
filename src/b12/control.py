@@ -96,6 +96,8 @@ CREATE TABLE IF NOT EXISTS approvals(operation_id TEXT PRIMARY KEY, digest TEXT,
  capability TEXT NOT NULL, revision INTEGER NOT NULL, expires_at REAL NOT NULL,
  decision TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS api_tokens(digest TEXT PRIMARY KEY, actor_id TEXT NOT NULL,
+ capabilities TEXT NOT NULL, revoked INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS audit(sequence INTEGER PRIMARY KEY,
  operation_id TEXT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL, error_code TEXT);
 CREATE TRIGGER IF NOT EXISTS audit_no_update BEFORE UPDATE ON audit
@@ -174,6 +176,49 @@ class ControlStore:
         """Trusted local bootstrap metadata (e.g. owner/default session IDs)."""
         with self._atomic():
             self.db.execute("INSERT OR REPLACE INTO meta VALUES (?,?)", (key, value))
+
+    def _token_digest(self, token: str) -> str:
+        return hmac.new(self._key, token.encode(), hashlib.sha256).hexdigest()
+
+    def issue_token(self, actor_id: str, capabilities: tuple[str, ...]) -> str:
+        """Bearer credential for the API; only its keyed digest is stored."""
+        self.resolve_actor(actor_id)
+        if not isinstance(capabilities, tuple) or any(
+            type(c) is not str or not c.isascii() for c in capabilities
+        ):
+            raise ValueError("invalid capabilities")
+        token = secrets.token_urlsafe(32)
+        with self._atomic():
+            self.db.execute(
+                "INSERT INTO api_tokens VALUES (?,?,?,0)",
+                (self._token_digest(token), actor_id, json.dumps(capabilities)),
+            )
+        return token
+
+    def resolve_token(self, token: str) -> tuple[Actor, tuple[str, ...]] | None:
+        if type(token) is not str or not token or len(token) > 256:
+            return None
+        row = self.db.execute(
+            "SELECT actor_id, capabilities FROM api_tokens WHERE digest=? AND revoked=0",
+            (self._token_digest(token),),
+        ).fetchone()
+        if row is None:
+            return None
+        return self.resolve_actor(row[0]), tuple(json.loads(row[1]))
+
+    def revoke_tokens(self, actor_id: str):
+        with self._atomic():
+            self.db.execute("UPDATE api_tokens SET revoked=1 WHERE actor_id=?", (actor_id,))
+
+    def turn_identity(self, turn_id: str) -> dict | None:
+        row = self.db.execute(
+            "SELECT actor_id, session_id FROM turns WHERE id=?", (turn_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+    def session_actor(self, session_id: str) -> str | None:
+        row = self.db.execute("SELECT actor_id FROM sessions WHERE id=?", (session_id,)).fetchone()
+        return row[0] if row else None
 
     def pending_approvals(self) -> list[dict]:
         """Owner review queue: generated IDs and trusted tool names, never arguments."""

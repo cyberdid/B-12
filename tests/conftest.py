@@ -265,3 +265,27 @@ async def scripted_ollama(profile_settings):
         task.cancel()
     await asyncio.gather(*handlers, return_exceptions=True)
     await server.wait_closed()
+
+
+@pytest.fixture
+async def api(scripted_ollama, tmp_path):
+    import httpx
+    from b12.api import create_app
+
+    from b12.cli import Owner
+    from b12.runtime import open_runtime
+
+    state, settings = scripted_ollama
+    settings = settings.model_copy(update={"state_dir": tmp_path / "state"})
+    bootstrap = open_runtime(settings)
+    actor = bootstrap.control.create_actor(owner=True, consent=True)
+    bootstrap.control.set_meta("owner_actor", actor.id)
+    bootstrap.control.set_meta("cli_session", bootstrap.control.create_session(actor.id))
+    assert Owner(bootstrap).initialized
+    bootstrap.close()
+    app = create_app(settings, allowed_hosts=("testserver",), port=80)
+    async with app.router.lifespan_context(app):
+        token = (settings.state_dir / "api" / "owner.token").read_text().strip()
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+            yield state, client, token, app, tmp_path

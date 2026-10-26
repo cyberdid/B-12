@@ -16,33 +16,10 @@ from pathlib import Path
 
 import httpx
 
+from b12.auth import HOST_CAPABILITIES
 from b12.config import Settings
 from b12.model_errors import ModelError
 
-CAPABILITIES = {
-    "full": (
-        "system.read",
-        "process.read",
-        "filesystem.read",
-        "filesystem.write",
-        "process.execute",
-        "network.http",
-        "memory.read",
-        "memory.write",
-        "memory.forget",
-        "knowledge.read",
-        "time.read",
-    ),
-    "read_only": (
-        "system.read",
-        "process.read",
-        "filesystem.read",
-        "memory.read",
-        "knowledge.read",
-        "time.read",
-    ),
-    "none": ("time.read",),
-}
 _EXIT = {"completed": 0, "failed": 1, "awaiting_approval": 2, "cancelled": 130}
 
 
@@ -95,7 +72,7 @@ class Owner:
         grant = control.issue_grant(
             self.actor_id,
             self.session_id,
-            CAPABILITIES[access],
+            HOST_CAPABILITIES[access],
             task_id=task,
             ttl_s=timeout_s + 3600,
             full_execution=access == "full",
@@ -372,6 +349,33 @@ async def cmd_tools(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_serve(args, settings) -> int:
+    import ipaddress
+
+    import uvicorn
+
+    from b12.api import create_app
+
+    if not ipaddress.ip_address(args.host).is_loopback:
+        emit_json({"error": "loopback_only"})
+        return 1
+    app = create_app(settings, port=args.port)
+    server = uvicorn.Server(
+        uvicorn.Config(app, host=args.host, port=args.port, log_level="warning", access_log=False)
+    )
+    print(
+        json.dumps(
+            {
+                "url": f"http://{args.host}:{args.port}",
+                "token_file": str(settings.state_dir / "api" / "owner.token"),
+            }
+        ),
+        file=sys.stderr,
+    )
+    await server.serve()
+    return 0
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(prog="b12", description="Локальний компаньйон B-12")
     root.add_argument("--config", help="TOML settings file (B12_* env overrides it)")
@@ -397,6 +401,9 @@ def parser() -> argparse.ArgumentParser:
     session = sub.add_parser("session", help="робоча історія CLI")
     session.add_argument("action", choices=("clear",))
     sub.add_parser("tools", help="каталог інструментів")
+    serve = sub.add_parser("serve", help="локальний API (лише loopback)")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8712)
     return root
 
 
@@ -418,6 +425,7 @@ def main(argv=None) -> int:
         "memory": cmd_memory,
         "session": cmd_session_clear,
         "tools": cmd_tools,
+        "serve": cmd_serve,
     }
     try:
         return asyncio.run(handlers[args.command](args, settings))

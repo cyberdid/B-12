@@ -19,7 +19,10 @@ b12 chat -m "…" --json       # один turn, машиночитний рез�
 b12 approvals | b12 approve <operation_id> | b12 resume <turn_id>
 b12 memory remember|search|forget|pending …
 b12 tools                    # каталог із capability та risk
+b12 serve --port 8712        # локальний API лише на loopback
 ```
+
+API: токен власника — у `$B12_STATE_DIR/api/owner.token` (0600), передається тільки заголовком `Authorization: Bearer …`. `POST /api/sessions`, `POST /api/chat` (NDJSON-стрім подій; розрив з’єднання скасовує turn), `/api/approvals`, `/api/memory`, `/api/guests` (гостьові токени зі scoped typed capabilities), `/api/control/consent`, `/api/turns/{id}/resume|cancel`, `/api/tools`, `/api/health`.
 
 Коди виходу: 0 — готово, 1 — помилка, 2 — чекає approval, 3 — purge ще pending, 130 — скасовано. Стан зберігається в `$XDG_STATE_HOME/b12` (або `B12_STATE_DIR`). Режим `host_access="full"` дає моделі реальний доступ до файлів і команд у межах прав Linux вашого користувача; руйнівні дії (forget) потребують approval.
 
