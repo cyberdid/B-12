@@ -96,3 +96,7 @@ tags: [history]
 ## [2026-10-26] lint | Task 4 fix round 1
 
 Перевірено 26 wiki-сторінок, required frontmatter/source paths, index coverage і 214 локальних посилань без помилок. Raw master brief байтово тотожний committed original; finished run1–3 SHA manifests незмінні. Async-only API та cooperative cancellation limits узгоджені між кодом і тематичною сторінкою; старе правило sync callbacks явно замінено.
+
+## [2026-10-26] verification | Task 4 fix commit calibration
+
+**Перевірений факт:** commit `46b374c` пройшов новий marked run4: 15/15 synthetic requests, exact token counts, independent boundary/tool assertions та public async deltas/reply equality; 1 passed за 26.37 s. Metadata фіксує fix HEAD, empty tracked diff і code hashes. Усі code/artifact hashes перевірені; alias параметри, raw і finished run1–3 незмінні. Coordinator re-review — окремий gate.
