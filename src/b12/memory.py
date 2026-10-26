@@ -224,6 +224,20 @@ class MemoryStore:
             self._audit(actor, "remember", memory_id=record.id)
         return record
 
+    def recent(self, actor: Actor, *, limit: int = 20, exclude_kinds=()) -> list[MemoryRecord]:
+        """Newest live records in the exact actor namespace (consent required)."""
+        self._consent(actor)
+        self._limit(limit)
+        with self._transaction():
+            rows = self._connection.execute(
+                """SELECT m.* FROM memories m WHERE actor_id=?
+                   AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
+                   ORDER BY m.rowid DESC""",
+                (actor.id,),
+            )
+            records = [self._record(row) for row in rows if row["kind"] not in exclude_kinds]
+            return records[:limit]
+
     def _record(self, row: sqlite3.Row) -> MemoryRecord:
         evidence = tuple(
             item[0]

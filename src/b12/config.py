@@ -25,6 +25,13 @@ class Settings(BaseModel):
     max_tool_calls: Annotated[int, Field(gt=0)] = 16
     tool_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 30
     host_access: Literal["full", "read_only", "none"] = "full"
+    # Initiative policy (local wall clock). Quiet hours block nonurgent speech only.
+    timezone: str = "Europe/Kyiv"
+    quiet_start: Annotated[str, Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")] = "23:00"
+    quiet_end: Annotated[str, Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")] = "08:00"
+    initiative_hour_cap: Annotated[int, Field(ge=0, le=60)] = 3
+    initiative_cooldown_s: Annotated[float, Field(ge=0, allow_inf_nan=False)] = 600
+    scheduler_tick_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 60
 
     @field_validator("state_dir", mode="before")
     @classmethod
@@ -101,7 +108,13 @@ class Settings(BaseModel):
         env = os.environ if environ is None else environ
         state_home = Path(env.get("XDG_STATE_HOME") or Path.home() / ".local" / "state")
         values: dict[str, Any] = {"state_dir": env.get("B12_STATE_DIR", state_home / "b12")}
-        integers = {"num_ctx", "output_tokens", "max_rounds", "max_tool_calls"}
+        integers = {
+            "num_ctx",
+            "output_tokens",
+            "max_rounds",
+            "max_tool_calls",
+            "initiative_hour_cap",
+        }
         for field in cls.model_fields:
             key = f"B12_{field.upper()}"
             if key not in env or field == "state_dir":
@@ -109,7 +122,12 @@ class Settings(BaseModel):
             value: Any = env[key]
             if field in integers:
                 value = int(value)
-            elif field in {"tool_timeout_s", "model_timeout_s"}:
+            elif field in {
+                "tool_timeout_s",
+                "model_timeout_s",
+                "initiative_cooldown_s",
+                "scheduler_tick_s",
+            }:
                 value = float(value)
             values[field] = value
         return cls(**values)

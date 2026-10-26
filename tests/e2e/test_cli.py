@@ -132,9 +132,7 @@ async def test_ctrl_c_cancels_turn_without_corrupting_state(cli):
     state, run, _ = cli
     await run("init")
     state["script"] = [{"content": "довга відповідь", "hang": True}, {"content": "після"}]
-    code, out, _ = await run(
-        "chat", "-m", "довго", "--json", interrupt_after=state["chat_started"]
-    )
+    code, out, _ = await run("chat", "-m", "довго", "--json", interrupt_after=state["chat_started"])
     assert code == 130 and parse(out)["state"] == "cancelled"
     assert (await run("doctor", "--json"))[0] == 0
     code, out, _ = await run("chat", "-m", "ще раз", "--json")
@@ -190,3 +188,33 @@ async def test_chat_startup_finishes_pending_purge_first(cli):
     state["script"] = [{"content": "ok"}]
     assert (await run("chat", "-m", "привіт", "--json"))[0] == 0
     assert parse((await run("memory", "pending"))[1]) == []
+
+
+async def test_goal_lifecycle_and_autonomy_tick_across_processes(cli):
+    state, run, tmp_path = cli
+    await run("init")
+    target = tmp_path / "goal.txt"
+    code, out, _ = await run(
+        "goals",
+        "add",
+        "Створити файл звіту",
+        "--budget",
+        "2",
+        "--check-file",
+        str(target),
+        "--check-text",
+        "звіт 9",
+    )
+    goal = parse(out)
+    assert code == 0 and goal["status"] == "active"
+    state["script"] = [
+        {"tool_calls": [("file_write", {"path": str(target), "text": "звіт 9"})]},
+        {"content": "Звіт записано."},
+    ]
+    code, out, _ = await run("autonomy")
+    [outcome] = parse(out)
+    assert code == 0 and outcome["status"] == "achieved"
+    listed = parse((await run("goals", "list"))[1])
+    assert listed[0]["status"] == "achieved" and listed[0]["consumed_turns"] == 1
+    assert parse((await run("quiet", "on"))[1]) == {"quiet": True, "stopped": False}
+    assert parse((await run("stop", "on"))[1])["stopped"] is True

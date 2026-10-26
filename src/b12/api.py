@@ -63,6 +63,28 @@ class ApprovalBody(_Body):
     approve: bool
 
 
+class GoalBody(_Body):
+    intent: str = Field(min_length=1, max_length=4000)
+    criteria: str = Field(min_length=1, max_length=4000)
+    budget_turns: int = Field(default=5, ge=1, le=100)
+    review_interval_s: float = Field(default=3600, ge=30, le=7 * 86400)
+    allowed_tools: list[str] = Field(default_factory=list, max_length=16)
+    check: dict[str, str] | None = None
+
+
+class GoalStatusBody(_Body):
+    status: str = Field(pattern="^(active|paused|abandoned)$")
+
+
+class AttentionBody(_Body):
+    quiet: bool | None = None
+    stopped: bool | None = None
+
+
+class FeedbackBody(_Body):
+    outcome: str = Field(pattern="^(engaged|ignored|dismissed)$")
+
+
 class Guard:
     """Pure ASGI guard: Host allowlist, Origin check and bounded request bodies."""
 
@@ -175,7 +197,11 @@ def stream_turn(start) -> StreamingResponse:
 
 
 def create_app(
-    settings: Settings, *, port: int = 8712, allowed_hosts: tuple[str, ...] = ()
+    settings: Settings,
+    *,
+    port: int = 8712,
+    allowed_hosts: tuple[str, ...] = (),
+    autonomy: bool = False,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -194,7 +220,21 @@ def create_app(
                 HOST_CAPABILITIES[settings.host_access],
             )
             app.state.runtime = runtime
-            yield
+            stop, background, scheduler = asyncio.Event(), None, None
+            if autonomy:
+                from b12.autonomy import Scheduler
+
+                scheduler = Scheduler(runtime)
+                background = asyncio.create_task(scheduler.run(stop))
+            try:
+                yield
+            finally:
+                stop.set()
+                if background is not None:
+                    for turn_id in list(runtime.agent.active):
+                        runtime.agent.active[turn_id].cancel.set()
+                    await asyncio.wait({background}, timeout=15)
+                    scheduler.close()
         finally:
             for turn_id in list(runtime.agent.active):
                 runtime.control.cancel_turn(turn_id)
@@ -387,6 +427,67 @@ def create_app(
             raise HTTPException(403, "owner_token_not_revocable_here")
         control.revoke_tokens(actor_id)
         return {"revoked": actor_id}
+
+    @app.get("/api/goals")
+    async def goal_list(request: Request, who: Identity):
+        return runtime_of(request).goals.for_actor(who.actor.id)
+
+    @app.post("/api/goals")
+    async def goal_create(request: Request, body: GoalBody, who: Identity):
+        require_owner(who)  # goals run tools autonomously under owner grants
+        runtime = runtime_of(request)
+        session = runtime.control.create_session(who.actor.id)
+        try:
+            return runtime.goals.create(
+                who.actor.id,
+                session,
+                body.intent,
+                body.criteria,
+                allowed_tools=tuple(set(body.allowed_tools) & set(who.capabilities)),
+                budget_turns=body.budget_turns,
+                review_interval_s=body.review_interval_s,
+                check=body.check,
+            )
+        except ValueError as exc:
+            raise HTTPException(422, "invalid_goal") from exc
+
+    @app.post("/api/goals/{goal_id}/status")
+    async def goal_status(request: Request, goal_id: str, body: GoalStatusBody, who: Identity):
+        try:
+            return runtime_of(request).goals.set_status(
+                goal_id, who.actor.id, body.status, "owner_control"
+            )
+        except KeyError:
+            raise HTTPException(404, "goal_not_found") from None
+
+    @app.get("/api/attention")
+    async def attention_state(request: Request, who: Identity):
+        return runtime_of(request).attention.state(who.actor.id)
+
+    @app.post("/api/attention")
+    async def attention_set(request: Request, body: AttentionBody, who: Identity):
+        attention = runtime_of(request).attention
+        if body.quiet is not None:
+            attention.set_quiet(who.actor.id, body.quiet)
+        if body.stopped is not None:
+            attention.set_stopped(who.actor.id, body.stopped)
+        return attention.state(who.actor.id)
+
+    @app.get("/api/proposals")
+    async def proposals(request: Request, who: Identity):
+        return runtime_of(request).goals.proposals(who.actor.id)
+
+    @app.post("/api/proposals/{proposal_id}/feedback")
+    async def proposal_feedback(
+        request: Request, proposal_id: str, body: FeedbackBody, who: Identity
+    ):
+        runtime = runtime_of(request)
+        match = [p for p in runtime.goals.proposals(who.actor.id) if p["id"] == proposal_id]
+        if not match:
+            raise HTTPException(404, "proposal_not_found")
+        if match[0]["attention_id"]:
+            runtime.attention.feedback(match[0]["attention_id"], body.outcome)
+        return {"proposal_id": proposal_id, "outcome": body.outcome}
 
     @app.post("/api/control/consent")
     async def consent(request: Request, body: ConsentBody, who: Identity):

@@ -7,9 +7,11 @@ sessions/. CLI/API/scheduler/audio share this object instead of building their o
 from dataclasses import dataclass
 
 from b12.agent import Agent
+from b12.attention import AttentionPolicy
 from b12.config import Settings
 from b12.control import ControlStore
 from b12.evidence import EvidenceResolver
+from b12.goals import GoalStore
 from b12.memory import MemoryStore
 from b12.model import OllamaModel
 from b12.purge import PurgeCoordinator
@@ -32,9 +34,19 @@ class Runtime:
     model: OllamaModel
     agent: Agent
     purge: PurgeCoordinator
+    goals: GoalStore
+    attention: AttentionPolicy
 
     def close(self):
-        for store in (self.backups, self.knowledge, self.sessions, self.memory, self.control):
+        for store in (
+            self.attention,
+            self.goals,
+            self.backups,
+            self.knowledge,
+            self.sessions,
+            self.memory,
+            self.control,
+        ):
             try:
                 store.close()
             except Exception:  # noqa: BLE001 - closing must continue for every store
@@ -49,6 +61,8 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     knowledge = KnowledgeIndex(root / "knowledge")
     backups = BackupStore(root / "backups")
     sessions = SessionStore(root / "sessions")
+    goals = GoalStore(root / "goals")
+    attention = AttentionPolicy(root / "attention", settings)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)
     model = model or OllamaModel(settings)
     agent = Agent(
@@ -67,6 +81,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         backups=backups,
         knowledge=knowledge,
         agent=agent,
+        goals=goals,
     )
     agent.purge = purge
     register_host_tools(
@@ -78,5 +93,16 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         memory_revision=agent.memory_revision,
     )
     return Runtime(
-        settings, control, memory, knowledge, backups, sessions, registry, model, agent, purge
+        settings,
+        control,
+        memory,
+        knowledge,
+        backups,
+        sessions,
+        registry,
+        model,
+        agent,
+        purge,
+        goals,
+        attention,
     )

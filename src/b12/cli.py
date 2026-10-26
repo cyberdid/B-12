@@ -349,6 +349,82 @@ async def cmd_tools(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_goals(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        goals = runtime.goals
+        if args.action == "add":
+            check = None
+            if args.check_file:
+                check = {"kind": "file_contains", "path": args.check_file, "text": args.check_text}
+            session = runtime.control.create_session(owner.actor_id)
+            emit_json(
+                goals.create(
+                    owner.actor_id,
+                    session,
+                    args.value,
+                    args.criteria,
+                    allowed_tools=tuple(args.tools or HOST_CAPABILITIES[settings.host_access]),
+                    budget_turns=args.budget,
+                    review_interval_s=args.interval,
+                    check=check,
+                )
+            )
+        elif args.action == "list":
+            emit_json(goals.for_actor(owner.actor_id))
+        else:
+            status = {"pause": "paused", "resume": "active", "abandon": "abandoned"}[args.action]
+            try:
+                emit_json(goals.set_status(args.value, owner.actor_id, status, "owner_control"))
+            except KeyError:
+                emit_json({"error": "goal_not_found"})
+                return 1
+        return 0
+    finally:
+        runtime.close()
+
+
+async def cmd_flag(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        setter = (
+            runtime.attention.set_quiet
+            if args.command == "quiet"
+            else runtime.attention.set_stopped
+        )
+        setter(owner.actor_id, args.value == "on")
+        emit_json(runtime.attention.state(owner.actor_id))
+        return 0
+    finally:
+        runtime.close()
+
+
+async def cmd_autonomy(args, settings) -> int:
+    from b12.autonomy import Scheduler, SchedulerLocked
+
+    runtime = open_or_fail(settings)
+    try:
+        require_owner(runtime)
+        await runtime.purge.resume()
+        try:
+            scheduler = Scheduler(runtime)
+        except SchedulerLocked:
+            emit_json({"error": "scheduler_locked"})
+            return 1
+        try:
+            if args.reflect:
+                emit_json(await scheduler.reflect_idle())
+            else:
+                emit_json(await scheduler.tick())
+            return 0
+        finally:
+            scheduler.close()
+    finally:
+        runtime.close()
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -359,7 +435,7 @@ async def cmd_serve(args, settings) -> int:
     if not ipaddress.ip_address(args.host).is_loopback:
         emit_json({"error": "loopback_only"})
         return 1
-    app = create_app(settings, port=args.port)
+    app = create_app(settings, port=args.port, autonomy=not args.no_autonomy)
     server = uvicorn.Server(
         uvicorn.Config(app, host=args.host, port=args.port, log_level="warning", access_log=False)
     )
@@ -404,6 +480,22 @@ def parser() -> argparse.ArgumentParser:
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)
+    serve.add_argument("--no-autonomy", action="store_true", help="без фонового scheduler")
+    goals = sub.add_parser("goals", help="фонові цілі власника")
+    goals.add_argument("action", choices=("add", "list", "pause", "resume", "abandon"))
+    goals.add_argument("value", nargs="?", default="")
+    goals.add_argument("--criteria", default="Короткий звіт про результат")
+    goals.add_argument("--budget", type=int, default=5)
+    goals.add_argument("--interval", type=float, default=3600)
+    goals.add_argument("--tools", nargs="*")
+    goals.add_argument("--check-file")
+    goals.add_argument("--check-text", default="")
+    for name in ("quiet", "stop"):
+        sub.add_parser(
+            name, help="тихий режим" if name == "quiet" else "зупинка фону"
+        ).add_argument("value", choices=("on", "off"))
+    autonomy = sub.add_parser("autonomy", help="один прохід scheduler")
+    autonomy.add_argument("--reflect", action="store_true", help="лише idle рефлексія")
     return root
 
 
@@ -426,6 +518,10 @@ def main(argv=None) -> int:
         "session": cmd_session_clear,
         "tools": cmd_tools,
         "serve": cmd_serve,
+        "goals": cmd_goals,
+        "quiet": cmd_flag,
+        "stop": cmd_flag,
+        "autonomy": cmd_autonomy,
     }
     try:
         return asyncio.run(handlers[args.command](args, settings))

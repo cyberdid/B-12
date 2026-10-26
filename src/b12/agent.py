@@ -169,6 +169,7 @@ class Agent:
         ]
         for turn_id, item in targets:
             item.invalidated = True
+            item.cancel.set()  # also stops background work that is not a control turn
             self.control.cancel_turn(turn_id)
         try:
             await asyncio.wait_for(

@@ -14,12 +14,14 @@ from b12.contracts import Actor, PurgeReceipt
 
 log = logging.getLogger(__name__)
 
-STORES = ("sessions", "active_turns", "backups", "provider_cache")
+STORES = ("sessions", "goals", "active_turns", "backups", "provider_cache")
 
 
 class PurgeCoordinator:
-    def __init__(self, *, control, memory, sessions, backups=None, knowledge=None, agent=None):
-        self.control, self.memory, self.sessions = control, memory, sessions
+    def __init__(
+        self, *, control, memory, sessions, backups=None, knowledge=None, agent=None, goals=None
+    ):
+        self.control, self.memory, self.sessions, self.goals = control, memory, sessions, goals
         self.backups, self.knowledge, self.agent = backups, knowledge, agent
 
     async def purge(self, memory_id: str, context, guard) -> PurgeReceipt:
@@ -51,6 +53,10 @@ class PurgeCoordinator:
             self.sessions.purge_evidence(receipt.operation_id, actor.id, targets)
             if self.agent is not None:
                 self.agent.purge_volatile(actor.id, targets)
+            return True
+        if store == "goals":
+            if self.goals is not None:
+                self.goals.purge_evidence(actor.id, targets)
             return True
         if store == "active_turns":
             if self.agent is None:
@@ -100,6 +106,8 @@ class PurgeCoordinator:
             if not ids or self.sessions.invalidation_applied(operation):
                 continue
             self.sessions.purge_evidence(operation, actor.id, ids)
+            if self.goals is not None:
+                self.goals.purge_evidence(actor.id, ids)
             if self.agent is not None:
                 self.agent.purge_volatile(actor.id, ids)
                 if not await self.agent.reset_provider():

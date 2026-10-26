@@ -180,3 +180,39 @@ async def test_live_server_binds_loopback_and_disconnect_cancels_turn(live_serve
     contents = [m["content"] for m in state["requests"][-1]["messages"]]
     assert "довга відповідь" not in contents and "довго" not in contents
     assert server.returncode is None
+
+
+async def test_goals_attention_and_proposals_over_api(api):
+    _, client, token, app, _ = api
+    created = await client.post(
+        "/api/goals",
+        json={"intent": "Ціль через API", "criteria": "звіт", "allowed_tools": ["time.read"]},
+        headers=auth(token),
+    )
+    assert created.status_code == 200 and created.json()["allowed_tools"] == ["time.read"]
+    goal_id = created.json()["id"]
+    assert [g["id"] for g in (await client.get("/api/goals", headers=auth(token))).json()] == [
+        goal_id
+    ]
+    paused = await client.post(
+        f"/api/goals/{goal_id}/status", json={"status": "paused"}, headers=auth(token)
+    )
+    assert paused.json()["status"] == "paused"
+    achieved = await client.post(
+        f"/api/goals/{goal_id}/status", json={"status": "achieved"}, headers=auth(token)
+    )
+    assert achieved.status_code == 422
+    state = await client.post("/api/attention", json={"quiet": True}, headers=auth(token))
+    assert state.json() == {"quiet": True, "stopped": False}
+    guest = (
+        await client.post(
+            "/api/guests",
+            json={"consent": True, "capabilities": ["time.read"]},
+            headers=auth(token),
+        )
+    ).json()
+    denied = await client.post(
+        "/api/goals", json={"intent": "x", "criteria": "y"}, headers=auth(guest["token"])
+    )
+    assert denied.status_code == 403
+    assert (await client.get("/api/proposals", headers=auth(token))).json() == []
