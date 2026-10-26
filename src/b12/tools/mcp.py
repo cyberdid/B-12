@@ -36,6 +36,17 @@ class McpError(Exception):
         super().__init__(code)
 
 
+def _optional(spec: dict) -> tuple[dict, bool]:
+    """Normalize anyOf [X, null] (FastMCP Optional) to X; we render our own schema."""
+    variants = spec.get("anyOf")
+    if isinstance(variants, list) and len(variants) == 2:
+        real = [v for v in variants if isinstance(v, dict) and v.get("type") != "null"]
+        if len(real) == 1 and any(v.get("type") == "null" for v in variants if isinstance(v, dict)):
+            merged = {**real[0], **{k: v for k, v in spec.items() if k == "description"}}
+            return merged, True
+    return spec, False
+
+
 def _python_type(spec: dict):
     kind = spec.get("type")
     if kind == "number":
@@ -59,6 +70,9 @@ def schema_model(name: str, schema: dict):
     for key, spec in properties.items():
         if not isinstance(spec, dict) or not key.isidentifier() or key.startswith("_"):
             return None
+        spec, nullable = _optional(spec)
+        if nullable:
+            required.discard(key)
         python = _python_type(spec)
         if python is None:
             return None
@@ -150,6 +164,7 @@ class McpServer:
                 cancelled.cancel()
         if future not in done:
             self._pending.pop(request_id, None)
+            future.cancel()
             await self._send(
                 {
                     "jsonrpc": "2.0",
@@ -186,7 +201,7 @@ class McpServer:
 
 
 async def register_server(
-    registry, server: McpServer, *, capability, risk="typed", read_only=False
+    registry, server: McpServer, *, capability, risk="typed", read_only=False, timeout_s=None
 ):
     """Discover and register a started server's supported tools; returns skipped names."""
     skipped = []
@@ -204,6 +219,7 @@ async def register_server(
             _handler(server, name, read_only),
             capability,
             risk=Risk(risk),
+            timeout_s=timeout_s,
         )
     return skipped
 
@@ -250,13 +266,27 @@ def _handler(server, tool_name, read_only):
     return handler
 
 
+async def close_servers(runtime) -> None:
+    """Async shutdown of child bridges (MCP servers, embedding bridge) inside the loop."""
+    for server in runtime.mcp_servers:
+        await server.aclose()
+    runtime.mcp_servers.clear()
+    if runtime.agent.semantic is not None:
+        await runtime.agent.semantic.embedder.aclose()
+
+
+def catalog_capabilities(state_dir: Path) -> tuple[str, ...]:
+    """Owner-only capabilities declared by the trusted catalog (never given to guests)."""
+    return tuple(sorted({entry["capability"] for entry in load_catalog(state_dir)}))
+
+
 def load_catalog(state_dir: Path) -> list[dict]:
     path = Path(state_dir) / "mcp.json"
     if not path.exists():
         return []
     entries = json.loads(path.read_text())
     for entry in entries:
-        if set(entry) - {"name", "command", "capability", "risk", "read_only", "cwd"}:
+        if set(entry) - {"name", "command", "capability", "risk", "read_only", "cwd", "timeout_s"}:
             raise ValueError("unknown catalog field")
         if not isinstance(entry["command"], list) or not entry["command"]:
             raise ValueError("command must be an argv list")
@@ -276,6 +306,7 @@ async def attach_catalog(runtime) -> dict:
             capability=entry["capability"],
             risk=entry.get("risk", "typed"),
             read_only=bool(entry.get("read_only")),
+            timeout_s=entry.get("timeout_s"),
         )
         report[entry["name"]] = {"skipped": skipped}
     return report

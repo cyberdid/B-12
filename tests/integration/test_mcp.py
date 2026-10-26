@@ -149,3 +149,16 @@ async def test_catalog_attaches_to_runtime_and_agent_uses_mcp_tool(scripted_olla
         assert result.state == "completed" and result.content == "Сума: 42.0"
     finally:
         runtime.close()
+
+
+async def test_optional_parameters_are_normalized_and_omitted_when_unset(bridge):
+    rig, _, _ = bridge
+    schema = next(
+        s for s in rig.registry.schemas(rig.context) if s["function"]["name"] == "mcp.fixture.maybe"
+    )
+    assert "anyOf" not in json.dumps(schema)
+    assert schema["function"]["parameters"].get("required", []) == []
+    unset = await call(rig, "mcp.fixture.maybe")
+    assert unset.content["text"] == "{}"
+    given = await call(rig, "mcp.fixture.maybe", v="так")
+    assert given.content["text"] == "{'v': 'так'}"

@@ -15,7 +15,7 @@ import os
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from b12.auth import HOST_CAPABILITIES
+from b12.auth import owner_capabilities
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class Scheduler:
             return {"goal_id": goal["id"], "state": "skipped", "reason": "owner_stop"}
         if self._busy(actor.id):
             return {"goal_id": goal["id"], "state": "skipped", "reason": "user_active"}
-        owner_caps = set(HOST_CAPABILITIES[rt.settings.host_access])
+        owner_caps = set(owner_capabilities(rt.settings))
         caps = tuple(sorted(set(goal["allowed_tools"]) & owner_caps)) or ("time.read",)
         task = rt.control.create_task(goal["session_id"])
         grant = rt.control.issue_grant(

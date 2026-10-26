@@ -129,6 +129,7 @@ class Agent:
         self.system_prompt = system_prompt
         self.tool_result_bytes, self.history_turns = tool_result_bytes, history_turns
         self.purge = None  # PurgeCoordinator, wired by the application factory
+        self.semantic = None  # optional SemanticIndex; lexical recall is always available
         self.model_lock = asyncio.Lock()
         self.active: dict[str, _Active] = {}
         self._session_locks: dict[str, asyncio.Lock] = {}
@@ -231,7 +232,7 @@ class Agent:
                 "turn_messages": [{"id": str(uuid4()), "role": "user", "content": text}],
                 "evidence": [],
             }
-            for item in self._recall(text, actor):
+            for item in await self._recall(text, actor):
                 state["evidence"].append(item)
                 state["tags"][item["id"]] = "memory"
             return await self._drive(context, actor, state, on_event, started=True)
@@ -256,10 +257,20 @@ class Agent:
         async with lock:
             return await self._drive(context, actor, state, on_event, started=False)
 
-    def _recall(self, text: str, actor: Actor, limit: int = 5) -> list[dict]:
+    async def _recall(self, text: str, actor: Actor, limit: int = 5) -> list[dict]:
         if not actor.consent:
             return []
         found: dict[str, str] = {}
+        if self.semantic is not None:
+            from b12.semantic import EmbeddingUnavailable
+
+            try:
+                for memory_id, _ in await self.semantic.search(text, actor, k=limit):
+                    record = self.memory.get(memory_id, actor)
+                    if record is not None:
+                        found[record.id] = record.text[:512]
+            except EmbeddingUnavailable:
+                log.warning("semantic recall unavailable; lexical fallback")
         for term in list(dict.fromkeys(re.findall(r"[^\W_]{3,}", text.lower())))[:8]:
             for record in self.memory.search(term, actor, limit=3):
                 if len(found) < limit:

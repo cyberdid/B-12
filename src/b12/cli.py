@@ -16,7 +16,7 @@ from pathlib import Path
 
 import httpx
 
-from b12.auth import HOST_CAPABILITIES
+from b12.auth import owner_capabilities
 from b12.config import Settings
 from b12.model_errors import ModelError
 
@@ -72,7 +72,7 @@ class Owner:
         grant = control.issue_grant(
             self.actor_id,
             self.session_id,
-            HOST_CAPABILITIES[access],
+            owner_capabilities(self.runtime.settings),
             task_id=task,
             ttl_s=timeout_s + 3600,
             full_execution=access == "full",
@@ -225,45 +225,54 @@ async def cmd_chat(args, settings) -> int:
         from b12.tools.mcp import attach_catalog
 
         await attach_catalog(runtime)
-        if args.message is not None:
-            grant, task = owner.grant(args.timeout)
-            console = Console(quiet=args.json)
-            result = await run_with_interrupt(
-                runtime.agent.turn,
-                owner.session_id,
-                grant,
-                args.message,
-                task_id=task,
-                on_event=console,
-                timeout_s=args.timeout,
-            )
-            if args.json:
-                emit_json(turn_json(result))
-            return _EXIT[result.state]
-        console = Console(quiet=False)
-        while True:
-            print("ти> ", end="", file=sys.stderr, flush=True)
-            line = await asyncio.to_thread(sys.stdin.readline)
-            if not line:
-                return 0
-            if not line.strip():
-                continue
-            grant, task = owner.grant(args.timeout)
-            print("B-12> ", end="", flush=True)
-            result = await run_with_interrupt(
-                runtime.agent.turn,
-                owner.session_id,
-                grant,
-                line.strip(),
-                task_id=task,
-                on_event=console,
-                timeout_s=args.timeout,
-            )
-            result = await interactive_approvals(runtime, result, console, args.timeout)
-            if result.state != "completed":
-                print(f"[{result.state}: {result.error_code}]", file=sys.stderr)
+        try:
+            return await _converse(args, runtime, owner)
+        finally:
+            from b12.tools.mcp import close_servers
+
+            await close_servers(runtime)
     finally:
         runtime.close()
+
+
+async def _converse(args, runtime, owner) -> int:
+    if args.message is not None:
+        grant, task = owner.grant(args.timeout)
+        console = Console(quiet=args.json)
+        result = await run_with_interrupt(
+            runtime.agent.turn,
+            owner.session_id,
+            grant,
+            args.message,
+            task_id=task,
+            on_event=console,
+            timeout_s=args.timeout,
+        )
+        if args.json:
+            emit_json(turn_json(result))
+        return _EXIT[result.state]
+    console = Console(quiet=False)
+    while True:
+        print("ти> ", end="", file=sys.stderr, flush=True)
+        line = await asyncio.to_thread(sys.stdin.readline)
+        if not line:
+            return 0
+        if not line.strip():
+            continue
+        grant, task = owner.grant(args.timeout)
+        print("B-12> ", end="", flush=True)
+        result = await run_with_interrupt(
+            runtime.agent.turn,
+            owner.session_id,
+            grant,
+            line.strip(),
+            task_id=task,
+            on_event=console,
+            timeout_s=args.timeout,
+        )
+        result = await interactive_approvals(runtime, result, console, args.timeout)
+        if result.state != "completed":
+            print(f"[{result.state}: {result.error_code}]", file=sys.stderr)
 
 
 async def cmd_resume(args, settings) -> int:
@@ -368,7 +377,7 @@ async def cmd_goals(args, settings) -> int:
                     session,
                     args.value,
                     args.criteria,
-                    allowed_tools=tuple(args.tools or HOST_CAPABILITIES[settings.host_access]),
+                    allowed_tools=tuple(args.tools or owner_capabilities(settings)),
                     budget_turns=args.budget,
                     review_interval_s=args.interval,
                     check=check,
@@ -466,6 +475,55 @@ async def cmd_status(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_mcp(args, settings) -> int:
+    from b12.tools.mcp import load_catalog
+
+    path = settings.state_dir / "mcp.json"
+    entries = load_catalog(settings.state_dir)
+    argv = args.server_argv
+    if args.action == "add":
+        if not argv or not args.capability:
+            emit_json({"error": "command_and_capability_required"})
+            return 1
+        entries = [e for e in entries if e["name"] != args.name]
+        entries.append(
+            {
+                "name": args.name,
+                "command": argv,
+                "capability": args.capability,
+                "risk": "typed",
+                "read_only": args.read_only,
+                **({"timeout_s": args.timeout_s} if args.timeout_s else {}),
+            }
+        )
+        settings.state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        fd = os.open(path, os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "w") as handle:
+            json.dump(entries, handle, indent=2)
+    elif args.action == "remove":
+        entries = [e for e in entries if e["name"] != args.name]
+        fd = os.open(path, os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "w") as handle:
+            json.dump(entries, handle, indent=2)
+    elif args.action == "test":
+        from b12.tools.mcp import McpServer
+
+        entry = next((e for e in entries if e["name"] == args.name), None)
+        if entry is None:
+            emit_json({"error": "not_found"})
+            return 1
+        server = McpServer(entry["name"], entry["command"], cwd=entry.get("cwd"))
+        try:
+            await server.start(timeout_s=60)
+            tools = await server.list_tools()
+        finally:
+            await server.aclose()
+        emit_json({"name": args.name, "tools": [t.get("name") for t in tools]})
+        return 0
+    emit_json(entries)
+    return 0
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -542,6 +600,12 @@ def parser() -> argparse.ArgumentParser:
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
         ).add_argument("value", choices=("on", "off"))
+    mcp = sub.add_parser("mcp", help="довірений каталог MCP-серверів власника")
+    mcp.add_argument("action", choices=("list", "add", "remove", "test"))
+    mcp.add_argument("name", nargs="?", default="")
+    mcp.add_argument("--capability")
+    mcp.add_argument("--read-only", action="store_true")
+    mcp.add_argument("--timeout-s", type=float, help="per-tool timeout (slow model loads)")
     backup = sub.add_parser("backup", help="керовані знімки стану")
     backup.add_argument("action", choices=("create", "list", "verify", "restore", "delete"))
     backup.add_argument("snapshot_id", nargs="?")
@@ -552,7 +616,12 @@ def parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    # `b12 mcp add NAME --capability C -- server argv...`: everything after -- is the argv.
+    server_argv = argv[argv.index("--") + 1 :] if "--" in argv else []
+    argv = argv[: argv.index("--")] if "--" in argv else argv
     args = parser().parse_args(argv)
+    args.server_argv = server_argv
     try:
         settings = load_settings(args.config)
     except (ValueError, OSError, tomllib.TOMLDecodeError) as exc:
@@ -575,6 +644,7 @@ def main(argv=None) -> int:
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,
         "backup": cmd_backup,
+        "mcp": cmd_mcp,
         "status": cmd_status,
     }
     try:

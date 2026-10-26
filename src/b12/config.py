@@ -32,6 +32,10 @@ class Settings(BaseModel):
     initiative_hour_cap: Annotated[int, Field(ge=0, le=60)] = 3
     initiative_cooldown_s: Annotated[float, Field(ge=0, allow_inf_nan=False)] = 600
     scheduler_tick_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 60
+    # Optional semantic recall: interpreter of an existing embedding app (e.g. the owner's
+    # archive-index venv) running scripts/embed_bridge.py. None keeps lexical-only recall.
+    embedding_python: str | None = None
+    embedding_backend: str = "archive_index.embed:Embedder"
 
     @field_validator("state_dir", mode="before")
     @classmethod

@@ -36,6 +36,7 @@ class _Tool:
     capability: str
     risk: Risk
     schema: dict
+    timeout_s: float | None = None
 
 
 class ToolRegistry:
@@ -54,7 +55,12 @@ class ToolRegistry:
         capability: str,
         *,
         risk: Risk | str = Risk.TYPED,
+        timeout_s: float | None = None,
     ):
+        if timeout_s is not None and (
+            type(timeout_s) not in (int, float) or not math.isfinite(timeout_s) or timeout_s <= 0
+        ):
+            raise ValueError("positive finite tool timeout required")
         if not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_.-]{0,127}", name):
             raise ValueError("invalid trusted tool name")
         if name in self._tools:
@@ -105,7 +111,7 @@ class ToolRegistry:
             "function": {"name": name, "description": description, "parameters": parameters},
         }
         self._tools[name] = _Tool(
-            name, description, argument_model, handler, capability, risk, schema
+            name, description, argument_model, handler, capability, risk, schema, timeout_s
         )
 
     def catalog(self) -> list[dict]:
@@ -194,7 +200,7 @@ class ToolRegistry:
             )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})
-            deadline = min(context.deadline, start + self.timeout_s)
+            deadline = min(context.deadline, start + (tool.timeout_s or self.timeout_s))
             guard = EffectGuard(self.control, context, tool.capability, operation, deadline)
 
             async def invoke():

@@ -43,6 +43,8 @@ class Runtime:
     def close(self):
         for server in self.mcp_servers:
             server.close()
+        if self.agent.semantic is not None:
+            self.agent.semantic.close()
         for store in (
             self.attention,
             self.goals,
@@ -91,6 +93,14 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         operations=operations,
     )
     agent.purge = purge
+    if settings.embedding_python:
+        from b12.semantic import BridgeEmbedder, SemanticIndex
+
+        agent.semantic = SemanticIndex(
+            root / "semantic",
+            BridgeEmbedder(settings.embedding_python, backend=settings.embedding_backend),
+            memory,
+        )
     register_host_tools(
         registry,
         backups=backups,

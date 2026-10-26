@@ -45,11 +45,19 @@ TOOLS = [
         "inputSchema": {"type": "object", "properties": {}},
     },
     {
+        "name": "maybe",
+        "description": "Optional parameter",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"v": {"anyOf": [{"type": "string"}, {"type": "null"}], "default": None}},
+        },
+    },
+    {
         "name": "union",
         "description": "Unsupported schema",
         "inputSchema": {
             "type": "object",
-            "properties": {"v": {"anyOf": [{"type": "string"}, {"type": "null"}]}},
+            "properties": {"v": {"anyOf": [{"type": "string"}, {"type": "integer"}]}},
         },
     },
 ]
@@ -79,6 +87,8 @@ def call(request):
                 return None
             time.sleep(0.05)
         return {"content": [{"type": "text", "text": "slept"}], "isError": False}
+    if name == "maybe":
+        return {"content": [{"type": "text", "text": repr(args)}], "isError": False}
     if name == "fail":
         return {"content": [{"type": "text", "text": "boom"}], "isError": True}
     raise KeyError(name)

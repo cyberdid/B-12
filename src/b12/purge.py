@@ -14,7 +14,15 @@ from b12.contracts import Actor, PurgeReceipt
 
 log = logging.getLogger(__name__)
 
-STORES = ("sessions", "goals", "active_turns", "backups", "snapshots", "provider_cache")
+STORES = (
+    "sessions",
+    "goals",
+    "semantic",
+    "active_turns",
+    "backups",
+    "snapshots",
+    "provider_cache",
+)
 
 
 class PurgeCoordinator:
@@ -78,6 +86,11 @@ class PurgeCoordinator:
             turns = self.sessions.purge_evidence(receipt.operation_id, actor.id, ())
             result = self.backups.purge(actor.id, turn_ids=tuple(turns))
             return result["state"] == "complete"
+        if store == "semantic":
+            semantic = getattr(self.agent, "semantic", None)
+            if semantic is not None:
+                semantic.purge(actor.id, targets)
+            return True
         if store == "snapshots":
             if self.operations is not None:
                 self.operations.purge_snapshots(receipt.operation_id, actor.id, targets)

@@ -17,7 +17,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from b12.auth import GUEST_CAPABILITIES, HOST_CAPABILITIES, Caller, bearer, owner_token
+from b12.auth import GUEST_CAPABILITIES, Caller, bearer, owner_capabilities, owner_token
 from b12.config import Settings
 from b12.control import ControlError
 
@@ -219,11 +219,14 @@ def create_app(
             from b12.tools.mcp import attach_catalog
 
             await attach_catalog(runtime)
+            if runtime.agent.semantic is not None:
+                warm = asyncio.create_task(runtime.agent.semantic.warm_up())
+                warm.add_done_callback(lambda task: task.exception())  # failure -> lexical
             owner_token(
                 runtime.control,
                 settings.state_dir,
                 owner_id,
-                HOST_CAPABILITIES[settings.host_access],
+                owner_capabilities(settings),
             )
             app.state.runtime = runtime
             stop, background, scheduler = asyncio.Event(), None, None
@@ -235,6 +238,9 @@ def create_app(
             try:
                 yield
             finally:
+                from b12.tools.mcp import close_servers
+
+                await close_servers(runtime)
                 stop.set()
                 if background is not None:
                     for turn_id in list(runtime.agent.active):

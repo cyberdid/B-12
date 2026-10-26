@@ -224,6 +224,16 @@ class MemoryStore:
             self._audit(actor, "remember", memory_id=record.id)
         return record
 
+    def get(self, memory_id: str, actor: Actor) -> MemoryRecord | None:
+        self._consent(actor)
+        with self._transaction():
+            row = self._connection.execute(
+                """SELECT m.* FROM memories m WHERE id=? AND actor_id=?
+                   AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                (memory_id, actor.id),
+            ).fetchone()
+            return self._record(row) if row else None
+
     def recent(self, actor: Actor, *, limit: int = 20, exclude_kinds=()) -> list[MemoryRecord]:
         """Newest live records in the exact actor namespace (consent required)."""
         self._consent(actor)

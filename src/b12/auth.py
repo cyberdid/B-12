@@ -41,6 +41,14 @@ GUEST_CAPABILITIES = frozenset(
 )
 
 
+def owner_capabilities(settings) -> tuple[str, ...]:
+    """Host capabilities for the configured access level plus trusted MCP catalog ones."""
+    from b12.tools.mcp import catalog_capabilities
+
+    extra = catalog_capabilities(settings.state_dir) if settings.host_access != "none" else ()
+    return tuple(dict.fromkeys((*HOST_CAPABILITIES[settings.host_access], *extra)))
+
+
 @dataclass(frozen=True)
 class Caller:
     actor: Actor
