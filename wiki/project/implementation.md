@@ -26,7 +26,9 @@ tags: [implementation, plan, acceptance]
 
 **Перевірений факт:** Task 4 завершено після fix review: commit `46b374c`, run4 із 15/15 реальними Bolt-запитами, full suite 208 passed / 1 real-model skip, fix re-review пройдено. Snapshot validation тепер спільна для builder і send; callbacks awaitable-only; malformed terminal дає typed error. [Докази та обмеження](../topics/model-transport.md).
 
-**Наступний крок:** Task 5 — server-owned control, grant revision, tool registry та approval/lifecycle policy. Після нього Task 6 підключить реальні host effects, Task 7 — sessions, purge coordination і спільний agent loop.
+**Перевірений факт:** Task 5 пройшов fix re-review (`task-5-rereview.md`): commit `bc07196` додає strict `HandlerOutcome` із bounded content, typed effects/truncation/unknown lifecycle та транзакційне завершення expired approvals. Fix round закрив Important handler-interface gap і Minor expiry lifecycle gap. Coordinator повторив suite: 274 passed / 1 skipped; Ruff і whitespace clean. [Поточний контрольний контракт і межі](../topics/tool-control.md).
+
+**Наступний крок:** Task 6 підключає реальні filesystem/process/network tools через перевірений `HandlerOutcome` і `EffectGuard`; тести використовують temp paths, harmless real processes і local HTTP. Task 7 об’єднає sessions, purge coordination і спільний agent loop.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 

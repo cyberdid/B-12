@@ -44,3 +44,5 @@ System 1 виконує barge-in, mute, обмеження приводів і �
 Модель, транспорт і корпус змінюються через адаптери. Вибір процесів/IPC/фреймворку ще відкритий: для першого PoC не потрібні всі каталоги зі структури §13 brief. [Голос](voice.md), [автономність](autonomy.md) і [обладнання](hardware.md) описують окремі обмеження. Статуси принципів — у [реєстрі рішень](../project/decisions.md).
 
 Для retrieval реалізовано [pinned actor-scoped lexical adapter](archive-retrieval.md); context builder рахує повний запит до pinned Bolt profile. Це не підключає приватний глобальний архів, semantic embedding або MCP.
+
+Server-owned grant/control і typed tool outcome реалізовані окремим етапом; межі approval, unknown outcome та Task6 host-tool контракт зібрані у [сторінці tool control](tool-control.md). API authentication і реальні host handlers лишаються наступними етапами.

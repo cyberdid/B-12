@@ -108,3 +108,11 @@ tags: [history]
 ## [2026-10-26] lint | Статус після Task 4
 
 Оновлено Q15/Q18, status, roadmap і пов’язані теми згідно зі scope Tasks 1–4. Pinned Bolt profile truncation gate закрито для перевірених сценаріїв; voice SLO, model A/B та повна українська якість відкриті. Локальні посилання/source paths/frontmatter/index і master brief checksum перевірено окремим lint нижче; global purge/tool control не позначені як готові.
+
+## [2026-10-26] implementation | Server-owned tool control
+
+**Перевірений факт:** Task 5 fix commit `bc07196` додає persistent `ControlStore`, server-issued `ExecutionContext`, exact approval/replay lifecycle та strict registry. Незалежний перший review знайшов handler outcome gap і expiry lifecycle; fix rereview підтвердив обидва addressed та відсутність нових Critical/Important. Coordinator suite: 274 passed / 1 skipped; Ruff clean. `HandlerOutcome` передає bounded content, typed side effects, truncation та `unknown`; host effect implementations і API authentication ще попереду. [Контракт і межі](topics/tool-control.md).
+
+## [2026-10-26] lint | Tool-control checkpoint
+
+Перевірено 27 wiki-сторінок, 230 локальних Markdown-посилань, required frontmatter/source paths і index coverage — без помилок. SHA-256 оригіналу master brief збігається з `raw/source-manifest.json`: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`. `git diff --check` clean; тема `tool-control.md` фіксує межі reviewed Task5 і не оголошує реальні host tools готовими.

@@ -7,12 +7,12 @@ tags: [milestones, acceptance]
 ---
 # Дорожня карта й критерії переходу
 
-Етапи M0–M6 походять з brief §12; критерії нижче конкретизовані в цьому аналізі. Tasks 1–4 реалізовані та reviewed у `feat/b12-runtime`; M0/M1 лишаються частковими. Календарні строки не призначені: голосове та апаратне середовища ще потребують вимірювання. [Поточний стан](status.md).
+Етапи M0–M6 походять з brief §12; критерії нижче конкретизовані в цьому аналізі. Tasks 1–5 реалізовані та reviewed у `feat/b12-runtime`; M0/M1 лишаються частковими. Календарні строки не призначені: голосове та апаратне середовища ще потребують вимірювання. [Поточний стан](status.md).
 
 | Етап | Робота | Доказ завершення | Залежності / стан |
 |---|---|---|---|
-| M0 — специфікація | Походження коду; Event/Observation/Action/Memory/Consent/Tool/Identity; permission/retention; telemetry/heartbeat | Узгоджені versioned contracts, негативні сценарії policy, відтворюваний software-only запуск, інструкція й логи | Частково: contracts, consent-aware memory, durable forget primitives; control/grants, heartbeat і global hooks розробляються |
-| M1 — текстове ядро | SQLite, retrieval, змінний LLM adapter, один tool, малий event loop та idle reflection | Дозволена подія згадується з evidence після restart; заборонена не зберігається; tool проходить policy; результати model A/B | Частково: canonical memory, lexical retrieval, pinned streaming/admission. Task5–7 потрібні для control/tools/agent; A/B та reflection попереду |
+| M0 — специфікація | Походження коду; Event/Observation/Action/Memory/Consent/Tool/Identity; permission/retention; telemetry/heartbeat | Узгоджені versioned contracts, негативні сценарії policy, відтворюваний software-only запуск, інструкція й логи | Частково: contracts, consent-aware memory, durable forget primitives, reviewed control/grants; heartbeat і global hooks попереду |
+| M1 — текстове ядро | SQLite, retrieval, змінний LLM adapter, один tool, малий event loop та idle reflection | Дозволена подія згадується з evidence після restart; заборонена не зберігається; tool проходить policy; результати model A/B | Частково: canonical memory, lexical retrieval, pinned streaming/admission і reviewed tool registry/control. Task6 real handlers, Task7 agent/global purge; A/B та reflection попереду |
 | M2 — голос desktop | PTT, UA/EN ASR, streaming TTS, speaker verification baseline | Версійований corpus, WER, TTS оцінка, latency traces P50/P95 та повтори | Текстовий шлях M1; не почато |
 | M3 — full-duplex | AEC render reference, endpoint, barge-in, consent/mute | 8h soak з ТБ/шумом/GPU load; виміряний time-to-stop; немає self-trigger loops; policy tests | M2; не почато |
 | M4 — робот | Вибір платформи; Wireless transport proof за потреби; один writer рухів; reconnect | Media proof без LLM; bounded motion, stop/mute, контрольна згода; recovery при Wi-Fi loss | Доступне обладнання й стабільне аудіо; не почато |
