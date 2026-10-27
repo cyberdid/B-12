@@ -16,6 +16,7 @@ import time
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
+from pathlib import Path
 from types import MappingProxyType
 from uuid import uuid4
 
@@ -405,7 +406,7 @@ class Agent:
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]
                 ]
-                system = self.system_prompt
+                system = f"{self.system_prompt} Домашня тека власника: {Path.home()}."
                 if state.get("language"):
                     system += "\n" + state["language"]
                 request = self.builder.build(system, messages, state["evidence"], tools)
