@@ -87,7 +87,7 @@ function setBusy(busy) {
   $("cancel").hidden = !busy;
 }
 
-async function readStream(response, assistant) {
+async function readStream(response, view) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -104,10 +104,14 @@ async function readStream(response, assistant) {
       const event = JSON.parse(line);
       if (event.type === "turn_started") state.turnId = event.turn_id;
       else if (event.type === "text_delta") {
-        assistant.textContent += event.text;
+        if (!view.node) view.node = addMessage("assistant", "");
+        view.node.textContent += event.text;
+        view.shown = true;
         scrollDown();
-      } else if (event.type === "tool_started") cards.set(event.call_id, toolCard(event));
-      else if (event.type === "tool_result") {
+      } else if (event.type === "tool_started") {
+        view.node = null; // text after a tool call starts a new bubble below its card
+        cards.set(event.call_id, toolCard(event));
+      } else if (event.type === "tool_result") {
         const card = cards.get(event.call_id) || toolCard(event);
         const badge = el("span", `badge ${event.status}`, ` → ${event.status}`);
         if (event.error_code) badge.textContent += ` (${event.error_code})`;
@@ -123,7 +127,7 @@ async function readStream(response, assistant) {
 
 async function runTurn(start) {
   setBusy(true);
-  const assistant = addMessage("assistant", "");
+  const view = { node: null, shown: false };
   state.controller = new AbortController();
   try {
     const response = await start(state.controller.signal);
@@ -131,19 +135,17 @@ async function runTurn(start) {
       const data = await response.json().catch(() => ({}));
       throw new Error(data.detail || data.error || `HTTP ${response.status}`);
     }
-    const result = await readStream(response, assistant);
+    const result = await readStream(response, view);
     if (!result) addMessage("state", "З’єднання завершилося без результату.");
     else if (result.type === "error") addMessage("state", `Помилка: ${result.error}`);
     else {
-      if (result.content && !assistant.textContent) assistant.textContent = result.content;
+      if (result.content && !view.shown) addMessage("assistant", result.content);
       if (result.state !== "completed") {
         const reason = result.error_code ? ` (${result.error_code})` : "";
         addMessage("state", `Стан: ${result.state}${reason}`);
       }
     }
-    if (!assistant.textContent) assistant.remove();
   } catch (error) {
-    if (!assistant.textContent) assistant.remove();
     addMessage("state", error.name === "AbortError" ? "Скасовано." : `Помилка: ${error.message}`);
   } finally {
     state.controller = null;

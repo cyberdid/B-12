@@ -413,3 +413,13 @@ def test_numeric_limits_are_stated_in_descriptions_the_model_can_see(host_factor
             if "maximum" in spec and str(spec["maximum"]) not in spec.get("description", ""):
                 missing.append((function["name"], name, spec["maximum"]))
     assert missing == []
+
+
+async def test_memory_store_drops_non_uuid_evidence_ids_instead_of_failing(host_factory):
+    rig = host_factory()
+    result = await rig.invoke(
+        "memory_store", text="нотатка про файл", evidence_ids=["979723", "not-a-uuid"]
+    )
+    assert result.status == "completed", result.error_code
+    found = await rig.invoke("memory_search", query="нотатка")
+    assert any("нотатка про файл" in str(item) for item in found.content["records"])

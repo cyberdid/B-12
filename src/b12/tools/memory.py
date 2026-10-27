@@ -52,9 +52,16 @@ class StoreArgs(Args):
     @field_validator("evidence_ids")
     @classmethod
     def _ids(cls, values):
+        # Small models paste archive chunk numbers here; keep only real UUIDs instead of
+        # failing the whole write (provenance stays honest: nothing is invented or kept).
+        kept = []
         for value in values:
-            UUID(value)
-        return values
+            try:
+                UUID(value)
+            except ValueError:
+                continue
+            kept.append(value)
+        return kept
 
 
 class ForgetArgs(Args):

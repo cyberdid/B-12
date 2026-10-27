@@ -298,6 +298,7 @@ def create_app(
         ),
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "no-referrer",
+        "Cache-Control": "no-cache",
     }
 
     @app.get("/")
