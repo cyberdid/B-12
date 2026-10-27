@@ -20,6 +20,7 @@ tags: [navigation]
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |
 | [Дорожня карта](project/roadmap.md) | M0–M6, залежності й критерії завершення |
 | [Аудит вимог R01–R17](project/requirements-audit.md) | Статус кожної вимоги з доказами й межами; відкриті рішення |
+| [Самоогляд меж безпеки](project/security-self-review.md) | Знахідки F1–F5 за читанням API, control, purge; не незалежний |
 | [Реєстр рішень](project/decisions.md) | ADR-001–010 з оригінального brief та їхній статус |
 | [Відкриті питання](project/open-questions.md) | Невідоме та спосіб отримати відповідь |
 
