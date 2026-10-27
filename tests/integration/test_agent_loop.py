@@ -504,3 +504,33 @@ async def test_empty_final_reply_is_retried_once_then_answered(runtime_factory):
     state["script"] = [{"content": ""}, {"content": "Ось відповідь."}]
     result, _ = await run_turn(runtime, who, "Скажи щось")
     assert result.state == "completed" and result.content == "Ось відповідь."
+
+
+async def test_persist_blocks_early_finish_while_listed_files_are_unread(runtime_factory, tmp_path):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "proj"
+    folder.mkdir()
+    for name in ("a.py", "b.py", "c.py"):
+        (folder / name).write_text(f"# {name}")
+    (folder / "notes.md").write_text("не код")
+
+    def read(name):
+        return {"tool_calls": [("file_read", {"path": str(folder / name)})]}
+
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        read("a.py"),
+        {"content": "Підсумок. ГОТОВО"},  # premature: b.py and c.py are still unread
+        read("b.py"),
+        read("c.py"),
+        {"content": "Повний підсумок. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Прочитай кожен .py", persist=True)
+    reads = [r.name for r in result.tool_results]
+    assert reads == ["file_list", "file_read", "file_read", "file_read"]
+    assert result.content == "Повний підсумок. ГОТОВО"
+    sent = state["requests"][3]["messages"]
+    unread = [m for m in sent if m["content"].startswith("[авто-продовження] Ти ще не")]
+    assert unread and "b.py" in unread[0]["content"] and "notes.md" not in unread[0]["content"]

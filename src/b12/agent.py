@@ -11,6 +11,7 @@ detached for the rest of the turn; effects already in progress are not abandoned
 import asyncio
 import json
 import logging
+import os
 import re
 import time
 from collections import deque
@@ -66,6 +67,9 @@ _NUDGE_PERSIST = (
     "фрагмент, який потрібен для запиту (за переліком тек, а не за відчуттям). Якщо ні — зроби "
     "наступний крок інструментами. Лише коли все опрацьовано, напиши підсумок і слово "
     f"{PERSIST_MARKER}."
+)
+_NUDGE_UNREAD = (
+    "[авто-продовження] Ти ще не прочитав файли з переліку, яких той самий тип: "
 )
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
@@ -447,14 +451,14 @@ class Agent:
                     nudge = None
                     if not reply.content.strip() and not state.get("empty_nudged"):
                         state["empty_nudged"], nudge = True, _NUDGE_EMPTY
-                    elif (
-                        persist
-                        and not last
-                        and state["nudges"] < PERSIST_NUDGES
-                        and PERSIST_MARKER not in reply.content.upper()
-                    ):
-                        state["nudges"] += 1
-                        nudge = _NUDGE_PERSIST
+                    elif persist and not last and state["nudges"] < PERSIST_NUDGES:
+                        unread = self._unread_listed(state)
+                        if unread:  # the marker is the model's word; coverage is the system's
+                            state["nudges"] += 1
+                            nudge = _NUDGE_UNREAD + "; ".join(unread[:8])
+                        elif PERSIST_MARKER not in reply.content.upper():
+                            state["nudges"] += 1
+                            nudge = _NUDGE_PERSIST
                     if nudge is None:
                         return await finish("completed", content=reply.content)
                     state["turn_messages"].append(
@@ -494,6 +498,25 @@ class Agent:
             self.active.pop(context.turn_id, None)
             self._revisions.pop(context.turn_id, None)
             self.control.release_turn(context.turn_id)
+
+    @staticmethod
+    def _track_files(state, call, result) -> None:
+        """Remember files seen in listings and files read, for persist-mode coverage."""
+        listed = state.setdefault("listed", {})
+        path = str(call.arguments.get("path", "")).rstrip("/")
+        if call.name == "file_list" and isinstance(result.content, dict):
+            for entry in result.content.get("entries", []):
+                if not entry.get("directory"):
+                    listed.setdefault(f"{path}/{entry.get('name', '')}", False)
+        elif call.name == "file_read" and path:
+            listed[path] = True
+
+    @staticmethod
+    def _unread_listed(state) -> list[str]:
+        """Listed files with a suffix of an already-read file that were never read."""
+        listed = state.get("listed", {})
+        suffixes = {os.path.splitext(p)[1] for p, read in listed.items() if read}
+        return [p for p, read in listed.items() if not read and os.path.splitext(p)[1] in suffixes]
 
     async def _run_calls(self, context, actor, state, emit) -> bool:
         """Execute queued calls in order; True when waiting for an approval decision."""
@@ -538,6 +561,8 @@ class Agent:
                     self._save_checkpoint(context, actor, state)
                     return True
                 state["calls"] += 1
+            if result.status == "completed":
+                self._track_files(state, call, result)
             state["queue"].pop(0)
             state["call_ids"].append(call.id)
             state["results"].append(result.model_dump(mode="json"))
