@@ -1,8 +1,9 @@
 """Render README charts from local run artifacts (system matplotlib).
 
   /usr/bin/python3 scripts/make_readme_charts.py artifacts docs/images
-Inputs: task14-eval-2026-10-26/summary.json, task15-soak-2026-10-26/metrics.jsonl,
-task15-growth-2026-10-26.json. Outputs PNGs referenced by README.md.
+Inputs: task14-eval-2026-10-27-merged/summary.json, task15-soak-2026-10-26/metrics.jsonl (first soak),
+task15-soak-2026-10-26-run2/{metrics,events}.jsonl (8 h soak), task15-growth-2026-10-26.json.
+Outputs PNGs referenced by README.md.
 """
 
 import json
@@ -20,7 +21,7 @@ plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.rig
 
 
 def eval_chart(artifacts: Path, out: Path):
-    summary = json.loads((artifacts / "task14-eval-2026-10-26/summary.json").read_text())
+    summary = json.loads((artifacts / "task14-eval-2026-10-27-merged/summary.json").read_text())
     data = summary["by_ctx"]["4096"]["by_category"]
     names = ["tools", "memory", "adversarial", "behavior", "ua", "en", "conversation"]
     labels = {
@@ -47,7 +48,7 @@ def eval_chart(artifacts: Path, out: Path):
     ax.set_ylim(0, 110)
     ax.set_ylabel("pass rate, %")
     ax.set_title(
-        "Real Bolt E4B eval, ctx 4096, 109 cases × 5 repeats (before language/morphology fixes)"
+        "Real Bolt E4B eval, ctx 4096, 109 cases × 5 repeats, merged code 60a4c0b"
     )
     fig.tight_layout()
     fig.savefig(out / "eval-by-category.png", dpi=130)
@@ -81,6 +82,40 @@ def soak_chart(artifacts: Path, out: Path):
     fig.savefig(out / "soak-latency.png", dpi=130)
 
 
+def soak8_chart(artifacts: Path, out: Path):
+    run = artifacts / "task15-soak-2026-10-26-run2"
+    rows = [json.loads(x) for x in (run / "metrics.jsonl").read_text().splitlines() if x]
+    events = [json.loads(x) for x in (run / "events.jsonl").read_text().splitlines() if x]
+    when = lambda s: datetime.fromisoformat(s)  # noqa: E731
+    start = when(events[0]["at"])
+    gaps, paused_at = [], None
+    for e in events:
+        if e["event"] == "soak_paused":
+            paused_at = when(e["at"])
+        elif e["event"] == "soak_resumed" and paused_at:
+            gaps.append((paused_at, when(e["at"])))
+            paused_at = None
+
+    def active_h(ts):
+        t = when(ts)
+        idle = sum((min(t, b) - a).total_seconds() for a, b in gaps if t > a)
+        return ((t - start).total_seconds() - idle) / 3600
+
+    rows = [r for r in rows if r["p50_ms"]]
+    hours = [active_h(r["at"]) for r in rows]
+    fig, (top, bottom) = plt.subplots(2, 1, figsize=(9, 5.4), sharex=True)
+    top.plot(hours, [r["p50_ms"] for r in rows], color=GREEN, lw=1.6, label="P50")
+    top.plot(hours, [r["p95_ms"] for r in rows], color=ORANGE, lw=1.6, label="P95")
+    top.set_ylabel("turn latency, ms")
+    top.set_title("8 h software soak (active time; 3 pauses): latency stays flat")
+    top.legend(frameon=False, ncol=2)
+    bottom.plot(hours, [r["rss_kb"] / 1024 for r in rows], color=BLUE, lw=1.6)
+    bottom.set_ylabel("worker RSS, MB")
+    bottom.set_xlabel("active hours (counters restart with each worker)")
+    fig.tight_layout()
+    fig.savefig(out / "soak-8h.png", dpi=130)
+
+
 def growth_chart(artifacts: Path, out: Path):
     results = json.loads((artifacts / "task15-growth-2026-10-26.json").read_text())["results"]
     sizes = [r["size"] for r in results]
@@ -109,4 +144,5 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=True)
     eval_chart(artifacts, out)
     soak_chart(artifacts, out)
+    soak8_chart(artifacts, out)
     growth_chart(artifacts, out)

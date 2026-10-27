@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-10-26
+updated: 2026-10-27
 status: active
 sources: [wiki/sources/master-brief.md, wiki/project/analysis.md]
 tags: [progress, next]
@@ -37,5 +37,7 @@ tags: [progress, next]
 **Уточнення після наданого репозиторію:** pinned lexical adapter в окремих actor stores ідентифікує evidence UUID/revisions, а context adapter admission-check-ить його. [Поточний код і межі](../topics/archive-retrieval.md). Cross-store resolver та purge coordinator ще потребують agent/control integration; приватний архів не імпортовано.
 
 Походження старого kernel залишається відкритим. Його пошук та Event/Memory/Consent contracts можна продовжити після першого model test. Q15 про характеристики host закрито в межах read-only аудиту; див. [питання](open-questions.md).
+
+**Стан на 27.10.2026 20:40 EET (злитий код `60a4c0b`, `main` == `feat/b12-runtime`):** Tasks 1–15 виконано, 16–17 відкладено рішенням власника, 18 — лише протокол на симуляторі, 19 — день 0 записано 27.10 о 09:34, 20 — [аудит](requirements-audit.md) складено. Виконано R01–R08, R11, R14 (10 із 17; R14 з межами), частково R09, R10, R12, R13, відкрито R15–R17. **Перевірений факт:** 467 тестів пройшло (3 пропущено — реальна модель вмикається явно); eval 91,7 % (ctx 4096) і 93,6 % (ctx 8192), див. [evals](../topics/evals.md); soak 8,007 год активного часу, не безперервно, див. [operations](../topics/operations.md). Відкриті рішення власника: мережевий allowlist `http_fetch`, sudoers для `sudo_exec`, установка systemd-сервісу й щоденного таймера, ліцензія. Незалежного рецензента для Tasks 7–19 не буде (рішення власника 27.10.2026).
 
 При наступній сесії починати з цього стану, оновлювати його лише за новими доказами та дописувати [журнал](../log.md).

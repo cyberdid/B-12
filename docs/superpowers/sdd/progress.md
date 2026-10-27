@@ -184,3 +184,7 @@ Nothing is running (soak, eval, serve, probes all stopped; verified by ps). All 
 - **Eval** finished earlier (artifacts/task14-eval-2026-10-26-head): ctx4096 91.3 %, ctx8192 100/109.
 - **Unmerged branch** feat/b12-access (pushed): wide-access settings, sudo_exec, limit hints, corpus v3, requirements-audit draft, wiki. Merge into feat/b12-runtime and main AFTER the soak finishes (workers import fresh source).
 - Pitfall hit again: `pgrep -f "soak.py drive"` matches the bash wrapper first; kill the python driver by exact PID (`ps -eo pid,cmd | grep soak.py`).
+
+## 27.10.2026 20:40 EET — Tasks 14, 15, 20 закрито
+
+Soak run2 завершено (8,007 год активно, 4 сегменти, не безперервно, 21/21 verify ok). Eval на злитому `60a4c0b`: ctx 4096 91,7 %, ctx 8192 93,6 %. `feat/b12-access` злито, `main` == `feat/b12-runtime`. Аудит: `wiki/project/requirements-audit.md` (10 із 17). Далі: самоогляд меж безпеки; рішення власника (allowlist, sudoers, systemd, ліцензія); R17 день 1 — 28.10.
