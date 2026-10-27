@@ -216,3 +216,32 @@ async def test_goals_attention_and_proposals_over_api(api):
     )
     assert denied.status_code == 403
     assert (await client.get("/api/proposals", headers=auth(token))).json() == []
+
+
+async def test_server_runs_and_stops_the_maintenance_loop(scripted_ollama, tmp_path, monkeypatch):
+    from b12 import maintenance
+    from b12.api import create_app
+    from b12.runtime import open_runtime
+
+    _, settings = scripted_ollama
+    settings = settings.model_copy(update={"state_dir": tmp_path / "state"})
+    bootstrap = open_runtime(settings)
+    actor = bootstrap.control.create_actor(owner=True, consent=True)
+    bootstrap.control.set_meta("owner_actor", actor.id)
+    bootstrap.close()
+    ticks = []
+    original = maintenance.maintenance_loop
+
+    async def fast(runtime, stop, **kwargs):
+        await original(runtime, stop, interval_s=0.01, trim=lambda: ticks.append(1))
+
+    monkeypatch.setattr(maintenance, "maintenance_loop", fast)
+    app = create_app(settings, allowed_hosts=("testserver",), port=80)
+    async with app.router.lifespan_context(app):
+        for _ in range(100):
+            if len(ticks) >= 3:
+                break
+            await asyncio.sleep(0.02)
+    stopped_at = len(ticks)
+    await asyncio.sleep(0.1)
+    assert stopped_at >= 3 and len(ticks) == stopped_at  # loop ended with the server
