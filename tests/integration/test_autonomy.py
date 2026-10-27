@@ -14,7 +14,13 @@ CAPS = ("filesystem.read", "filesystem.write", "memory.read", "memory.write", "t
 
 class Clock:
     def __init__(self):
-        self.now = datetime(2026, 10, 27, 10, 0, tzinfo=UTC)  # 12:00 Kyiv
+        # GoalStore stamps real wall-clock time, so the fake clock must stay ahead of it:
+        # the next 10:00 UTC (daytime in Kyiv, outside quiet hours) at least an hour from now.
+        real = datetime.now(UTC)
+        start = real.replace(hour=10, minute=0, second=0, microsecond=0)
+        while start < real + timedelta(hours=1):
+            start += timedelta(days=1)
+        self.now = start
 
     def __call__(self):
         return self.now
