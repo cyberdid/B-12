@@ -401,3 +401,15 @@ def test_registered_host_schemas_stay_in_calibrated_renderer_subset(host_factory
     text = json.dumps(rig.registry.schemas(rig.context))
     for construct in ('"anyOf"', '"oneOf"', '"allOf"', '"$ref"', '"$defs"', '"not"'):
         assert construct not in text
+
+
+def test_numeric_limits_are_stated_in_descriptions_the_model_can_see(host_factory):
+    """Bolt's chat template renders only type/description, never maximum/minLength."""
+    rig = host_factory()
+    missing = []
+    for schema in rig.registry.schemas(rig.context):
+        function = schema["function"]
+        for name, spec in function["parameters"].get("properties", {}).items():
+            if "maximum" in spec and str(spec["maximum"]) not in spec.get("description", ""):
+                missing.append((function["name"], name, spec["maximum"]))
+    assert missing == []

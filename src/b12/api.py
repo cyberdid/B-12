@@ -235,6 +235,9 @@ def create_app(
 
                 scheduler = Scheduler(runtime)
                 background = asyncio.create_task(scheduler.run(stop))
+            from b12 import maintenance
+
+            housekeeping = asyncio.create_task(maintenance.maintenance_loop(runtime, stop))
             try:
                 yield
             finally:
@@ -242,6 +245,7 @@ def create_app(
 
                 await close_servers(runtime)
                 stop.set()
+                await asyncio.wait({housekeeping}, timeout=5)
                 if background is not None:
                     for turn_id in list(runtime.agent.active):
                         runtime.agent.active[turn_id].cancel.set()

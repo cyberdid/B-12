@@ -8,6 +8,7 @@ import asyncio
 import ctypes
 import os
 import platform
+import shutil
 import signal
 from pathlib import Path
 
@@ -229,6 +230,36 @@ async def shell_exec(args, guard):
         if proc is not None:
             await _terminate(proc, drains)
         raise
+
+
+def make_sudo_exec(sudo_path: str | None):
+    """sudo_exec: run one exact command through non-interactive sudo (never a password)."""
+
+    async def sudo_exec(args, guard):
+        binary = sudo_path or shutil.which("sudo")
+        if not binary:
+            return failure("not_found")
+        derived = ExecArgs(
+            executable=binary,
+            argv=["-n", "--", args.executable, *args.argv],
+            cwd=args.cwd,
+            declared_effects=args.declared_effects,
+            max_output_bytes=args.max_output_bytes,
+        )
+        return await shell_exec(derived, guard)
+
+    return sudo_exec
+
+
+def register_sudo(registry, sudo_path: str | None = None):
+    registry.register(
+        "sudo_exec",
+        "Run one exact absolute command as root via sudo -n; every call needs owner approval",
+        ExecArgs,
+        make_sudo_exec(sudo_path),
+        "process.sudo",
+        risk=Risk.DESTRUCTIVE,
+    )
 
 
 def register(registry):

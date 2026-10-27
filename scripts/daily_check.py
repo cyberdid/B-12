@@ -62,10 +62,11 @@ async def check(runtime, out: Path):
         hits = runtime.memory.search(word, actor)
         recall[key] = seed_record["anchors"][key] in {h.id for h in hits}
     marker = seed_record["forgotten"]["marker"].encode()
+    own = out.resolve()  # the driver's own bookkeeping legitimately names the marker
     leaked = [
         str(p.relative_to(runtime.settings.state_dir))
         for p in runtime.settings.state_dir.rglob("*")
-        if p.is_file() and marker in p.read_bytes()
+        if p.is_file() and own not in p.resolve().parents and marker in p.read_bytes()
     ]
     integrity = {}
     for path in runtime.settings.state_dir.rglob("*.sqlite3"):
