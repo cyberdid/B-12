@@ -30,6 +30,8 @@ class Settings(BaseModel):
     forget_requires_approval: bool = True
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"
+    # http_fetch destinations: exact hosts or "*.suffix" (subdomains); empty denies every fetch.
+    network_allow: tuple[Annotated[str, Field(min_length=1, max_length=253)], ...] = ()
     # Initiative policy (local wall clock). Quiet hours block nonurgent speech only.
     timezone: str = "Europe/Kyiv"
     quiet_start: Annotated[str, Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")] = "23:00"
@@ -131,6 +133,8 @@ class Settings(BaseModel):
             value: Any = env[key]
             if field in integers:
                 value = int(value)
+            elif field == "network_allow":
+                value = tuple(item.strip() for item in value.split(",") if item.strip())
             elif field == "forget_requires_approval":
                 value = value.strip().lower() in ("1", "true", "yes", "on")
             elif field in {

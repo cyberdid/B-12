@@ -4,7 +4,9 @@ Layout under Settings.state_dir (private): control/, memory/, knowledge/, backup
 sessions/. CLI/API/scheduler/audio share this object instead of building their own.
 """
 
+import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from b12.agent import Agent
 from b12.attention import AttentionPolicy
@@ -112,6 +114,11 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     )
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")
+    registry.network_allow = settings.network_allow
+    config_home = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
+    registry.protected_paths = tuple(
+        os.path.realpath(path) for path in (settings.state_dir, config_home / "b12")
+    )
     return Runtime(
         settings,
         control,

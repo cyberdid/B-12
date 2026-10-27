@@ -1,6 +1,7 @@
 """Bounded GET-only HTTP transport; no ambient proxy/auth or implicit redirects."""
 
 import asyncio
+import ipaddress
 from urllib.parse import urlsplit
 
 import httpx
@@ -31,7 +32,31 @@ class FetchArgs(Args):
         return value
 
 
-async def http_fetch(args, guard):
+def _normal(host: str) -> str:
+    return host.strip().lower().rstrip(".")
+
+
+def host_allowed(host: str, patterns) -> bool:
+    """Exact host or `*.suffix` (subdomains only); an IP literal needs an exact entry."""
+    host = _normal(host)
+    try:
+        ipaddress.ip_address(host.strip("[]"))
+        literal = True
+    except ValueError:
+        literal = False
+    for pattern in patterns:
+        pattern = _normal(pattern)
+        if pattern.startswith("*."):
+            if not literal and host.endswith(pattern[1:]) and len(host) > len(pattern) - 1:
+                return True
+        elif host == pattern:
+            return True
+    return False
+
+
+async def http_fetch(args, guard, allow=None):
+    if allow is not None and not host_allowed(urlsplit(args.url).hostname or "", allow):
+        return failure("network_denied")
     started = False
     raw = bytearray()
     status = None
@@ -86,10 +111,13 @@ async def http_fetch(args, guard):
 
 
 def register(registry):
+    async def fetch(args, guard):
+        return await http_fetch(args, guard, registry.network_allow)
+
     registry.register(
         "http_fetch",
         "Fetch bounded HTTP(S) GET; redirects are returned, not followed",
         FetchArgs,
-        http_fetch,
+        fetch,
         "network.http",
     )

@@ -11,6 +11,7 @@ import asyncio
 import copy
 import inspect
 import math
+import os
 import re
 import time
 from collections.abc import Awaitable, Callable
@@ -25,6 +26,20 @@ from b12.tools.policy import EffectGuard, Risk
 
 Handler = Callable[[BaseModel, EffectGuard], Awaitable[HandlerOutcome]]
 _UNCALIBRATED_SCHEMA = frozenset({"anyOf", "oneOf", "allOf", "$ref", "$defs", "not"})
+
+
+def _names_protected(value, roots) -> bool:
+    """Cooperative guard: any absolute path in the arguments resolving into a protected root."""
+    if isinstance(value, str):
+        if not value.startswith("/"):
+            return False
+        real = os.path.realpath(value)
+        return any(real == root or real.startswith(root + os.sep) for root in roots)
+    if isinstance(value, dict):
+        return any(_names_protected(item, roots) for item in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_names_protected(item, roots) for item in value)
+    return False
 
 
 def _state_limits(node) -> None:
@@ -66,6 +81,10 @@ class ToolRegistry:
         self._tools: dict[str, _Tool] = {}
         # Owner-configured DESTRUCTIVE tools that run on the grant alone (never from model text).
         self.approval_exempt: set[str] = set()
+        # Owner-configured http_fetch destinations; None = unrestricted (library default).
+        self.network_allow: tuple[str, ...] | None = None
+        # Resolved roots (owner state/config) that filesystem/process arguments may not name.
+        self.protected_paths: tuple[str, ...] = ()
 
     def register(
         self,
@@ -210,6 +229,9 @@ class ToolRegistry:
                 raise ControlError("invalid_arguments") from None
             except (ValueError, TypeError, OverflowError):
                 raise ControlError("invalid_arguments") from None
+            if self.protected_paths and tool.capability.startswith(("filesystem.", "process.")):
+                if _names_protected(raw, self.protected_paths):
+                    raise ControlError("path_protected")
             call = call.model_copy(
                 update={"arguments": raw, "turn_id": context.turn_id, "task_id": context.task_id}
             )

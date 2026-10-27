@@ -39,6 +39,7 @@ _ERROR_CODES = frozenset(
         "origin_mismatch",
         "unknown_tool",
         "invalid_arguments",
+        "path_protected",
         "cancel_mismatch",
         "operation_not_active",
         "handler_failed",

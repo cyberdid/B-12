@@ -272,3 +272,33 @@ async def test_preference_change_keeps_history_after_evidence_purge(rig):
     assert [(h["version"], h["redacted"]) for h in history] == [(1, 1), (2, 0)]
     assert history[0]["value"] is None and history[0]["reason"] is None
     assert runtime.goals.current_preference(actor.id, "verbosity")["value"] == "стисло"
+
+
+async def test_autonomous_goal_never_runs_shell_without_approval(rig, tmp_path):
+    state, runtime, scheduler, actor, clock, open_all, close_all = rig
+    marker = tmp_path / "ran-without-approval"
+    new_goal(
+        runtime,
+        actor,
+        allowed_tools=("process.execute", "time.read"),
+        intent="Створити маркер",
+    )
+    state["script"] = [
+        {
+            "tool_calls": [
+                (
+                    "shell_exec",
+                    {
+                        "executable": "/usr/bin/touch",
+                        "argv": [str(marker)],
+                        "cwd": str(tmp_path),
+                        "declared_effects": ["create marker"],
+                    },
+                )
+            ]
+        },
+        {"content": "Чекаю на підтвердження."},
+    ]
+    [outcome] = await scheduler.tick()
+    assert not marker.exists()
+    assert outcome["state"] == "awaiting_approval" and outcome["status"] == "paused"

@@ -83,7 +83,7 @@ class Scheduler:
             caps,
             task_id=task,
             ttl_s=900,
-            full_execution=actor.owner and "process.execute" in caps,
+            full_execution=False,  # unattended turns never get shell without approval
         )
         prompt = (
             f"Фонова ціль власника: {goal['intent']}\n"

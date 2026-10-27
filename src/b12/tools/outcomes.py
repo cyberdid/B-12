@@ -24,6 +24,7 @@ HandlerErrorCode = Literal[
     "unsupported",
     "process_failed",
     "network_failed",
+    "network_denied",
     "cleanup_failed",
     "deadline_exceeded",
     "cancelled",

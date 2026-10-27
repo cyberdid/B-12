@@ -29,7 +29,8 @@ def load_settings(config: str | None = None) -> Settings:
     path = Path(config) if config else base / "b12" / "config.toml"
     if config or path.exists():
         for key, value in tomllib.loads(path.read_text()).items():
-            environ.setdefault(f"B12_{key.upper()}", str(value))
+            text = ",".join(map(str, value)) if isinstance(value, list) else str(value)
+            environ.setdefault(f"B12_{key.upper()}", text)
     return Settings.from_env(environ)
 
 

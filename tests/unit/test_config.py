@@ -87,7 +87,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "timezone": "Europe/Kyiv", "quiet_start": "23:00", "quiet_end": "08:00",
         "initiative_hour_cap": 3, "initiative_cooldown_s": 600, "scheduler_tick_s": 60,
         "embedding_python": None, "embedding_backend": "archive_index.embed:Embedder",
-        "forget_requires_approval": True, "sudo_access": "off",
+        "forget_requires_approval": True, "sudo_access": "off", "network_allow": (),
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 
@@ -116,3 +116,15 @@ def test_example_configuration_validates_without_creating_state():
     assert settings.output_tokens < settings.num_ctx
     assert settings.state_dir.exists() == existed
     assert os.path.isabs(settings.state_dir)
+
+
+def test_network_allow_parses_comma_list_and_toml_list(tmp_path, monkeypatch):
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_NETWORK_ALLOW": " example.com, *.docs.org ,"}
+    assert Settings.from_env(env).network_allow == ("example.com", "*.docs.org")
+    from b12.cli import load_settings
+
+    config = tmp_path / "c.toml"
+    config.write_text('network_allow = ["a.example", "*.b.example"]\n')
+    monkeypatch.delenv("B12_NETWORK_ALLOW", raising=False)
+    monkeypatch.setenv("B12_STATE_DIR", str(tmp_path))
+    assert load_settings(str(config)).network_allow == ("a.example", "*.b.example")
