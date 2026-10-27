@@ -448,3 +448,59 @@ async def test_finished_turns_release_runtime_control_state(runtime_factory):
     waiting, _ = await run_turn(runtime, who, "забудь")
     assert waiting.state == "awaiting_approval"
     assert runtime.control._runtime == {}  # waiting turns are resumed with a fresh context
+
+
+async def test_persist_mode_continues_after_text_only_replies_until_marker(
+    runtime_factory, tmp_path
+):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    files = []
+    for n in range(3):
+        path = tmp_path / f"part{n}.txt"
+        path.write_text(f"частина {n}")
+        files.append(path)
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(files[0])})]},
+        {"content": "Прочитав першу частину."},
+        {"tool_calls": [("file_read", {"path": str(files[1])})]},
+        {"content": "Прочитав другу частину."},
+        {"tool_calls": [("file_read", {"path": str(files[2])})]},
+        {"content": "Підсумок по трьох частинах. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Прочитай усе до кінця", persist=True)
+    assert result.state == "completed" and result.content.endswith("ГОТОВО")
+    assert [r.name for r in result.tool_results] == ["file_read"] * 3
+    sent = state["requests"][-1]["messages"]
+    nudges = [m for m in sent if m["content"].startswith("[авто-продовження]")]
+    assert len(nudges) == 2
+
+
+async def test_without_persist_a_text_only_reply_ends_the_turn(runtime_factory, tmp_path):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "Прочитав першу частину."}, {"content": "не має настати"}]
+    result, _ = await run_turn(runtime, who, "Прочитай усе до кінця")
+    assert result.content == "Прочитав першу частину." and len(state["requests"]) == 1
+
+
+async def test_persist_nudges_are_bounded(runtime_factory):
+    from b12.agent import PERSIST_NUDGES
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": f"крок {n}"} for n in range(PERSIST_NUDGES + 5)]
+    result, _ = await run_turn(runtime, who, "Роби без кінця", persist=True)
+    assert result.state == "completed" and len(state["requests"]) == PERSIST_NUDGES + 1
+
+
+async def test_empty_final_reply_is_retried_once_then_answered(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": ""}, {"content": "Ось відповідь."}]
+    result, _ = await run_turn(runtime, who, "Скажи щось")
+    assert result.state == "completed" and result.content == "Ось відповідь."

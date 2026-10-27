@@ -248,6 +248,7 @@ async def _converse(args, runtime, owner) -> int:
             task_id=task,
             on_event=console,
             timeout_s=args.timeout,
+            persist=args.persist,
         )
         if args.json:
             emit_json(turn_json(result))
@@ -270,6 +271,7 @@ async def _converse(args, runtime, owner) -> int:
             task_id=task,
             on_event=console,
             timeout_s=args.timeout,
+            persist=args.persist,
         )
         result = await interactive_approvals(runtime, result, console, args.timeout)
         if result.state != "completed":
@@ -575,6 +577,9 @@ def parser() -> argparse.ArgumentParser:
     chat.add_argument("-m", "--message")
     chat.add_argument("--json", action="store_true")
     chat.add_argument("--timeout", type=float, default=300.0)
+    chat.add_argument(
+        "--persist", action="store_true", help="не зупинятися: до 40 кроків і авто-продовження"
+    )
     resume = sub.add_parser("resume", help="продовжити turn після approval")
     resume.add_argument("turn_id")
     resume.add_argument("--json", action="store_true")

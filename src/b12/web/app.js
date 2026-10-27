@@ -156,7 +156,7 @@ async function runTurn(start) {
 async function send(text) {
   addMessage("user", text);
   await runTurn((signal) =>
-    api("/api/chat", { method: "POST", body: { session_id: state.session, text }, signal }),
+    api("/api/chat", { method: "POST", body: { session_id: state.session, text, persist: $("persist").checked }, signal }),
   );
 }
 

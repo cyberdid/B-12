@@ -36,6 +36,7 @@ class ChatBody(_Body):
     session_id: str = Field(min_length=1, max_length=64)
     text: str = Field(min_length=1, max_length=16000)
     timeout_s: float = Field(default=300.0, gt=0, le=3600)
+    persist: bool = False
 
 
 class MemoryBody(_Body):
@@ -347,12 +348,13 @@ def create_app(
         runtime = runtime_of(request)
         own_session(request, who, body.session_id)
         task = runtime.control.create_task(body.session_id)
+        timeout_s = max(body.timeout_s, 1800.0) if body.persist else body.timeout_s
         grant = runtime.control.issue_grant(
             who.actor.id,
             body.session_id,
             who.capabilities or ("time.read",),
             task_id=task,
-            ttl_s=body.timeout_s + 3600,
+            ttl_s=timeout_s + 3600,
             full_execution=who.owner and "process.execute" in who.capabilities,
         )
         return stream_turn(
@@ -363,7 +365,8 @@ def create_app(
                 task_id=task,
                 on_event=on_event,
                 cancel=cancel,
-                timeout_s=body.timeout_s,
+                timeout_s=timeout_s,
+                persist=body.persist,
             )
         )
 

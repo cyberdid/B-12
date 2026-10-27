@@ -57,6 +57,18 @@ SYSTEM_PROMPT = (
 )
 
 
+# "Не зупинятися" mode (owner opt-in per turn): larger budgets, automatic continuation
+# after a text-only reply until the model writes the finish marker, bounded nudges.
+PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 40, 80, 25, 3
+PERSIST_MARKER = "ГОТОВО"
+_NUDGE_PERSIST = (
+    "[авто-продовження] Не зупиняйся й не питай дозволу: зроби наступний крок інструментами "
+    "(наступний файл чи фрагмент). Коли весь запит повністю виконано, напиши підсумок і слово "
+    f"{PERSIST_MARKER}."
+)
+_NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
+
+
 @dataclass(frozen=True)
 class TurnEvent:
     type: str
@@ -224,6 +236,7 @@ class Agent:
         on_event: EventCallback | None = None,
         cancel: asyncio.Event | None = None,
         timeout_s: float = 300.0,
+        persist: bool = False,
     ) -> TurnResult:
         if not isinstance(text, str) or not text.strip():
             raise ValueError("user text required")
@@ -251,6 +264,8 @@ class Agent:
                 "turn_messages": [{"id": str(uuid4()), "role": "user", "content": text}],
                 "language": reply_language(text),
                 "evidence": [],
+                "persist": bool(persist),
+                "nudges": 0,
             }
             for item in await self._recall(text, actor):
                 state["evidence"].append(item)
@@ -399,13 +414,18 @@ class Agent:
                         return await finish("cancelled", code="cancelled")
                     continue
                 state["round"] += 1
-                last = state["round"] >= self.settings.max_rounds
+                persist = state.get("persist", False)
+                last = state["round"] >= (PERSIST_ROUNDS if persist else self.settings.max_rounds)
                 tools = [] if last else self.registry.schemas(context)
                 history = self.history_messages(context.session_id, actor)
                 messages = [
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]
                 ]
+                if persist:  # long reads: older tool outputs shrink so the window keeps moving
+                    tool_at = [i for i, m in enumerate(messages) if m["role"] == "tool"]
+                    for i in tool_at[:-PERSIST_KEEP]:
+                        messages[i]["content"] = messages[i]["content"][:200] + " …[скорочено]"
                 system = f"{self.system_prompt} Домашня тека власника: {Path.home()}."
                 if state.get("language"):
                     system += "\n" + state["language"]
@@ -423,7 +443,23 @@ class Agent:
                     state["turn_messages"].append(
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
                     )
-                    return await finish("completed", content=reply.content)
+                    nudge = None
+                    if not reply.content.strip() and not state.get("empty_nudged"):
+                        state["empty_nudged"], nudge = True, _NUDGE_EMPTY
+                    elif (
+                        persist
+                        and not last
+                        and state["nudges"] < PERSIST_NUDGES
+                        and PERSIST_MARKER not in reply.content.upper()
+                    ):
+                        state["nudges"] += 1
+                        nudge = _NUDGE_PERSIST
+                    if nudge is None:
+                        return await finish("completed", content=reply.content)
+                    state["turn_messages"].append(
+                        {"id": str(uuid4()), "role": "user", "content": nudge}
+                    )
+                    continue
                 if last:
                     return await finish("failed", code="max_rounds")
                 state["turn_messages"].append(
@@ -476,7 +512,9 @@ class Agent:
                     content={},
                     error_code="duplicate_call_id",
                 )
-            elif state["calls"] >= self.settings.max_tool_calls:
+            elif state["calls"] >= (
+                PERSIST_CALLS if state.get("persist") else self.settings.max_tool_calls
+            ):
                 result = ToolResult(
                     call_id=call.id,
                     name=call.name,
