@@ -37,7 +37,9 @@ def _normal(host: str) -> str:
 
 
 def host_allowed(host: str, patterns) -> bool:
-    """Exact host or `*.suffix` (subdomains only); an IP literal needs an exact entry."""
+    """Exact host, `*.suffix` (subdomains only) or `*` (everything, owner opt-in).
+
+    An IP literal matches only an exact entry or `*`."""
     host = _normal(host)
     try:
         ipaddress.ip_address(host.strip("[]"))
@@ -46,6 +48,8 @@ def host_allowed(host: str, patterns) -> bool:
         literal = False
     for pattern in patterns:
         pattern = _normal(pattern)
+        if pattern == "*":
+            return True
         if pattern.startswith("*."):
             if not literal and host.endswith(pattern[1:]) and len(host) > len(pattern) - 1:
                 return True

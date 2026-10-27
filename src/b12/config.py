@@ -30,7 +30,7 @@ class Settings(BaseModel):
     forget_requires_approval: bool = True
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"
-    # http_fetch destinations: exact hosts or "*.suffix" (subdomains); empty denies every fetch.
+    # http_fetch destinations: exact hosts, "*.suffix" (subdomains) or "*" (all); empty denies all.
     network_allow: tuple[Annotated[str, Field(min_length=1, max_length=253)], ...] = ()
     # Initiative policy (local wall clock). Quiet hours block nonurgent speech only.
     timezone: str = "Europe/Kyiv"

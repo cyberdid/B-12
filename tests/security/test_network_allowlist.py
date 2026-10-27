@@ -19,6 +19,8 @@ from b12.tools.network import host_allowed
         ("127.0.0.1", ("*.0.0.1",), False),
         ("127.0.0.1", ("127.0.0.1",), True),
         ("example.com", (), False),
+        ("anything.example", ("*",), True),
+        ("10.0.0.5", ("*",), True),
     ],
 )
 def test_host_matching(host, patterns, expected):
