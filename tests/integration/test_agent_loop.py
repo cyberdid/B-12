@@ -487,14 +487,14 @@ async def test_without_persist_a_text_only_reply_ends_the_turn(runtime_factory, 
 
 
 async def test_persist_nudges_are_bounded(runtime_factory):
-    from b12.agent import PERSIST_NUDGES
+    from b12.agent import PERSIST_GENERIC
 
     state, factory = runtime_factory
     runtime = factory()
     who = owner(runtime)
-    state["script"] = [{"content": f"крок {n}"} for n in range(PERSIST_NUDGES + 5)]
+    state["script"] = [{"content": f"крок {n}"} for n in range(PERSIST_GENERIC + 5)]
     result, _ = await run_turn(runtime, who, "Роби без кінця", persist=True)
-    assert result.state == "completed" and len(state["requests"]) == PERSIST_NUDGES + 1
+    assert result.state == "completed" and len(state["requests"]) == PERSIST_GENERIC + 1
 
 
 async def test_empty_final_reply_is_retried_once_then_answered(runtime_factory):

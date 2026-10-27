@@ -61,6 +61,7 @@ SYSTEM_PROMPT = (
 # "Не зупинятися" mode (owner opt-in per turn): larger budgets, automatic continuation
 # after a text-only reply until the model writes the finish marker, bounded nudges.
 PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 40, 80, 25, 3
+PERSIST_GENERIC = 3  # marker-less nudges; coverage nudges (unread files) use the full budget
 PERSIST_MARKER = "ГОТОВО"
 _NUDGE_PERSIST = (
     "[авто-продовження] Не зупиняйся й не питай дозволу. Звір, чи опрацьовано КОЖЕН файл чи "
@@ -456,8 +457,12 @@ class Agent:
                         if unread:  # the marker is the model's word; coverage is the system's
                             state["nudges"] += 1
                             nudge = _NUDGE_UNREAD + "; ".join(unread[:8])
-                        elif PERSIST_MARKER not in reply.content.upper():
+                        elif (
+                            PERSIST_MARKER not in reply.content.upper()
+                            and state.get("generic", 0) < PERSIST_GENERIC
+                        ):
                             state["nudges"] += 1
+                            state["generic"] = state.get("generic", 0) + 1
                             nudge = _NUDGE_PERSIST
                     if nudge is None:
                         return await finish("completed", content=reply.content)
