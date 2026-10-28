@@ -116,3 +116,22 @@ def test_ndjson_and_summary_helpers():
     assert _summary({"path": "  /tmp/x \n y  "}) == "/tmp/x y"
     assert _summary({}) == ""
     assert _summary({"text": "x" * 200}).endswith("…")
+
+
+def test_tui_command_runs_on_the_cli_event_loop(monkeypatch, tmp_path):
+    """Regression: `b12 tui` crashed with 'asyncio.run() cannot be called from a running event loop'."""
+    from b12 import cli
+    from b12.tui import app as tui_app
+
+    state = tmp_path / "state"
+    (state / "api").mkdir(parents=True)
+    (state / "api" / "owner.token").write_text("tok")
+    started = {}
+
+    async def fake_run_async(self, *args, **kwargs):
+        started["ran"] = True
+
+    monkeypatch.setattr(tui_app.B12App, "run_async", fake_run_async)
+    monkeypatch.setenv("B12_STATE_DIR", str(state))
+    assert cli.main(["tui", "--url", "http://127.0.0.1:1"]) == 0
+    assert started == {"ran": True}

@@ -541,7 +541,8 @@ async def cmd_tui(args, settings) -> int:
         return 1
     client = ApiClient(args.url, token_file.read_text().strip())
     try:
-        B12App(client, persist_default=args.persist).run()
+        # Already inside asyncio.run(main): the app must run on this loop (run_async).
+        await B12App(client, persist_default=args.persist).run_async()
     finally:
         await client.close()
     return 0
