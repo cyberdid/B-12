@@ -427,13 +427,14 @@ async def file_list(args, guard):
         for entry in page:
             guard.check()
             name, _ = clip(entry.name, 128)
-            entries.append(
-                {
-                    "name": name,
-                    "directory": entry.is_dir(follow_symlinks=False),
-                    "symlink": entry.is_symlink(),
-                }
-            )
+            # One short string per entry: "name/" for directories, "name@" for symlinks.
+            # Compact on purpose: a JSON object per entry overflowed the model's result budget.
+            if entry.is_symlink():
+                entries.append(f"{name}@")
+            elif entry.is_dir(follow_symlinks=False):
+                entries.append(f"{name}/")
+            else:
+                entries.append(name)
         more = args.offset + args.limit < total
         content = {
             "entries": entries,

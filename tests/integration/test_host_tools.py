@@ -436,7 +436,7 @@ async def test_file_list_pages_sorted_entries_and_never_hides_a_name(host_factor
     while offset is not None:
         result = await rig.invoke("file_list", path=str(folder), limit=50, offset=offset)
         assert result.status == "completed" and result.truncated is False
-        seen += [e["name"] for e in result.content["entries"]]
+        seen += [e.rstrip("/@") for e in result.content["entries"]]
         offset = result.content["next_offset"]
     assert len(seen) == result.content["total"] == 121
     assert seen == sorted(seen) and "Projects" in seen
@@ -457,3 +457,18 @@ async def test_chunked_read_reassembles_cyrillic_file_exactly(host_factory):
             break
         offset = result.content["next_offset"]
     assert rebuilt == original and steps > 10
+
+
+async def test_file_list_entries_are_short_strings_that_fit_the_result_budget(host_factory):
+    rig = host_factory()
+    folder = rig.root / "budget"
+    folder.mkdir()
+    for n in range(79):
+        (folder / f"File-number-{n:03d}-with-a-long-name.txt").write_text("x")
+    (folder / "Projects").mkdir()
+    result = await rig.invoke("file_list", path=str(folder), limit=200)
+    import json
+
+    assert "Projects/" in result.content["entries"]
+    assert all(isinstance(e, str) for e in result.content["entries"])
+    assert len(json.dumps(result.content).encode()) < 4096

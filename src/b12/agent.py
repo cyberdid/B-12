@@ -537,8 +537,8 @@ class Agent:
         path = str(call.arguments.get("path", "")).rstrip("/")
         if call.name == "file_list" and isinstance(result.content, dict):
             for entry in result.content.get("entries", []):
-                if not entry.get("directory"):
-                    listed.setdefault(f"{path}/{entry.get('name', '')}", False)
+                if isinstance(entry, str) and not entry.endswith(("/", "@")):
+                    listed.setdefault(f"{path}/{entry}", False)
         elif call.name == "file_read" and path:
             listed[path] = True
             partial = state.setdefault("partial", {})
