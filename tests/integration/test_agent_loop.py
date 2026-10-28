@@ -543,7 +543,7 @@ async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
     runtime = factory()
     who = owner(runtime)
     big = tmp_path / "long.txt"
-    big.write_text("рядок " * 900)  # several 1600-byte chunks
+    big.write_text("x" * 1800)  # two 1600-byte chunks, ASCII so the size is exact
     first = {"tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600})]}
 
     def follow(request):
@@ -564,7 +564,7 @@ async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
     result, _ = await run_turn(runtime, who, "Прочитай файл повністю", persist=True)
     reads = [r for r in result.tool_results if r.name == "file_read"]
     assert len(reads) == 2 and reads[1].content["offset"] > 0
-    assert result.content == "Готово."
+    assert (result.state, result.error_code, result.content) == ("completed", None, "Готово.")
 
 
 def test_head_and_tail_survive_truncation_with_an_omission_marker():
@@ -576,3 +576,28 @@ def test_head_and_tail_survive_truncation_with_an_omission_marker():
     assert clipped.startswith("START") and clipped.endswith("RESULT: 42 files")
     assert "пропущено" in clipped
     assert _head_tail("short", 400) == "short"
+
+
+async def test_persist_refuses_the_same_call_a_third_time(runtime_factory, tmp_path):
+    """Regression: the model re-read the same chunk in a loop until the round budget ran out."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    target = tmp_path / "loop.txt"
+    target.write_text("текст " * 300)
+    same = {"tool_calls": [("file_read", {"path": str(target), "max_bytes": 1600, "offset": 0})]}
+    state["script"] = [same, same, same, same, {"content": "Зупиняюся. ГОТОВО"}]
+    result, _ = await run_turn(runtime, who, "Прочитай файл", persist=True)
+    codes = [r.error_code for r in result.tool_results]
+    assert codes.count("repeated_call") >= 1
+    assert [r.status for r in result.tool_results][:2] == ["completed", "completed"]
+
+
+async def test_persist_stops_when_the_model_repeats_the_same_answer(runtime_factory):
+    """Regression: the model repeated 'Я опрацював …' without doing anything new."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "Я опрацював файл."}, {"content": "Я опрацював файл."}]
+    result, _ = await run_turn(runtime, who, "Аналізуй", persist=True)
+    assert result.state == "failed" and result.error_code == "stalled"

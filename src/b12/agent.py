@@ -76,6 +76,11 @@ _NUDGE_UNREAD = "[авто-продовження] Ти ще не прочита
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
 
+def _call_key(call) -> str:
+    """Identity of a step for loop detection: tool name plus canonical arguments."""
+    return call.name + "|" + json.dumps(call.arguments, sort_keys=True, ensure_ascii=False)
+
+
 def _head_tail(text: str, budget: int) -> str:
     """Keep the start and the end of an oversized output; the end often holds the result."""
     raw = text.encode()
@@ -464,6 +469,11 @@ class Agent:
                     )
                 state.setdefault("model_metrics", []).append(dict(reply.metrics))
                 if not reply.tool_calls:
+                    text = (reply.content or "").strip()
+                    if persist and text and text == state.get("last_text"):
+                        # Same answer as last time and no new action: the loop is not progressing.
+                        return await finish("failed", code="stalled")
+                    state["last_text"] = text
                     state["turn_messages"].append(
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
                     )
@@ -564,6 +574,9 @@ class Agent:
                     "tool_started",
                     {"call_id": call.id, "name": call.name, "arguments": call.arguments},
                 )
+            seen = state.setdefault("seen", {})
+            key = _call_key(call)
+            seen[key] = seen.get(key, 0) + 1
             if call.id in state["call_ids"]:
                 result = ToolResult(
                     call_id=call.id,
@@ -571,6 +584,18 @@ class Agent:
                     status="denied",
                     content={},
                     error_code="duplicate_call_id",
+                )
+            elif state.get("persist") and seen[key] > 2:
+                # Same call, same arguments, a third time: the model is looping on one step.
+                result = ToolResult(
+                    call_id=call.id,
+                    name=call.name,
+                    status="denied",
+                    content={
+                        "note": "Цей виклик уже виконано з тими самими аргументами. "
+                        "Перейди до наступного непрочитаного пункту."
+                    },
+                    error_code="repeated_call",
                 )
             elif state["calls"] >= (
                 PERSIST_CALLS if state.get("persist") else self.settings.max_tool_calls
