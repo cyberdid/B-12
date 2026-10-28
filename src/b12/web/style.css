@@ -199,3 +199,15 @@ input, select, textarea {
 .memory-card .memory-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 .memory-card .actions { display: flex; gap: 6px; }
 .hint { color: var(--muted); font-size: 12px; }
+
+/* Chat column: centred, readable width; replies are plain text, not boxes. */
+.messages { max-width: 760px; width: 100%; margin: 0 auto; gap: 10px; }
+.msg.assistant { background: transparent; border: 0; padding: 2px 0; max-width: 100%; font-size: 15px; line-height: 1.65; }
+.msg.user { font-size: 15px; }
+.tool-group { margin: 2px 0; border-left: 2px solid var(--border); padding-left: 10px; }
+.tool-group > summary { color: var(--muted); font-size: 12.5px; cursor: pointer; list-style: none; padding: 2px 0; }
+.tool-group > summary::-webkit-details-marker { display: none; }
+.tool-group > summary::before { content: "▸ "; }
+.tool-group[open] > summary::before { content: "▾ "; }
+.tool-group > .msg.tool { background: transparent; border: 0; padding: 2px 0; max-width: 100%; }
+.tool-group .tool-result pre, .tool-group .tool-args pre { background: var(--tool); }

@@ -78,6 +78,7 @@ function messageActions(node, text, when) {
 
 function addMessage(kind, text, when) {
   $("empty").hidden = true;
+  if (kind !== "tool") closeToolGroup();
   const node = el("div", `msg ${kind}`);
   if (kind === "assistant") node.append(renderMarkdown(text));
   else node.textContent = text;
@@ -100,6 +101,26 @@ function toolSummary(args) {
   return "";
 }
 
+// All tool calls of one reply go into one collapsible group ("Інструменти: N").
+let toolGroup = null;
+
+function currentToolGroup() {
+  if (!toolGroup) {
+    toolGroup = el("details", "tool-group");
+    toolGroup.open = true;
+    toolGroup.append(el("summary", null, "Інструменти: 0"));
+    $("messages").append(toolGroup);
+  }
+  const count = toolGroup.querySelectorAll(":scope > .msg.tool").length + 1;
+  toolGroup.querySelector("summary").textContent = `Інструменти: ${count}`;
+  return toolGroup;
+}
+
+function closeToolGroup() {
+  if (toolGroup) toolGroup.open = false;
+  toolGroup = null;
+}
+
 function toolCard(event) {
   const card = el("div", "msg tool");
   card.dataset.started = String(performance.now());
@@ -119,7 +140,7 @@ function toolCard(event) {
   resultBox.hidden = true;
   resultBox.append(el("summary", null, "результат"), el("pre", null, ""));
   card.append(resultBox);
-  $("messages").append(card);
+  currentToolGroup().append(card);
   scrollDown();
   return card;
 }
@@ -213,6 +234,7 @@ async function runTurn(start) {
   } catch (error) {
     addMessage("state", error.name === "AbortError" ? "Скасовано." : `Помилка: ${error.message}`);
   } finally {
+    closeToolGroup();
     state.controller = null;
     state.turnId = null;
     setBusy(false);
@@ -237,6 +259,7 @@ async function cancelTurn() {
 
 async function loadHistory() {
   cards.clear();
+  closeToolGroup();
   $("messages").replaceChildren();
   const history = await json(`/api/sessions/${state.session}/history`);
   // Arguments live on the assistant's tool_calls; results live on the tool messages.
