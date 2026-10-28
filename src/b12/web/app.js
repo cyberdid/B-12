@@ -296,16 +296,22 @@ async function loadHistory() {
 async function loadSessions(preferred) {
   let sessions = await json("/api/sessions");
   if (!sessions.length) sessions = [(await json("/api/sessions", { method: "POST", body: {} })).session_id];
-  const select = $("session-select");
-  select.replaceChildren(
-    ...sessions.map((id, i) => {
-      const option = el("option", null, `Сесія ${i + 1}`);
-      option.value = id;
-      return option;
-    }),
-  );
   state.session = sessions.includes(preferred) ? preferred : sessions[sessions.length - 1];
-  select.value = state.session;
+  // Newest conversations first, numbered by creation order.
+  $("session-list").replaceChildren(
+    ...sessions
+      .map((id, i) => {
+        const item = el("button", "session-item", `Розмова ${i + 1}`);
+        item.type = "button";
+        item.setAttribute("aria-current", String(id === state.session));
+        item.addEventListener("click", () => {
+          loadSessions(id);
+          $("sidebar").classList.remove("open");
+        });
+        return item;
+      })
+      .reverse(),
+  );
   storage("localStorage")?.setItem(SESSION_KEY, state.session);
   await loadHistory();
 }
@@ -314,7 +320,10 @@ async function refreshApprovals() {
   const list = $("approvals");
   try {
     const items = await json("/api/approvals");
-    $("approval-count").textContent = items.length ? `(${items.length})` : "";
+    const count = items.length ? `(${items.length})` : "";
+    $("approval-count").textContent = count;
+    $("approval-count-tab").textContent = count;
+    $("toggle-panel").classList.toggle("alert", items.length > 0);
     list.replaceChildren(
       ...items.map((item) => {
         const li = el("li");
@@ -481,7 +490,12 @@ function bind() {
     const created = await json("/api/sessions", { method: "POST", body: {} });
     await loadSessions(created.session_id);
   });
-  $("session-select").addEventListener("change", (event) => loadSessions(event.target.value));
+  $("toggle-panel").addEventListener("click", () => {
+    const open = $("panel").hidden;
+    $("panel").hidden = !open;
+    document.querySelector(".layout").classList.toggle("panel-open", open);
+  });
+  $("toggle-sidebar").addEventListener("click", () => $("sidebar").classList.toggle("open"));
   $("consent").addEventListener("change", async (event) => {
     try {
       await json("/api/control/consent", { method: "POST", body: { consent: event.target.checked } });

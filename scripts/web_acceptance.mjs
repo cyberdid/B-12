@@ -87,6 +87,7 @@ try {
   check("history reloads after page refresh", await waitFor(`document.querySelectorAll(".msg.user").length >= 1`));
 
   // Memory: remember, search, forget through the panel.
+  await evaluate(`document.getElementById("panel").hidden && document.getElementById("toggle-panel").click()`);
   await click('[data-tab="memory"]');
   await typeInto("#memory-text", "Улюблений колір тестувальника — бірюзовий", false);
   await click("#memory-add button");

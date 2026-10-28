@@ -21,64 +21,86 @@
   </section>
 
   <div id="app" class="app" hidden>
-    <header class="topbar">
-      <div class="brand"><span id="health" class="dot" title="Стан сервера"></span> B-12</div>
-      <label class="switch" title="Згода на збереження пам’яті">
-        <input id="consent" type="checkbox"> Пам’ять
-      </label>
-      <label class="switch" title="Не зупинятися: до 40 кроків, авто-продовження до слова ГОТОВО">
-        <input id="persist" type="checkbox"> Не зупинятися
-      </label>
-      <select id="session-select" aria-label="Сесія"></select>
-      <button id="new-session" type="button">Нова сесія</button>
-      <button id="logout" type="button" class="ghost">Вийти</button>
-    </header>
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-head">
+        <span class="brand">B-12</span>
+        <span id="health" class="dot" title="Стан сервера"></span>
+      </div>
+      <button id="new-session" type="button" class="new-chat">Нова розмова</button>
+      <nav id="session-list" class="session-list" aria-label="Розмови"></nav>
+      <div class="sidebar-foot">
+        <button id="logout" type="button" class="ghost">Вийти</button>
+      </div>
+    </aside>
 
-    <main class="layout">
-      <section class="chat" aria-label="Розмова">
-        <div id="messages" class="messages" aria-live="polite"></div>
-        <p id="empty" class="empty">Почніть розмову. Інструменти виконуються реально у межах ваших дозволів.</p>
-        <form id="composer" class="composer">
-          <textarea id="input" rows="2" placeholder="Повідомлення (Enter — надіслати, Shift+Enter — новий рядок)" required></textarea>
-          <button id="send" type="submit">Надіслати</button>
-          <button id="cancel" type="button" class="danger" hidden>Скасувати</button>
-        </form>
-        <p id="status" class="status" role="status"></p>
-      </section>
+    <div class="main">
+      <header class="topbar">
+        <button id="toggle-sidebar" type="button" class="ghost icon" aria-label="Список розмов">☰</button>
+        <span class="title">Розмова</span>
+        <button id="toggle-panel" type="button" class="ghost">Панель <span id="approval-count"></span></button>
+      </header>
 
-      <aside class="side">
-        <nav class="tabs" role="tablist">
-          <button type="button" role="tab" data-tab="approvals" aria-selected="true">Підтвердження <span id="approval-count"></span></button>
-          <button type="button" role="tab" data-tab="memory">Пам’ять</button>
-          <button type="button" role="tab" data-tab="tools">Інструменти</button>
-        </nav>
-        <section id="tab-approvals" class="tab">
-          <ul id="approvals" class="list"></ul>
-          <p class="hint">Руйнівні дії чекають вашого рішення; після нього turn продовжується.</p>
-        </section>
-        <section id="tab-memory" class="tab" hidden>
-          <form id="memory-search" class="row">
-            <input id="memory-query" placeholder="Пошук у пам’яті" required>
-            <button type="submit">Шукати</button>
-          </form>
-          <ul id="memories" class="list"></ul>
-          <form id="memory-add" class="row">
-            <input id="memory-text" placeholder="Запам’ятати факт" required>
-            <button type="submit" id="memory-save">Зберегти</button>
-          </form>
-          <div class="row memory-head">
-            <strong>Уся пам’ять</strong>
-            <span class="hint">редагування створює новий запис і забуває старий</span>
-            <span id="memories-count" class="meta"></span>
-            <button type="button" id="memories-reload" class="ghost">Оновити</button>
+      <main class="layout">
+        <section class="chat" aria-label="Розмова">
+          <div id="empty" class="welcome">
+            <h2>Чим допомогти?</h2>
+            <p>Інструменти виконуються реально, у межах ваших дозволів.</p>
           </div>
-          <ul id="memories-all" class="list memory-all"></ul>
+          <div id="messages" class="messages" aria-live="polite"></div>
+          <form id="composer" class="composer">
+            <textarea id="input" rows="2" placeholder="Напишіть повідомлення. Enter — надіслати, Shift+Enter — новий рядок" required></textarea>
+            <div class="composer-bar">
+              <div class="toggles">
+                <label class="toggle" title="Згода на збереження пам’яті">
+                  <input id="consent" type="checkbox"> Пам’ять
+                </label>
+                <label class="toggle" title="Не зупинятися: до 150 кроків, авто-продовження до слова ГОТОВО">
+                  <input id="persist" type="checkbox"> Не зупинятися
+                </label>
+              </div>
+              <div class="send-area">
+                <button id="cancel" type="button" class="ghost" hidden>Зупинити</button>
+                <button id="send" type="submit">Надіслати</button>
+              </div>
+            </div>
+          </form>
+          <p id="status" class="status" role="status"></p>
         </section>
-        <section id="tab-tools" class="tab" hidden>
-          <ul id="tools" class="list"></ul>
-        </section>
-      </aside>
-    </main>
+
+        <aside id="panel" class="side" hidden>
+          <nav class="tabs" role="tablist">
+            <button type="button" role="tab" data-tab="approvals" aria-selected="true">Підтвердження <span id="approval-count-tab"></span></button>
+            <button type="button" role="tab" data-tab="memory">Пам’ять</button>
+            <button type="button" role="tab" data-tab="tools">Інструменти</button>
+          </nav>
+          <section id="tab-approvals" class="tab">
+            <ul id="approvals" class="list"></ul>
+            <p class="hint">Руйнівні дії чекають вашого рішення; після нього turn продовжується.</p>
+          </section>
+          <section id="tab-memory" class="tab" hidden>
+            <form id="memory-search" class="row">
+              <input id="memory-query" placeholder="Пошук у пам’яті" required>
+              <button type="submit">Шукати</button>
+            </form>
+            <ul id="memories" class="list"></ul>
+            <form id="memory-add" class="row">
+              <input id="memory-text" placeholder="Запам’ятати факт" required>
+              <button type="submit" id="memory-save">Зберегти</button>
+            </form>
+            <div class="row memory-head">
+              <strong>Уся пам’ять</strong>
+              <span id="memories-count" class="meta"></span>
+              <button type="button" id="memories-reload" class="ghost">Оновити</button>
+            </div>
+            <p class="hint">Редагування створює новий запис і забуває старий.</p>
+            <ul id="memories-all" class="list memory-all"></ul>
+          </section>
+          <section id="tab-tools" class="tab" hidden>
+            <ul id="tools" class="list"></ul>
+          </section>
+        </aside>
+      </main>
+    </div>
   </div>
 </body>
 </html>
