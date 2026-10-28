@@ -21,6 +21,10 @@ class Settings(BaseModel):
     model_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 120
     num_ctx: Annotated[int, Field(gt=0)] = 4096
     output_tokens: Annotated[int, Field(gt=0)] = 512
+    # Sampling. Eval/determinism default is temperature 0; NVIDIA recommends 1.0 / top_p 0.95.
+    temperature: Annotated[float, Field(ge=0, le=2, allow_inf_nan=False)] = 0.0
+    top_p: Annotated[float, Field(gt=0, le=1, allow_inf_nan=False)] = 1.0
+    seed: Annotated[int, Field(ge=0, le=2**31 - 1)] = 42
     # Bytes of one tool result shown to the model before clipping (context budget).
     tool_result_bytes: Annotated[int, Field(ge=512, le=16384)] = 4096
     max_rounds: Annotated[int, Field(gt=0)] = 8
@@ -128,6 +132,7 @@ class Settings(BaseModel):
             "max_tool_calls",
             "initiative_hour_cap",
             "tool_result_bytes",
+            "seed",
         }
         for field in cls.model_fields:
             key = f"B12_{field.upper()}"
@@ -136,6 +141,8 @@ class Settings(BaseModel):
             value: Any = env[key]
             if field in integers:
                 value = int(value)
+            elif field in ("temperature", "top_p"):
+                value = float(value)
             elif field == "network_allow":
                 value = tuple(item.strip() for item in value.split(",") if item.strip())
             elif field == "forget_requires_approval":

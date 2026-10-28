@@ -81,12 +81,16 @@ def test_physical_purge_erases_unique_fts_terms_and_payload_bytes(tmp_path):
     with sqlite3.connect(path) as connection:
         connection.execute("CREATE VIRTUAL TABLE vocabulary USING fts5vocab(memory_fts, 'row')")
         assert {row[0] for row in connection.execute("SELECT term FROM vocabulary")} == {
-            markers[0], markers[1], "retaineduniqueterm"}
+            markers[0],
+            markers[1],
+            "retaineduniqueterm",
+        }
     receipt = store.begin_purge(saved.id, actor)
     assert receipt.state == "complete"
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT term FROM vocabulary").fetchall() == [
-            ("retaineduniqueterm",)]
+            ("retaineduniqueterm",)
+        ]
     for file in tmp_path.iterdir():
         for marker in markers:
             assert marker.encode() not in file.read_bytes()

@@ -47,6 +47,9 @@ class AdmittedRequest:
     profile_identity: str
     dropped_ids: tuple[str, ...]
     fingerprint: str
+    temperature: float = 0.0
+    top_p: float = 1.0
+    seed: int = 42
 
     def __post_init__(self):
         object.__setattr__(self, "messages", freeze(self.messages))
@@ -63,8 +66,9 @@ class AdmittedRequest:
             "options": {
                 "num_ctx": self.num_ctx,
                 "num_predict": self.output_reserve,
-                "temperature": 0,
-                "seed": 42,
+                "temperature": self.temperature,
+                "top_p": self.top_p,
+                "seed": self.seed,
                 "draft_num_predict": 0,
             },
         }
@@ -166,6 +170,9 @@ class ContextBuilder:
             self.profile.identity,
             tuple(dropped),
             "",
+            temperature=self.settings.temperature,
+            top_p=self.settings.top_p,
+            seed=self.settings.seed,
         )
         return replace(request, fingerprint=request._fingerprint())
 

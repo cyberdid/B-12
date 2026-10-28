@@ -26,24 +26,40 @@ def test_actor_is_frozen_and_forbids_untrusted_fields():
     with pytest.raises(ValidationError):
         Actor(id="guest", approved=True)
     assert actor.model_dump() == {
-        "schema_version": 1, "id": "owner", "owner": True, "consent": True,
+        "schema_version": 1,
+        "id": "owner",
+        "owner": True,
+        "consent": True,
     }
 
 
 def memory_data(**changes):
     return {
-        "id": str(uuid4()), "owner_id": "owner", "kind": "fact", "text": "Пам’ять",
-        "source": "event-17", "created_at": "2026-10-24T18:00:00+00:00", **changes,
+        "id": str(uuid4()),
+        "owner_id": "owner",
+        "kind": "fact",
+        "text": "Пам’ять",
+        "source": "event-17",
+        "created_at": "2026-10-24T18:00:00+00:00",
+        **changes,
     }
 
 
-@pytest.mark.parametrize("changes", [
-    {"id": "not-a-uuid"}, {"evidence_ids": ("not-a-uuid",)}, {"owner_id": " "},
-    {"source": ""}, {"kind": " "}, {"text": " "},
-    {"created_at": "2026-10-24T18:00:00"}, {"created_at": "yesterday"},
-    {"created_at": "2026-10-24T18:00:00+03:00"},
-    {"created_at": "2026-10-24T18:00:00+0000"},
-])
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"id": "not-a-uuid"},
+        {"evidence_ids": ("not-a-uuid",)},
+        {"owner_id": " "},
+        {"source": ""},
+        {"kind": " "},
+        {"text": " "},
+        {"created_at": "2026-10-24T18:00:00"},
+        {"created_at": "yesterday"},
+        {"created_at": "2026-10-24T18:00:00+03:00"},
+        {"created_at": "2026-10-24T18:00:00+0000"},
+    ],
+)
 def test_memory_rejects_invalid_provenance(changes):
     with pytest.raises(ValidationError):
         MemoryRecord(**memory_data(**changes))
@@ -83,7 +99,10 @@ def test_tool_call_origin_is_an_application_uuid(field):
 
 def test_uncertain_tool_effects_survive_serialization():
     result = ToolResult(
-        call_id="a", name="shell_exec", status="error", content={},
+        call_id="a",
+        name="shell_exec",
+        status="error",
+        content={},
         side_effects=({"path": "/tmp/output", "state": "possibly_written"},),
         outcome_unknown=True,
     )

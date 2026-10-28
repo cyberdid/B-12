@@ -137,6 +137,9 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "sudo_access": "off",
         "network_allow": (),
         "tool_result_bytes": 4096,
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 

@@ -239,6 +239,9 @@ async def main():
     parser.add_argument("--num-ctx", type=int, default=4096)
     parser.add_argument("--categories", default="")
     parser.add_argument("--latency", action="store_true")
+    parser.add_argument("--temperature", type=float, default=0.0)
+    parser.add_argument("--top-p", type=float, default=1.0)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     out = Path(args.out).absolute()
     out.mkdir(parents=True, exist_ok=True)
@@ -249,6 +252,9 @@ async def main():
         tokenizer_dir=Path(args.tokenizer),
         num_ctx=args.num_ctx,
         output_tokens=512,
+        temperature=args.temperature,
+        top_p=args.top_p,
+        seed=args.seed,
         quiet_start="00:00",
         quiet_end="00:00",
     )
@@ -275,8 +281,9 @@ async def main():
                     "options": {
                         "num_ctx": args.num_ctx,
                         "num_predict": 512,
-                        "temperature": 0,
-                        "seed": 42,
+                        "temperature": args.temperature,
+                        "top_p": args.top_p,
+                        "seed": args.seed,
                     },
                     "repeats": args.repeats,
                 },
