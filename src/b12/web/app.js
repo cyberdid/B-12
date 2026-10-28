@@ -59,7 +59,9 @@ function scrollDown() {
 
 function addMessage(kind, text) {
   $("empty").hidden = true;
-  const node = el("div", `msg ${kind}`, text);
+  const node = el("div", `msg ${kind}`);
+  if (kind === "assistant") node.append(renderMarkdown(text));
+  else node.textContent = text;
   $("messages").append(node);
   scrollDown();
   return node;
@@ -67,12 +69,12 @@ function addMessage(kind, text) {
 
 function toolCard(event) {
   const card = el("div", "msg tool");
-  const title = el("div");
-  title.append(el("span", "badge", "⚙ "), document.createTextNode(event.name));
+  const title = el("div", "tool-title");
+  title.append(el("span", "tool-name", `⚙ ${event.name}`));
   card.append(title);
-  if (event.arguments) {
-    const details = el("details");
-    details.append(el("summary", null, "Аргументи"));
+  if (event.arguments && Object.keys(event.arguments).length) {
+    const details = el("details", "tool-args");
+    details.append(el("summary", null, "аргументи"));
     details.append(el("pre", null, JSON.stringify(event.arguments, null, 2)));
     card.append(details);
   }
@@ -104,8 +106,12 @@ async function readStream(response, view) {
       const event = JSON.parse(line);
       if (event.type === "turn_started") state.turnId = event.turn_id;
       else if (event.type === "text_delta") {
-        if (!view.node) view.node = addMessage("assistant", "");
-        view.node.textContent += event.text;
+        if (!view.node) {
+          view.node = addMessage("assistant", "");
+          view.raw = "";
+        }
+        view.raw += event.text;
+        view.node.replaceChildren(renderMarkdown(view.raw));
         view.shown = true;
         scrollDown();
       } else if (event.type === "tool_started") {
@@ -256,6 +262,18 @@ function memoryItem(record) {
   return li;
 }
 
+async function loadAllMemories() {
+  const list = $("memories-all");
+  try {
+    const records = await json("/api/memory/records?limit=1000");
+    $("memories-count").textContent = `${records.length} записів`;
+    list.replaceChildren(...records.map(memoryItem));
+    if (!records.length) list.replaceChildren(el("li", "meta", "Пам’ять порожня."));
+  } catch (error) {
+    list.replaceChildren(el("li", "meta", `Недоступно: ${error.message}`));
+  }
+}
+
 async function searchMemory(query) {
   const list = $("memories");
   try {
@@ -349,6 +367,7 @@ function bind() {
       setStatus(`Не вдалося змінити згоду: ${error.message}`);
     }
   });
+  $("memories-reload").addEventListener("click", loadAllMemories);
   $("memory-search").addEventListener("submit", (event) => {
     event.preventDefault();
     searchMemory($("memory-query").value.trim());
@@ -370,6 +389,7 @@ function bind() {
         other.setAttribute("aria-selected", String(other === tab));
         $(`tab-${other.dataset.tab}`).hidden = other !== tab;
       }
+      if (tab.dataset.tab === "memory") loadAllMemories();
     });
   }
   window.addEventListener("online", checkHealth);

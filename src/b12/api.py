@@ -307,7 +307,11 @@ def create_app(
 
     @app.get("/static/{name}")
     async def static(name: str):
-        types = {"app.js": "text/javascript", "style.css": "text/css"}
+        types = {
+            "app.js": "text/javascript",
+            "markdown.js": "text/javascript",
+            "style.css": "text/css",
+        }
         if name not in types:
             raise HTTPException(404, "not_found")
         return FileResponse(web / name, media_type=types[name], headers=security_headers)
@@ -384,6 +388,20 @@ def create_app(
         own_turn(request, who, turn_id)
         runtime_of(request).control.cancel_turn(turn_id)
         return {"cancelled": turn_id}
+
+    @app.get("/api/memory/records")
+    async def memory_records(request: Request, who: Identity, limit: int = 500):
+        """Every live record in the caller's namespace, newest first (full memory view)."""
+        runtime = runtime_of(request)
+        if "memory.read" not in who.capabilities:
+            raise HTTPException(403, "capability_denied")
+        try:
+            records = runtime.memory.recent(
+                runtime.control.resolve_actor(who.actor.id), limit=max(0, min(limit, 1000))
+            )
+        except PermissionError:
+            raise HTTPException(403, "consent_required") from None
+        return [r.model_dump(mode="json") for r in records]
 
     @app.get("/api/memory")
     async def memory_search(request: Request, q: str, who: Identity):

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>B-12</title>
   <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/markdown.js" defer></script>
   <script src="/static/app.js" defer></script>
 </head>
 <body>
@@ -65,6 +66,12 @@
             <input id="memory-text" placeholder="Запам’ятати факт" required>
             <button type="submit">Зберегти</button>
           </form>
+          <div class="row memory-head">
+            <strong>Уся пам’ять</strong>
+            <span id="memories-count" class="meta"></span>
+            <button type="button" id="memories-reload" class="ghost">Оновити</button>
+          </div>
+          <ul id="memories-all" class="list memory-all"></ul>
         </section>
         <section id="tab-tools" class="tab" hidden>
           <ul id="tools" class="list"></ul>

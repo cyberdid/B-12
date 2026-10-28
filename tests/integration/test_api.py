@@ -245,3 +245,18 @@ async def test_server_runs_and_stops_the_maintenance_loop(scripted_ollama, tmp_p
     stopped_at = len(ticks)
     await asyncio.sleep(0.1)
     assert stopped_at >= 3 and len(ticks) == stopped_at  # loop ended with the server
+
+
+async def test_memory_records_lists_all_live_records_newest_first(api):
+    state, client, token, _, _ = api
+    first = (await client.post("/api/memory", json={"text": "перший"}, headers=auth(token))).json()
+    second = (await client.post("/api/memory", json={"text": "другий"}, headers=auth(token))).json()
+    records = (await client.get("/api/memory/records?limit=50", headers=auth(token))).json()
+    ids = [r["id"] for r in records]
+    assert ids.index(second["id"]) < ids.index(first["id"])
+    assert {r["text"] for r in records} >= {"перший", "другий"}
+    await client.delete(f"/api/memory/{first['id']}", headers=auth(token))
+    after = (await client.get("/api/memory/records", headers=auth(token))).json()
+    assert first["id"] not in [r["id"] for r in after]
+    big = await client.get("/api/memory/records?limit=5000", headers=auth(token))
+    assert big.status_code == 200
