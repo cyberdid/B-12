@@ -95,7 +95,7 @@ try {
   await click("#memory-search button");
   check("memory searchable", await waitFor(`[...document.querySelectorAll("#memories li")].some(n=>n.textContent.includes("бірюзовий"))`));
   await shot("04-memory.png");
-  await click("#memories li button");
+  await evaluate(`[...document.querySelectorAll("#memories li button")].find((b) => b.textContent === "Забути").click()`);
   check("memory forget reports full purge", await waitFor(`document.querySelector("#memories li").textContent.includes("Забуто повністю")`, 30000), await evaluate(`document.querySelector("#memories li").textContent`));
 
   // Approval flow: model searches memory and asks to forget; owner approves in UI.

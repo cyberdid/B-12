@@ -107,6 +107,7 @@ function toolCard(event) {
   title.append(el("span", "tool-name", `⚙ ${event.name}`));
   const summary = toolSummary(event.arguments);
   if (summary) title.append(el("span", "tool-summary", summary));
+  title.append(el("span", "badge running", " … виконується"));
   card.append(title);
   if (event.arguments && Object.keys(event.arguments).length) {
     const details = el("details", "tool-args");
@@ -114,9 +115,23 @@ function toolCard(event) {
     details.append(el("pre", null, JSON.stringify(event.arguments, null, 2)));
     card.append(details);
   }
+  const resultBox = el("details", "tool-result");
+  resultBox.hidden = true;
+  resultBox.append(el("summary", null, "результат"), el("pre", null, ""));
+  card.append(resultBox);
   $("messages").append(card);
   scrollDown();
   return card;
+}
+
+// Show what a tool returned. Clipped by the server to the model's budget; the full
+// outcome is what the model saw, so the owner sees exactly that.
+function showResult(card, content) {
+  const box = card.querySelector(".tool-result");
+  if (!box) return;
+  const text = typeof content?.text === "string" ? content.text : JSON.stringify(content ?? {}, null, 2);
+  box.querySelector("pre").textContent = text;
+  box.hidden = false;
 }
 
 function setBusy(busy) {
@@ -155,6 +170,7 @@ async function readStream(response, view) {
         cards.set(event.call_id, toolCard(event));
       } else if (event.type === "tool_result") {
         const card = cards.get(event.call_id) || toolCard(event);
+        card.querySelector(".badge.running")?.remove();
         const badge = el("span", `badge ${event.status}`, ` → ${event.status}`);
         if (event.error_code) badge.textContent += ` (${event.error_code})`;
         const started = Number(card.dataset.started);
@@ -190,6 +206,10 @@ async function runTurn(start) {
         addMessage("state", `Стан: ${result.state}${reason}`);
       }
     }
+    for (const outcome of result?.tool_results || []) {
+      const card = cards.get(outcome.call_id);
+      if (card) showResult(card, outcome.content);
+    }
   } catch (error) {
     addMessage("state", error.name === "AbortError" ? "Скасовано." : `Помилка: ${error.message}`);
   } finally {
@@ -219,10 +239,33 @@ async function loadHistory() {
   cards.clear();
   $("messages").replaceChildren();
   const history = await json(`/api/sessions/${state.session}/history`);
+  // Arguments live on the assistant's tool_calls; results live on the tool messages.
+  const argsById = new Map();
   for (const message of history) {
-    if (message.role === "user") addMessage("user", message.content);
-    else if (message.role === "assistant" && message.content) addMessage("assistant", message.content);
-    else if (message.role === "tool") addMessage("tool", `⚙ ${message.tool_name}`);
+    for (const call of message.tool_calls || []) {
+      const fn = call.function || call;
+      argsById.set(call.id, fn.arguments);
+    }
+  }
+  for (const message of history) {
+    if (message.role === "user") addMessage("user", message.content, null);
+    else if (message.role === "assistant" && message.content) addMessage("assistant", message.content, null);
+    else if (message.role === "tool") {
+      let outcome = {};
+      try {
+        outcome = JSON.parse(message.content || "{}");
+      } catch {
+        /* unparsable stored result: show the name only */
+      }
+      const card = toolCard({ name: message.tool_name, arguments: argsById.get(message.tool_call_id) });
+      card.querySelector(".badge.running")?.remove();
+      if (outcome.content !== undefined) showResult(card, outcome.content);
+      const status = outcome.status || "completed";
+      const badge = el("span", `badge ${status}`, ` → ${status}`);
+      if (outcome.error_code) badge.textContent += ` (${outcome.error_code})`;
+      card.firstChild.append(badge);
+      card.dataset.started = "";
+    }
   }
   $("empty").hidden = history.length > 0;
 }
@@ -284,9 +327,18 @@ async function decide(item, approve) {
 }
 
 function memoryItem(record) {
-  const li = el("li");
-  li.append(el("span", null, record.text));
+  const li = el("li", "memory-card");
+  li.append(el("span", "memory-text", record.text));
   li.append(el("span", "meta", `${record.kind} · ${record.created_at.slice(0, 16).replace("T", " ")}`));
+  const actions = el("div", "actions");
+  const edit = el("button", "ghost", "Редагувати");
+  edit.type = "button";
+  edit.addEventListener("click", () => {
+    $("memory-text").value = record.text;
+    $("memory-text").dataset.replaces = record.id;
+    $("memory-text").focus();
+    $("memory-save").textContent = "Зберегти зміну";
+  });
   const forget = el("button", "ghost", "Забути");
   forget.type = "button";
   forget.addEventListener("click", async () => {
@@ -297,7 +349,8 @@ function memoryItem(record) {
       li.replaceChildren(el("span", "meta", `Очікує: ${(receipt.pending_stores || []).join(", ")}`));
     } else li.append(el("span", "error", "Не вдалося забути."));
   });
-  li.append(forget);
+  actions.append(edit, forget);
+  li.append(actions);
   return li;
 }
 
@@ -423,8 +476,14 @@ function bind() {
   $("memory-add").addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = $("memory-text").value.trim();
+    const replaces = $("memory-text").dataset.replaces;
     try {
       const record = await json("/api/memory", { method: "POST", body: { text } });
+      if (replaces) {
+        await api(`/api/memory/${replaces}`, { method: "DELETE" });
+        delete $("memory-text").dataset.replaces;
+        $("memory-save").textContent = "Зберегти";
+      }
       $("memory-text").value = "";
       $("memories").prepend(memoryItem(record));
     } catch (error) {

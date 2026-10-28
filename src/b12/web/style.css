@@ -122,7 +122,9 @@ input, select, textarea {
 .msg.assistant pre { background: var(--tool); border-radius: 6px; padding: 8px; overflow-x: auto; white-space: pre; margin: 0 0 8px; }
 .msg.assistant pre code { background: none; padding: 0; }
 .msg.tool { background: var(--tool); font-size: 12.5px; padding: 4px 10px; max-width: 60ch; }
-.tool-title { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.tool-title { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.tool-name { min-width: 0; overflow-wrap: anywhere; }
+.msg.tool { min-width: 0; max-width: min(60ch, 100%); }
 .tool-summary { color: var(--muted); font-family: ui-monospace, monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
 .msg-actions { display: flex; align-items: center; gap: 10px; margin-top: 6px; opacity: 0; transition: opacity 0.15s; font-size: 12px; }
 .msg:hover .msg-actions, .msg:focus-within .msg-actions { opacity: 1; }
@@ -183,8 +185,17 @@ input, select, textarea {
 .meta { color: var(--muted); font-size: 12px; }
 
 @media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
+  .layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .chat, .topbar { min-width: 0; max-width: 100%; }
+  .topbar { flex-wrap: wrap; gap: 6px; }
   .side { border-left: 0; border-top: 1px solid var(--border); max-height: 40vh; }
   .composer { flex-wrap: wrap; }
   .composer textarea { flex-basis: 100%; }
 }
+.badge.running { color: var(--muted); font-weight: 500; }
+.msg.tool .tool-result { margin-top: 4px; }
+.msg.tool .tool-result summary { color: var(--muted); cursor: pointer; font-size: 12px; }
+.msg.tool .tool-result pre { max-height: 260px; overflow: auto; white-space: pre-wrap; font-size: 12px; margin: 4px 0 0; }
+.memory-card .memory-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.memory-card .actions { display: flex; gap: 6px; }
+.hint { color: var(--muted); font-size: 12px; }
