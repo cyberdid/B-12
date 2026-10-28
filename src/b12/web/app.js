@@ -4,6 +4,7 @@
 
 const TOKEN_KEY = "b12.token";
 const SESSION_KEY = "b12.session";
+const DRAFT_KEY = "b12.draft";
 const $ = (id) => document.getElementById(id);
 
 const state = { token: null, session: null, turnId: null, controller: null, busy: false };
@@ -57,20 +58,55 @@ function scrollDown() {
   box.scrollTop = box.scrollHeight;
 }
 
-function addMessage(kind, text) {
+function messageActions(node, text, when) {
+  const bar = el("div", "msg-actions");
+  const copy = el("button", "ghost", "Копіювати");
+  copy.type = "button";
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      copy.textContent = "Скопійовано";
+      setTimeout(() => (copy.textContent = "Копіювати"), 1500);
+    } catch {
+      copy.textContent = "Не вдалося";
+    }
+  });
+  bar.append(copy);
+  if (when) bar.append(el("span", "meta", when.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" })));
+  node.append(bar);
+}
+
+function addMessage(kind, text, when) {
   $("empty").hidden = true;
   const node = el("div", `msg ${kind}`);
   if (kind === "assistant") node.append(renderMarkdown(text));
   else node.textContent = text;
+  if (text && (kind === "assistant" || kind === "user")) messageActions(node, text, when);
   $("messages").append(node);
   scrollDown();
   return node;
 }
 
+const SUMMARY_KEYS = ["path", "command", "executable", "query", "url", "memory_id", "text"];
+
+function toolSummary(args) {
+  if (!args || typeof args !== "object") return "";
+  for (const key of SUMMARY_KEYS) {
+    if (typeof args[key] === "string" && args[key]) {
+      const value = args[key].replace(/\s+/g, " ").trim();
+      return value.length > 70 ? `${value.slice(0, 69)}…` : value;
+    }
+  }
+  return "";
+}
+
 function toolCard(event) {
   const card = el("div", "msg tool");
+  card.dataset.started = String(performance.now());
   const title = el("div", "tool-title");
   title.append(el("span", "tool-name", `⚙ ${event.name}`));
+  const summary = toolSummary(event.arguments);
+  if (summary) title.append(el("span", "tool-summary", summary));
   card.append(title);
   if (event.arguments && Object.keys(event.arguments).length) {
     const details = el("details", "tool-args");
@@ -121,6 +157,8 @@ async function readStream(response, view) {
         const card = cards.get(event.call_id) || toolCard(event);
         const badge = el("span", `badge ${event.status}`, ` → ${event.status}`);
         if (event.error_code) badge.textContent += ` (${event.error_code})`;
+        const started = Number(card.dataset.started);
+        if (started) badge.textContent += ` · ${Math.max(1, Math.round(performance.now() - started))} мс`;
         if (event.outcome_unknown) badge.textContent += " — результат невідомий";
         card.firstChild.append(badge);
       } else if (event.type === "approval_pending") {
@@ -145,7 +183,8 @@ async function runTurn(start) {
     if (!result) addMessage("state", "З’єднання завершилося без результату.");
     else if (result.type === "error") addMessage("state", `Помилка: ${result.error}`);
     else {
-      if (result.content && !view.shown) addMessage("assistant", result.content);
+      if (result.content && !view.shown) addMessage("assistant", result.content, new Date());
+      else if (view.node && view.raw) messageActions(view.node, view.raw, new Date());
       if (result.state !== "completed") {
         const reason = result.error_code ? ` (${result.error_code})` : "";
         addMessage("state", `Стан: ${result.state}${reason}`);
@@ -344,7 +383,16 @@ function bind() {
     const text = $("input").value.trim();
     if (!text || state.busy) return;
     $("input").value = "";
+    storage("localStorage")?.removeItem(DRAFT_KEY);
     send(text);
+  });
+  $("input").value = storage("localStorage")?.getItem(DRAFT_KEY) || "";
+  $("input").addEventListener("input", (event) => {
+    try {
+      storage("localStorage")?.setItem(DRAFT_KEY, event.target.value);
+    } catch {
+      /* storage unavailable: draft is not kept */
+    }
   });
   $("input").addEventListener("keydown", (event) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
