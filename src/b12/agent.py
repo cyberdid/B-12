@@ -63,7 +63,7 @@ SYSTEM_PROMPT = (
 
 # "Не зупинятися" mode (owner opt-in per turn): larger budgets, automatic continuation
 # after a text-only reply until the model writes the finish marker, bounded nudges.
-PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 40, 80, 25, 3
+PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 40, 80, 25, 1
 PERSIST_GENERIC = 3  # marker-less nudges; coverage nudges (unread files) use the full budget
 PERSIST_MARKER = "ГОТОВО"
 _NUDGE_PERSIST = (
@@ -159,7 +159,7 @@ class Agent:
         resolver,
         builder: ContextBuilder | None = None,
         system_prompt: str = SYSTEM_PROMPT,
-        tool_result_bytes: int = 2048,
+        tool_result_bytes: int = 4096,
         history_turns: int = 20,
     ):
         self.settings = settings
@@ -332,7 +332,7 @@ class Agent:
         text = json.dumps(body, ensure_ascii=False)
         if len(text.encode()) > self.tool_result_bytes:
             content = json.dumps(result.content, ensure_ascii=False)
-            clipped = content.encode()[: self.tool_result_bytes // 2].decode(errors="ignore")
+            clipped = content.encode()[: self.tool_result_bytes].decode(errors="ignore")
             body.update(content={"clipped": clipped}, truncated=True)
             text = json.dumps(body, ensure_ascii=False)
         return {
@@ -431,10 +431,14 @@ class Agent:
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]
                 ]
-                if persist:  # long reads: older tool outputs shrink so the window keeps moving
+                if persist:  # long reads: older outputs shrink so the window keeps moving
                     tool_at = [i for i, m in enumerate(messages) if m["role"] == "tool"]
                     for i in tool_at[:-PERSIST_KEEP]:
                         messages[i]["content"] = messages[i]["content"][:200] + " …[скорочено]"
+                    model_at = [i for i, m in enumerate(messages) if m["role"] == "assistant"]
+                    for i in model_at[:-2]:
+                        if len(messages[i].get("content") or "") > 400:
+                            messages[i]["content"] = messages[i]["content"][:400] + " …[скорочено]"
                 system = f"{self.system_prompt} Домашня тека власника: {Path.home()}."
                 if state.get("language"):
                     system += "\n" + state["language"]

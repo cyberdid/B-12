@@ -8,35 +8,64 @@ from pydantic import ValidationError
 from b12.config import Settings
 
 
-@pytest.mark.parametrize("changes", [
-    {"max_rounds": -1}, {"max_rounds": 0}, {"max_tool_calls": 0},
-    {"num_ctx": 0}, {"output_tokens": 0}, {"num_ctx": 512, "output_tokens": 512},
-    {"num_ctx": 512, "output_tokens": 513}, {"tool_timeout_s": -1},
-    {"tool_timeout_s": float("inf")}, {"tool_timeout_s": float("nan")},
-    {"model": " "}, {"host_access": "unvalidated"}, {"max_rounds": True},
-])
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"max_rounds": -1},
+        {"max_rounds": 0},
+        {"max_tool_calls": 0},
+        {"num_ctx": 0},
+        {"output_tokens": 0},
+        {"num_ctx": 512, "output_tokens": 512},
+        {"num_ctx": 512, "output_tokens": 513},
+        {"tool_timeout_s": -1},
+        {"tool_timeout_s": float("inf")},
+        {"tool_timeout_s": float("nan")},
+        {"model": " "},
+        {"host_access": "unvalidated"},
+        {"max_rounds": True},
+    ],
+)
 def test_invalid_resource_limits_are_rejected(tmp_path, changes):
     with pytest.raises(ValidationError):
         Settings(state_dir=tmp_path, **changes)
 
 
-@pytest.mark.parametrize("url", [
-    "localhost:11434", "http://", "file:///tmp/ollama", "ftp://localhost:11434",
-    "http://user:secret@localhost:11434", "http://localhost:99999", "http://local host:11434",
-    "http://localhost:11434?token=secret", "http://localhost:11434#fragment",
-    "http://localhost:11434?", "http://localhost:11434#",
-    "http://localhost:11434\\evil", "http://[broken", "http://localhost:bad",
-    "http://localhost:", "http://bad\x7fhost:11434",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "localhost:11434",
+        "http://",
+        "file:///tmp/ollama",
+        "ftp://localhost:11434",
+        "http://user:secret@localhost:11434",
+        "http://localhost:99999",
+        "http://local host:11434",
+        "http://localhost:11434?token=secret",
+        "http://localhost:11434#fragment",
+        "http://localhost:11434?",
+        "http://localhost:11434#",
+        "http://localhost:11434\\evil",
+        "http://[broken",
+        "http://localhost:bad",
+        "http://localhost:",
+        "http://bad\x7fhost:11434",
+    ],
+)
 def test_invalid_ollama_endpoint_is_rejected(tmp_path, url):
     with pytest.raises(ValidationError):
         Settings(state_dir=tmp_path, ollama_url=url)
 
 
-@pytest.mark.parametrize("url", [
-    "http://127.0.0.1:11434", "http://[::1]:11434", "https://inference.example.org/ollama",
-    "https://inference.example.org/ollama%3F%23",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://127.0.0.1:11434",
+        "http://[::1]:11434",
+        "https://inference.example.org/ollama",
+        "https://inference.example.org/ollama%3F%23",
+    ],
+)
 def test_explicit_http_endpoints_are_supported(tmp_path, url):
     assert Settings(state_dir=tmp_path, ollama_url=url).ollama_url == url
 
@@ -72,22 +101,42 @@ def test_loading_settings_does_not_create_state_directory(tmp_path):
 def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
     monkeypatch.setenv("B12_MODEL", "ambient-must-not-leak")
     environ = {
-        "B12_STATE_DIR": str(tmp_path), "B12_MODEL": "test-model", "B12_NUM_CTX": "8192",
-        "B12_OUTPUT_TOKENS": "1024", "B12_MAX_ROUNDS": "3", "B12_MAX_TOOL_CALLS": "6",
-        "B12_TOOL_TIMEOUT_S": "2.5", "B12_HOST_ACCESS": "full",
+        "B12_STATE_DIR": str(tmp_path),
+        "B12_MODEL": "test-model",
+        "B12_NUM_CTX": "8192",
+        "B12_OUTPUT_TOKENS": "1024",
+        "B12_MAX_ROUNDS": "3",
+        "B12_MAX_TOOL_CALLS": "6",
+        "B12_TOOL_TIMEOUT_S": "2.5",
+        "B12_HOST_ACCESS": "full",
         "B12_OLLAMA_URL": "https://inference.example.org",
     }
     settings = Settings.from_env(environ)
     assert settings.model_dump() == {
-        "state_dir": tmp_path, "model": "test-model", "num_ctx": 8192,
-        "output_tokens": 1024, "max_rounds": 3, "max_tool_calls": 6,
-        "tool_timeout_s": 2.5, "host_access": "full",
+        "state_dir": tmp_path,
+        "model": "test-model",
+        "num_ctx": 8192,
+        "output_tokens": 1024,
+        "max_rounds": 3,
+        "max_tool_calls": 6,
+        "tool_timeout_s": 2.5,
+        "host_access": "full",
         "ollama_url": "https://inference.example.org",
-        "model_profile": None, "tokenizer_dir": None, "model_timeout_s": 120,
-        "timezone": "Europe/Kyiv", "quiet_start": "23:00", "quiet_end": "08:00",
-        "initiative_hour_cap": 3, "initiative_cooldown_s": 600, "scheduler_tick_s": 60,
-        "embedding_python": None, "embedding_backend": "archive_index.embed:Embedder",
-        "forget_requires_approval": True, "sudo_access": "off", "network_allow": (),
+        "model_profile": None,
+        "tokenizer_dir": None,
+        "model_timeout_s": 120,
+        "timezone": "Europe/Kyiv",
+        "quiet_start": "23:00",
+        "quiet_end": "08:00",
+        "initiative_hour_cap": 3,
+        "initiative_cooldown_s": 600,
+        "scheduler_tick_s": 60,
+        "embedding_python": None,
+        "embedding_backend": "archive_index.embed:Embedder",
+        "forget_requires_approval": True,
+        "sudo_access": "off",
+        "network_allow": (),
+        "tool_result_bytes": 4096,
     }
     assert Settings.from_env({}).model != "ambient-must-not-leak"
 

@@ -61,7 +61,7 @@ async def test_bounded_binary_read_list_and_literal_search(host_factory):
     for name in ("one", "two", "three"):
         (folder / name).write_text("amber literal [.*]\nsecond line")
     listing = await rig.invoke("file_list", path=str(folder), limit=2)
-    assert len(listing.content["entries"]) == 2 and listing.truncated
+    assert len(listing.content["entries"]) == 2 and listing.content["next_offset"] == 2
     search = await rig.invoke("file_search", path=str(folder), query="[.*]", limit=2)
     assert len(search.content["matches"]) == 2 and search.truncated
     assert all(m["line"] == 1 for m in search.content["matches"])
@@ -423,3 +423,20 @@ async def test_memory_store_drops_non_uuid_evidence_ids_instead_of_failing(host_
     assert result.status == "completed", result.error_code
     found = await rig.invoke("memory_search", query="нотатка")
     assert any("нотатка про файл" in str(item) for item in found.content["records"])
+
+
+async def test_file_list_pages_sorted_entries_and_never_hides_a_name(host_factory):
+    rig = host_factory()
+    folder = rig.root / "many"
+    folder.mkdir()
+    for n in range(120):
+        (folder / f"f{n:03d}.txt").write_text("x")
+    (folder / "Projects").mkdir()
+    seen, offset = [], 0
+    while offset is not None:
+        result = await rig.invoke("file_list", path=str(folder), limit=50, offset=offset)
+        assert result.status == "completed" and result.truncated is False
+        seen += [e["name"] for e in result.content["entries"]]
+        offset = result.content["next_offset"]
+    assert len(seen) == result.content["total"] == 121
+    assert seen == sorted(seen) and "Projects" in seen

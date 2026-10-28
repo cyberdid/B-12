@@ -83,6 +83,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         sessions=sessions,
         memory=memory,
         resolver=EvidenceResolver(memory, knowledge),
+        tool_result_bytes=settings.tool_result_bytes,
     )
     purge = PurgeCoordinator(
         control=control,

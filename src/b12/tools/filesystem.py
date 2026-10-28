@@ -384,7 +384,8 @@ class PathArgs(Args):
 
 
 class ListArgs(PathArgs):
-    limit: int = Field(default=30, ge=1, le=50)
+    limit: int = Field(default=200, ge=1, le=500)
+    offset: int = Field(default=0, ge=0, le=100000)
 
 
 class ReadArgs(PathArgs):
@@ -410,26 +411,36 @@ class WriteArgs(PathArgs):
 
 
 async def file_list(args, guard):
+    """Sorted, paged listing: `next_offset` is set whenever more entries exist."""
     try:
         guard.check()
-        entries = []
-        truncated = False
+        names = []
         with os.scandir(args.path) as iterator:
             for entry in iterator:
                 guard.check()
-                if len(entries) == args.limit:
-                    truncated = True
-                    break
-                name, cut = clip(entry.name, 128)
-                truncated |= cut
-                entries.append(
-                    {
-                        "name": name,
-                        "directory": entry.is_dir(follow_symlinks=False),
-                        "symlink": entry.is_symlink(),
-                    }
-                )
-        return HandlerOutcome(content={"entries": entries}, truncated=truncated)
+                names.append(entry)
+        names.sort(key=lambda entry: entry.name)
+        total = len(names)
+        page = names[args.offset : args.offset + args.limit]
+        entries = []
+        for entry in page:
+            guard.check()
+            name, _ = clip(entry.name, 128)
+            entries.append(
+                {
+                    "name": name,
+                    "directory": entry.is_dir(follow_symlinks=False),
+                    "symlink": entry.is_symlink(),
+                }
+            )
+        more = args.offset + args.limit < total
+        content = {
+            "entries": entries,
+            "total": total,
+            "offset": args.offset,
+            "next_offset": args.offset + args.limit if more else None,
+        }
+        return HandlerOutcome(content=content, truncated=False)
     except OSError as exc:
         return failure(exc)
 
