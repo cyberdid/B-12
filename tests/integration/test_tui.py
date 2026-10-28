@@ -119,7 +119,7 @@ def test_ndjson_and_summary_helpers():
 
 
 def test_tui_command_runs_on_the_cli_event_loop(monkeypatch, tmp_path):
-    """Regression: `b12 tui` crashed with 'asyncio.run() cannot be called from a running event loop'."""
+    """Regression: `b12 tui` crashed inside a running asyncio loop."""
     from b12 import cli
     from b12.tui import app as tui_app
 
