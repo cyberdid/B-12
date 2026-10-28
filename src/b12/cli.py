@@ -530,6 +530,23 @@ async def cmd_mcp(args, settings) -> int:
     return 0
 
 
+async def cmd_tui(args, settings) -> int:
+    """Start the terminal UI on the owner's running API (the token file is the owner's)."""
+    from b12.tui.app import B12App
+    from b12.tui.client import ApiClient
+
+    token_file = settings.state_dir / "api" / "owner.token"
+    if not token_file.exists():
+        emit_json({"error": "owner_token_missing", "hint": "start `b12 serve` once"})
+        return 1
+    client = ApiClient(args.url, token_file.read_text().strip())
+    try:
+        B12App(client, persist_default=args.persist).run()
+    finally:
+        await client.close()
+    return 0
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -592,6 +609,9 @@ def parser() -> argparse.ArgumentParser:
     session = sub.add_parser("session", help="робоча історія CLI")
     session.add_argument("action", choices=("clear",))
     sub.add_parser("tools", help="каталог інструментів")
+    tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
+    tui.add_argument("--url", default="http://127.0.0.1:8712")
+    tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)
@@ -648,6 +668,7 @@ def main(argv=None) -> int:
         "session": cmd_session_clear,
         "tools": cmd_tools,
         "serve": cmd_serve,
+        "tui": cmd_tui,
         "goals": cmd_goals,
         "quiet": cmd_flag,
         "stop": cmd_flag,
