@@ -565,3 +565,14 @@ async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
     reads = [r for r in result.tool_results if r.name == "file_read"]
     assert len(reads) == 2 and reads[1].content["offset"] > 0
     assert result.content == "Готово."
+
+
+def test_head_and_tail_survive_truncation_with_an_omission_marker():
+    from b12.agent import _head_tail
+
+    text = "START" + "x" * 5000 + "RESULT: 42 files"
+    clipped = _head_tail(text, 400)
+    assert len(clipped.encode()) <= 400
+    assert clipped.startswith("START") and clipped.endswith("RESULT: 42 files")
+    assert "пропущено" in clipped
+    assert _head_tail("short", 400) == "short"

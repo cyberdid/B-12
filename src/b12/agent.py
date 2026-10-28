@@ -76,6 +76,19 @@ _NUDGE_UNREAD = "[авто-продовження] Ти ще не прочита
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
 
+def _head_tail(text: str, budget: int) -> str:
+    """Keep the start and the end of an oversized output; the end often holds the result."""
+    raw = text.encode()
+    if len(raw) <= budget:
+        return text
+    marker = f" …[пропущено {len(raw)} байт]… "
+    room = max(budget - len(marker.encode()), 0)
+    head_len = room * 2 // 3
+    head = raw[:head_len].decode(errors="ignore")
+    tail = raw[len(raw) - (room - head_len) :].decode(errors="ignore") if room > head_len else ""
+    return head + marker + tail
+
+
 @dataclass(frozen=True)
 class TurnEvent:
     type: str
@@ -330,7 +343,7 @@ class Agent:
         text = json.dumps(body, ensure_ascii=False)
         if len(text.encode()) > self.tool_result_bytes:
             content = json.dumps(result.content, ensure_ascii=False)
-            clipped = content.encode()[: self.tool_result_bytes].decode(errors="ignore")
+            clipped = _head_tail(content, self.tool_result_bytes)
             body.update(content={"clipped": clipped}, truncated=True)
             text = json.dumps(body, ensure_ascii=False)
         return {
