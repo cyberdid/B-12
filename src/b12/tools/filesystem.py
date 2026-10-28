@@ -389,7 +389,8 @@ class ListArgs(PathArgs):
 
 
 class ReadArgs(PathArgs):
-    max_bytes: int = Field(default=4096, ge=1, le=8192)
+    # Small chunks: a chunk plus JSON escaping must fit one tool-result budget unclipped.
+    max_bytes: int = Field(default=1600, ge=1, le=1600)
     offset: int = Field(default=0, ge=0)
 
 
@@ -445,6 +446,17 @@ async def file_list(args, guard):
         return failure(exc)
 
 
+def _utf8_chunk(chunk: bytes) -> bytes:
+    """Drop a trailing partial UTF-8 sequence so text chunks stay text."""
+    for cut in range(len(chunk), max(len(chunk) - 4, 0), -1):
+        try:
+            chunk[:cut].decode("utf-8")
+        except UnicodeDecodeError:
+            continue
+        return chunk[:cut] or chunk
+    return chunk
+
+
 async def file_read(args, guard):
     try:
         guard.check()
@@ -455,10 +467,17 @@ async def file_read(args, guard):
             guard.check()
             stream.seek(args.offset)
             raw = stream.read(args.max_bytes + 1)
-        return HandlerOutcome(
-            content={**body(raw[: args.max_bytes]), "bytes_read": min(len(raw), args.max_bytes)},
-            truncated=len(raw) > args.max_bytes,
-        )
+        more = len(raw) > args.max_bytes
+        chunk = _utf8_chunk(raw[: args.max_bytes]) if more else raw
+        content = {
+            **body(chunk),
+            "offset": args.offset,
+            "bytes_read": len(chunk),
+            "eof": not more,
+        }
+        if more:
+            content["next_offset"] = args.offset + len(chunk)
+        return HandlerOutcome(content=content, truncated=more)
     except OSError as exc:
         return failure(exc)
 

@@ -534,3 +534,34 @@ async def test_persist_blocks_early_finish_while_listed_files_are_unread(runtime
     sent = state["requests"][3]["messages"]
     unread = [m for m in sent if m["content"].startswith("[авто-продовження] Ти ще не")]
     assert unread and "b.py" in unread[0]["content"] and "notes.md" not in unread[0]["content"]
+
+
+async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
+    runtime_factory, tmp_path
+):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "long.txt"
+    big.write_text("рядок " * 900)  # several 1600-byte chunks
+    first = {"tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600})]}
+
+    def follow(request):
+        sent = request["messages"]
+        nudge = [m for m in sent if m["content"].startswith("[авто-продовження] Файл")]
+        assert nudge, "no continuation nudge"
+        offset = int(nudge[-1]["content"].split("offset=")[1])
+        return {
+            "tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600, "offset": offset})]
+        }
+
+    state["script"] = [
+        first,
+        {"content": "Перша частина прочитана."},
+        follow,
+        {"content": "Готово."},
+    ]
+    result, _ = await run_turn(runtime, who, "Прочитай файл повністю", persist=True)
+    reads = [r for r in result.tool_results if r.name == "file_read"]
+    assert len(reads) == 2 and reads[1].content["offset"] > 0
+    assert result.content == "Готово."

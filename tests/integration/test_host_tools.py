@@ -440,3 +440,20 @@ async def test_file_list_pages_sorted_entries_and_never_hides_a_name(host_factor
         offset = result.content["next_offset"]
     assert len(seen) == result.content["total"] == 121
     assert seen == sorted(seen) and "Projects" in seen
+
+
+async def test_chunked_read_reassembles_cyrillic_file_exactly(host_factory):
+    rig = host_factory()
+    path = rig.root / "uk.txt"
+    original = ("Привіт, світе! Ґанок і їжак. " * 40).encode("utf-8")
+    path.write_bytes(original)
+    rebuilt, offset, steps = b"", 0, 0
+    while True:
+        result = await rig.invoke("file_read", path=str(path), max_bytes=7, offset=offset)
+        assert result.status == "completed" and result.content["encoding"] == "utf-8"
+        rebuilt += result.content["text"].encode("utf-8")
+        steps += 1
+        if result.content["eof"]:
+            break
+        offset = result.content["next_offset"]
+    assert rebuilt == original and steps > 10

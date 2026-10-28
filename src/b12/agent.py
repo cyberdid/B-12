@@ -63,7 +63,7 @@ SYSTEM_PROMPT = (
 
 # "Не зупинятися" mode (owner opt-in per turn): larger budgets, automatic continuation
 # after a text-only reply until the model writes the finish marker, bounded nudges.
-PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 40, 80, 25, 1
+PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 150, 300, 120, 1
 PERSIST_GENERIC = 3  # marker-less nudges; coverage nudges (unread files) use the full budget
 PERSIST_MARKER = "ГОТОВО"
 _NUDGE_PERSIST = (
@@ -461,7 +461,15 @@ class Agent:
                         state["empty_nudged"], nudge = True, _NUDGE_EMPTY
                     elif persist and not last and state["nudges"] < PERSIST_NUDGES:
                         unread = self._unread_listed(state)
-                        if unread:  # the marker is the model's word; coverage is the system's
+                        partial = state.get("partial") or {}
+                        if partial:  # a file read only part of the way: continue it exactly
+                            path, offset = next(iter(partial.items()))
+                            state["nudges"] += 1
+                            nudge = (
+                                "[авто-продовження] Файл прочитано не до кінця. Продовж: "
+                                f"file_read з path={path} і offset={offset}"
+                            )
+                        elif unread:  # the marker is the model's word; coverage is the system's
                             state["nudges"] += 1
                             nudge = _NUDGE_UNREAD + "; ".join(unread[:8])
                         elif (
@@ -522,6 +530,11 @@ class Agent:
                     listed.setdefault(f"{path}/{entry.get('name', '')}", False)
         elif call.name == "file_read" and path:
             listed[path] = True
+            partial = state.setdefault("partial", {})
+            if result.truncated and isinstance(result.content, dict):
+                partial[path] = result.content.get("next_offset")
+            else:
+                partial.pop(path, None)
 
     @staticmethod
     def _unread_listed(state) -> list[str]:
