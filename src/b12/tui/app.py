@@ -8,6 +8,7 @@ session. Colors are fixed (dark terminal). The app talks only to the loopback AP
 import json
 from dataclasses import dataclass, field
 
+import httpx
 from rich.markup import escape
 from textual import work
 from textual.app import App, ComposeResult
@@ -226,6 +227,8 @@ class B12App(App):
         try:
             stream = self.client.chat(self.current, text, persist=persist)
             await self.consume(stream)
+        except httpx.HTTPError as error:
+            await self.add_state(f"СЕРВЕР НЕДОСТУПНИЙ: {escape(str(error))}")
         finally:
             self.turn = None
             await self.refresh_approvals()
@@ -235,6 +238,8 @@ class B12App(App):
         self.turn = self.turn or Turn(session_id=self.current, turn_id=turn_id)
         try:
             await self.consume(self.client.resume(turn_id))
+        except httpx.HTTPError as error:
+            await self.add_state(f"СЕРВЕР НЕДОСТУПНИЙ: {escape(str(error))}")
         finally:
             self.turn = None
             await self.refresh_approvals()

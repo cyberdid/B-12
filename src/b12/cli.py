@@ -539,6 +539,13 @@ async def cmd_tui(args, settings) -> int:
     if not token_file.exists():
         emit_json({"error": "owner_token_missing", "hint": "start `b12 serve` once"})
         return 1
+    import httpx
+
+    try:
+        httpx.get(f"{args.url}/api/health", timeout=3).raise_for_status()
+    except httpx.HTTPError:
+        emit_json({"error": "server_unavailable", "url": args.url, "hint": "run `b12 serve` first"})
+        return 1
     client = ApiClient(args.url, token_file.read_text().strip())
     try:
         # Already inside asyncio.run(main): the app must run on this loop (run_async).

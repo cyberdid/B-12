@@ -132,6 +132,11 @@ def test_tui_command_runs_on_the_cli_event_loop(monkeypatch, tmp_path):
         started["ran"] = True
 
     monkeypatch.setattr(tui_app.B12App, "run_async", fake_run_async)
+    import httpx
+
+    monkeypatch.setattr(
+        httpx, "get", lambda *a, **k: httpx.Response(200, request=httpx.Request("GET", "http://x"))
+    )
     monkeypatch.setenv("B12_STATE_DIR", str(state))
     assert cli.main(["tui", "--url", "http://127.0.0.1:1"]) == 0
     assert started == {"ran": True}
@@ -168,3 +173,16 @@ async def test_tool_arguments_and_results_with_brackets_do_not_crash_the_app():
         for node in app.query(Collapsible):
             Text.from_markup(node.title)  # raises if the title would crash rendering
         assert app.is_running
+
+
+def test_tui_reports_an_unreachable_server_without_a_traceback(monkeypatch, tmp_path, capsys):
+    """Regression: starting `b12 tui` with no server printed a Python traceback."""
+    from b12 import cli
+
+    state = tmp_path / "state"
+    (state / "api").mkdir(parents=True)
+    (state / "api" / "owner.token").write_text("tok")
+    monkeypatch.setenv("B12_STATE_DIR", str(state))
+    assert cli.main(["tui", "--url", "http://127.0.0.1:9"]) == 1
+    out = capsys.readouterr().out
+    assert "server_unavailable" in out and "Traceback" not in out
