@@ -135,3 +135,36 @@ def test_tui_command_runs_on_the_cli_event_loop(monkeypatch, tmp_path):
     monkeypatch.setenv("B12_STATE_DIR", str(state))
     assert cli.main(["tui", "--url", "http://127.0.0.1:1"]) == 0
     assert started == {"ran": True}
+
+
+async def test_tool_arguments_and_results_with_brackets_do_not_crash_the_app():
+    """Regression: a shell argument like `[1]` or `]` in a tool call broke Textual's markup."""
+    events = [
+        {"type": "turn_started", "turn_id": "t-5", "session_id": "s-1"},
+        {
+            "type": "tool_started",
+            "call_id": "c-9",
+            "name": "shell_exec",
+            "arguments": {"command": 'ffmpeg -af "[in]highpass=f=200[/out]"'},
+        },
+        {"type": "tool_result", "call_id": "c-9", "name": "shell_exec", "status": "completed"},
+        {
+            "type": "result",
+            "state": "completed",
+            "content": "готово",
+            "tool_results": [{"call_id": "c-9", "content": {"text": "[...] ] [/x] done"}}],
+        },
+    ]
+    app = B12App(FakeClient(events))
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        app.query_one("#prompt").value = "обробити"
+        await pilot.press("enter")
+        await pilot.pause(0.5)
+        assert app.turn is None
+        from rich.text import Text
+        from textual.widgets import Collapsible
+
+        for node in app.query(Collapsible):
+            Text.from_markup(node.title)  # raises if the title would crash rendering
+        assert app.is_running

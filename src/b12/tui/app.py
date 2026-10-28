@@ -166,7 +166,7 @@ class B12App(App):
         for item in items:
             op = item["operation_id"]
             await box.mount(
-                Static(f"{item.get('name', 'дія')}  {op[:8]}", classes="item"),
+                Static(escape(f"{item.get('name', 'дія')}  {op[:8]}"), classes="item"),
                 Horizontal(Button("ДОЗВОЛИТИ", id=f"ok-{op}"), Button("ВІДХИЛИТИ", id=f"no-{op}")),
             )
 
@@ -260,7 +260,7 @@ class B12App(App):
             elif kind == "tool_result":
                 node = self.turn.tools.get(event.get("call_id"))
                 if node is not None:
-                    node.title = f"$ {event.get('name')}  → {event.get('status')}"
+                    node.title = escape(f"$ {event.get('name')}  → {event.get('status')}")
             elif kind == "approval_pending":
                 self.waiting_turn = self.turn.turn_id
                 await self.add_state(f"ОЧІКУЄ ПІДТВЕРДЖЕННЯ: {event.get('name')}")
@@ -308,7 +308,7 @@ class B12App(App):
         summary = _summary(event.get("arguments") or {})
         node = Collapsible(
             Static(_pretty(event.get("arguments"))),
-            title=f"$ {event.get('name')}  {summary}".rstrip(),
+            title=escape(f"$ {event.get('name')}  {summary}".rstrip()),
             collapsed=True,
         )
         await chat.mount(node)
@@ -324,7 +324,7 @@ class B12App(App):
         await chat.mount(
             Collapsible(
                 Static(_pretty(outcome.get("content"))),
-                title=f"$ {message.get('tool_name')}  → {status}",
+                title=escape(f"$ {message.get('tool_name')}  → {status}"),
                 collapsed=True,
             )
         )
