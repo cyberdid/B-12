@@ -952,3 +952,27 @@ async def test_a_nearly_identical_report_is_treated_as_a_repeat(runtime_factory,
     after_second = state["requests"][4]  # the nudge that follows the second, near-identical reply
     last_user = [m["content"] for m in after_second["messages"] if m["role"] == "user"][-1]
     assert last_user.startswith(agent_mod._NUDGE_REDIRECT)
+
+
+async def test_long_persist_turn_keeps_the_window_within_a_fixed_budget(
+    runtime_factory, tmp_path, monkeypatch
+):
+    """Regression: the window grew linearly with rounds (fixed per-message cuts) and overflowed."""
+    import b12.agent as agent_mod
+
+    monkeypatch.setattr(agent_mod, "PERSIST_HISTORY_CHARS", 6000)
+    monkeypatch.setattr(agent_mod, "_LARGE_FILE_CHUNKS", 1000)
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    files = []
+    for i in range(30):
+        p = tmp_path / f"f{i}.cc"
+        p.write_text(f"// file {i}\n" + "int x = 1; " * 250)
+        files.append(str(p))
+    state["script"] = [{"tool_calls": [("file_read", {"path": p})]} for p in files]
+    state["script"] += [{"content": "Звіт. ГОТОВО"}]
+    await run_turn(runtime, who, "прочитай", persist=True)
+    last = state["requests"][-1]["messages"]
+    total = sum(len(m.get("content") or "") for m in last)
+    assert total < 6000 + 4000, total

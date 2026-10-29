@@ -108,6 +108,7 @@ _TOOL_NAMES = (
 # A call written as prose: tool(...), or tool{...} / the model's own token syntax.
 _PSEUDO_CALL = re.compile(rf"\b({_TOOL_NAMES})\s*\(|\b({_TOOL_NAMES})\{{|<\|\"\|>")
 _NATIVE_CALL = re.compile(rf"\b({_TOOL_NAMES})\{{|<\|\"\|>")
+PERSIST_HISTORY_CHARS = 6000  # characters of older tool results and replies the window keeps
 _LARGE_FILE_CHUNKS = 4
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
@@ -178,6 +179,22 @@ def _unlisted_dirs(state) -> list[str]:
     """Folders named in a listing and not yet looked into; their code is still unread."""
     dirs = state.get("dirs") or {}
     return [d for d, done in dirs.items() if not done and not _is_noise(os.path.basename(d))]
+
+
+def _fit_history(messages: list[dict], budget: int) -> None:
+    """Keep the newest messages whole within `budget` characters; shrink older tool results and
+    model replies to stubs. Prompts and nudges are instructions and are never shrunk."""
+    used = 0
+    for index in range(len(messages) - 1, -1, -1):
+        message = messages[index]
+        text = message.get("content") or ""
+        if index >= len(messages) - 2 or used + len(text) <= budget:
+            used += len(text)
+            continue
+        if message["role"] in ("tool", "assistant") and len(text) > 80:
+            limit = 80 if message["role"] == "tool" else 160
+            message["content"] = text[:limit] + " …[скорочено]"
+        used += len(message["content"] or "")
 
 
 def _same_report(text: str, previous: str | None) -> bool:
@@ -632,14 +649,8 @@ class Agent:
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]
                 ]
-                if persist:  # long reads: older outputs shrink so the window keeps moving
-                    tool_at = [i for i, m in enumerate(messages) if m["role"] == "tool"]
-                    for i in tool_at[:-PERSIST_KEEP]:
-                        messages[i]["content"] = messages[i]["content"][:200] + " …[скорочено]"
-                    model_at = [i for i, m in enumerate(messages) if m["role"] == "assistant"]
-                    for i in model_at[:-2]:
-                        if len(messages[i].get("content") or "") > 400:
-                            messages[i]["content"] = messages[i]["content"][:400] + " …[скорочено]"
+                if persist:  # long reads: the history stays inside a fixed budget
+                    _fit_history(messages, PERSIST_HISTORY_CHARS)
                 system = f"{self.system_prompt} Домашня тека власника: {Path.home()}."
                 if state.get("language"):
                     system += "\n" + state["language"]
