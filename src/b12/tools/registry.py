@@ -140,12 +140,10 @@ class ToolRegistry:
 
         check_nested_schema(parameters)
         _state_limits(parameters)
-        if risk == Risk.ARBITRARY and not {
-            "executable",
-            "argv",
-            "cwd",
-            "declared_effects",
-        }.issubset(parameters.get("required", [])):
+        required = set(parameters.get("required", []))
+        exact_program = {"executable", "argv", "cwd", "declared_effects"} <= required
+        command_line = {"command", "cwd", "declared_effects"} <= required
+        if risk == Risk.ARBITRARY and not (exact_program or command_line):
             raise ValueError("arbitrary execution requires reviewable exact arguments")
         schema = {
             "type": "function",

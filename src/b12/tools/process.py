@@ -12,6 +12,7 @@ import shlex
 import shutil
 import signal
 from pathlib import Path
+from types import SimpleNamespace
 
 from pydantic import Field, field_validator
 
@@ -34,6 +35,24 @@ def _die_with_parent():
 class ProcessListArgs(Args):
     limit: int = Field(default=50, ge=1, le=200)
     pid: int = Field(default=0, ge=0, description="0 lists all processes")
+
+
+class CommandArgs(Args):
+    command: str = Field(
+        min_length=1,
+        max_length=4096,
+        description=(
+            "One terminal line, exactly as typed in a shell: pipes, redirects, globs and "
+            "&& are allowed, e.g. grep -n 'def ' file.py | head -40"
+        ),
+    )
+    cwd: AbsolutePath = Field(description="Absolute working directory, e.g. /home/cyberdid")
+    declared_effects: list[str] = Field(
+        min_length=1,
+        max_length=16,
+        description="What the command does, in words: e.g. read-only search, writes a report file",
+    )
+    max_output_bytes: int = Field(default=4096, ge=1, le=4096)
 
 
 class ExecArgs(Args):
@@ -286,6 +305,18 @@ def register_sudo(registry, sudo_path: str | None = None):
     )
 
 
+async def run_command(args, guard):
+    """A full terminal line through /bin/bash -c, with the same bounds and cleanup as shell_exec."""
+    as_exec = SimpleNamespace(
+        executable="/bin/bash",
+        argv=["-c", args.command],
+        cwd=args.cwd,
+        declared_effects=args.declared_effects,
+        max_output_bytes=args.max_output_bytes,
+    )
+    return await shell_exec(as_exec, guard)
+
+
 def register(registry):
     registry.register(
         "system_info",
@@ -308,6 +339,15 @@ def register(registry):
         "argv=['-l', 'FILE'])",
         ExecArgs,
         shell_exec,
+        "process.execute",
+        risk=Risk.ARBITRARY,
+    )
+    registry.register(
+        "run_command",
+        "Run one terminal line as a shell would (pipes, redirects, globs allowed); "
+        "returns stdout, stderr and the exit code, bounded to 4 KB",
+        CommandArgs,
+        run_command,
         "process.execute",
         risk=Risk.ARBITRARY,
     )
