@@ -9,6 +9,7 @@ detached for the rest of the turn; effects already in progress are not abandoned
 """
 
 import asyncio
+import difflib
 import json
 import logging
 import os
@@ -177,6 +178,15 @@ def _unlisted_dirs(state) -> list[str]:
     """Folders named in a listing and not yet looked into; their code is still unread."""
     dirs = state.get("dirs") or {}
     return [d for d, done in dirs.items() if not done and not _is_noise(os.path.basename(d))]
+
+
+def _same_report(text: str, previous: str | None) -> bool:
+    """True when the model wrote the same report again, with a few words changed."""
+    if not previous:
+        return False
+    if text.strip() == previous.strip():
+        return True
+    return difflib.SequenceMatcher(None, text, previous, autojunk=False).ratio() >= 0.9
 
 
 def _continuable(state) -> dict:
@@ -667,7 +677,7 @@ class Agent:
                         )
                         continue
                     redirect = None
-                    if persist and text and text == state.get("last_text"):
+                    if persist and text and _same_report(text, state.get("last_text")):
                         # Same answer and no new action. Point at unfinished work first; then ask
                         # for a report from what was read; stop only when neither is possible.
                         pending = self._next_unfinished(state)

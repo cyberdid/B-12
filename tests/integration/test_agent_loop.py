@@ -926,3 +926,29 @@ async def test_unlisted_subfolder_is_covered_before_a_persist_turn_ends(runtime_
     reads = [r.name for r in result.tool_results]
     assert reads == ["file_list", "file_read", "file_list", "file_read"]
     assert body(result.content) == "Повний звіт. ГОТОВО"
+
+
+async def test_a_nearly_identical_report_is_treated_as_a_repeat(runtime_factory, tmp_path):
+    """Regression: the model rewrote the same report with a few words changed; only an exact
+    repeat was caught, so the loop ran on for minutes."""
+    import b12.agent as agent_mod
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "proj"
+    folder.mkdir()
+    (folder / "README.md").write_text("# proj")
+    (folder / "a.cc").write_text("int a() { return 1; }")
+    base = "Звіт: LTESniffer — це інструмент для прослуховування LTE. " * 3
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "README.md")})]},
+        {"content": base},
+        {"content": base.replace("інструмент", "засіб", 1)},
+        {"content": "Далі. ГОТОВО"},
+    ]
+    await run_turn(runtime, who, "аналіз", persist=True)
+    after_second = state["requests"][4]  # the nudge that follows the second, near-identical reply
+    last_user = [m["content"] for m in after_second["messages"] if m["role"] == "user"][-1]
+    assert last_user.startswith(agent_mod._NUDGE_REDIRECT)
