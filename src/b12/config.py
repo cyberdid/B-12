@@ -20,7 +20,7 @@ class Settings(BaseModel):
     tokenizer_dir: Path | None = None
     model_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 120
     num_ctx: Annotated[int, Field(gt=0)] = 4096
-    output_tokens: Annotated[int, Field(gt=0)] = 512
+    output_tokens: Annotated[int, Field(gt=0)] = 1024  # room for a full report
     # Sampling. Eval/determinism default is temperature 0; NVIDIA recommends 1.0 / top_p 0.95.
     temperature: Annotated[float, Field(ge=0, le=2, allow_inf_nan=False)] = 0.0
     top_p: Annotated[float, Field(gt=0, le=1, allow_inf_nan=False)] = 1.0

@@ -70,6 +70,11 @@ def assert_event_stream(events, result, *, terminal):
     assert events[-1].type == terminal
 
 
+def body(content):
+    """The reply without the journal footer the agent adds for persist turns with reads."""
+    return content.split("\n\nПрочитано за журналом")[0]
+
+
 def tool_messages(request):
     return [m for m in request["messages"] if m["role"] == "tool"]
 
@@ -471,7 +476,7 @@ async def test_persist_mode_continues_after_text_only_replies_until_marker(
         {"content": "Підсумок по трьох частинах. ГОТОВО"},
     ]
     result, _ = await run_turn(runtime, who, "Прочитай усе до кінця", persist=True)
-    assert result.state == "completed" and result.content.endswith("ГОТОВО")
+    assert result.state == "completed" and body(result.content).endswith("ГОТОВО")
     assert [r.name for r in result.tool_results] == ["file_read"] * 3
     sent = state["requests"][-1]["messages"]
     nudges = [m for m in sent if m["content"].startswith("[авто-продовження]")]
@@ -531,7 +536,7 @@ async def test_persist_blocks_early_finish_while_listed_files_are_unread(runtime
     result, _ = await run_turn(runtime, who, "Прочитай кожен .py", persist=True)
     reads = [r.name for r in result.tool_results]
     assert reads == ["file_list", "file_read", "file_read", "file_read"]
-    assert result.content == "Повний підсумок. ГОТОВО"
+    assert body(result.content) == "Повний підсумок. ГОТОВО"
     sent = state["requests"][3]["messages"]
     unread = [m for m in sent if m["content"].startswith("[авто-продовження] Ти ще не")]
     assert unread and "b.py" in unread[0]["content"] and "notes.md" not in unread[0]["content"]
@@ -565,7 +570,7 @@ async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
     result, _ = await run_turn(runtime, who, "Прочитай файл повністю", persist=True)
     reads = [r for r in result.tool_results if r.name == "file_read"]
     assert len(reads) == 2 and reads[1].content["offset"] > 0
-    assert (result.state, result.error_code, result.content) == ("completed", None, "Готово.")
+    assert (result.state, result.error_code, body(result.content)) == ("completed", None, "Готово.")
 
 
 def test_head_and_tail_survive_truncation_with_an_omission_marker():
@@ -624,7 +629,7 @@ async def test_stall_redirects_to_the_unfinished_file_instead_of_ending_the_turn
     ]
     result, _ = await run_turn(runtime, who, "Прочитай файл повністю", persist=True)
     assert (result.state, result.error_code) == ("completed", None)
-    assert result.content == "Фінал. ГОТОВО"
+    assert body(result.content) == "Фінал. ГОТОВО"
 
 
 async def test_a_stalled_turn_is_saved_with_its_status_marker(runtime_factory):
@@ -678,7 +683,7 @@ async def test_stalled_turn_with_reads_ends_with_a_report_without_tools(runtime_
     ]
     result, _ = await run_turn(runtime, who, "Проаналізуй файл", persist=True)
     assert (result.state, result.error_code) == ("completed", None)
-    assert result.content == "Звіт: прочитано частину."
+    assert body(result.content) == "Звіт: прочитано частину."
     assert state["requests"][-1]["tools"] == []
 
 
@@ -688,3 +693,20 @@ def test_file_read_chunk_is_larger_and_fits_its_budget():
     default = ReadArgs(path="/tmp/x").max_bytes
     assert default >= 2400
     assert ReadArgs.model_fields["max_bytes"].metadata[-1].le >= 2400
+
+
+async def test_persist_report_lists_what_was_actually_read(runtime_factory, tmp_path):
+    """Regression: the model listed files it never read; the list now comes from the journal."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    real = tmp_path / "real.py"
+    real.write_text("print('hi')\n")
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(real)})]},
+        {"content": "Звіт готовий. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Проаналізуй файл", persist=True)
+    assert result.content.startswith("Звіт готовий. ГОТОВО")
+    assert "real.py" in result.content and "за журналом" in result.content
+    assert "nvidia" not in result.content.lower()  # never a file the turn did not read
