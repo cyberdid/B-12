@@ -656,3 +656,35 @@ async def test_same_failing_program_is_refused_after_two_failures_in_any_mode(ru
     result, _ = await run_turn(runtime, who, "запусти")
     statuses = [(r.status, r.error_code) for r in result.tool_results]
     assert statuses[2] == ("denied", "repeated_failure"), statuses
+
+
+async def test_stalled_turn_with_reads_ends_with_a_report_without_tools(runtime_factory, tmp_path):
+    """Regression: a stalled analysis ended empty; now the model reports on what it read."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "big.txt"
+    big.write_text("x" * 1800)
+    first = {"tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600})]}
+    repeat = {"content": "Аналіз."}
+    state["script"] = [
+        first,
+        repeat,
+        repeat,
+        repeat,
+        repeat,
+        repeat,
+        {"content": "Звіт: прочитано частину."},
+    ]
+    result, _ = await run_turn(runtime, who, "Проаналізуй файл", persist=True)
+    assert (result.state, result.error_code) == ("completed", None)
+    assert result.content == "Звіт: прочитано частину."
+    assert state["requests"][-1]["tools"] == []
+
+
+def test_file_read_chunk_is_larger_and_fits_its_budget():
+    from b12.tools.filesystem import ReadArgs
+
+    default = ReadArgs(path="/tmp/x").max_bytes
+    assert default >= 2400
+    assert ReadArgs.model_fields["max_bytes"].metadata[-1].le >= 2400

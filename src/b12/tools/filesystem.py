@@ -389,8 +389,8 @@ class ListArgs(PathArgs):
 
 
 class ReadArgs(PathArgs):
-    # Small chunks: a chunk plus JSON escaping must fit one tool-result budget unclipped.
-    max_bytes: int = Field(default=1600, ge=1, le=1600)
+    # A chunk plus JSON escaping must fit the tool-result budget for file reads (see agent).
+    max_bytes: int = Field(default=2400, ge=1, le=2400)
     offset: int = Field(default=0, ge=0)
 
 

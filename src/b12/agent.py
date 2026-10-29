@@ -84,7 +84,16 @@ _NUDGE_REDIRECT = (
     "[авто-продовження] Ти повторюєш той самий звіт і не рухаєшся далі. "
     "Наступний незавершений пункт: "
 )
+_NUDGE_REPORT = (
+    "[авто] Зупини читання. Склади звіт зараз з того, що вже прочитано: що це за проєкт, "
+    "архітектура, як запустити, ризики. Прямо познач, які частини не прочитано. Без інструментів."
+)
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
+
+
+def _has_reads(state) -> bool:
+    """True when the turn already produced some completed tool results to report on."""
+    return any(r.get("status") == "completed" for r in state.get("results", []))
 
 
 def _drop_unanswered_calls(messages: list[dict]) -> None:
@@ -489,7 +498,7 @@ class Agent:
                 state["round"] += 1
                 persist = state.get("persist", False)
                 last = state["round"] >= (PERSIST_ROUNDS if persist else self.settings.max_rounds)
-                tools = [] if last else self.registry.schemas(context)
+                tools = [] if last or state.get("force_text") else self.registry.schemas(context)
                 history = self.history_messages(context.session_id, actor)
                 messages = [
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
@@ -518,15 +527,28 @@ class Agent:
                 state.setdefault("model_metrics", []).append(dict(reply.metrics))
                 if not reply.tool_calls:
                     text = (reply.content or "").strip()
+                    if state.get("finalized"):
+                        # The report was requested: whatever the model answers now is the end.
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "assistant", "content": reply.content}
+                        )
+                        if text:
+                            return await finish("completed", content=reply.content)
+                        return await finish("failed", code="stalled")
                     redirect = None
                     if persist and text and text == state.get("last_text"):
-                        # Same answer and no new action. Point at unfinished work first; end only
-                        # when there is none left or the redirects are used up.
+                        # Same answer and no new action. Point at unfinished work first; then ask
+                        # for a report from what was read; stop only when neither is possible.
                         pending = self._next_unfinished(state)
-                        if pending is None or state.get("redirects", 0) >= PERSIST_REDIRECTS:
+                        if pending is not None and state.get("redirects", 0) < PERSIST_REDIRECTS:
+                            state["redirects"] = state.get("redirects", 0) + 1
+                            redirect = _NUDGE_REDIRECT + pending
+                        elif _has_reads(state):
+                            state["finalized"] = True
+                            state["force_text"] = True
+                            redirect = _NUDGE_REPORT
+                        else:
                             return await finish("failed", code="stalled")
-                        state["redirects"] = state.get("redirects", 0) + 1
-                        redirect = _NUDGE_REDIRECT + pending
                     state["last_text"] = text
                     state["turn_messages"].append(
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
@@ -566,6 +588,12 @@ class Agent:
                     )
                     continue
                 if last:
+                    if persist and not state.get("finalized") and _has_reads(state):
+                        state["finalized"] = True
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "user", "content": _NUDGE_REPORT}
+                        )
+                        continue
                     return await finish("failed", code="max_rounds")
                 state["turn_messages"].append(
                     {
