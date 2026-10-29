@@ -639,3 +639,20 @@ async def test_a_stalled_turn_is_saved_with_its_status_marker(runtime_factory):
     history = runtime.agent.history_messages(who.session, actor)
     assert any("хід не завершено: stalled" in m["content"] for m in history)
     assert any(m["content"] == "Звіт." for m in history)
+
+
+async def test_same_failing_program_is_refused_after_two_failures_in_any_mode(runtime_factory):
+    """Regression: the model retried `ls -1` with different argv forever."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    failing = {"executable": "/bin/false", "argv": [], "cwd": "/tmp", "declared_effects": ["noop"]}
+    state["script"] = [
+        {"tool_calls": [("shell_exec", dict(failing))]},
+        {"tool_calls": [("shell_exec", dict(failing, argv=["x"]))]},
+        {"tool_calls": [("shell_exec", dict(failing, argv=["y"]))]},
+        {"content": "Не вийшло."},
+    ]
+    result, _ = await run_turn(runtime, who, "запусти")
+    statuses = [(r.status, r.error_code) for r in result.tool_results]
+    assert statuses[2] == ("denied", "repeated_failure"), statuses

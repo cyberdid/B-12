@@ -8,6 +8,7 @@ import asyncio
 import ctypes
 import os
 import platform
+import shlex
 import shutil
 import signal
 from pathlib import Path
@@ -36,9 +37,14 @@ class ProcessListArgs(Args):
 
 
 class ExecArgs(Args):
-    executable: AbsolutePath = Field(description="Absolute program path, e.g. /usr/bin/ls")
+    executable: AbsolutePath = Field(
+        description="Full path to the program, for example /usr/bin/wc"
+    )
     argv: list[str] = Field(
-        max_length=128, description="Arguments after the program, without the program itself"
+        max_length=128,
+        description=(
+            "Only the arguments, without the program name: for wc -l FILE use ['-l', 'FILE']"
+        ),
     )
     cwd: AbsolutePath = Field(description="Absolute working directory")
     declared_effects: list[str] = Field(
@@ -143,12 +149,30 @@ async def _terminate(proc, drains):
     return confirmed
 
 
+SHELLS = {"sh", "bash", "zsh", "dash"}
+
+
+def normalize_argv(executable: str, argv: list[str]) -> list[str]:
+    """Models repeat the program name in argv or pass a command line to a shell.
+
+    `argv` is only the arguments: a leading copy of the program name is dropped, and a
+    shell given plain words gets them as one `-c` command line.
+    """
+    name = os.path.basename(executable)
+    if argv and argv[0] == name:
+        argv = argv[1:]
+    if name in SHELLS and argv and argv[0] != "-c":
+        argv = ["-c", " ".join(shlex.quote(word) for word in argv)]
+    return argv
+
+
 async def shell_exec(args, guard):
     proc = None
     spawn = None
     drains = []
     outputs = [bytearray(), bytearray()]
     cut = [False, False]
+    argv = normalize_argv(args.executable, args.argv)
 
     async def drain(stream, index):
         while chunk := await stream.read(8192):
@@ -182,7 +206,7 @@ async def shell_exec(args, guard):
         spawn = asyncio.create_task(
             asyncio.create_subprocess_exec(
                 args.executable,
-                *args.argv,
+                *argv,
                 cwd=args.cwd,
                 stdin=asyncio.subprocess.DEVNULL,
                 stdout=asyncio.subprocess.PIPE,
@@ -279,7 +303,9 @@ def register(registry):
     )
     registry.register(
         "shell_exec",
-        "Execute exact argv with bounded output and process-group cleanup",
+        "Run a program: executable is its full path (e.g. /usr/bin/wc); argv lists only "
+        "its arguments, without the program name (wc -l FILE is executable=/usr/bin/wc, "
+        "argv=['-l', 'FILE'])",
         ExecArgs,
         shell_exec,
         "process.execute",

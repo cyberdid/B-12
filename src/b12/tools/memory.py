@@ -212,21 +212,22 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
 
     registry.register(
         "memory_search",
-        "Search exact-actor canonical memory with bounded evidence",
+        "Find facts in memory by a word or phrase. Argument: query (what to search for).",
         SearchArgs,
         memory_search,
         "memory.read",
     )
     registry.register(
         "memory_store",
-        "Store memory using trusted turn deletion revision and provenance",
+        "Remember a fact about the owner. Arguments: text (the fact, required); "
+        "kind (a short type such as fact or user_preference).",
         StoreArgs,
         memory_store,
         "memory.write",
     )
     registry.register(
         "memory_forget",
-        "Request global purge through registered coordinator",
+        "Forget one memory record permanently. Argument: memory_id (the record id, a UUID).",
         ForgetArgs,
         memory_forget,
         "memory.forget",
