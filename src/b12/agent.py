@@ -74,6 +74,7 @@ SYSTEM_PROMPT = (
 # "Не зупинятися" mode (owner opt-in per turn): larger budgets, automatic continuation
 # after a text-only reply until the model writes the finish marker, bounded nudges.
 PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 150, 300, 120, 1
+PERSIST_REPORT_ROUNDS = 6  # the last rounds are reserved for the report, with tools off
 PERSIST_GENERIC = 3  # marker-less nudges; coverage nudges (unread files) use the full budget
 PERSIST_REDIRECTS = 3  # repeated answers redirected to unfinished files before the turn stops
 PERSIST_MARKER = "ГОТОВО"
@@ -99,7 +100,7 @@ _NUDGE_PSEUDO_CALL = (
 _PSEUDO_CALL = re.compile(
     r"\b(memory_store|memory_forget|memory_search|run_command|shell_exec|file_read|file_list|file_write)\s*\("
 )
-_LARGE_FILE_CHUNKS = 6
+_LARGE_FILE_CHUNKS = 4
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
 
@@ -119,6 +120,17 @@ def _journal_footer(state) -> str:
     if partial:
         line += " Не дочитано до кінця: " + ", ".join(shown(p) for p in partial) + "."
     return line
+
+
+def _continuable(state) -> dict:
+    """Partial reads that may still continue: not closed, and under the per-file chunk limit."""
+    closed = state.get("closed") or []
+    chunks = state.get("chunks") or {}
+    return {
+        path: offset
+        for path, offset in (state.get("partial") or {}).items()
+        if path not in closed and chunks.get(path, 0) < _LARGE_FILE_CHUNKS
+    }
 
 
 def _has_reads(state) -> bool:
@@ -533,6 +545,20 @@ class Agent:
                 state["round"] += 1
                 persist = state.get("persist", False)
                 last = state["round"] >= (PERSIST_ROUNDS if persist else self.settings.max_rounds)
+                if (
+                    persist
+                    and not last
+                    and not state.get("finalized")
+                    and state["round"] >= PERSIST_ROUNDS - PERSIST_REPORT_ROUNDS
+                    and _has_reads(state)
+                ):
+                    # Reading goes on until the reserve starts; then the report is written from
+                    # what was read, instead of the budget ending mid-reading.
+                    state["finalized"] = True
+                    state["force_text"] = True
+                    state["turn_messages"].append(
+                        {"id": str(uuid4()), "role": "user", "content": _NUDGE_REPORT}
+                    )
                 tools = [] if last or state.get("force_text") else self.registry.schemas(context)
                 history = self.history_messages(context.session_id, actor)
                 messages = [
@@ -608,7 +634,7 @@ class Agent:
                         and state["nudges"] < PERSIST_NUDGES
                     ):
                         unread = self._unread_listed(state)
-                        partial = state.get("partial") or {}
+                        partial = _continuable(state)
                         if partial:  # a file read only part of the way: continue it exactly
                             path, offset = next(iter(partial.items()))
                             state["nudges"] += 1
@@ -626,6 +652,14 @@ class Agent:
                             state["nudges"] += 1
                             state["generic"] = state.get("generic", 0) + 1
                             nudge = _NUDGE_PERSIST
+                    if (
+                        nudge is None
+                        and persist
+                        and last
+                        and PERSIST_MARKER not in reply.content.upper()
+                    ):
+                        # The budget ended on a progress note: say so, do not call it complete.
+                        return await finish("failed", content=reply.content, code="max_rounds")
                     if nudge is None:
                         return await finish("completed", content=reply.content)
                     state["turn_messages"].append(
@@ -693,13 +727,9 @@ class Agent:
     @staticmethod
     def _next_unfinished(state) -> str | None:
         """Describe the next unfinished file (partial read first), preferring a different file."""
-        closed = state.get("closed") or set()
-        partial = state.get("partial") or {}
-        options = [
-            (path, offset)
-            for path, offset in partial.items()
-            if offset is not None and path not in closed
-        ]
+        closed = state.get("closed") or []
+        partial = _continuable(state)
+        options = [(path, offset) for path, offset in partial.items() if offset is not None]
         options += [(path, 0) for path in Agent._unread_listed(state) if path not in closed]
         if not options:
             return None

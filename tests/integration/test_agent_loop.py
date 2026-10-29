@@ -761,7 +761,7 @@ async def test_a_large_file_is_not_read_chunk_by_chunk_forever(runtime_factory, 
     result, _ = await run_turn(runtime, who, "прочитай", persist=True)
     codes = [r.error_code for r in result.tool_results]
     assert codes.count("use_search") >= 1
-    assert codes[:6] == [None] * 6
+    assert codes[:4] == [None] * 4
 
 
 async def test_a_closed_file_is_not_sent_back_to_file_read(runtime_factory, tmp_path):
@@ -782,3 +782,77 @@ async def test_a_closed_file_is_not_sent_back_to_file_read(runtime_factory, tmp_
     await run_turn(runtime, who, "прочитай", persist=True)
     nudges = [m["content"] for r in state["requests"] for m in r["messages"] if m["role"] == "user"]
     assert not any(f"file_read з path={big}" in n or f"path={big}" in n for n in nudges)
+
+
+def _small_files(tmp_path, count):
+    paths = []
+    for i in range(count):
+        p = tmp_path / f"part{i}.cc"
+        p.write_text(f"int f{i}() {{ return {i}; }}\n")
+        paths.append(str(p))
+    return paths
+
+
+async def test_report_is_requested_before_the_round_budget_ends(
+    runtime_factory, tmp_path, monkeypatch
+):
+    """Regression: the round budget ran out while the model was still reading files."""
+    import b12.agent as agent_mod
+
+    monkeypatch.setattr(agent_mod, "PERSIST_ROUNDS", 8)
+    monkeypatch.setattr(agent_mod, "PERSIST_REPORT_ROUNDS", 3)
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    paths = _small_files(tmp_path, 8)
+    state["script"] = [{"tool_calls": [("file_read", {"path": p})]} for p in paths[:4]]
+    state["script"] += [{"content": "Звіт з прочитаного. ГОТОВО"}]
+    result, _ = await run_turn(runtime, who, "аналіз", persist=True)
+    assert result.state == "completed"
+    report_round = state["requests"][4]
+    assert report_round["tools"] == []
+    last_user = [m["content"] for m in report_round["messages"] if m["role"] == "user"][-1]
+    assert "звіт" in last_user.lower()
+
+
+async def test_round_budget_end_without_a_report_is_failed_not_completed(
+    runtime_factory, tmp_path, monkeypatch
+):
+    """Regression: the last round ended on a progress note and was recorded as completed."""
+    import b12.agent as agent_mod
+
+    monkeypatch.setattr(agent_mod, "PERSIST_ROUNDS", 3)
+    monkeypatch.setattr(agent_mod, "PERSIST_REPORT_ROUNDS", 0)  # the budget ends on this turn
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    (path,) = _small_files(tmp_path, 1)
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": path})]},
+        {"content": "Я прочитав файл, наступний — ще один."},
+        {"content": "Далі ще читаю і не встигаю звіт."},
+    ]
+    result, _ = await run_turn(runtime, who, "аналіз", persist=True)
+    assert result.state == "failed"
+    assert result.error_code == "max_rounds"
+    assert "не встигаю звіт" in result.content
+
+
+async def test_continue_nudge_skips_a_file_at_the_chunk_limit(
+    runtime_factory, tmp_path, monkeypatch
+):
+    """Regression: after the chunk limit, the continue-nudge still pointed at the file."""
+    import b12.agent as agent_mod
+
+    monkeypatch.setattr(agent_mod, "_LARGE_FILE_CHUNKS", 3)
+    state, factory = runtime_factory
+    runtime = factory()
+    big = tmp_path / "big.md"
+    big.write_text("# readme\n" + "line of text\n" * 3000)
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(3)
+    ]
+    state["script"] += [{"content": "Прочитано частково."}, {"content": "Звіт. ГОТОВО"}]
+    await run_turn(runtime, owner(runtime), "прочитай", persist=True)
+    nudges = [m["content"] for r in state["requests"] for m in r["messages"] if m["role"] == "user"]
+    assert not any(f"path={big}" in n for n in nudges if n.startswith("[авто"))
