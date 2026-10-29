@@ -710,3 +710,22 @@ async def test_persist_report_lists_what_was_actually_read(runtime_factory, tmp_
     assert result.content.startswith("Звіт готовий. ГОТОВО")
     assert "real.py" in result.content and "за журналом" in result.content
     assert "nvidia" not in result.content.lower()  # never a file the turn did not read
+
+
+async def test_journal_footer_keeps_same_named_files_distinct(runtime_factory, tmp_path):
+    """Regression: two CMakeLists.txt files were shown as one name repeated."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    (tmp_path / "a").mkdir()
+    (tmp_path / "b").mkdir()
+    (tmp_path / "a" / "CMakeLists.txt").write_text("a")
+    (tmp_path / "b" / "CMakeLists.txt").write_text("b")
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(tmp_path / "a" / "CMakeLists.txt")})]},
+        {"tool_calls": [("file_read", {"path": str(tmp_path / "b" / "CMakeLists.txt")})]},
+        {"content": "Готово. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Прочитай", persist=True)
+    footer = result.content.split("Прочитано за журналом інструментів: ")[1]
+    assert "a/CMakeLists.txt" in footer and "b/CMakeLists.txt" in footer

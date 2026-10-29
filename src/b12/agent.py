@@ -98,11 +98,16 @@ def _journal_footer(state) -> str:
     read = sorted(path for path, done in (state.get("listed") or {}).items() if done)
     if not read:
         return ""
-    names = ", ".join(path.rsplit("/", 1)[-1] for path in read)
+    base = os.path.commonpath(read) if len(read) > 1 else os.path.dirname(read[0])
+
+    def shown(path: str) -> str:
+        return os.path.relpath(path, base) if base else path
+
+    names = ", ".join(shown(path) for path in read)
     line = f"Прочитано за журналом інструментів: {names}."
     partial = sorted((state.get("partial") or {}).keys())
     if partial:
-        line += " Не дочитано до кінця: " + ", ".join(p.rsplit("/", 1)[-1] for p in partial) + "."
+        line += " Не дочитано до кінця: " + ", ".join(shown(p) for p in partial) + "."
     return line
 
 
