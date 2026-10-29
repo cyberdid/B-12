@@ -903,3 +903,26 @@ async def test_repeated_native_call_text_ends_as_failed(runtime_factory):
     result, _ = await run_turn(runtime, who, "аналіз")
     assert result.state == "failed"
     assert result.error_code == "pseudo_call"
+
+
+async def test_unlisted_subfolder_is_covered_before_a_persist_turn_ends(runtime_factory, tmp_path):
+    """Regression: a project's src/ was never listed, so its code never counted as unread."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "proj"
+    (folder / "src").mkdir(parents=True)
+    (folder / "README.md").write_text("# proj")
+    (folder / "src" / "main.cc").write_text("int main() {}")
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "README.md")})]},
+        {"content": "Прочитано. ГОТОВО"},  # premature: src/ was never looked into
+        {"tool_calls": [("file_list", {"path": str(folder / "src")})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "src" / "main.cc")})]},
+        {"content": "Повний звіт. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "аналіз", persist=True)
+    reads = [r.name for r in result.tool_results]
+    assert reads == ["file_list", "file_read", "file_list", "file_read"]
+    assert body(result.content) == "Повний звіт. ГОТОВО"

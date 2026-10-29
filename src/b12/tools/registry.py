@@ -166,7 +166,12 @@ class ToolRegistry:
 
     def schemas(self, context: ExecutionContext) -> list[dict]:
         result = []
+        # run_command takes a whole terminal line; offering shell_exec beside it made the model
+        # send one tool's fields to the other. shell_exec stays registered for direct use.
+        hidden = {"shell_exec"} if "run_command" in self._tools else set()
         for tool in self._tools.values():
+            if tool.schema["function"]["name"] in hidden:
+                continue
             try:
                 self.control.check(context, tool.capability)
             except ControlError:

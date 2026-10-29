@@ -84,6 +84,10 @@ _NUDGE_PERSIST = (
     "наступний крок інструментами. Лише коли все опрацьовано, напиши підсумок і слово "
     f"{PERSIST_MARKER}."
 )
+_NUDGE_DIRS = (
+    "[авто-продовження] Ти не переглянув підкаталоги проєкту. Переглянь їх через file_list і "
+    "прочитай їхній код, перш ніж писати підсумок: "
+)
 _NUDGE_UNREAD = "[авто-продовження] Ти ще не прочитав файли з переліку, яких той самий тип: "
 _NUDGE_REDIRECT = (
     "[авто-продовження] Ти повторюєш той самий звіт і не рухаєшся далі. "
@@ -167,6 +171,12 @@ def _is_noise(name: str) -> bool:
         or lowered.startswith("license")
         or lowered.endswith((".lock", ".pyc", ".log"))
     )
+
+
+def _unlisted_dirs(state) -> list[str]:
+    """Folders named in a listing and not yet looked into; their code is still unread."""
+    dirs = state.get("dirs") or {}
+    return [d for d, done in dirs.items() if not done and not _is_noise(os.path.basename(d))]
 
 
 def _continuable(state) -> dict:
@@ -695,6 +705,11 @@ class Agent:
                         elif unread:  # the marker is the model's word; coverage is the system's
                             state["nudges"] += 1
                             nudge = _NUDGE_UNREAD + "; ".join(unread[:8])
+                        elif unlisted := _unlisted_dirs(state):
+                            state["nudges"] += 1
+                            nudge = _NUDGE_DIRS + "; ".join(
+                                f"file_list з path={d}" for d in unlisted[:8]
+                            )
                         elif (
                             PERSIST_MARKER not in reply.content.upper()
                             and state.get("generic", 0) < PERSIST_GENERIC
@@ -762,8 +777,12 @@ class Agent:
         listed = state.setdefault("listed", {})
         path = str(call.arguments.get("path", "")).rstrip("/")
         if call.name == "file_list" and isinstance(result.content, dict):
+            dirs = state.setdefault("dirs", {})
+            dirs[path] = True  # this folder has been looked into
             for entry in result.content.get("entries", []):
-                if isinstance(entry, str) and not entry.endswith(("/", "@")):
+                if isinstance(entry, str) and entry.endswith("/"):
+                    dirs.setdefault(f"{path}/{entry.rstrip('/')}", False)
+                elif isinstance(entry, str) and not entry.endswith("@"):
                     listed.setdefault(f"{path}/{entry}", False)
         elif call.name == "file_read" and path:
             listed[path] = True
@@ -782,7 +801,8 @@ class Agent:
         options = [(path, offset) for path, offset in partial.items() if offset is not None]
         options += [(path, 0) for path in Agent._unread_listed(state) if path not in closed]
         if not options:
-            return None
+            folders = _unlisted_dirs(state)
+            return f"file_list з path={folders[0]}" if folders else None
         others = [option for option in options if option[0] != state.get("last_read")]
         path, offset = (others or options)[0]
         if offset:

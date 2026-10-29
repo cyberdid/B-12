@@ -88,3 +88,11 @@ async def test_wrong_fields_for_run_command_name_the_allowed_fields(host_factory
     assert result.status == "denied"
     allowed = result.content["allowed_fields"]
     assert "command" in allowed and "executable" not in allowed
+
+
+def test_shell_exec_is_not_offered_to_the_model_when_run_command_is(host_factory):
+    """Regression: the model kept sending shell_exec's executable/argv to run_command."""
+    rig = host_factory()
+    names = {s["function"]["name"] for s in rig.registry.schemas(rig.context)}
+    assert "run_command" in names
+    assert "shell_exec" not in names
