@@ -186,3 +186,17 @@ def test_tui_reports_an_unreachable_server_without_a_traceback(monkeypatch, tmp_
     assert cli.main(["tui", "--url", "http://127.0.0.1:9"]) == 1
     out = capsys.readouterr().out
     assert "server_unavailable" in out and "Traceback" not in out
+
+
+async def test_switch_labels_show_their_state_in_words():
+    """Regression: both checkboxes drew the same glyph, so the owner could not see which was on."""
+    from textual.widgets import Checkbox
+
+    app = B12App(FakeClient(STREAM))
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        persist = app.query_one("#persist", Checkbox)
+        assert "ВИМК" in str(persist.label)
+        persist.value = True
+        await pilot.pause()
+        assert "ВКЛ" in str(persist.label)

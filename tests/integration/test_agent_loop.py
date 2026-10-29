@@ -176,7 +176,8 @@ async def test_round_limit_withholds_tools_and_fails_honestly(runtime_factory, t
     result, events = await run_turn(runtime, who, "цикл")
     assert state["requests"][0]["tools"] and state["requests"][1]["tools"] == []
     assert result.state == "failed" and result.error_code == "max_rounds"
-    assert not result.persisted
+    # An unfinished turn is kept with a status marker, so its work survives a reload.
+    assert result.persisted
     assert_event_stream(events, result, terminal="turn_failed")
 
 
@@ -601,3 +602,40 @@ async def test_persist_stops_when_the_model_repeats_the_same_answer(runtime_fact
     state["script"] = [{"content": "Я опрацював файл."}, {"content": "Я опрацював файл."}]
     result, _ = await run_turn(runtime, who, "Аналізуй", persist=True)
     assert result.state == "failed" and result.error_code == "stalled"
+
+
+async def test_stall_redirects_to_the_unfinished_file_instead_of_ending_the_turn(
+    runtime_factory, tmp_path
+):
+    """Regression: a repeated report ended the turn while the file was still half-read."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "big.txt"
+    big.write_text("x" * 1800)
+    first = {"tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600})]}
+    rest = {"tool_calls": [("file_read", {"path": str(big), "max_bytes": 1600, "offset": 1600})]}
+    state["script"] = [
+        first,
+        {"content": "Звіт."},
+        {"content": "Звіт."},
+        rest,
+        {"content": "Фінал. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Прочитай файл повністю", persist=True)
+    assert (result.state, result.error_code) == ("completed", None)
+    assert result.content == "Фінал. ГОТОВО"
+
+
+async def test_a_stalled_turn_is_saved_with_its_status_marker(runtime_factory):
+    """Regression: work from a turn that did not finish was lost on reload."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "Звіт."}, {"content": "Звіт."}]
+    result, _ = await run_turn(runtime, who, "Аналізуй", persist=True)
+    assert result.state == "failed" and result.error_code == "stalled"
+    actor = runtime.control.resolve_actor(who.actor.id)
+    history = runtime.agent.history_messages(who.session, actor)
+    assert any("хід не завершено: stalled" in m["content"] for m in history)
+    assert any(m["content"] == "Звіт." for m in history)

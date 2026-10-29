@@ -13,6 +13,7 @@ import json
 import logging
 import os
 import re
+import sqlite3
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping
@@ -65,6 +66,7 @@ SYSTEM_PROMPT = (
 # after a text-only reply until the model writes the finish marker, bounded nudges.
 PERSIST_ROUNDS, PERSIST_CALLS, PERSIST_NUDGES, PERSIST_KEEP = 150, 300, 120, 1
 PERSIST_GENERIC = 3  # marker-less nudges; coverage nudges (unread files) use the full budget
+PERSIST_REDIRECTS = 3  # repeated answers redirected to unfinished files before the turn stops
 PERSIST_MARKER = "ГОТОВО"
 _NUDGE_PERSIST = (
     "[авто-продовження] Не зупиняйся й не питай дозволу. Звір, чи опрацьовано КОЖЕН файл чи "
@@ -73,7 +75,30 @@ _NUDGE_PERSIST = (
     f"{PERSIST_MARKER}."
 )
 _NUDGE_UNREAD = "[авто-продовження] Ти ще не прочитав файли з переліку, яких той самий тип: "
+_NUDGE_REDIRECT = (
+    "[авто-продовження] Ти повторюєш той самий звіт і не рухаєшся далі. "
+    "Наступний незавершений пункт: "
+)
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
+
+
+def _drop_unanswered_calls(messages: list[dict]) -> None:
+    """Remove a trailing assistant tool-call message whose results never came back.
+
+    A saved history must not end with a call that has no result: the next turn would
+    replay an unanswered call to the model.
+    """
+    for index in range(len(messages) - 1, -1, -1):
+        message = messages[index]
+        if message.get("role") == "assistant" and message.get("tool_calls"):
+            answered = {
+                m.get("tool_call_id") for m in messages[index + 1 :] if m.get("role") == "tool"
+            }
+            if any(call["id"] not in answered for call in message["tool_calls"]):
+                del messages[index:]
+            return
+        if message.get("role") != "tool":
+            return
 
 
 def _call_key(call) -> str:
@@ -392,8 +417,26 @@ class Agent:
             persisted = False
             if status == "completed":
                 persisted = self._commit(context, state, active)
-            elif status == "cancelled":
-                self.control.cancel_turn(context.turn_id)
+            elif status != "awaiting_approval":
+                # Work done before an unfinished end (stall, error, cancel) is kept, marked as such.
+                if len(state["turn_messages"]) > 1:
+                    _drop_unanswered_calls(state["turn_messages"])
+                    state["turn_messages"].append(
+                        {
+                            "id": str(uuid4()),
+                            "role": "user",
+                            "content": f"[хід не завершено: {code or status}] "
+                            "Прочитане і відповіді вище збережено; можна продовжити з цього місця.",
+                        }
+                    )
+                    try:
+                        persisted = self._commit(context, state, active)
+                    except sqlite3.IntegrityError:
+                        # The turn's evidence is already recorded (e.g. an earlier commit): keep it
+                        # as is and do not fail the turn over bookkeeping.
+                        log.info("partial turn already recorded; skipped second commit")
+                if status == "cancelled":
+                    self.control.cancel_turn(context.turn_id)
             if status != "awaiting_approval":
                 self._drop_checkpoint(context, actor)
                 await emit(
@@ -470,17 +513,28 @@ class Agent:
                 state.setdefault("model_metrics", []).append(dict(reply.metrics))
                 if not reply.tool_calls:
                     text = (reply.content or "").strip()
+                    redirect = None
                     if persist and text and text == state.get("last_text"):
-                        # Same answer as last time and no new action: the loop is not progressing.
-                        return await finish("failed", code="stalled")
+                        # Same answer and no new action. Point at unfinished work first; end only
+                        # when there is none left or the redirects are used up.
+                        pending = self._next_unfinished(state)
+                        if pending is None or state.get("redirects", 0) >= PERSIST_REDIRECTS:
+                            return await finish("failed", code="stalled")
+                        state["redirects"] = state.get("redirects", 0) + 1
+                        redirect = _NUDGE_REDIRECT + pending
                     state["last_text"] = text
                     state["turn_messages"].append(
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
                     )
-                    nudge = None
+                    nudge = redirect
                     if not reply.content.strip() and not state.get("empty_nudged"):
                         state["empty_nudged"], nudge = True, _NUDGE_EMPTY
-                    elif persist and not last and state["nudges"] < PERSIST_NUDGES:
+                    elif (
+                        persist
+                        and not last
+                        and redirect is None
+                        and state["nudges"] < PERSIST_NUDGES
+                    ):
                         unread = self._unread_listed(state)
                         partial = state.get("partial") or {}
                         if partial:  # a file read only part of the way: continue it exactly
@@ -551,11 +605,26 @@ class Agent:
                     listed.setdefault(f"{path}/{entry}", False)
         elif call.name == "file_read" and path:
             listed[path] = True
+            state["last_read"] = path
             partial = state.setdefault("partial", {})
             if result.truncated and isinstance(result.content, dict):
                 partial[path] = result.content.get("next_offset")
             else:
                 partial.pop(path, None)
+
+    @staticmethod
+    def _next_unfinished(state) -> str | None:
+        """Describe the next unfinished file (partial read first), preferring a different file."""
+        partial = state.get("partial") or {}
+        options = [(path, offset) for path, offset in partial.items() if offset is not None]
+        options += [(path, 0) for path in Agent._unread_listed(state)]
+        if not options:
+            return None
+        others = [option for option in options if option[0] != state.get("last_read")]
+        path, offset = (others or options)[0]
+        if offset:
+            return f"file_read з path={path} і offset={offset}"
+        return f"file_read з path={path}"
 
     @staticmethod
     def _unread_listed(state) -> list[str]:

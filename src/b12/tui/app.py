@@ -100,6 +100,8 @@ class B12App(App):
     async def on_mount(self) -> None:
         me = await self.client.me()
         self.query_one("#consent", Checkbox).value = bool(me.get("consent"))
+        for box in self.query(Checkbox):
+            box.label = _switch_label(box.id, box.value)
         await self.load_sessions()
         await self.refresh_approvals()
         await self.refresh_memories()
@@ -204,6 +206,8 @@ class B12App(App):
 
     # ---- chat ---------------------------------------------------------------
     async def on_checkbox_changed(self, event: Checkbox.Changed) -> None:
+        # The glyph is the same for both states in this widget; the label says it in words.
+        event.checkbox.label = _switch_label(event.checkbox.id, event.value)
         if event.checkbox.id == "consent":
             await self.client.set_consent(event.value)
 
@@ -337,6 +341,14 @@ class B12App(App):
     async def add_state(self, text: str) -> None:
         chat = self.query_one("#chat", VerticalScroll)
         await chat.mount(Static(escape(text), classes="msg-state"))
+
+
+_SWITCH_NAMES = {"consent": "ПАМ'ЯТЬ", "persist": "НЕ ЗУПИНЯТИСЯ"}
+
+
+def _switch_label(switch_id: str | None, value: bool) -> str:
+    name = _SWITCH_NAMES.get(switch_id or "", switch_id or "")
+    return f"{name}: {'ВКЛ' if value else 'ВИМК'}"
 
 
 def _summary(arguments: dict) -> str:
