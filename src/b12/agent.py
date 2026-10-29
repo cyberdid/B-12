@@ -92,6 +92,14 @@ _NUDGE_REPORT = (
     "[авто] Зупини читання. Склади звіт зараз з того, що вже прочитано: що це за проєкт, "
     "архітектура, як запустити, ризики. Прямо познач, які частини не прочитано. Без інструментів."
 )
+_NUDGE_PSEUDO_CALL = (
+    "[авто] Ти написав виклик інструмента текстом, і він не виконався. "
+    "Виклич інструмент через механізм інструментів, а не текстом."
+)
+_PSEUDO_CALL = re.compile(
+    r"\b(memory_store|memory_forget|memory_search|run_command|shell_exec|file_read|file_list|file_write)\s*\("
+)
+_LARGE_FILE_CHUNKS = 6
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
 
@@ -562,6 +570,16 @@ class Agent:
                         if text:
                             return await finish("completed", content=reply.content)
                         return await finish("failed", code="stalled")
+                    if text and _PSEUDO_CALL.search(text) and state.get("pseudo_calls", 0) < 2:
+                        # A call written as prose did not run: say so and ask for the real call.
+                        state["pseudo_calls"] = state.get("pseudo_calls", 0) + 1
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "assistant", "content": reply.content}
+                        )
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "user", "content": _NUDGE_PSEUDO_CALL}
+                        )
+                        continue
                     redirect = None
                     if persist and text and text == state.get("last_text"):
                         # Same answer and no new action. Point at unfinished work first; then ask
@@ -727,6 +745,21 @@ class Agent:
                     },
                     error_code="repeated_failure",
                 )
+            elif call.name == "file_read" and (
+                state.setdefault("chunks", {}).get(call.arguments.get("path"), 0)
+                >= _LARGE_FILE_CHUNKS
+            ):
+                # A big file read chunk by chunk: search it (grep / sed -n) instead.
+                result = ToolResult(
+                    call_id=call.id,
+                    name=call.name,
+                    status="denied",
+                    content={
+                        "note": "Файл уже прочитано по частинах до ліміту. Знайди потрібне через "
+                        "run_command: grep -n шаблон файл або sed -n 'A,Bp' файл."
+                    },
+                    error_code="use_search",
+                )
             elif state.get("persist") and seen[key] > 2:
                 # Same call, same arguments, a third time: the model is looping on one step.
                 result = ToolResult(
@@ -766,6 +799,11 @@ class Agent:
                 state["calls"] += 1
             if result.status == "completed":
                 self._track_files(state, call, result)
+                if call.name == "file_read":
+                    chunks = state.setdefault("chunks", {})
+                    chunks[call.arguments.get("path")] = (
+                        chunks.get(call.arguments.get("path"), 0) + 1
+                    )
             if call.name == "shell_exec" and result.content.get("command_succeeded") is False:
                 fails = state.setdefault("exec_fails", {})
                 fails[call.arguments.get("executable")] = (

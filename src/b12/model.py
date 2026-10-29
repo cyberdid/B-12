@@ -289,11 +289,9 @@ class OllamaModel:
                             if metrics["prompt_eval_count"] != request.input_tokens:
                                 # Keep both numbers so the next occurrence can be diagnosed.
                                 logging.getLogger("b12.model").warning(
-                                    "context_mismatch provider=%s admitted=%s msgs=%s ctx=%s",
-                                    metrics["prompt_eval_count"],
-                                    request.input_tokens,
-                                    len(request.messages),
-                                    request.num_ctx,
+                                    f"context_mismatch provider={metrics['prompt_eval_count']} "
+                                    f"admitted={request.input_tokens} msgs={len(request.messages)} "
+                                    f"ctx={request.num_ctx}"
                                 )
                                 raise ModelError(
                                     "context_mismatch",

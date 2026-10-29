@@ -729,3 +729,36 @@ async def test_journal_footer_keeps_same_named_files_distinct(runtime_factory, t
     result, _ = await run_turn(runtime, who, "Прочитай", persist=True)
     footer = result.content.split("Прочитано за журналом інструментів: ")[1]
     assert "a/CMakeLists.txt" in footer and "b/CMakeLists.txt" in footer
+
+
+async def test_text_written_as_a_tool_call_is_not_a_final_answer(runtime_factory):
+    """Regression: `memory_store(text=...)` was printed as the reply and nothing was stored."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [
+        {"content": 'memory_store(text="бірюзовий", kind="fact")'},
+        {"tool_calls": [("memory_store", {"text": "бірюзовий", "kind": "fact"})]},
+        {"content": "Запам'ятав. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "запам'ятай колір")
+    assert result.state == "completed"
+    assert [r.name for r in result.tool_results] == ["memory_store"]
+    assert body(result.content) == "Запам'ятав. ГОТОВО"
+
+
+async def test_a_large_file_is_not_read_chunk_by_chunk_forever(runtime_factory, tmp_path):
+    """Regression: a 140 KB file was read in 2.4 KB chunks for 60 rounds."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "big.py"
+    big.write_text("def f():\n    pass\n" * 4000)
+    script = [
+        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(8)
+    ]
+    state["script"] = script + [{"content": "ГОТОВО"}]
+    result, _ = await run_turn(runtime, who, "прочитай", persist=True)
+    codes = [r.error_code for r in result.tool_results]
+    assert codes.count("use_search") >= 1
+    assert codes[:6] == [None] * 6

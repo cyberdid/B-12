@@ -43,7 +43,8 @@ class CommandArgs(Args):
         max_length=4096,
         description=(
             "One terminal line, exactly as typed in a shell: pipes, redirects, globs and "
-            "&& are allowed, e.g. grep -n 'def ' file.py | head -40"
+            "&& are allowed. File names are relative to cwd: with cwd=/x/app use "
+            "grep -n 'def ' file.py, not app/file.py"
         ),
     )
     cwd: AbsolutePath = Field(description="Absolute working directory, e.g. /home/cyberdid")
