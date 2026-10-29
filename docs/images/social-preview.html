@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: #05070d; }
+  svg { display: block; width: 1280px; height: 640px; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <radialGradient id="sky" cx="0.72" cy="0.45" r="0.85">
+      <stop offset="0" stop-color="#14203a"/>
+      <stop offset="0.55" stop-color="#0a1020"/>
+      <stop offset="1" stop-color="#05070d"/>
+    </radialGradient>
+    <radialGradient id="core" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="0.25" stop-color="#8ff7ff" stop-opacity="0.95"/>
+      <stop offset="0.6" stop-color="#2ea8ff" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#2ea8ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#3fb9ff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#3fb9ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3fb950"/>
+      <stop offset="1" stop-color="#58a6ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#sky)"/>
+
+  <!-- faint grid -->
+  <g stroke="#58a6ff" stroke-opacity="0.06" stroke-width="1">
+    <path d="M0 80H1280 M0 160H1280 M0 240H1280 M0 320H1280 M0 400H1280 M0 480H1280 M0 560H1280"/>
+    <path d="M80 0V640 M160 0V640 M240 0V640 M320 0V640 M400 0V640 M480 0V640 M560 0V640 M640 0V640 M720 0V640 M800 0V640 M880 0V640 M960 0V640 M1040 0V640 M1120 0V640 M1200 0V640"/>
+  </g>
+
+  <!-- companion: halo, orbits, core -->
+  <g transform="translate(930 322) scale(0.9)">
+    <circle r="330" fill="url(#halo)"/>
+    <circle r="250" fill="none" stroke="url(#ring)" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="4 14"/>
+    <ellipse rx="230" ry="88" fill="none" stroke="#58a6ff" stroke-opacity="0.35" stroke-width="2" transform="rotate(-18)"/>
+    <ellipse rx="210" ry="70" fill="none" stroke="#3fb950" stroke-opacity="0.35" stroke-width="2" transform="rotate(24)"/>
+    <ellipse rx="170" ry="170" fill="none" stroke="#58a6ff" stroke-opacity="0.12" stroke-width="1"/>
+
+    <circle r="150" fill="url(#core)" filter="url(#soft)"/>
+    <circle r="92" fill="url(#core)"/>
+    <circle r="36" fill="#ffffff" filter="url(#glow)"/>
+
+    <!-- eyes: two calm lines of light -->
+    <g filter="url(#glow)" fill="#0a1020" opacity="0.9">
+      <ellipse cx="-30" cy="-6" rx="9" ry="13"/>
+      <ellipse cx="30" cy="-6" rx="9" ry="13"/>
+    </g>
+
+    <!-- nodes on the orbits -->
+    <g filter="url(#glow)">
+      <circle cx="232" cy="-30" r="6" fill="#3fb950"/>
+      <circle cx="-196" cy="-120" r="5" fill="#58a6ff"/>
+      <circle cx="-120" cy="206" r="5" fill="#3fb950"/>
+      <circle cx="170" cy="150" r="4" fill="#58a6ff"/>
+      <circle cx="-240" cy="60" r="4" fill="#58a6ff"/>
+    </g>
+  </g>
+
+  <!-- title block -->
+  <g font-family="DejaVu Sans, system-ui, sans-serif">
+    <rect x="70" y="96" width="330" height="40" rx="20" fill="none" stroke="#3fb950" stroke-opacity="0.7" stroke-width="1.5"/>
+    <text x="235" y="122" fill="#3fb950" font-size="15" text-anchor="middle" letter-spacing="2">ЛОКАЛЬНО · БЕЗ ХМАРИ</text>
+
+    <text x="64" y="330" fill="#e6edf3" font-size="136" font-weight="700" letter-spacing="-2">B-12</text>
+    <text x="70" y="390" fill="#e6edf3" font-size="34">Локальний ШІ-компаньйон</text>
+    <text x="70" y="436" fill="#8b949e" font-size="20">Пам’ять зі згодою власника · інструменти з підтвердженням</text>
+    <text x="70" y="468" fill="#8b949e" font-size="20">Модель змінна · Ollama · RTX 4060 8 ГБ</text>
+  </g>
+
+  <rect x="0" y="0" width="1280" height="5" fill="#3fb950"/>
+</svg>
+</body>
+</html>
