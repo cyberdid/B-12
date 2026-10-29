@@ -762,3 +762,23 @@ async def test_a_large_file_is_not_read_chunk_by_chunk_forever(runtime_factory, 
     codes = [r.error_code for r in result.tool_results]
     assert codes.count("use_search") >= 1
     assert codes[:6] == [None] * 6
+
+
+async def test_a_closed_file_is_not_sent_back_to_file_read(runtime_factory, tmp_path):
+    """Regression: after the chunk limit, a continue-nudge sent the model back to that file."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "big.md"
+    big.write_text("# readme\n" + "line of text\n" * 3000)
+    script = [
+        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(7)
+    ]
+    script += [
+        {"content": "Не можу продовжити читання."},
+        {"content": "Звіт з прочитаного. ГОТОВО"},
+    ]
+    state["script"] = script
+    await run_turn(runtime, who, "прочитай", persist=True)
+    nudges = [m["content"] for r in state["requests"] for m in r["messages"] if m["role"] == "user"]
+    assert not any(f"file_read з path={big}" in n or f"path={big}" in n for n in nudges)

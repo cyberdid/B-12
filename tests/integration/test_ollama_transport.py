@@ -247,11 +247,21 @@ async def test_changes_invalidate_admission_before_chat(wire_server, change):
     assert state["requests"] == []
 
 
-async def test_prompt_count_mismatch_is_not_silently_accepted(wire_server):
+async def test_prompt_count_above_admission_is_refused(wire_server):
     state, settings, request = wire_server
-    state["chunks"] = [done(request.input_tokens - 1)]
+    state["chunks"] = [done(request.input_tokens + 1)]
     with pytest.raises(ModelError, match="context_mismatch"):
         await OllamaModel(settings).chat(request)
+
+
+async def test_prompt_count_below_admission_is_accepted_and_logged(wire_server, caplog):
+    """Admission is an upper bound: a smaller provider count fits, so the turn runs."""
+    state, settings, request = wire_server
+    state["chunks"] = [done(request.input_tokens - 1)]
+    with caplog.at_level("WARNING", logger="b12.model"):
+        reply = await OllamaModel(settings).chat(request)
+    assert reply.metrics["prompt_eval_count"] == request.input_tokens - 1
+    assert f"provider={request.input_tokens - 1} admitted={request.input_tokens}" in caplog.text
 
 
 async def test_unterminated_inline_thinking_does_not_leak(wire_server):

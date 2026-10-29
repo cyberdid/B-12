@@ -286,16 +286,20 @@ class OllamaModel:
                                 or item["done_reason"] not in {"stop", "length"}
                             ):
                                 raise ModelError("invalid_terminal", "missing terminal metadata")
-                            if metrics["prompt_eval_count"] != request.input_tokens:
+                            provider_prompt = metrics["prompt_eval_count"]
+                            if provider_prompt != request.input_tokens:
                                 # Keep both numbers so the next occurrence can be diagnosed.
                                 logging.getLogger("b12.model").warning(
-                                    f"context_mismatch provider={metrics['prompt_eval_count']} "
+                                    f"prompt count provider={provider_prompt} "
                                     f"admitted={request.input_tokens} msgs={len(request.messages)} "
                                     f"ctx={request.num_ctx}"
                                 )
+                            if provider_prompt > request.input_tokens:
+                                # The model saw more tokens than admission allowed for: the
+                                # admitted budget is not a bound on what ran. Refuse.
                                 raise ModelError(
                                     "context_mismatch",
-                                    "provider prompt count differs from admission",
+                                    "provider prompt count exceeds admission",
                                 )
                             if metrics["eval_count"] > request.output_reserve:
                                 raise ModelError("output_limit", "provider exceeded output reserve")

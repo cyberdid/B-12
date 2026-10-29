@@ -693,9 +693,14 @@ class Agent:
     @staticmethod
     def _next_unfinished(state) -> str | None:
         """Describe the next unfinished file (partial read first), preferring a different file."""
+        closed = state.get("closed") or set()
         partial = state.get("partial") or {}
-        options = [(path, offset) for path, offset in partial.items() if offset is not None]
-        options += [(path, 0) for path in Agent._unread_listed(state)]
+        options = [
+            (path, offset)
+            for path, offset in partial.items()
+            if offset is not None and path not in closed
+        ]
+        options += [(path, 0) for path in Agent._unread_listed(state) if path not in closed]
         if not options:
             return None
         others = [option for option in options if option[0] != state.get("last_read")]
@@ -709,7 +714,12 @@ class Agent:
         """Listed files with a suffix of an already-read file that were never read."""
         listed = state.get("listed", {})
         suffixes = {os.path.splitext(p)[1] for p, read in listed.items() if read}
-        return [p for p, read in listed.items() if not read and os.path.splitext(p)[1] in suffixes]
+        closed = state.get("closed") or set()
+        return [
+            p
+            for p, read in listed.items()
+            if not read and os.path.splitext(p)[1] in suffixes and p not in closed
+        ]
 
     async def _run_calls(self, context, actor, state, emit) -> bool:
         """Execute queued calls in order; True when waiting for an approval decision."""
@@ -749,7 +759,12 @@ class Agent:
                 state.setdefault("chunks", {}).get(call.arguments.get("path"), 0)
                 >= _LARGE_FILE_CHUNKS
             ):
-                # A big file read chunk by chunk: search it (grep / sed -n) instead.
+                # A big file read chunk by chunk: search it (grep / sed -n) instead. The file is
+                # closed for file_read, so no continue-nudge may send the model back to it.
+                closed = state.setdefault("closed", [])
+                if call.arguments.get("path") not in closed:
+                    closed.append(call.arguments.get("path"))
+                (state.get("partial") or {}).pop(call.arguments.get("path"), None)
                 result = ToolResult(
                     call_id=call.id,
                     name=call.name,
