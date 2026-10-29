@@ -15,6 +15,7 @@ is process/model scoped and is deliberately not claimed as a per-actor purge.
 import asyncio
 import inspect
 import json
+import logging
 import math
 import time
 from collections.abc import Awaitable, Callable
@@ -286,6 +287,14 @@ class OllamaModel:
                             ):
                                 raise ModelError("invalid_terminal", "missing terminal metadata")
                             if metrics["prompt_eval_count"] != request.input_tokens:
+                                # Keep both numbers so the next occurrence can be diagnosed.
+                                logging.getLogger("b12.model").warning(
+                                    "context_mismatch provider=%s admitted=%s msgs=%s ctx=%s",
+                                    metrics["prompt_eval_count"],
+                                    request.input_tokens,
+                                    len(request.messages),
+                                    request.num_ctx,
+                                )
                                 raise ModelError(
                                     "context_mismatch",
                                     "provider prompt count differs from admission",
