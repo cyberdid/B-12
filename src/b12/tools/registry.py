@@ -180,6 +180,7 @@ class ToolRegistry:
         start = time.monotonic()
         operation = None
         invalid_fields = None
+        allowed_fields = None
         unknown = False
         task = None
 
@@ -224,6 +225,8 @@ class ToolRegistry:
                     {"field": ".".join(map(str, error["loc"]))[:64], "error": error["type"]}
                     for error in exc.errors(include_url=False, include_input=False)[:8]
                 ]
+                # Name what is allowed, so the model can correct the call instead of giving up.
+                allowed_fields = sorted(tool.model.model_fields)
                 raise ControlError("invalid_arguments") from None
             except (ValueError, TypeError, OverflowError):
                 raise ControlError("invalid_arguments") from None
@@ -324,7 +327,7 @@ class ToolRegistry:
                 exc.code,
                 evidence.content
                 if evidence
-                else {"invalid_fields": invalid_fields}
+                else {"invalid_fields": invalid_fields, "allowed_fields": allowed_fields}
                 if invalid_fields
                 else None,
                 uncertain=unknown,

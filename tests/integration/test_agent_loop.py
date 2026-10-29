@@ -877,3 +877,29 @@ def test_unread_coverage_counts_code_files_after_a_readme(tmp_path):
     assert "/p/build.sh" in unread and "/p/src/main.cc" in unread
     assert "/p/LICENSE" not in unread and "/p/.gitignore" not in unread
     assert "/p/data.bin" not in unread
+
+
+async def test_model_native_call_syntax_in_text_is_not_a_final_answer(runtime_factory):
+    """Regression: a call in the model's token syntax, followed by the marker, was the report."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [
+        {"content": 'memory_store{kind:<|"|>fact<|"|>,text:<|"|>x<|"|>}\n\nГОТОВО'},
+        {"content": "Звіт з прочитаного. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "аналіз", persist=True)
+    assert result.state == "completed"
+    assert "<|" not in result.content
+    assert "memory_store{" not in result.content
+
+
+async def test_repeated_native_call_text_ends_as_failed(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    bad = {"content": 'memory_store{kind:<|"|>fact<|"|>,text:<|"|>x<|"|>}'}
+    state["script"] = [bad, bad, bad, bad]
+    result, _ = await run_turn(runtime, who, "аналіз")
+    assert result.state == "failed"
+    assert result.error_code == "pseudo_call"

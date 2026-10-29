@@ -97,9 +97,12 @@ _NUDGE_PSEUDO_CALL = (
     "[авто] Ти написав виклик інструмента текстом, і він не виконався. "
     "Виклич інструмент через механізм інструментів, а не текстом."
 )
-_PSEUDO_CALL = re.compile(
-    r"\b(memory_store|memory_forget|memory_search|run_command|shell_exec|file_read|file_list|file_write)\s*\("
+_TOOL_NAMES = (
+    "memory_store|memory_forget|memory_search|run_command|shell_exec|file_read|file_list|file_write"
 )
+# A call written as prose: tool(...), or tool{...} / the model's own token syntax.
+_PSEUDO_CALL = re.compile(rf"\b({_TOOL_NAMES})\s*\(|\b({_TOOL_NAMES})\{{|<\|\"\|>")
+_NATIVE_CALL = re.compile(rf"\b({_TOOL_NAMES})\{{|<\|\"\|>")
 _LARGE_FILE_CHUNKS = 4
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
@@ -640,6 +643,9 @@ class Agent:
                         if text:
                             return await finish("completed", content=reply.content)
                         return await finish("failed", code="stalled")
+                    if text and _NATIVE_CALL.search(text) and state.get("pseudo_calls", 0) >= 2:
+                        # The same call keeps coming back as text: this is not a report.
+                        return await finish("failed", content=reply.content, code="pseudo_call")
                     if text and _PSEUDO_CALL.search(text) and state.get("pseudo_calls", 0) < 2:
                         # A call written as prose did not run: say so and ask for the real call.
                         state["pseudo_calls"] = state.get("pseudo_calls", 0) + 1

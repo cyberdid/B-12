@@ -72,3 +72,19 @@ async def test_run_command_reports_exit_status_and_bounds_output(host_factory, t
 def test_prompt_tells_the_model_to_grep_large_files_not_read_them_in_chunks():
     text = SYSTEM_PROMPT.lower()
     assert "run_command" in text and "grep" in text
+
+
+async def test_wrong_fields_for_run_command_name_the_allowed_fields(host_factory, tmp_path):
+    """Regression: run_command got shell_exec fields and the error did not name the allowed ones."""
+    rig = host_factory()
+    result = await rig.invoke(
+        "run_command",
+        command="ls",
+        cwd=str(tmp_path),
+        declared_effects=["read-only listing"],
+        executable="ls",
+        argv=["-l"],
+    )
+    assert result.status == "denied"
+    allowed = result.content["allowed_fields"]
+    assert "command" in allowed and "executable" not in allowed
