@@ -122,6 +122,50 @@ def _journal_footer(state) -> str:
     return line
 
 
+# Code and configuration: always part of the work. Documents (.md, .txt, .rst) only count once a
+# document of the same type has been read, so a README does not pull in every note in the folder.
+_CODE_SUFFIXES = {
+    ".py",
+    ".c",
+    ".cc",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".cu",
+    ".cuh",
+    ".sh",
+    ".cmake",
+    ".json",
+    ".toml",
+    ".yaml",
+    ".yml",
+    ".ini",
+    ".cfg",
+    ".js",
+    ".ts",
+    ".go",
+    ".rs",
+    ".java",
+    ".scad",
+    ".kt",
+    ".rb",
+    ".php",
+    ".html",
+    ".css",
+    ".sql",
+}
+
+
+def _is_noise(name: str) -> bool:
+    """Files that are not the project's work: licences, dotfiles, lock and cache files."""
+    lowered = name.lower()
+    return (
+        lowered.startswith(".")
+        or lowered.startswith("license")
+        or lowered.endswith((".lock", ".pyc", ".log"))
+    )
+
+
 def _continuable(state) -> dict:
     """Partial reads that may still continue: not closed, and under the per-file chunk limit."""
     closed = state.get("closed") or []
@@ -741,15 +785,19 @@ class Agent:
 
     @staticmethod
     def _unread_listed(state) -> list[str]:
-        """Listed files with a suffix of an already-read file that were never read."""
+        """Listed files never read: the project code and config, and docs of a type already read."""
         listed = state.get("listed", {})
-        suffixes = {os.path.splitext(p)[1] for p, read in listed.items() if read}
-        closed = state.get("closed") or set()
-        return [
-            p
-            for p, read in listed.items()
-            if not read and os.path.splitext(p)[1] in suffixes and p not in closed
-        ]
+        closed = state.get("closed") or []
+        read_suffixes = {os.path.splitext(p)[1] for p, read in listed.items() if read}
+        out = []
+        for path, read in listed.items():
+            name = os.path.basename(path)
+            suffix = os.path.splitext(path)[1]
+            if read or path in closed or _is_noise(name):
+                continue
+            if suffix in _CODE_SUFFIXES or suffix in read_suffixes:
+                out.append(path)
+        return out
 
     async def _run_calls(self, context, actor, state, emit) -> bool:
         """Execute queued calls in order; True when waiting for an approval decision."""

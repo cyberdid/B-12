@@ -856,3 +856,24 @@ async def test_continue_nudge_skips_a_file_at_the_chunk_limit(
     await run_turn(runtime, owner(runtime), "прочитай", persist=True)
     nudges = [m["content"] for r in state["requests"] for m in r["messages"] if m["role"] == "user"]
     assert not any(f"path={big}" in n for n in nudges if n.startswith("[авто"))
+
+
+def test_unread_coverage_counts_code_files_after_a_readme(tmp_path):
+    """Regression: after README.md was read, the source files were not counted as unread."""
+    from b12.agent import Agent
+
+    state = {
+        "listed": {
+            "/p/README.md": True,
+            "/p/build.sh": False,
+            "/p/src/main.cc": False,
+            "/p/LICENSE": False,
+            "/p/.gitignore": False,
+            "/p/data.bin": False,
+        },
+        "closed": [],
+    }
+    unread = Agent._unread_listed(state)
+    assert "/p/build.sh" in unread and "/p/src/main.cc" in unread
+    assert "/p/LICENSE" not in unread and "/p/.gitignore" not in unread
+    assert "/p/data.bin" not in unread
