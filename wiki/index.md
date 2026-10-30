@@ -34,6 +34,7 @@ tags: [navigation]
 | [Пам’ять і приватність](topics/memory.md) | Provenance, згода, retrieval, видалення |
 | [archive-index для B-12](topics/archive-retrieval.md) | Повторне використання retrieval, окремий ledger, scope/cache/token boundaries |
 | [Ініціатива й рефлексія](topics/autonomy.md) | Цілі, доречність втручання, self-model |
+| [Порівняння з NVIDIA Reachy Jetson](topics/reachy-jetson-comparison.md) | Їхній голос і зір, наш контроль дій і пам'ять; ризики й розбіжності у джерелах |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Контроль і результати інструментів](topics/tool-control.md) | Server-owned grants, exact approval, lifecycle, bounded effects і unknown outcomes |
