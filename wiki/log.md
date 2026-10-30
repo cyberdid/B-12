@@ -384,3 +384,7 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-10-30] ingest | Порівняння з NVIDIA reachy-mini-jetson-assistant і туторіалом Jetson AI Lab
 
 **Джерела (WebFetch, сторінки переказані моделлю, не дослівно):** github.com/NVIDIA-AI-IOT/reachy-mini-jetson-assistant (Apache-2.0, 38 зірок, станом на читання); jetson-ai-lab.com/tutorials/reachy-mini-jetson-assistant/. Код не запускався, їхні цифри не перевірені. **Висновок:** у них голос і зір на Orin Nano 8GB, у нас їх немає (голос відкладено). У нас сильніший контроль дій, пам'ять зі згодою і тести. Їхній веб-UI без автентифікації з живим відео — негативний приклад. Розбіжності в їхніх джерелах: різні VLM (Gemma 4 E2B проти Cosmos-Reason2-2B), різні JetPack, «no internet» при сетапі з мережею. Наші ризики: `network_allow=["*"]` у конфігурації власника, відсутній LICENSE, немає голосових цифр. Деталі: [topics/reachy-jetson-comparison.md](topics/reachy-jetson-comparison.md).
+
+## [2026-10-30] lint | Перевірка коду NVIDIA reachy-mini-jetson-assistant
+
+Клон `2673202` прочитано без запуску. Підтверджено: веб-сервер на `0.0.0.0:8090` без автентифікації віддає живе відео камери кожному клієнту (`run_web_vision_chat.py:70–90`, `app/config.py:155`); `/ws` приймає керування PTT і гучністю від будь-кого; модель без інструментів; `save_wav` не викликається. Кількість тестів не перевірено (команда відхилена, обхід не робився). Деталі: [topics/reachy-jetson-comparison.md](topics/reachy-jetson-comparison.md).
