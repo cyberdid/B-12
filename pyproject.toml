@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "b12-runtime"
 version = "0.1.0"
 description = "Локальне ядро компаньйона B-12"
+license = { file = "LICENSE" }
 requires-python = ">=3.12,<3.14"
 dependencies = [
   "httpx>=0.28,<1",

@@ -43,6 +43,10 @@ def test_installer_renders_private_unit_without_starting(tmp_path, profile_setti
     assert f"EnvironmentFile={env_file}" in unit and "@" not in unit.split("[Install]")[0]
     assert oct(env_file.stat().st_mode & 0o777) == "0o600"
     assert "B12_PORT=8799" in env_file.read_text()
+    daily_svc = (tmp_path / "config/systemd/user/b12-daily-check.service").read_text()
+    daily_tmr = (tmp_path / "config/systemd/user/b12-daily-check.timer").read_text()
+    assert "scripts/daily_check.py check" in daily_svc and "@" not in daily_svc
+    assert "OnCalendar=daily" in daily_tmr
     assert calls.read_text().split() == ["--user", "daemon-reload"]  # never enable/start
     assert "init" in (tmp_path / "b12.calls").read_text()
     if shutil.which("systemd-analyze"):

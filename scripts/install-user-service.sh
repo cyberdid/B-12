@@ -26,6 +26,11 @@ fi
 chmod 600 "$env_file"
 sed -e "s|@B12_BIN@|$b12_bin|" -e "s|@ENV_FILE@|$env_file|" \
   "$repo/deploy/b12.service" > "$unit_dir/b12.service"
+python_bin="$(dirname "$b12_bin")/python"
+[[ -x "$python_bin" ]] || python_bin="$(command -v python3)"
+sed -e "s|@PYTHON_BIN@|$python_bin|" -e "s|@REPO_DIR@|$repo|" -e "s|@ENV_FILE@|$env_file|" \
+  "$repo/deploy/b12-daily-check.service" > "$unit_dir/b12-daily-check.service"
+cp "$repo/deploy/b12-daily-check.timer" "$unit_dir/b12-daily-check.timer"
 B12_MODEL_PROFILE="$profile" B12_TOKENIZER_DIR="$tokenizer" "$b12_bin" init >/dev/null
 systemctl --user daemon-reload
-echo "installed $unit_dir/b12.service (env $env_file); start: systemctl --user enable --now b12.service"
+echo "installed $unit_dir/b12.service and b12-daily-check.timer (env $env_file); start: systemctl --user enable --now b12.service b12-daily-check.timer"

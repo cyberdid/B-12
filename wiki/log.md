@@ -399,5 +399,5 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 **Довготривала перевірка пам'яті (R17):** прогін `scripts/daily_check.py check --out ~/.local/state/b12/long_horizon` на позначці `elapsed_days: 4.389` дав `ok: true` (усі 3 якорі згадані, забутий маркер відсутній у пошуку й байтах, цілісність усіх БД і знімків підтверджена, 80 подій аудиту).
 
-**Синхронізація документації (lint):** оновлено цифри в `README.md` (14 host tools, 542 тести, стан R17), додано головну ілюстрацію `docs/images/b12-hero.jpg` на початок `README.md` і виправлено застаріле твердження про нереалізований план F4 у `wiki/topics/reachy-jetson-comparison.md`.
+**Синхронізація документації (lint):** оновлено цифри в `README.md` (14 host tools, 542 тести, стан R17), додано головну ілюстрацію `docs/images/b12-hero.jpg` на початок `README.md`, додано `LICENSE` (Apache-2.0) і шаблони `deploy/b12-daily-check.{service,timer}` (таймер увімкнено у `systemd --user` і перевірено запуском `status=0/SUCCESS`), виправлено застаріле твердження про нереалізований план F4 у `wiki/topics/reachy-jetson-comparison.md`.
 

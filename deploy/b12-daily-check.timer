@@ -1,0 +1,11 @@
+# Daily schedule for b12-daily-check.service (R17: 1, 7, 30-day memory verification).
+[Unit]
+Description=Daily B-12 long-horizon memory check timer (R17)
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target

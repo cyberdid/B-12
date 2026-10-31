@@ -1,0 +1,10 @@
+# B-12 daily long-horizon memory check (R17). Runs without loading any LLM/GPU model.
+[Unit]
+Description=B-12 daily long-horizon memory and integrity check (R17)
+
+[Service]
+Type=oneshot
+EnvironmentFile=@ENV_FILE@
+ExecStart=@PYTHON_BIN@ @REPO_DIR@/scripts/daily_check.py check --out %h/.local/state/b12/long_horizon
+NoNewPrivileges=yes
+UMask=0077
