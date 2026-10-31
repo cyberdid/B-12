@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import sqlite3
 import time
 from collections import deque
@@ -103,7 +104,10 @@ _NUDGE_PSEUDO_CALL = (
     "Виклич інструмент через механізм інструментів, а не текстом."
 )
 _TOOL_NAMES = (
-    "memory_store|memory_forget|memory_search|run_command|shell_exec|file_read|file_list|file_write"
+    "memory_store|memory_forget|memory_search|knowledge_search|"
+    "run_command|shell_exec|sudo_exec|"
+    "file_read|file_list|file_search|file_write|"
+    "http_fetch|system_info|process_list|current_time"
 )
 # A call written as prose: tool(...), or tool{...} / the model's own token syntax.
 _PSEUDO_CALL = re.compile(rf"\b({_TOOL_NAMES})\s*\(|\b({_TOOL_NAMES})\{{|<\|\"\|>")
@@ -430,6 +434,8 @@ class Agent:
     ) -> TurnResult:
         if not isinstance(text, str) or not text.strip():
             raise ValueError("user text required")
+        if persist and timeout_s == 300.0:
+            timeout_s = 1800.0
         lock = self._session_locks.setdefault(session_id, asyncio.Lock())
         async with lock:
             context = self.control.begin_turn(
@@ -477,7 +483,12 @@ class Agent:
         actor = self.control.resolve_actor(context.actor_id)
         state = self._waiting.pop(turn_id, None) or self.sessions.load_checkpoint(turn_id, actor.id)
         if state is None:
+            self.control.release_turn(turn_id)
             raise LookupError("no waiting turn")
+        if state.get("persist") and timeout_s < 1800.0:
+            context = self.control.resume_turn(
+                turn_id, deadline=time.monotonic() + 1800.0, cancel=context.cancel
+            )
         lock = self._session_locks.setdefault(context.session_id, asyncio.Lock())
         async with lock:
             return await self._drive(context, actor, state, on_event, started=False)
@@ -496,7 +507,15 @@ class Agent:
                         found[record.id] = record.text[:512]
             except EmbeddingUnavailable:
                 log.warning("semantic recall unavailable; lexical fallback")
-        for term in list(dict.fromkeys(re.findall(r"[^\W_]{3,}", text.lower())))[:8]:
+        from b12.memory import _STOP_TERMS
+
+        words = [
+            w.replace("’", "'").replace("ʼ", "'")
+            for w in re.findall(r"[^\W_]+(?:['’ʼ][^\W_]+)*", text.lower())
+            if len(w) >= 3
+        ]
+        filtered = [w for w in words if w not in _STOP_TERMS] or words
+        for term in list(dict.fromkeys(filtered))[:8]:
             for record in self.memory.search(term, actor, limit=3):
                 if len(found) < limit:
                     found.setdefault(record.id, record.text[:512])
@@ -813,6 +832,71 @@ class Agent:
                 partial[path] = result.content.get("next_offset")
             else:
                 partial.pop(path, None)
+        elif call.name == "file_search" and path and isinstance(result.content, dict):
+            dirs = state.setdefault("dirs", {})
+            partial = state.setdefault("partial", {})
+            is_dir = path in dirs or os.path.isdir(path)
+            if is_dir:
+                dirs[path] = True
+            elif path in listed or os.path.isfile(path):
+                listed[path] = True
+                state["last_read"] = path
+                partial.pop(path, None)
+            for match in result.content.get("matches", ()):
+                rel = match.get("path") if isinstance(match, dict) else None
+                if isinstance(rel, str) and rel:
+                    full = (
+                        os.path.normpath(os.path.join(path, rel))
+                        if is_dir and rel != "."
+                        else path
+                    )
+                    listed[full] = True
+                    state["last_read"] = full
+                    partial.pop(full, None)
+        elif (
+            call.name in ("run_command", "shell_exec")
+            and isinstance(result.content, dict)
+            and result.content.get("command_succeeded") is not False
+        ):
+            dirs = state.setdefault("dirs", {})
+            partial = state.setdefault("partial", {})
+            cwd = str(call.arguments.get("cwd") or "").rstrip("/")
+            if call.name == "run_command":
+                raw = str(call.arguments.get("command", ""))
+                try:
+                    tokens = shlex.split(raw, posix=True)
+                except ValueError:
+                    tokens = raw.split()
+            else:
+                tokens = [
+                    str(call.arguments.get("executable", "")),
+                    *(str(a) for a in call.arguments.get("argv", ())),
+                ]
+            for token in tokens:
+                cleaned = token.strip(";|&\n\t\"'()").rstrip("/")
+                if not cleaned or cleaned.startswith("-"):
+                    continue
+                cand = (
+                    os.path.normpath(cleaned)
+                    if os.path.isabs(cleaned)
+                    else os.path.normpath(os.path.join(cwd, cleaned))
+                    if cwd
+                    else cleaned
+                )
+                if cand in listed:
+                    listed[cand] = True
+                    state["last_read"] = cand
+                    partial.pop(cand, None)
+                elif cand in dirs:
+                    dirs[cand] = True
+                elif (
+                    os.path.isabs(cand)
+                    and any(cand.startswith(d + "/") for d in dirs)
+                    and os.path.isfile(cand)
+                ):
+                    listed[cand] = True
+                    state["last_read"] = cand
+                    partial.pop(cand, None)
 
     @staticmethod
     def _next_unfinished(state) -> str | None:

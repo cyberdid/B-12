@@ -96,8 +96,38 @@ class BridgeEmbedder:
         return matrix / np.where(norms == 0, 1, norms)
 
     def close(self):
-        if self.process is not None and self.process.returncode is None:
-            self.process.kill()
+        proc, self.process = self.process, None
+        if proc is None:
+            return
+        if proc.returncode is None:
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+        transport = getattr(proc, "_transport", None)
+        if transport is not None:
+            loop = getattr(transport, "_loop", None)
+            if loop is not None and not loop.is_closed():
+                transport.close()
+            else:
+                for proto in getattr(transport, "_pipes", {}).values():
+                    pipe = getattr(proto, "pipe", None)
+                    if pipe is not None:
+                        pipe._closing = True
+                        pipe._fileno = None
+                popen = getattr(transport, "_proc", None)
+                if popen is not None:
+                    for stream in (popen.stdin, popen.stdout, popen.stderr):
+                        if stream is not None:
+                            try:
+                                stream.close()
+                            except OSError:
+                                pass
+                    try:
+                        popen.wait(timeout=1)
+                    except Exception:
+                        pass
+                transport._closed = True
         self.process = None
 
     async def aclose(self):

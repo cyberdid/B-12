@@ -20,22 +20,47 @@ from uuid import UUID, uuid4
 from b12.contracts import Actor, MemoryRecord, PurgeReceipt, _identifier
 from b12.migrations import check_schema, migrate
 
+_FTS_OPERATORS = frozenset({"and", "or", "not", "near"})
+_STOP_TERMS = frozenset(
+    {
+        "а", "але", "бо", "будь", "був", "була", "були", "було", "бути", "в", "ви",
+        "від", "він", "вона", "вони", "воно", "всі", "де", "для", "до", "є", "ж",
+        "за", "зараз", "з", "зі", "із", "і", "й", "її", "їх", "його", "йому", "коли",
+        "котрий", "ласка", "мені", "мене", "ми", "мій", "мною", "моє", "моєї", "моєму",
+        "мої", "моїй", "моїм", "моїх", "моя", "мою", "на", "над", "нам", "наш", "наша",
+        "наше", "наші", "не", "ні", "ну", "о", "об", "от", "пам'ятаєш", "під", "по",
+        "при", "про", "привіт", "саме", "свій", "свої", "своя", "своє", "себе", "собі",
+        "скажи", "нагадай", "та", "так", "там", "твій", "твоє", "твої", "твоя", "те",
+        "тебе", "ти", "то", "тобі", "той", "тому", "тут", "у", "усі", "хто", "це",
+        "цей", "ці", "цій", "цього", "цьому", "ця", "цю", "чи", "чиї", "чий", "чия",
+        "чому", "що", "щоб", "як", "яка", "яке", "який", "яким", "яких", "які", "якої",
+        "якому", "яку", "я",
+        "a", "an", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from",
+        "had", "has", "have", "he", "her", "his", "how", "i", "in", "is", "it", "its",
+        "me", "my", "of", "on", "our", "please", "she", "tell", "that", "the", "their",
+        "them", "there", "these", "they", "this", "to", "us", "was", "we", "were",
+        "what", "when", "where", "which", "who", "whom", "whose", "why", "will", "with",
+        "would", "you", "your",
+    }
+)
+
 
 @functools.lru_cache(maxsize=50_000)
 def _forms(term: str) -> tuple[str, ...]:
     """The term plus inflections of its dictionary lemmas (uk; ru only without uk letters)."""
+    term = term.replace("’", "'").replace("ʼ", "'")
     forms = {term}
     if any("\u0400" <= ch <= "\u04ff" for ch in term):
         from b12._vendor.archive_index.lexical import _analyzer
 
-        languages = ["uk"] if any(ch in "іїєґ" for ch in term) else ["uk", "ru"]
+        languages = ["uk"] if any(ch in "іїєґ'" for ch in term) else ["uk", "ru"]
         for language in languages:
             try:
                 parses = [p for p in _analyzer(language).parse(term) if p.is_known]
             except Exception:  # missing dictionary: keep the literal term
                 continue
             for parse in parses[:3]:
-                forms.update(f.word for f in parse.lexeme)
+                forms.update(f.word.replace("’", "'").replace("ʼ", "'") for f in parse.lexeme)
             if parses:
                 break
     return tuple(sorted(forms, key=lambda f: (f != term, f)))[:48]
@@ -351,24 +376,35 @@ class MemoryStore:
         self._limit(limit)
         if not isinstance(query, str):
             raise TypeError("query must be text")
-        # Only literal Unicode alphanumeric tokens; no FTS operators or SQL syntax.
-        terms = re.findall(r"[^\W_]+", query, flags=re.UNICODE)[:64]
-        # Each term matches any inflection of its lemma (шафку ~ шафки); every form is a
-        # quoted literal, so the query can never inject FTS operators.
-        expression = " AND ".join(
-            "(" + " OR ".join('"' + form + '"' for form in _forms(term.lower())) + ")"
-            for term in terms
-        )
-        with self._transaction():
-            if not terms or not limit:
-                return []
-            rows = self._connection.execute(
+        # Only literal Unicode alphanumeric tokens (keeping internal apostrophes); no FTS syntax.
+        raw_terms = re.findall(r"[^\W_]+(?:['’ʼ][^\W_]+)*", query, flags=re.UNICODE)[:64]
+        terms = [t.replace("’", "'").replace("ʼ", "'").lower() for t in raw_terms]
+
+        def fts_expr(items: list[str], joiner: str = " AND ") -> str:
+            return joiner.join(
+                "(" + " OR ".join('"' + form + '"' for form in _forms(term)) + ")"
+                for term in items
+            )
+
+        def query_rows(expr: str):
+            return self._connection.execute(
                 """SELECT m.* FROM memory_fts JOIN memories m ON m.rowid=memory_fts.rowid
                    WHERE memory_fts MATCH ? AND m.actor_id=?
                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
                    ORDER BY bm25(memory_fts), m.rowid DESC LIMIT ?""",
-                (expression, actor.id, limit),
+                (expr, actor.id, limit),
             ).fetchall()
+
+        with self._transaction():
+            if not terms or not limit:
+                return []
+            rows = query_rows(fts_expr(terms, " AND "))
+            if not rows and not (_FTS_OPERATORS & set(terms)):
+                content = [t for t in terms if t not in _STOP_TERMS]
+                if content and len(content) < len(terms):
+                    rows = query_rows(fts_expr(content, " AND "))
+                if not rows and len(content) > 1:
+                    rows = query_rows(fts_expr(content, " OR "))
             return [self._record(row) for row in rows]
 
     def audit_events(self, actor: Actor, *, limit: int = 100) -> list[dict]:

@@ -69,7 +69,13 @@ class ApiClient:
     async def chat(
         self, session_id: str, text: str, *, persist: bool, timeout_s: float = 600
     ) -> AsyncIterator[dict]:
-        body = {"session_id": session_id, "text": text, "persist": persist, "timeout_s": timeout_s}
+        effective_timeout = max(timeout_s, 1800.0) if persist else timeout_s
+        body = {
+            "session_id": session_id,
+            "text": text,
+            "persist": persist,
+            "timeout_s": effective_timeout,
+        }
         async with self.http.stream("POST", "/api/chat", json=body) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():

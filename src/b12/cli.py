@@ -237,8 +237,9 @@ async def cmd_chat(args, settings) -> int:
 
 
 async def _converse(args, runtime, owner) -> int:
+    timeout = max(args.timeout, 1800.0) if args.persist else args.timeout
     if args.message is not None:
-        grant, task = owner.grant(args.timeout)
+        grant, task = owner.grant(timeout)
         console = Console(quiet=args.json)
         result = await run_with_interrupt(
             runtime.agent.turn,
@@ -247,7 +248,7 @@ async def _converse(args, runtime, owner) -> int:
             args.message,
             task_id=task,
             on_event=console,
-            timeout_s=args.timeout,
+            timeout_s=timeout,
             persist=args.persist,
         )
         if args.json:
@@ -261,7 +262,7 @@ async def _converse(args, runtime, owner) -> int:
             return 0
         if not line.strip():
             continue
-        grant, task = owner.grant(args.timeout)
+        grant, task = owner.grant(timeout)
         print("B-12> ", end="", flush=True)
         result = await run_with_interrupt(
             runtime.agent.turn,
@@ -270,10 +271,10 @@ async def _converse(args, runtime, owner) -> int:
             line.strip(),
             task_id=task,
             on_event=console,
-            timeout_s=args.timeout,
+            timeout_s=timeout,
             persist=args.persist,
         )
-        result = await interactive_approvals(runtime, result, console, args.timeout)
+        result = await interactive_approvals(runtime, result, console, timeout)
         if result.state != "completed":
             print(f"[{result.state}: {result.error_code}]", file=sys.stderr)
 
@@ -603,7 +604,7 @@ def parser() -> argparse.ArgumentParser:
     chat.add_argument("--json", action="store_true")
     chat.add_argument("--timeout", type=float, default=300.0)
     chat.add_argument(
-        "--persist", action="store_true", help="не зупинятися: до 40 кроків і авто-продовження"
+        "--persist", action="store_true", help="не зупинятися: до 150 кроків і авто-продовження"
     )
     resume = sub.add_parser("resume", help="продовжити turn після approval")
     resume.add_argument("turn_id")

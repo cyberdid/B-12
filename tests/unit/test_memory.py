@@ -244,3 +244,17 @@ def test_purge_keeps_fts_index_consistent_and_repairs_secure_delete(tmp_path):
     assert store._connection.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
     assert [r.text for r in store.search("запис", actor)] == ["другий запис"]
     store.close()
+
+
+def test_search_handles_ukrainian_apostrophe_inflections_and_natural_questions(tmp_path):
+    from b12.memory import MemoryStore
+
+    actor = Actor(id="owner", consent=True)
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    locker = store.remember("Тестовий код шафки 3355", actor)
+    name = store.remember("Моє ім'я — Дмитро, працюю за комп'ютером", actor)
+    assert [r.id for r in store.search("який у мене код від шафки?", actor)] == [locker.id]
+    assert [r.id for r in store.search("імені", actor)] == [name.id]
+    assert [r.id for r in store.search("комп'ютера", actor)] == [name.id]
+    store.close()
+

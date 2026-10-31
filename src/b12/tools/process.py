@@ -14,7 +14,7 @@ import signal
 from pathlib import Path
 from types import SimpleNamespace
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from b12.tools._common import AbsolutePath, Args, EmptyArgs, clip, failure
 from b12.tools.outcomes import HandlerOutcome, SideEffect
@@ -54,6 +54,18 @@ class CommandArgs(Args):
         description="What the command does, in words: e.g. read-only search, writes a report file",
     )
     max_output_bytes: int = Field(default=4096, ge=1, le=4096)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _default_missing(cls, data):
+        if isinstance(data, dict):
+            out = dict(data)
+            if not out.get("cwd"):
+                out["cwd"] = str(Path.home())
+            if not out.get("declared_effects"):
+                out["declared_effects"] = ["shell command"]
+            return out
+        return data
 
 
 class ExecArgs(Args):

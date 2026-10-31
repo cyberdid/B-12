@@ -976,3 +976,100 @@ async def test_long_persist_turn_keeps_the_window_within_a_fixed_budget(
     last = state["requests"][-1]["messages"]
     total = sum(len(m.get("content") or "") for m in last)
     assert total < 6000 + 4000, total
+
+
+async def test_persist_counts_files_and_dirs_inspected_via_run_command_and_file_search(
+    runtime_factory, tmp_path
+):
+    """Files inspected via run_command (grep/sed/head/cat) or file_search count as covered."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "proj"
+    (folder / "sub").mkdir(parents=True)
+    (folder / "a.py").write_text("def a(): return 1\n")
+    (folder / "b.py").write_text("def b(): return 2\n")
+    (folder / "sub" / "c.py").write_text("def c(): return 3\n")
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "a.py")})]},
+        {
+            "tool_calls": [
+                (
+                    "run_command",
+                    {"command": f"sed -n '1,10p' {folder / 'b.py'}", "cwd": str(folder)},
+                )
+            ]
+        },
+        {
+            "tool_calls": [
+                ("file_search", {"path": str(folder / "sub"), "query": "def c"})
+            ]
+        },
+        {"content": "Повний звіт. ГОТОВО"},
+    ]
+    result, _ = await run_turn(runtime, who, "Проаналізуй проєкт", persist=True)
+    assert result.state == "completed"
+    assert body(result.content) == "Повний звіт. ГОТОВО"
+    assert len(state["requests"]) == 5  # no extra unread/unlisted nudges
+    assert "a.py" in result.content and "b.py" in result.content and "sub/c.py" in result.content
+
+
+async def test_pseudo_call_catches_file_search_and_knowledge_search_written_as_text(
+    runtime_factory, tmp_path
+):
+    """All built-in tool names written as prose trigger the pseudo-call nudge."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    target = tmp_path / "sample.py"
+    target.write_text("def hello(): pass\n")
+    state["script"] = [
+        {"content": f'file_search(path="{tmp_path}", query="hello")'},
+        {"tool_calls": [("file_search", {"path": str(tmp_path), "query": "hello"})]},
+        {"content": "Знайдено функцію hello."},
+    ]
+    result, _ = await run_turn(runtime, who, "знайди hello")
+    assert result.state == "completed"
+    assert [r.name for r in result.tool_results] == ["file_search"]
+    assert result.content == "Знайдено функцію hello."
+
+
+async def test_resumed_persist_turn_keeps_extended_deadline_and_persist_coverage(
+    runtime_factory, tmp_path
+):
+    """A persist turn paused on approval resumes with persist=True and >=1800s deadline."""
+    import time
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    record = runtime.memory.remember("тимчасовий запис", who.actor)
+    folder = tmp_path / "proj"
+    folder.mkdir()
+    (folder / "a.py").write_text("x = 1\n")
+    (folder / "b.py").write_text("y = 2\n")
+    seen_remaining = []
+
+    def check_deadline(request):
+        turn_id = next(iter(runtime.control._runtime))
+        remaining = runtime.control._runtime[turn_id][0] - time.monotonic()
+        seen_remaining.append(remaining)
+        return {"content": "Проміжний текст без маркера."}
+
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "a.py")})]},
+        {"tool_calls": [("memory_forget", {"memory_id": record.id})]},
+        check_deadline,  # after resume: b.py is still unread, so persist must nudge
+        {"tool_calls": [("file_read", {"path": str(folder / "b.py")})]},
+        {"content": "Усе прочитано. ГОТОВО"},
+    ]
+    waiting, _ = await run_turn(runtime, who, "Очисти і прочитай", persist=True)
+    assert waiting.state == "awaiting_approval"
+    runtime.control.decide_approval(waiting.pending_operations[0], True)
+    done = await runtime.agent.resume(waiting.turn_id)
+    assert done.state == "completed"
+    assert body(done.content) == "Усе прочитано. ГОТОВО"
+    assert seen_remaining and seen_remaining[0] > 1500.0
+

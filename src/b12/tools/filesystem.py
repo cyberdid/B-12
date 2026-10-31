@@ -485,8 +485,41 @@ async def file_read(args, guard):
 
 async def file_search(args, guard):
     matches, truncated, seen = [], False, 0
-    stack = [(Path(args.path), 0)]
+    max_file_bytes = 262144
+
+    def scan_file(file_path: str, rel_name: str) -> bool:
+        nonlocal truncated
+        try:
+            fd = os.open(file_path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
+            with os.fdopen(fd, "rb") as stream:
+                if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                    return False
+                raw = stream.read(max_file_bytes + 1)
+        except OSError:
+            return False
+        truncated |= len(raw) > max_file_bytes
+        if b"\x00" in raw:
+            return False
+        for line, text in enumerate(
+            raw[:max_file_bytes].decode("utf-8", "replace").splitlines(), 1
+        ):
+            if args.query in text:
+                if len(matches) == args.limit:
+                    return True
+                snippet, cut = clip(text, 128)
+                relative, path_cut = clip(rel_name, 128)
+                truncated |= cut or path_cut
+                matches.append({"path": relative, "line": line, "text": snippet})
+        return False
+
     try:
+        guard.check()
+        info = os.lstat(args.path)
+        if stat.S_ISREG(info.st_mode):
+            if scan_file(args.path, os.path.basename(args.path)):
+                return HandlerOutcome(content={"matches": matches}, truncated=True)
+            return HandlerOutcome(content={"matches": matches}, truncated=truncated)
+        stack = [(Path(args.path), 0)]
         while stack:
             folder, depth = stack.pop()
             guard.check()
@@ -504,31 +537,8 @@ async def file_search(args, guard):
                         else:
                             truncated = True
                     elif entry.is_file(follow_symlinks=False):
-                        try:
-                            fd = os.open(entry.path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW)
-                            with os.fdopen(fd, "rb") as stream:
-                                if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
-                                    continue
-                                raw = stream.read(8193)
-                        except OSError:
-                            continue
-                        truncated |= len(raw) > 8192
-                        if b"\x00" in raw:
-                            continue
-                        for line, text in enumerate(
-                            raw[:8192].decode("utf-8", "replace").splitlines(), 1
-                        ):
-                            if args.query in text:
-                                if len(matches) == args.limit:
-                                    return HandlerOutcome(
-                                        content={"matches": matches}, truncated=True
-                                    )
-                                snippet, cut = clip(text, 128)
-                                relative, path_cut = clip(
-                                    os.path.relpath(entry.path, args.path), 128
-                                )
-                                truncated |= cut or path_cut
-                                matches.append({"path": relative, "line": line, "text": snippet})
+                        if scan_file(entry.path, os.path.relpath(entry.path, args.path)):
+                            return HandlerOutcome(content={"matches": matches}, truncated=True)
                     await asyncio.sleep(0)
         return HandlerOutcome(content={"matches": matches}, truncated=truncated)
     except OSError as exc:

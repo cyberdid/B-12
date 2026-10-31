@@ -472,3 +472,19 @@ async def test_file_list_entries_are_short_strings_that_fit_the_result_budget(ho
     assert "Projects/" in result.content["entries"]
     assert all(isinstance(e, str) for e in result.content["entries"])
     assert len(json.dumps(result.content).encode()) < 4096
+
+
+async def test_file_search_supports_single_file_path_and_large_files(host_factory):
+    rig = host_factory()
+    large = rig.root / "large_module.py"
+    large.write_text("# padding line\n" * 1000 + "def target_after_8kb():\n    return 42\n")
+    by_file = await rig.invoke("file_search", path=str(large), query="def target_after_8kb")
+    assert by_file.status == "completed"
+    assert len(by_file.content["matches"]) == 1
+    assert by_file.content["matches"][0]["line"] == 1001
+    by_dir = await rig.invoke("file_search", path=str(rig.root), query="def target_after_8kb")
+    assert by_dir.status == "completed"
+    assert any(
+        m["path"] == "large_module.py" and m["line"] == 1001 for m in by_dir.content["matches"]
+    )
+

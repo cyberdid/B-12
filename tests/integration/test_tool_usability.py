@@ -96,3 +96,16 @@ def test_shell_exec_is_not_offered_to_the_model_when_run_command_is(host_factory
     names = {s["function"]["name"] for s in rig.registry.schemas(rig.context)}
     assert "run_command" in names
     assert "shell_exec" not in names
+
+
+async def test_run_command_fills_default_cwd_and_declared_effects_when_omitted(
+    host_factory, tmp_path
+):
+    """Models often omit declared_effects or cwd when calling run_command on an absolute path."""
+    rig = host_factory()
+    target = tmp_path / "check.txt"
+    target.write_text("one\ntwo\n")
+    result = await rig.invoke("run_command", command=f"wc -l < {target}")
+    assert result.status == "completed" and result.content["command_succeeded"] is True
+    assert result.content["stdout"].strip() == "2"
+
