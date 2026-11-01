@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from b12.auth import GUEST_CAPABILITIES, Caller, bearer, owner_capabilities, owner_token
@@ -22,6 +22,7 @@ from b12.config import Settings
 from b12.control import ControlError
 
 MAX_BODY = 64 * 1024
+MAX_VOICE_BODY = 1024 * 1024
 
 
 class _Body(BaseModel):
@@ -86,6 +87,27 @@ class FeedbackBody(_Body):
     outcome: str = Field(pattern="^(engaged|ignored|dismissed)$")
 
 
+class VoiceMuteBody(_Body):
+    muted: bool
+
+
+class VoiceTtsBody(_Body):
+    text: str = Field(min_length=1, max_length=4000)
+    lang: str = Field(default="auto", pattern="^(auto|uk|en)$")
+
+
+class VoiceAudioBody(_Body):
+    audio_b64: str = Field(min_length=4, max_length=900_000)
+    sample_rate: int = Field(default=16000, ge=8000, le=48000)
+    language: str = Field(default="auto", pattern="^(auto|uk|en)$")
+
+
+class VoiceEnrollBody(_Body):
+    audio_b64: str = Field(min_length=4, max_length=900_000)
+    sample_rate: int = Field(default=16000, ge=8000, le=48000)
+    actor_id: str | None = None
+
+
 class Guard:
     """Pure ASGI guard: Host allowlist, Origin check and bounded request bodies."""
 
@@ -115,6 +137,7 @@ class Guard:
             origin not in self.origins for origin in origins
         ):
             return await self._reject(send, 403, "origin_rejected")
+        limit = MAX_VOICE_BODY if scope.get("path", "").startswith("/api/voice/") else MAX_BODY
         body, more = b"", True
         while more:
             message = await receive()
@@ -122,7 +145,7 @@ class Guard:
                 return
             body += message.get("body", b"")
             more = message.get("more_body", False)
-            if len(body) > MAX_BODY:
+            if len(body) > limit:
                 return await self._reject(send, 413, "body_too_large")
         delivered = False
 
@@ -294,7 +317,8 @@ def create_app(
     security_headers = {
         "Content-Security-Policy": (
             "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; "
-            "img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+            "img-src 'self' data:; media-src 'self' blob: data:; "
+            "frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
         ),
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "no-referrer",
@@ -561,6 +585,124 @@ def create_app(
         except ControlError:
             raise HTTPException(404, "actor_not_found") from None
         return {"actor_id": target, "consent": body.consent}
+
+    @app.get("/api/voice/status")
+    async def voice_status(request: Request, who: Identity):
+        from b12.audio.capture import MicController, inventory_devices
+        from b12.audio.tts import PiperTts
+
+        runtime = runtime_of(request)
+        mic = MicController(runtime.control)
+        tts = PiperTts()
+        actor = runtime.control.resolve_actor(who.actor.id)
+        return {
+            "muted": mic.muted,
+            "consent": actor.consent,
+            "uk_tts_ready": tts.uk_model_path.is_file(),
+            "en_tts_ready": tts.en_model_path.is_file(),
+            "devices": inventory_devices(),
+        }
+
+    @app.post("/api/voice/mute")
+    async def voice_mute(request: Request, body: VoiceMuteBody, who: Identity):
+        from b12.audio.capture import MicController
+
+        require_owner(who)
+        mic = MicController(runtime_of(request).control)
+        return {"muted": mic.set_muted(body.muted)}
+
+    @app.post("/api/voice/tts")
+    async def voice_tts(request: Request, body: VoiceTtsBody, who: Identity):
+        from b12.audio.tts import PiperTts
+
+        tts = PiperTts()
+        audio = await asyncio.to_thread(tts.synthesize, body.text, lang=body.lang)
+        return Response(
+            content=audio.to_wav_bytes(),
+            media_type="audio/wav",
+            headers={
+                **security_headers,
+                "X-TTFA-Ms": str(audio.ttfa_ms),
+                "X-Sample-Rate": str(audio.sample_rate),
+                "X-Language": audio.language,
+            },
+        )
+
+    @app.post("/api/voice/asr")
+    async def voice_asr(request: Request, body: VoiceAudioBody, who: Identity):
+        import base64
+
+        from b12.audio.asr import WhisperAsr
+        from b12.audio.capture import MicController
+        from b12.audio.endpoint import EndpointDetector
+
+        runtime = runtime_of(request)
+        mic = MicController(runtime.control)
+        if mic.muted:
+            raise HTTPException(403, "microphone_muted")
+        try:
+            raw = base64.b64decode(body.audio_b64, validate=True)
+        except Exception:
+            raise HTTPException(400, "invalid_audio_base64") from None
+
+        asr = WhisperAsr()
+        audio_16k = asr.to_float32_16k(raw, sample_rate=body.sample_rate)
+        ep = EndpointDetector().detect_utterance(audio_16k)
+        target_audio = ep.speech_audio if len(ep.speech_audio) > 0 else audio_16k
+        res = await asyncio.to_thread(asr.transcribe, target_audio, language=body.language)
+        return {
+            "text": res.text,
+            "language": res.language,
+            "language_probability": res.language_probability,
+            "duration_s": res.duration_s,
+            "asr_latency_ms": res.asr_latency_ms,
+            "physical_eou_to_endpoint_ms": ep.physical_eou_to_endpoint_ms,
+            "provenance_id": res.provenance_id,
+        }
+
+    @app.post("/api/voice/speaker/enroll")
+    async def voice_speaker_enroll(request: Request, body: VoiceEnrollBody, who: Identity):
+        import base64
+
+        from b12.audio.asr import WhisperAsr
+        from b12.audio.speaker import SpeakerStore, SpeakerVerifier
+
+        runtime = runtime_of(request)
+        try:
+            raw = base64.b64decode(body.audio_b64, validate=True)
+        except Exception:
+            raise HTTPException(400, "invalid_audio_base64") from None
+
+        audio_16k = WhisperAsr.to_float32_16k(raw, sample_rate=body.sample_rate)
+        store = SpeakerStore(runtime.settings.state_dir / "voice" / "speakers.sqlite3")
+        try:
+            verifier = SpeakerVerifier(store, runtime.control)
+            target_id = body.actor_id or who.actor.id
+            try:
+                return verifier.enroll(
+                    actor_id=target_id,
+                    caller_actor_id=who.actor.id,
+                    audio_16k=audio_16k,
+                )
+            except PermissionError as exc:
+                raise HTTPException(403, str(exc)) from None
+            except ValueError as exc:
+                raise HTTPException(422, str(exc)) from None
+        finally:
+            store.close()
+
+    @app.delete("/api/voice/speaker/{actor_id}")
+    async def voice_speaker_delete(request: Request, actor_id: str, who: Identity):
+        from b12.audio.speaker import SpeakerStore
+
+        if not who.owner and actor_id != who.actor.id:
+            raise HTTPException(403, "owner_required")
+        store = SpeakerStore(runtime_of(request).settings.state_dir / "voice" / "speakers.sqlite3")
+        try:
+            deleted = store.delete_actor(actor_id)
+        finally:
+            store.close()
+        return {"actor_id": actor_id, "deleted": deleted}
 
     app.add_middleware(
         Guard,

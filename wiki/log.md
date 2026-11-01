@@ -401,3 +401,19 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 **Синхронізація документації (lint):** оновлено цифри в `README.md` (14 host tools, 542 тести, стан R17), додано головну ілюстрацію `docs/images/b12-hero.jpg` на початок `README.md`, додано `LICENSE` (Apache-2.0) і шаблони `deploy/b12-daily-check.{service,timer}` (таймер увімкнено у `systemd --user` і перевірено запуском `status=0/SUCCESS`), виправлено застаріле твердження про нереалізований план F4 у `wiki/topics/reachy-jetson-comparison.md`.
 
+## [2026-11-01] implementation | Голосовий шар B-12: PTT, VAD/endpoint, ASR, TTS, AEC, speaker verification та full-duplex (Tasks 16–17, R15)
+
+**Перевірений факт:**
+1. Встановлено голосові залежності (`faster-whisper 1.2.1`, `onnxruntime 1.31.1`, `piper-tts 1.8.0`, `soundfile 0.14.0`, опція `b12-runtime[voice]`) та локальні відкриті голосові моделі у `~/.local/share/b12/voices/` (`uk_UA-ukrainian_tts-medium.onnx` CC0-1.0, `uk_UA-mykyta-high.onnx` Apache-2.0, `en_US-lessac-medium.onnx`, `silero_vad.onnx` MIT); SHA-256 та ліцензії зафіксовано в `evals/voice/licenses.json`. Дані чи код із проєктів VoiceID/VoiceEvolve не імпортувались.
+2. Реалізовано пакет `src/b12/audio/`:
+   - `capture.py`: `MicController` (`mic_muted` у `ControlStore` окремо від `actor.consent`), `PttCapture` (PipeWire `pw-record` / ALSA `arecord` у volatile `float32` 16 кГц без запису сирого аудіо на диск за замовчуванням, негайне переривання при `cancel`).
+   - `endpoint.py`: `SileroVad` (ONNX Runtime CPU з 64-семпловим контекстним вікном для 512-семплових фреймів 32 мс) та `EndpointDetector` із роздільним обліком фізичного завершення мовлення (`physical_eou_sample`) та моменту рішення (`decision_sample`).
+   - `asr.py`: `WhisperAsr` (`Systran/faster-whisper-small`, одноразовий `encode` з обмеженням авто-визначення мови до `{uk, en}`, декодування PCM/WAV у пам'яті в обхід помилки `av.open(metadata_errors=...)`).
+   - `tts.py`: `PiperTts` (українська нормалізація чисел, акронімів і апострофів без відсутніх фонем, перемикання на `en_US-lessac-medium` для англійських речень, обмежена черга фраз `max_queue_phrases`), `generate_earcon_pcm` (окремий облік `earcon_ms`) та `AudioPlayer` із передачею 16 кГц `render_reference` та миттєвим `stop()`.
+   - `aec.py`: `AcousticEchoCanceller` (адаптивний NLMS + кореляційне пригнічення за точним `render_reference`, текстовий фільтр самовідлуння `is_tts_echo_text` та детектор медіа-забруднення).
+   - `speaker.py`: `SpeakerStore` (`SQLite` із `PRAGMA secure_delete = ON`) та `SpeakerVerifier` (спектрально-гармонічний voiceprint, блокування exact-replay і spoof, реєстрація лише через автентифікований контрольний шлях власника, фізичне видалення біометрії).
+   - `pipeline.py` та `duplex.py`: `VoicePipeline` і `DuplexSession` (barge-in під час активного мовлення зупиняє плеєр, скасовує активний turn моделі й очищує чергу TTS; повага до `quiet` режиму для автономних реплік).
+3. Інтегровано голосові маршрути у `src/b12/api.py` (`/api/voice/{status,mute,tts,asr}`, `/api/voice/speaker/enroll`, `DELETE /api/voice/speaker/{actor_id}`), підкоманду `b12 voice {status,mute,unmute,say,listen}` у `src/b12/cli.py` та елементи керування мікрофоном/озвученням у `src/b12/web/{index.html,app.js}`.
+4. **Бенчмарки та тести:** 9 нових інтеграційних тестів у `tests/integration/test_voice.py` та `tests/integration/test_duplex.py` пройшли; у `evals/voice/report.json` отримано TTS TTFA P50 `258,57 мс`, endpoint P50 `320,0 мс`, ASR P50 `2359,13 мс`; у `evals/voice/duplex/report.json` — AEC ERLE `156,32 дБ`, barge-in stop P95 `0,039 мс`, FAR/FRR `0,0 / 0,0`, exact-replay блокується. **Межі:** 8-годинний фізичний акустичний soak у кімнаті з ТБ/шумом залишається відкритим.
+
+

@@ -1,0 +1,48 @@
+{
+  "generated_at_utc": "2026-10-31T17:41:45.501839Z",
+  "components": [
+    {
+      "role": "TTS (Ukrainian multi-speaker)",
+      "model": "uk_UA-ukrainian_tts-medium.onnx",
+      "engine": "piper-tts 1.8.0 (MIT)",
+      "dataset_url": "https://github.com/OHF-Voice/voice-datasets",
+      "license": "CC0-1.0",
+      "sample_rate": 22050,
+      "sha256": "7920419ac5f6fd8b6450520f24b52ed5a319cb53dd018fbcd71c9e079cbac84f"
+    },
+    {
+      "role": "TTS (Ukrainian high espeak)",
+      "model": "uk_UA-mykyta-high.onnx",
+      "engine": "piper-tts 1.8.0 (MIT)",
+      "dataset_url": "https://github.com/egorsmkv/ukrainian-tts-datasets",
+      "license": "Apache-2.0",
+      "sample_rate": 22050,
+      "sha256": "081d253cd246d7d4d698c6dd147b74cad498dafd213527887a3a490519138243"
+    },
+    {
+      "role": "TTS (English Lessac)",
+      "model": "en_US-lessac-medium.onnx",
+      "engine": "piper-tts 1.8.0 (MIT)",
+      "dataset_url": "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/",
+      "license": "Blizzard 2013 Lessac Research/Permissive",
+      "sample_rate": 22050,
+      "sha256": "5efe09e69902187827af646e1a6e9d269dee769f9877d17b16b1b46eeaaf019f"
+    },
+    {
+      "role": "VAD / Endpoint",
+      "model": "silero_vad.onnx",
+      "engine": "onnxruntime 1.31.1 (MIT)",
+      "source_url": "https://github.com/snakers4/silero-vad",
+      "license": "MIT",
+      "sample_rate": 16000,
+      "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+    },
+    {
+      "role": "ASR (UA/EN/code-switch)",
+      "model": "Systran/faster-whisper-small",
+      "engine": "faster-whisper 1.2.1 / CTranslate2 4.8.4 (MIT)",
+      "license": "MIT",
+      "sample_rate": 16000
+    }
+  ]
+}

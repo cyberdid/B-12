@@ -7,7 +7,15 @@ const SESSION_KEY = "b12.session";
 const DRAFT_KEY = "b12.draft";
 const $ = (id) => document.getElementById(id);
 
-const state = { token: null, session: null, turnId: null, controller: null, busy: false };
+const state = {
+  token: null,
+  session: null,
+  turnId: null,
+  controller: null,
+  busy: false,
+  audioPlayer: null,
+  recording: null,
+};
 // Tool cards by call ID survive approval/resume streams of the same turn.
 const cards = new Map();
 
@@ -222,6 +230,10 @@ async function runTurn(start) {
     else {
       if (result.content && !view.shown) addMessage("assistant", result.content, new Date());
       else if (view.node && view.raw) messageActions(view.node, view.raw, new Date());
+      const spokenText = result.content || view.raw || "";
+      if (spokenText && $("tts-auto")?.checked) {
+        playTts(spokenText).catch(() => {});
+      }
       if (result.state !== "completed") {
         const reason = result.error_code ? ` (${result.error_code})` : "";
         addMessage("state", `Стан: ${result.state}${reason}`);
@@ -249,7 +261,35 @@ async function send(text) {
   );
 }
 
+function stopTtsPlayback() {
+  if (state.audioPlayer) {
+    try {
+      state.audioPlayer.pause();
+      state.audioPlayer.src = "";
+    } catch {
+      /* ignore */
+    }
+    state.audioPlayer = null;
+  }
+}
+
+async function playTts(text) {
+  stopTtsPlayback();
+  const response = await api("/api/voice/tts", { method: "POST", body: { text, lang: "auto" } });
+  if (!response.ok) return;
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const audio = new Audio(url);
+  state.audioPlayer = audio;
+  audio.addEventListener("ended", () => {
+    URL.revokeObjectURL(url);
+    if (state.audioPlayer === audio) state.audioPlayer = null;
+  });
+  await audio.play().catch(() => URL.revokeObjectURL(url));
+}
+
 async function cancelTurn() {
+  stopTtsPlayback();
   const turn = state.turnId;
   if (turn) {
     await api(`/api/turns/${turn}/cancel`, { method: "POST", body: {} }).catch(() => {});
@@ -446,6 +486,12 @@ async function enter() {
   $("app").hidden = false;
   $("consent").checked = me.consent;
   $("consent").disabled = !me.owner && !me.consent;
+  const vStatus = await json("/api/voice/status").catch(() => ({ muted: false }));
+  if ($("mic-mute")) {
+    $("mic-mute").checked = Boolean(vStatus.muted);
+    $("mic-mute").disabled = !me.owner;
+  }
+  if ($("ptt-btn")) $("ptt-btn").disabled = Boolean(vStatus.muted);
   await loadSessions(storage("localStorage")?.getItem(SESSION_KEY));
   await Promise.all([refreshApprovals(), loadTools(), checkHealth()]);
 }
@@ -503,6 +549,84 @@ function bind() {
     } catch (error) {
       event.target.checked = !event.target.checked;
       setStatus(`Не вдалося змінити згоду: ${error.message}`);
+    }
+  });
+  $("mic-mute")?.addEventListener("change", async (event) => {
+    try {
+      const res = await json("/api/voice/mute", { method: "POST", body: { muted: event.target.checked } });
+      if ($("ptt-btn")) $("ptt-btn").disabled = Boolean(res.muted);
+      setStatus(res.muted ? "Мікрофон вимкнено (mute)." : "Мікрофон увімкнено.");
+    } catch (error) {
+      event.target.checked = !event.target.checked;
+      setStatus(`Не вдалося змінити стан мікрофона: ${error.message}`);
+    }
+  });
+  $("ptt-btn")?.addEventListener("click", async () => {
+    if ($("mic-mute")?.checked) {
+      setStatus("Мікрофон вимкнено.");
+      return;
+    }
+    stopTtsPlayback();
+    if (state.recording) {
+      state.recording.stop();
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setStatus("Браузер не підтримує захоплення мікрофона.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const ctx = new AudioContext({ sampleRate: 16000 });
+      const src = ctx.createMediaStreamSource(stream);
+      const proc = ctx.createScriptProcessor(4096, 1, 1);
+      const chunks = [];
+      proc.onaudioprocess = (e) => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+      src.connect(proc);
+      proc.connect(ctx.destination);
+      $("ptt-btn").textContent = "⏹ Стоп";
+      setStatus("Слухаю… Натисніть «Стоп» для розпізнавання.");
+      state.recording = {
+        stop: async () => {
+          state.recording = null;
+          $("ptt-btn").textContent = "🎙 Голос";
+          proc.disconnect();
+          src.disconnect();
+          stream.getTracks().forEach((t) => t.stop());
+          await ctx.close();
+          const total = chunks.reduce((acc, c) => acc + c.length, 0);
+          const pcm = new Int16Array(total);
+          let off = 0;
+          for (const c of chunks) {
+            for (let i = 0; i < c.length; i++) {
+              const s = Math.max(-1, Math.min(1, c[i]));
+              pcm[off++] = s < 0 ? s * 32768 : s * 32767;
+            }
+          }
+          const bytes = new Uint8Array(pcm.buffer);
+          let bin = "";
+          for (let i = 0; i < bytes.length; i += 8192) {
+            bin += String.fromCharCode(...bytes.subarray(i, i + 8192));
+          }
+          setStatus("Розпізнавання мовлення…");
+          try {
+            const tr = await json("/api/voice/asr", {
+              method: "POST",
+              body: { audio_b64: btoa(bin), sample_rate: 16000, language: "auto" },
+            });
+            setStatus("");
+            if (tr.text?.trim()) {
+              await send(tr.text.trim());
+            } else {
+              setStatus("Мовлення не виявлено.");
+            }
+          } catch (err) {
+            setStatus(`Помилка ASR: ${err.message}`);
+          }
+        },
+      };
+    } catch (error) {
+      setStatus(`Мікрофон недоступний: ${error.message}`);
     }
   });
   $("memories-reload").addEventListener("click", loadAllMemories);

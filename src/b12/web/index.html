@@ -54,11 +54,18 @@
                 <label class="toggle" title="Згода на збереження пам’яті">
                   <input id="consent" type="checkbox"> Пам’ять
                 </label>
+                <label class="toggle" title="Вимкнути мікрофон (окремо від згоди на пам’ять)">
+                  <input id="mic-mute" type="checkbox"> Mute мікр.
+                </label>
+                <label class="toggle" title="Автоматично озвучувати відповіді B-12">
+                  <input id="tts-auto" type="checkbox"> Озвучувати
+                </label>
                 <label class="toggle" title="Не зупинятися: до 150 кроків, авто-продовження до слова ГОТОВО">
                   <input id="persist" type="checkbox"> Не зупинятися
                 </label>
               </div>
               <div class="send-area">
+                <button id="ptt-btn" type="button" class="ghost" title="Натисніть для голосового запису (PTT)">🎙 Голос</button>
                 <button id="cancel" type="button" class="ghost" hidden>Зупинити</button>
                 <button id="send" type="submit">Надіслати</button>
               </div>

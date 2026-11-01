@@ -1,0 +1,109 @@
+{
+  "generated_at_utc": "2026-10-31T17:42:13.620481Z",
+  "host": "Ubuntu 24.04.5, i9-14900HX, CPUExecutionProvider (int8)",
+  "cold_start": {
+    "tts_ms": 1717.03,
+    "asr_ms": 2746.1
+  },
+  "summary": {
+    "cases": 8,
+    "uk_mean_wer": 0.3924,
+    "en_mean_wer": 0.0417,
+    "tts_ttfa_p50_ms": 258.57,
+    "tts_ttfa_p95_ms": 1595.77,
+    "asr_p50_ms": 2359.13,
+    "asr_p95_ms": 2478.74,
+    "physical_eou_to_endpoint_p50_ms": 320.0,
+    "interruption_time_to_stop_ms": 0.008
+  },
+  "cases": [
+    {
+      "id": "ua-01",
+      "lang": "uk",
+      "reference": "Привіт Олександре система працює стабільно",
+      "hypothesis": "Привіт, Олександра Система працює стабільно.",
+      "wer": 0.2,
+      "tts_ttfa_ms": 174.33,
+      "asr_latency_ms": 2170.21,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 3.738
+    },
+    {
+      "id": "ua-02",
+      "lang": "uk",
+      "reference": "Перевір будь ласка стан локальної пам'яті",
+      "hypothesis": "Паравір, Бутласкад, стан локальної пом'яти.",
+      "wer": 0.6667,
+      "tts_ttfa_ms": 255.08,
+      "asr_latency_ms": 2363.72,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 3.947
+    },
+    {
+      "id": "ua-03",
+      "lang": "uk",
+      "reference": "Запам'ятай що мій улюблений колір синій",
+      "hypothesis": "За пом'ятой, що мій улюблений кулір синій.",
+      "wer": 0.5,
+      "tts_ttfa_ms": 262.07,
+      "asr_latency_ms": 2354.54,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 3.518
+    },
+    {
+      "id": "ua-04",
+      "lang": "uk",
+      "reference": "Яка зараз температура процесора та відеокарти",
+      "hypothesis": "Яка зараз температура процесора та відеокарте.",
+      "wer": 0.1667,
+      "tts_ttfa_ms": 313.46,
+      "asr_latency_ms": 2354.01,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 3.657
+    },
+    {
+      "id": "en-01",
+      "lang": "en",
+      "reference": "Hello friend the local voice pipeline is ready",
+      "hypothesis": "Hello friend, the local voice pipeline is ready.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 2227.55,
+      "asr_latency_ms": 2482.24,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 2.74
+    },
+    {
+      "id": "en-02",
+      "lang": "en",
+      "reference": "Please check the system status and active processes",
+      "hypothesis": "Please check the system's status and active processes.",
+      "wer": 0.125,
+      "tts_ttfa_ms": 251.06,
+      "asr_latency_ms": 2332.06,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 3.1
+    },
+    {
+      "id": "en-03",
+      "lang": "en",
+      "reference": "Remember that the backup schedule runs every night",
+      "hypothesis": "Remember that the backup schedule runs every night.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 166.09,
+      "asr_latency_ms": 2472.23,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 2.786
+    },
+    {
+      "id": "cs-01",
+      "lang": "uk",
+      "reference": "Запусти перевірку local runtime та покажи статус",
+      "hypothesis": "Запусти перевірку локал вранта ім та покажи статус.",
+      "wer": 0.4286,
+      "tts_ttfa_ms": 422.47,
+      "asr_latency_ms": 2470.13,
+      "physical_eou_to_endpoint_ms": 320.0,
+      "audio_duration_s": 4.818
+    }
+  ]
+}

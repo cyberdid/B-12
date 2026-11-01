@@ -482,6 +482,115 @@ async def cmd_status(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_voice(args, settings) -> int:
+    from b12.audio.asr import WhisperAsr
+    from b12.audio.capture import MicController, PttCapture, inventory_devices
+    from b12.audio.pipeline import VoicePipeline
+    from b12.audio.tts import AudioPlayer, PiperTts
+
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        mic = MicController(runtime.control)
+        tts = PiperTts()
+        if args.action == "status":
+            emit_json(
+                {
+                    "muted": mic.muted,
+                    "consent": owner.actor().consent,
+                    "uk_tts_ready": tts.uk_model_path.is_file(),
+                    "en_tts_ready": tts.en_model_path.is_file(),
+                    "devices": inventory_devices(),
+                }
+            )
+            return 0
+        if args.action in ("mute", "unmute"):
+            emit_json({"muted": mic.set_muted(args.action == "mute")})
+            return 0
+        if args.action == "say":
+            if not args.value.strip():
+                emit_json({"error": "text_required"})
+                return 1
+            audio = await asyncio.to_thread(tts.synthesize, args.value, lang=args.lang)
+            if args.out:
+                Path(args.out).write_bytes(audio.to_wav_bytes())
+            if args.play:
+                player = AudioPlayer(use_hardware=True)
+                await player.play(audio)
+            emit_json(
+                {
+                    "language": audio.language,
+                    "sample_rate": audio.sample_rate,
+                    "duration_s": audio.duration_s,
+                    "ttfa_ms": audio.ttfa_ms,
+                    "output_file": args.out,
+                }
+            )
+            return 0
+        if args.action == "listen":
+            try:
+                if args.file:
+                    raw = Path(args.file).read_bytes()
+                    audio_16k = WhisperAsr.to_float32_16k(raw)
+                else:
+                    audio_16k = await PttCapture(mic).record_hardware(duration_s=args.duration)
+            except PermissionError:
+                emit_json({"error": "microphone_muted"})
+                return 1
+            if args.chat:
+                pipe = VoicePipeline(runtime, tts=tts)
+                res = await pipe.process_utterance(
+                    session_id=owner.session_id,
+                    actor_id=owner.actor_id,
+                    audio_16k=audio_16k,
+                    language=args.lang,
+                )
+                if args.play and res.tts_chunks:
+                    player = AudioPlayer(use_hardware=True)
+                    for chunk in res.tts_chunks:
+                        await player.play(chunk)
+                emit_json(
+                    {
+                        "state": res.state,
+                        "transcript": res.transcript.text,
+                        "language": res.transcript.language,
+                        "reply": res.reply_text,
+                        "metrics": {
+                            "physical_eou_to_endpoint_ms": res.metrics.physical_eou_to_endpoint_ms,
+                            "endpoint_to_asr_ms": res.metrics.endpoint_to_asr_ms,
+                            "asr_to_first_token_ms": res.metrics.asr_to_first_token_ms,
+                            "first_token_to_first_meaningful_audio_ms": (
+                                res.metrics.first_token_to_first_meaningful_audio_ms
+                            ),
+                            "endpoint_to_first_meaningful_audio_ms": (
+                                res.metrics.endpoint_to_first_meaningful_audio_ms
+                            ),
+                            "physical_eou_to_first_meaningful_audio_ms": (
+                                res.metrics.physical_eou_to_first_meaningful_audio_ms
+                            ),
+                            "total_turn_ms": res.metrics.total_turn_ms,
+                        },
+                    }
+                )
+                return 0
+            asr = WhisperAsr()
+            tr = await asyncio.to_thread(asr.transcribe, audio_16k, language=args.lang)
+            emit_json(
+                {
+                    "text": tr.text,
+                    "language": tr.language,
+                    "language_probability": tr.language_probability,
+                    "duration_s": tr.duration_s,
+                    "asr_latency_ms": tr.asr_latency_ms,
+                    "provenance_id": tr.provenance_id,
+                }
+            )
+            return 0
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_mcp(args, settings) -> int:
     from b12.tools.mcp import load_catalog
 
@@ -650,6 +759,15 @@ def parser() -> argparse.ArgumentParser:
     sub.add_parser("status", help="метрики й ресурси")
     autonomy = sub.add_parser("autonomy", help="один прохід scheduler")
     autonomy.add_argument("--reflect", action="store_true", help="лише idle рефлексія")
+    voice = sub.add_parser("voice", help="локальний голосовий шар (PTT, ASR, TTS)")
+    voice.add_argument("action", choices=("status", "mute", "unmute", "say", "listen"))
+    voice.add_argument("value", nargs="?", default="")
+    voice.add_argument("--lang", choices=("auto", "uk", "en"), default="auto")
+    voice.add_argument("--out", help="записати синтезований WAV у файл")
+    voice.add_argument("--file", help="прочитати WAV/PCM файл замість мікрофона")
+    voice.add_argument("--duration", type=float, default=5.0, help="тривалість PTT запису (с)")
+    voice.add_argument("--chat", action="store_true", help="виконати повний turn моделі й TTS")
+    voice.add_argument("--play", action="store_true", help="відтворити аудіо через динамік")
     return root
 
 
@@ -685,6 +803,7 @@ def main(argv=None) -> int:
         "backup": cmd_backup,
         "mcp": cmd_mcp,
         "status": cmd_status,
+        "voice": cmd_voice,
     }
     try:
         return asyncio.run(handlers[args.command](args, settings))

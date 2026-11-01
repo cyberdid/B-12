@@ -12,7 +12,7 @@
   <img src="docs/images/web-dark.png" alt="Web UI B-12: tool-виклики, підтвердження і скасування" width="900">
 </p>
 
-> **Стан на 31.10.2026:** desktop runtime працює end-to-end з реальною моделлю. Реалізовано: пам’ять зі згодою та глобальним забуттям, 14 host tools + MCP (+ опційний `sudo_exec`), agent loop (включно з режимом «Не зупинятися»), CLI/API/Web/TUI, автономність, backup/restore. Голос, Reachy/Jetson і тривалі (30 днів) докази ще відкриті. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
+> **Стан на 01.11.2026:** desktop runtime працює end-to-end з реальною моделлю. Реалізовано: пам’ять зі згодою та глобальним забуттям, 14 host tools + MCP (+ опційний `sudo_exec`), agent loop (включно з режимом «Не зупинятися»), CLI/API/Web/TUI, автономність, backup/restore, локальний голосовий шар (PTT, Silero VAD/endpoint, faster-whisper UA/EN, Piper TTS UA/EN, NLMS AEC, barge-in, speaker verification). Фізичний Reachy/Jetson, 8h акустичний soak у кімнаті та 30-денні докази ще попереду. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
 
 ## Архітектура
 
@@ -162,7 +162,7 @@ Web UI обслуговується тим самим API зі строгим CS
 | 13 | Snapshots, deletion replay, restore, user service | ✅ (службу вмикає власник) |
 | 14 | Великий eval | ✅ 91,7 % (ctx 4096), 102/109 (ctx 8192) на злитому коді |
 | 15 | Stress / growth / 8 год soak | ✅ 8,007 год активно (не безперервно); ріст RSS у воркері відкритий |
-| 16–17 | Голос, full-duplex | ⏸ відкладено |
+| 16–17 | Голос, full-duplex | 🟡 програмний стек і локальні бенчмарки готові (`src/b12/audio/`, `evals/voice/`); 8h кімнатний soak відкритий |
 | 18 | Reachy / Jetson | 🟡 протокол на симуляторі; фізичне приймання — з пристроєм |
 | 19 | Пам’ять 1/7/30 днів | 🟡 день 0 (27.10) і перевірка на 4,4 доби (31.10, `ok: true`) записані; чекає 7/30 днів |
 | 20 | Фінальний аудит R01–R17 | 🟡 [готово](wiki/project/requirements-audit.md): 10 із 17 виконано, решта частково/відкрито |
@@ -171,7 +171,7 @@ Web UI обслуговується тим самим API зі строгим CS
 
 Текстовий клієнт на Textual, той самий локальний API: список розмов, потокова відповідь, згорнуті виклики інструментів, черга підтверджень, пам’ять, перемикачі «Пам’ять» і «Не зупинятися». Потрібен запущений `b12 serve`; клавіші: `Ctrl+N` нова розмова, `Ctrl+P` панель, `Esc` зупинити хід, `Ctrl+Q` вийти. Встановлення залежності: `uv sync --extra tui`.
 
-Тести: `uv run --no-sync pytest -q` — 542 passed, 3 skipped. Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
+Тести: `uv run --no-sync pytest -q` — 551 passed, 3 skipped. Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
 
 ## Швидкий старт
 
@@ -192,6 +192,7 @@ b12 memory remember|search|forget|pending …
 b12 goals add "…" --check-file /abs/path --check-text "…"
 b12 quiet on|off · b12 stop on|off · b12 autonomy [--reflect]
 b12 backup create|list|verify|restore <id> · b12 status
+b12 voice status|mute|unmute|say "…" [--play]|listen [--chat]
 b12 mcp add archive --capability archive.read --read-only --timeout-s 180 -- /path/python -m archive_index.mcp_server
 ```
 
@@ -209,4 +210,4 @@ b12 mcp add archive --capability archive.read --read-only --timeout-s 180 -- /pa
 - [Статус](wiki/project/status.md), [дорожня карта](wiki/project/roadmap.md), [журнал](wiki/log.md), [правила агента](AGENTS.md).
 - [Оригінальний master brief](raw/B-12_Master_Project_2026-10-24.md) — незмінена копія.
 
-Зовнішні матеріали зберігають права й ліцензії своїх авторів; vendored-компоненти archive-index — з їхніми LICENSE/NOTICE. Ліцензію власного коду ще не обрано.
+Зовнішні матеріали зберігають права й ліцензії своїх авторів; vendored-компоненти archive-index — з їхніми LICENSE/NOTICE. Власний код поширюється під ліцензією [Apache-2.0](LICENSE).

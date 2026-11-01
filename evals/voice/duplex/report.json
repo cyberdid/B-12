@@ -1,0 +1,24 @@
+{
+  "generated_at_utc": "2026-10-31T17:42:18.361564Z",
+  "aec": {
+    "trials": 5,
+    "erle_mean_db": 156.32,
+    "erle_min_db": 148.64
+  },
+  "barge_in": {
+    "trials": 10,
+    "time_to_stop_p50_ms": 0.029,
+    "time_to_stop_p95_ms": 0.039,
+    "time_to_stop_p99_ms": 0.04
+  },
+  "speaker_verification": {
+    "genuine_trials": 10,
+    "impostor_trials": 10,
+    "frr": 0.0,
+    "far": 0.0,
+    "exact_replay_blocked": true
+  },
+  "limits": {
+    "physical_8h_acoustic_soak": "open (requires 8h real room speaker+TV+mic run by owner)"
+  }
+}
