@@ -458,9 +458,8 @@ class AudioPlayer:
         if self.on_playback_start is not None:
             with contextlib.suppress(Exception):
                 self.on_playback_start()
-        if self.on_render_reference is not None:
-            self.on_render_reference(audio.to_float32_16k())
-
+        # The render reference is fed block by block as each block is written to the output, so
+        # the echo canceller sees the reference on the same clock as the sound (A-06).
         try:
             if self.use_hardware:
                 pw_play = shutil.which("pw-play")
@@ -507,7 +506,9 @@ class AudioPlayer:
                         if self._stop_event.is_set() or (cancel is not None and cancel.is_set()):
                             self._proc.terminate()
                             return False
-                        self._proc.stdin.write(raw[offset : offset + chunk_bytes])
+                        block = raw[offset : offset + chunk_bytes]
+                        self._proc.stdin.write(block)
+                        self._feed_reference(audio, block)
                         with contextlib.suppress(
                             asyncio.TimeoutError, BrokenPipeError, ConnectionResetError
                         ):
@@ -525,10 +526,15 @@ class AudioPlayer:
 
             step_s = 0.02
             remaining = min(audio.duration_s, self.simulated_max_duration_s)
+            raw = audio.pcm_int16
+            block_bytes = max(2, int(audio.sample_rate * 2 * step_s))
+            position = 0
             while remaining > 0:
                 if self._stop_event.is_set() or (cancel is not None and cancel.is_set()):
                     return False
                 await asyncio.sleep(min(step_s, remaining))
+                self._feed_reference(audio, raw[position : position + block_bytes])
+                position += block_bytes
                 remaining -= step_s
             return True
         finally:
@@ -538,6 +544,40 @@ class AudioPlayer:
             if self.on_playback_end is not None:
                 with contextlib.suppress(Exception):
                     self.on_playback_end()
+
+    def _feed_reference(self, audio: "SynthesizedAudio", block: bytes) -> None:
+        """Send one written block to the render reference, converted to 16 kHz float."""
+        if self.on_render_reference is None or not block:
+            return
+        arr = np.frombuffer(block, dtype=np.int16).astype(np.float32) / 32768.0
+        if audio.sample_rate != 16000:
+            target_len = max(1, int(round(len(arr) * 16000.0 / audio.sample_rate)))
+            arr = np.interp(
+                np.linspace(0.0, len(arr) - 1, target_len), np.arange(len(arr)), arr
+            ).astype(np.float32)
+        with contextlib.suppress(Exception):
+            self.on_render_reference(arr)
+
+    async def stop_measured(self, *, exit_timeout_s: float = 2.0) -> dict:
+        """Stop playback and time two separate events: the signal sent to the output process,
+        and the process exit. Neither is the moment the sound physically stops. The output
+        buffer may keep sounding after the process exits; only a microphone loopback measures
+        that, and it is not measured here."""
+        t0 = time.perf_counter()
+        self._stop_event.set()
+        proc = self._proc
+        if proc is None or proc.returncode is not None:
+            return {"process": None, "signal_ms": 0.0, "exit_ms": 0.0}
+        proc.terminate()
+        t1 = time.perf_counter()
+        with contextlib.suppress(asyncio.TimeoutError):
+            await asyncio.wait_for(proc.wait(), exit_timeout_s)
+        t2 = time.perf_counter()
+        return {
+            "process": "exited" if proc.returncode is not None else "still_running",
+            "signal_ms": round((t1 - t0) * 1000.0, 3),
+            "exit_ms": round((t2 - t0) * 1000.0, 3),
+        }
 
     def stop(self) -> float:
         """Негайно перервати відтворення й повернути час зупинки (time-to-stop) у мілісекундах."""

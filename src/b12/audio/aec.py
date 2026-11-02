@@ -31,6 +31,9 @@ class AecStats:
     double_talk_detected: bool = False
 
 
+FRAME_SAMPLES_16K = 512  # 32 ms at 16 kHz
+
+
 class PulseAudioWebRtcAec:
     """Системний WebRTC AEC маршрут через PulseAudio/PipeWire module-echo-cancel."""
 
@@ -151,79 +154,110 @@ class PulseAudioWebRtcAec:
 
 
 class AcousticEchoCanceller:
-    """Адаптивний багатотаповий FIR NLMS ехокомпенсатор із DTD та анти-self-trigger."""
+    """Адаптивний FIR-ехокомпенсатор з часовою синхронізацією референсу та оцінкою затримки.
+
+    Референс подається потоково в момент запису в програвач (FIFO). Кожен кадр захоплення
+    споживає рівно стільки референсу, скільки пройшло часу, тож референс і мікрофон йдуть
+    одним годинником; пропуски заповнюються нулями. Затримка між відтворенням і захопленням
+    оцінюється кросс-кореляцією історії мікрофона з історією споживаного референсу до
+    max_delay_ms (за замовчуванням 400 мс), тобто може перевищувати тривалість кадру.
+    Коефіцієнти фільтра оновлюються з рекурсивною ковариацією між кадрами, а не з 8 рядків
+    на кадр. Це власний запасний шлях: для реального відлуння в кімнаті основний шлях —
+    системний echo-cancel PipeWire (див. PipeWireEchoCancel).
+    """
 
     def __init__(
         self,
         *,
         sample_rate: int = 16000,
-        filter_length: int = 128,
+        filter_length: int = 256,
         step_size: float = 0.35,
-        max_ref_seconds: float = 12.0,
-        max_delay_ms: float = 40.0,
+        max_fifo_seconds: float = 3.0,
+        max_delay_ms: float = 400.0,
+        evidence_ms: float = 500.0,
     ):
         self.sample_rate = sample_rate
         self.filter_length = max(8, int(filter_length))
         self.step_size = float(step_size)
-        self.max_ref_samples = int(sample_rate * max_ref_seconds)
         self.max_delay_samples = max(0, int(sample_rate * max_delay_ms / 1000.0))
-        self._ref_buffer = np.zeros(0, dtype=np.float32)
+        self.evidence_samples = max(64, int(sample_rate * evidence_ms / 1000.0))
+        self._max_fifo = int(sample_rate * max_fifo_seconds)
+        self._history = self.evidence_samples + self.max_delay_samples + FRAME_SAMPLES_16K
+        self._fifo = np.zeros(0, dtype=np.float32)
+        self._mic_hist = np.zeros(self._history, dtype=np.float32)
+        self._ref_hist = np.zeros(self._history, dtype=np.float32)
         self._weights = np.zeros(self.filter_length, dtype=np.float32)
-        # Ініціалізуємо головний тап одиницею для швидкого старту на нульовій затримці
-        self._weights[0] = 0.5
+        self._weights[0] = 0.5  # одиниця на старті: швидкий вихід на прямий шлях
+        self._delay = 0
+        self._delay_score = 0.0
+        self._frames = 0
         self._recent_tts: deque[str] = deque(maxlen=16)
         self.call_count: int = 0
 
     def feed_render_reference(self, ref_16k: np.ndarray) -> None:
-        """Додати точний буфер відтворення TTS (16 кГц float32) до reference-лінії AEC."""
+        """Поставити в чергу референс, який щойно записано в програвач (16 кГц float32)."""
         arr = np.asarray(ref_16k, dtype=np.float32).reshape(-1)
         if len(arr) == 0:
             return
-        self._ref_buffer = np.concatenate([self._ref_buffer, arr])
-        if len(self._ref_buffer) > self.max_ref_samples:
-            self._ref_buffer = self._ref_buffer[-self.max_ref_samples :]
+        self._fifo = np.concatenate([self._fifo, arr])
+        if len(self._fifo) > self._max_fifo:
+            self._fifo = self._fifo[-self._max_fifo :]
 
     def clear_reference(self) -> None:
-        self._ref_buffer = np.zeros(0, dtype=np.float32)
+        self._fifo = np.zeros(0, dtype=np.float32)
 
     def reset_filter(self) -> None:
         self._weights.fill(0.0)
         self._weights[0] = 0.5
+        self._delay = 0
+        self._delay_score = 0.0
         self.clear_reference()
 
-    def _align_reference(self, mic: np.ndarray) -> tuple[np.ndarray, np.ndarray, int]:
-        """Витягти вікно ref і вирівняти його за causal-затримкою через FFT крос-кореляцію."""
-        n = len(mic)
-        avail = len(self._ref_buffer)
-        if avail >= n:
-            raw_ref = self._ref_buffer[:n]
-            self._ref_buffer = self._ref_buffer[n:]
-        else:
-            raw_ref = np.pad(self._ref_buffer, (0, n - avail))
-            self._ref_buffer = np.zeros(0, dtype=np.float32)
+    def _consume(self, n: int) -> np.ndarray:
+        """Взяти з FIFO n семплів референсу; нестача заповнюється нулями (тиша відтворення)."""
+        out = np.zeros(n, dtype=np.float32)
+        take = min(n, len(self._fifo))
+        out[:take] = self._fifo[:take]
+        self._fifo = self._fifo[take:]
+        return out
 
-        max_lag = min(self.max_delay_samples, n // 2)
-        if max_lag <= 0 or float(np.dot(raw_ref, raw_ref)) <= 1e-8:
-            return raw_ref, raw_ref, 0
+    @staticmethod
+    def _push(history: np.ndarray, block: np.ndarray) -> np.ndarray:
+        if len(block) >= len(history):
+            return block[-len(history) :].astype(np.float32)
+        return np.concatenate([history[len(block) :], block]).astype(np.float32)
 
-        fft_size = 1 << (2 * n - 1).bit_length()
-        mic_f = np.fft.rfft(mic, n=fft_size)
-        ref_f = np.fft.rfft(raw_ref, n=fft_size)
-        # Позитивний лаг d означає mic[t] ~ ref[t - d]
-        xcorr = np.fft.irfft(mic_f * np.conj(ref_f), n=fft_size)[: max_lag + 1]
-        best_lag = int(np.argmax(np.abs(xcorr)))
-        if best_lag > 0:
-            aligned = np.concatenate(
-                [np.zeros(best_lag, dtype=np.float32), raw_ref[: n - best_lag]]
-            )
+    def _estimate_delay(self) -> tuple[int, float] | None:
+        """Затримка d (семпли): мікрофон у момент t несе референс із t - d. Повертає (d, score)."""
+        window = self.evidence_samples
+        span = self.max_delay_samples
+        mic_w = self._mic_hist[-window:]
+        ref_w = self._ref_hist[-(window + span) :]
+        mic_energy = float(np.dot(mic_w, mic_w))
+        if mic_energy < 1e-8 or float(np.dot(ref_w, ref_w)) < 1e-8:
+            return None
+        nfft = 1 << (len(ref_w) + window).bit_length()
+        # r[j] = sum_k ref_w[k + j] * mic_w[k], затримка d = span - j
+        corr = np.fft.irfft(np.fft.rfft(ref_w, nfft) * np.conj(np.fft.rfft(mic_w, nfft)), nfft)
+        corr = corr[: span + 1]
+        power = np.concatenate([[0.0], np.cumsum(ref_w.astype(np.float64) ** 2)])
+        energy = power[window : window + span + 1] - power[: span + 1]
+        score = corr / np.sqrt(np.maximum(energy * mic_energy, 1e-12))
+        best = float(np.max(score))
+        # Periodic sound repeats its peaks every pitch period, so several lags can score alike.
+        # Among them keep the one nearest the current estimate; with no estimate, the best peak.
+        candidates = np.nonzero(score >= 0.95 * best)[0]
+        if self._delay_score > 0.0:
+            lags = span - candidates
+            j = int(candidates[np.argmin(np.abs(lags - self._delay))])
         else:
-            aligned = raw_ref
-        return raw_ref, aligned, best_lag
+            j = int(np.argmax(score))
+        return span - j, float(score[j])
 
     def _nlms_block_filter(
         self, mic: np.ndarray, raw_ref: np.ndarray, aligned_ref: np.ndarray
     ) -> tuple[np.ndarray, float, bool]:
-        """Багатотаповий FIR NLMS-фільтр із детектором double-talk за вирівняною кореляцією."""
+        """FIR-фільтр з рекурсивною ковариацією та детектором double-talk."""
         L = self.filter_length
         n = len(mic)
         align_corr = float(
@@ -237,25 +271,25 @@ class AcousticEchoCanceller:
         if n < L:
             ref_e = float(np.dot(aligned_ref, aligned_ref)) + 1e-8
             gain = float(np.dot(mic, aligned_ref) / ref_e)
-            y_est = gain * aligned_ref
-            return mic - y_est, align_corr, double_talk
+            return mic - gain * aligned_ref, align_corr, double_talk
 
-        padded_ref = np.pad(raw_ref, (L - 1, 0))
-        shape = (n, L)
-        strides = (padded_ref.strides[0], padded_ref.strides[0])
-        X = np.lib.stride_tricks.as_strided(padded_ref, shape=shape, strides=strides)[:, ::-1]
+        padded_ref = np.pad(aligned_ref, (L - 1, 0))
+        X = np.lib.stride_tricks.as_strided(
+            padded_ref, shape=(n, L), strides=(padded_ref.strides[0], padded_ref.strides[0])
+        )[:, ::-1]
 
+        Xc = np.ascontiguousarray(X)
         if not double_talk:
-            step_stride = max(1, n // 64)
-            X_sub = X[::step_stride]
-            m_sub = mic[::step_stride]
-            # Регуляризований NLMS / RLS крок для багатотапової імпульсної характеристики RIR
-            gram = (X_sub.T @ X_sub) / max(1, len(X_sub)) + np.eye(L, dtype=np.float32) * 1e-4
-            rhs = (X_sub.T @ m_sub) / max(1, len(X_sub))
-            target_w = np.linalg.solve(gram, rhs).astype(np.float32)
-            self._weights = (1.0 - self.step_size) * self._weights + self.step_size * target_w
+            # Блоковий NLMS: крок — кореляція помилки з референсом, нормована на потужність.
+            # Кілька мс на кадр; розв'язання систем 256×256 на кожному кадрі займало ~600 мс.
+            y_prev = Xc @ self._weights
+            error = mic - y_prev
+            # ||x||² по всіх L відводах: L × середня потужність референсу в кадрі.
+            power = L * float(np.dot(aligned_ref, aligned_ref)) / max(1, n) + 1e-6
+            grad = (Xc.T @ error) / n
+            self._weights = self._weights + self.step_size * grad / power
 
-        y_fir = X @ self._weights
+        y_fir = Xc @ self._weights
         fir_corr = float(
             abs(np.dot(mic, y_fir)) / (np.linalg.norm(mic) * np.linalg.norm(y_fir) + 1e-8)
         )
@@ -277,7 +311,8 @@ class AcousticEchoCanceller:
         *,
         background_media_active: bool = False,
     ) -> tuple[np.ndarray, AecStats]:
-        """Пригнітити відлуння динаміка та оцінити ERLE, double-talk і домінування відлуння."""
+        """Пригнітити відлуння динаміка та оцінити ERLE, double-talk і домінування від
+        справжнього референсу, вирівняного за оціненою затримкою."""
         self.call_count += 1
         mic = np.asarray(mic_16k, dtype=np.float32).reshape(-1)
         n = len(mic)
@@ -285,25 +320,29 @@ class AcousticEchoCanceller:
             return mic, AecStats(0.0, 0.0, 0.0, 0.0, 0.0, False, background_media_active)
 
         in_rms = float(np.sqrt(np.mean(mic * mic)) + 1e-9)
-        if len(self._ref_buffer) == 0:
-            return mic.copy(), AecStats(
-                input_rms=in_rms,
-                output_rms=in_rms,
-                reference_rms=0.0,
-                correlation=0.0,
-                echo_return_loss_enhancement_db=0.0,
-                is_echo_dominant=False,
-                is_media_contaminated=background_media_active and in_rms < 0.04,
-                delay_samples=0,
-                double_talk_detected=False,
-            )
-
-        raw_ref, aligned_ref, delay_samples = self._align_reference(mic)
+        consumed = self._consume(n)
+        self._mic_hist = self._push(self._mic_hist, mic)
+        self._ref_hist = self._push(self._ref_hist, consumed)
+        self._frames += 1
+        if self._frames % 8 == 1:
+            estimate = self._estimate_delay()
+            if estimate is not None and estimate[1] >= 0.2:
+                if estimate[0] != self._delay:
+                    # Коефіцієнти, навчені за старим вирівнюванням, більше не чинні.
+                    self._weights.fill(0.0)
+                    self._weights[0] = 0.5
+                self._delay, self._delay_score = estimate
+        d = self._delay
+        if d > 0:
+            aligned = self._ref_hist[-(n + d) : -d]
+        else:
+            aligned = self._ref_hist[-n:]
+        raw_ref = aligned
         ref_rms = float(np.sqrt(np.mean(raw_ref * raw_ref)) + 1e-9)
         ref_energy = float(np.dot(raw_ref, raw_ref))
 
         if ref_energy > 1e-8:
-            residual, corr, double_talk = self._nlms_block_filter(mic, raw_ref, aligned_ref)
+            residual, corr, double_talk = self._nlms_block_filter(mic, raw_ref, aligned)
             if corr > 0.75 and not double_talk:
                 suppression = max(0.05, 1.0 - corr * 0.92)
                 cleaned = residual * suppression
@@ -325,7 +364,7 @@ class AcousticEchoCanceller:
             echo_return_loss_enhancement_db=round(erle_db, 2),
             is_echo_dominant=is_echo_dominant,
             is_media_contaminated=background_media_active and out_rms < 0.05,
-            delay_samples=delay_samples,
+            delay_samples=int(d),
             double_talk_detected=double_talk,
         )
 

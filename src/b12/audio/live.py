@@ -195,6 +195,7 @@ class LiveSession:
         self.utterances = 0
         self.asr_calls = 0
         self.barge_ins = 0
+        self._frames = 0
         self._turn: asyncio.Task | None = None
 
     def _emit(self, event: str, **data) -> None:
@@ -203,6 +204,16 @@ class LiveSession:
     async def run(self, stop: asyncio.Event) -> dict:
         async for frame in self.mic.frames(stop):
             barge = await self.duplex.feed_capture_frame(frame)
+            self._frames += 1
+            if self._frames % 31 == 0:  # about once a second: the acoustic health of this session
+                stats = barge.aec_stats
+                self._emit(
+                    "aec",
+                    erle_db=stats.echo_return_loss_enhancement_db,
+                    delay_ms=round(stats.delay_samples * 1000.0 / SAMPLE_RATE, 1),
+                    double_talk=stats.double_talk_detected,
+                    echo_dominant=stats.is_echo_dominant,
+                )
             if barge.barge_in_triggered:
                 self.barge_ins += 1
                 self._emit("barge_in", stop_ms=barge.time_to_stop_ms)
