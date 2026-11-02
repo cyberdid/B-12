@@ -269,3 +269,33 @@ async def test_voice_api_routes_status_mute_tts_asr_and_speaker(api):
 
     del_res = await client.delete(f"/api/voice/speaker/{actor_id}", headers=headers)
     assert del_res.status_code == 200 and del_res.json()["deleted"] is True
+
+
+def test_silero_vad_backend_and_streaming_endpoint_state():
+    """V-006, V-007: SileroVad працює в ONNX без RMS-завищення та підтримує потоковий endpoint."""
+    from b12.audio.endpoint import EndpointDetector, SileroVad
+    from b12.audio.tts import PiperTts
+
+    vad = SileroVad(allow_rms_fallback=False)
+    assert vad.backend == "onnx"
+    # Мертва тиша відсікається pre-filter'ом (rms < 0.002)
+    assert vad.frame_probability(np.zeros(512, dtype=np.float32)) == 0.0
+
+    tts = PiperTts()
+    speech_16k = tts.synthesize("Привіт Олександре").to_float32_16k()
+    silence_16k = np.zeros(int(16000 * 0.45), dtype=np.float32)
+    stream_buf = np.concatenate([np.zeros(1024, dtype=np.float32), speech_16k, silence_16k])
+
+    ep_det = EndpointDetector(vad=vad)
+    final_decision = None
+    # Подаємо по 1024 семпли (64 мс), перевіряючи збереження стану між викликами
+    for offset in range(0, len(stream_buf), 1024):
+        _, dec = ep_det.feed_stream_chunk(stream_buf[offset : offset + 1024])
+        if dec is not None:
+            final_decision = dec
+            break
+
+    assert final_decision is not None
+    assert final_decision.ended is True
+    assert final_decision.speech_duration_ms > 200.0
+    assert len(final_decision.speech_audio) > len(speech_16k) // 2

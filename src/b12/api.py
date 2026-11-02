@@ -588,18 +588,23 @@ def create_app(
 
     @app.get("/api/voice/status")
     async def voice_status(request: Request, who: Identity):
+        from b12.audio.aec import PulseAudioWebRtcAec
         from b12.audio.capture import MicController, inventory_devices
+        from b12.audio.endpoint import SileroVad
         from b12.audio.tts import PiperTts
 
         runtime = runtime_of(request)
         mic = MicController(runtime.control)
         tts = PiperTts()
+        vad = SileroVad()
         actor = runtime.control.resolve_actor(who.actor.id)
         return {
             "muted": mic.muted,
             "consent": actor.consent,
             "uk_tts_ready": tts.uk_model_path.is_file(),
             "en_tts_ready": tts.en_model_path.is_file(),
+            "vad_backend": vad.backend,
+            "webrtc_aec_supported": PulseAudioWebRtcAec.is_supported(),
             "devices": inventory_devices(),
         }
 

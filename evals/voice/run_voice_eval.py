@@ -15,14 +15,14 @@ from b12.audio.endpoint import EndpointDetector
 from b12.audio.tts import AudioPlayer, PiperTts
 
 CORPUS = [
-    {"id": "ua-01", "lang": "uk", "text": "Привіт Олександре система працює стабільно"},
-    {"id": "ua-02", "lang": "uk", "text": "Перевір будь ласка стан локальної пам'яті"},
-    {"id": "ua-03", "lang": "uk", "text": "Запам'ятай що мій улюблений колір синій"},
-    {"id": "ua-04", "lang": "uk", "text": "Яка зараз температура процесора та відеокарти"},
-    {"id": "en-01", "lang": "en", "text": "Hello friend the local voice pipeline is ready"},
-    {"id": "en-02", "lang": "en", "text": "Please check the system status and active processes"},
-    {"id": "en-03", "lang": "en", "text": "Remember that the backup schedule runs every night"},
-    {"id": "cs-01", "lang": "uk", "text": "Запусти перевірку local runtime та покажи статус"},
+    {"id": "ua-01", "lang": "uk", "text": "Привіт, Олександре, система працює стабільно."},
+    {"id": "ua-02", "lang": "uk", "text": "Перевір, будь ласка, стан локальної пам'яті."},
+    {"id": "ua-03", "lang": "uk", "text": "Запам'ятай, що мій улюблений колір синій."},
+    {"id": "ua-04", "lang": "uk", "text": "Яка зараз температура процесора та відеокарти?"},
+    {"id": "en-01", "lang": "en", "text": "Hello friend, the local voice pipeline is ready."},
+    {"id": "en-02", "lang": "en", "text": "Please check the system status and active processes."},
+    {"id": "en-03", "lang": "en", "text": "Remember that the backup schedule runs every night."},
+    {"id": "cs-01", "lang": "uk", "text": "Запусти перевірку local runtime та покажи статус."},
 ]
 
 _WORD_RE = re.compile(r"[0-9a-zа-яіїєґ']+")
@@ -119,9 +119,10 @@ async def main() -> None:
     asr = WhisperAsr()
     endpoint = EndpointDetector()
 
-    # Measure cold start
+    # Measure cold start (both UK and EN models)
     t0 = time.perf_counter()
     cold_audio = tts.synthesize(CORPUS[0]["text"], lang="uk")
+    _ = tts.synthesize(CORPUS[4]["text"], lang="en")
     cold_tts_ms = round((time.perf_counter() - t0) * 1000.0, 2)
     t0 = time.perf_counter()
     _ = asr.transcribe_pcm(cold_audio.pcm_int16, sample_rate=cold_audio.sample_rate, language="uk")
@@ -171,6 +172,7 @@ async def main() -> None:
     report = {
         "generated_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "host": "Ubuntu 24.04.5, i9-14900HX, CPUExecutionProvider (int8)",
+        "measurement_scope": "tts_to_asr_synthetic_roundtrip_smoke_test",
         "cold_start": {"tts_ms": cold_tts_ms, "asr_ms": cold_asr_ms},
         "summary": {
             "cases": len(cases_report),

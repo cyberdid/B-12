@@ -1,4 +1,4 @@
-"""Оцінювання full-duplex, AEC, barge-in та speaker verification (Task 17)."""
+"""Оцінювання full-duplex, NLMS AEC (RIR + шум), barge-in та speaker verification (Task 17)."""
 
 import asyncio
 import hashlib
@@ -26,6 +26,24 @@ def _signal(duration_s: float, f0: float, sr: int = 16000) -> np.ndarray:
         + 0.15 * np.sin(2 * np.pi * (3 * f0) * t + 0.5)
     )
     return (w * env).astype(np.float32)
+
+
+def _simulate_room_echo(
+    ref: np.ndarray, *, delay_samples: int = 16, rng: np.random.Generator
+) -> np.ndarray:
+    """Симулювати багатопроменеве кімнатне відлуння (RIR) + тепловий шум мікрофона (-42 dBFS)."""
+    rir = np.zeros(64, dtype=np.float32)
+    rir[0] = 0.58
+    rir[7] = 0.14
+    rir[19] = -0.06
+    rir[37] = 0.025
+    convolved = np.convolve(ref, rir, mode="full")[: len(ref)]
+    if delay_samples > 0:
+        convolved = np.concatenate(
+            [np.zeros(delay_samples, dtype=np.float32), convolved[:-delay_samples]]
+        )
+    noise = rng.normal(0.0, 0.004, size=len(ref)).astype(np.float32)
+    return (convolved + noise).astype(np.float32)
 
 
 def _temp_settings(root: Path) -> Settings:
@@ -65,17 +83,19 @@ def _temp_settings(root: Path) -> Settings:
 async def main() -> None:
     out_dir = Path(__file__).resolve().parent
     out_dir.mkdir(parents=True, exist_ok=True)
+    rng = np.random.default_rng(42)
 
-    # 1. AEC ERLE evaluation
-    aec = AcousticEchoCanceller()
+    # 1. AEC ERLE evaluation on simulated multi-tap RIR + noise + delay
+    aec = AcousticEchoCanceller(filter_length=128)
     erle_values = []
-    for f0 in (130.0, 160.0, 190.0, 220.0, 250.0):
+    for idx, f0 in enumerate((130.0, 160.0, 190.0, 220.0, 250.0)):
         ref = _signal(0.6, f0)
+        echo_mic = _simulate_room_echo(ref, delay_samples=12 + idx * 4, rng=rng)
         aec.feed_render_reference(ref)
-        _, stats = aec.process_capture(0.6 * ref)
+        _, stats = aec.process_capture(echo_mic)
         erle_values.append(stats.echo_return_loss_enhancement_db)
 
-    # 2. Barge-in time-to-stop across 10 trials & Speaker verification FAR/FRR
+    # 2. Barge-in time-to-stop across 10 trials using real TTS speech & ONNX Silero VAD
     stop_times = []
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -92,17 +112,20 @@ async def main() -> None:
             runtime.control.set_meta("owner_actor", owner.id)
 
             duplex = DuplexSession(runtime, session_id=session_id, actor_id=owner.id)
-            for i in range(10):
+            barge_speech = (
+                duplex.pipeline.tts.synthesize("Стоп, зачекай будь ласка!").to_float32_16k() * 1.3
+            )
+            for _ in range(10):
                 speak_task = asyncio.create_task(
                     duplex.speak_response("Перше речення для перевірки. Друге речення.")
                 )
                 await asyncio.sleep(0.04)
-                barge = await duplex.feed_capture_frame(_signal(0.4, 140.0 + i) * 1.4)
+                barge = await duplex.feed_capture_frame(barge_speech)
                 if barge.time_to_stop_ms is not None:
                     stop_times.append(barge.time_to_stop_ms)
                 await speak_task
 
-            # Speaker verification trials: 10 genuine owner variations, 10 impostors, 2 replays
+            # Speaker verification trials: 10 genuine owner variations, 10 impostors, exact replay
             enroll_audio = _signal(1.0, 135.0)
             duplex.speaker_verifier.enroll(
                 actor_id=owner.id, caller_actor_id=owner.id, audio_16k=enroll_audio
@@ -128,18 +151,23 @@ async def main() -> None:
 
     report = {
         "generated_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "measurement_scope": "software_pipeline_with_simulated_rir_and_real_tts_barge_in",
         "aec": {
+            "method": "multi_tap_nlms_fir_128_with_fft_delay_alignment",
             "trials": len(erle_values),
             "erle_mean_db": round(float(np.mean(erle_values)), 2),
             "erle_min_db": round(float(np.min(erle_values)), 2),
         },
         "barge_in": {
+            "vad_backend": "silero_onnx_no_rms_override",
+            "metric_type": "internal_software_cancel_and_player_stop_ms",
             "trials": len(stop_times),
             "time_to_stop_p50_ms": round(float(np.percentile(stop_times, 50)), 3),
             "time_to_stop_p95_ms": round(float(np.percentile(stop_times, 95)), 3),
             "time_to_stop_p99_ms": round(float(np.percentile(stop_times, 99)), 3),
         },
         "speaker_verification": {
+            "method": "mfcc_dct_plus_f0_harmonic_profile_diagnostic",
             "genuine_trials": 10,
             "impostor_trials": 10,
             "frr": round(false_rejects / 10.0, 4),

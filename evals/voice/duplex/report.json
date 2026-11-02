@@ -1,17 +1,22 @@
 {
-  "generated_at_utc": "2026-10-31T17:42:18.361564Z",
+  "generated_at_utc": "2026-11-02T09:54:25.996366Z",
+  "measurement_scope": "software_pipeline_with_simulated_rir_and_real_tts_barge_in",
   "aec": {
+    "method": "multi_tap_nlms_fir_128_with_fft_delay_alignment",
     "trials": 5,
-    "erle_mean_db": 156.32,
-    "erle_min_db": 148.64
+    "erle_mean_db": 30.41,
+    "erle_min_db": 28.45
   },
   "barge_in": {
+    "vad_backend": "silero_onnx_no_rms_override",
+    "metric_type": "internal_software_cancel_and_player_stop_ms",
     "trials": 10,
-    "time_to_stop_p50_ms": 0.029,
-    "time_to_stop_p95_ms": 0.039,
-    "time_to_stop_p99_ms": 0.04
+    "time_to_stop_p50_ms": 0.025,
+    "time_to_stop_p95_ms": 0.036,
+    "time_to_stop_p99_ms": 0.042
   },
   "speaker_verification": {
+    "method": "mfcc_dct_plus_f0_harmonic_profile_diagnostic",
     "genuine_trials": 10,
     "impostor_trials": 10,
     "frr": 0.0,

@@ -51,23 +51,41 @@ def extract_voiceprint(
     flatness = geo_mean / arith_mean
     is_spoof = flatness > 0.85
 
-    # Log-mel-like 32 frequency bands + 16 cepstral (DCT-like) coefficients + pitch autocorrelation
+    # Log-mel-like 32 frequency bands + 16 cepstral (DCT-II) coefficients + pitch harmonic profile
     freqs = np.linspace(0, sample_rate / 2.0, len(mean_spec))
     mel_edges = np.geomspace(60.0, 7600.0, 34)
-    band_feats = []
+    band_means = np.zeros(32, dtype=np.float32)
+    band_stds = np.zeros(32, dtype=np.float32)
     for b in range(32):
         mask = (freqs >= mel_edges[b]) & (freqs < mel_edges[b + 2])
-        val = float(np.log1p(np.mean(mean_spec[mask]))) if np.any(mask) else 0.0
-        var = float(np.log1p(np.mean(std_spec[mask]))) if np.any(mask) else 0.0
-        band_feats.extend([val, var])
+        if np.any(mask):
+            band_means[b] = float(np.log1p(np.mean(mean_spec[mask])))
+            band_stds[b] = float(np.log1p(np.mean(std_spec[mask])))
 
-    # Fine-grained harmonic peak bins in fundamental frequency region (70 Hz .. 400 Hz)
+    # DCT-II cepstral liftering (16 MFCC-like coefficients invariant to gain)
+    n_bands = 32
+    k_idx = np.arange(1, 17)[:, None]
+    n_idx = np.arange(n_bands)[None, :]
+    dct_basis = np.cos(np.pi * k_idx * (2 * n_idx + 1) / (2.0 * n_bands)).astype(np.float32)
+    cepstral = dct_basis @ (band_means - np.mean(band_means))
+    cepstral = cepstral / (np.linalg.norm(cepstral) + 1e-8)
+
+    band_feats = np.empty(64, dtype=np.float32)
+    band_feats[0::2] = band_means
+    band_feats[1::2] = band_stds
+    band_feats = band_feats / (np.linalg.norm(band_feats) + 1e-8)
+
+    # Fine-grained harmonic peak bins in fundamental frequency region (70 Hz .. 450 Hz)
     f0_mask = (freqs >= 70.0) & (freqs <= 450.0)
     f0_profile = mean_spec[f0_mask]
     f0_profile = f0_profile / (np.linalg.norm(f0_profile) + 1e-8)
 
     vec = np.concatenate(
-        [np.asarray(band_feats, dtype=np.float32), f0_profile.astype(np.float32) * 3.0]
+        [
+            band_feats * 1.5,
+            cepstral * 2.0,
+            f0_profile.astype(np.float32) * 2.5,
+        ]
     )
     norm = float(np.linalg.norm(vec))
     if norm > 1e-8:
@@ -146,6 +164,12 @@ class SpeakerStore:
         cur = self._conn.execute("DELETE FROM speaker_profiles WHERE actor_id = ?", (actor_id,))
         self._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         return cur.rowcount > 0
+
+    def purge_evidence(self, actor_id: str, target_ids: tuple[str, ...] = ()) -> bool:
+        """Видалити голосовий профіль актора при повному забутті або за явною ціллю."""
+        if not target_ids or actor_id in target_ids or f"voice:{actor_id}" in target_ids:
+            return self.delete_actor(actor_id)
+        return False
 
     def close(self) -> None:
         self._conn.close()

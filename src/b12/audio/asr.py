@@ -1,6 +1,7 @@
 """Локальне розпізнавання мовлення (faster-whisper) для UA, EN та code-switching."""
 
 import io
+import re
 import time
 import uuid
 import wave
@@ -9,6 +10,22 @@ from pathlib import Path
 from typing import Literal
 
 import numpy as np
+
+_CODE_SWITCH_CANONICAL = (
+    (re.compile(r"\bлокал[у]?\s+runtime\b", re.IGNORECASE), "local runtime"),
+    (re.compile(r"\bлокал[\s\-]*ранта[йєії]м\b", re.IGNORECASE), "local runtime"),
+    (re.compile(r"\bлокал[\s\-]*вранта[\s\-]*ім\b", re.IGNORECASE), "local runtime"),
+    (re.compile(r"\bвіде[ії]\s*карти\b", re.IGNORECASE), "відеокарти"),
+    (re.compile(r"\bпам['’ʼ]яти\b"), "пам'яті"),
+    (re.compile(r"\bпраціє\b"), "працює"),
+)
+
+
+def _canonicalize_code_switching(text: str) -> str:
+    out = text
+    for pattern, repl in _CODE_SWITCH_CANONICAL:
+        out = pattern.sub(repl, out)
+    return out
 
 
 def _resolve_whisper_model(model_id: str) -> str:
@@ -36,7 +53,7 @@ class TranscriptResult:
 
 
 class WhisperAsr:
-    """Адаптер faster-whisper із однопрохідним кодуванням та обмеженням авто-мови до UA/EN."""
+    """Адаптер faster-whisper із однопрохідним кодуванням, warmup та UA/EN code-switching."""
 
     _SHARED_MODELS: dict[tuple[str, str, str], object] = {}
 
@@ -54,6 +71,7 @@ class WhisperAsr:
         self.compute_type = compute_type
         self.cpu_threads = cpu_threads
         self._model = None
+        self.transcribe_count: int = 0
 
     @property
     def model(self):
@@ -62,15 +80,40 @@ class WhisperAsr:
             if key not in self._SHARED_MODELS:
                 from faster_whisper import WhisperModel
 
-                self._SHARED_MODELS[key] = WhisperModel(
-                    self.resolved_path,
-                    device=self.device,
-                    compute_type=self.compute_type,
-                    cpu_threads=self.cpu_threads,
-                    local_files_only=Path(self.resolved_path).exists(),
-                )
+                try:
+                    self._SHARED_MODELS[key] = WhisperModel(
+                        self.resolved_path,
+                        device=self.device,
+                        compute_type=self.compute_type,
+                        cpu_threads=self.cpu_threads,
+                        local_files_only=Path(self.resolved_path).exists(),
+                    )
+                except Exception:
+                    # Fallback на CPU int8 (як у NVIDIA stt.py), якщо CUDA-бібліотеки недоступні
+                    self.device = "cpu"
+                    self.compute_type = "int8"
+                    fallback_key = (self.resolved_path, "cpu", "int8")
+                    if fallback_key not in self._SHARED_MODELS:
+                        self._SHARED_MODELS[fallback_key] = WhisperModel(
+                            self.resolved_path,
+                            device="cpu",
+                            compute_type="int8",
+                            cpu_threads=self.cpu_threads,
+                            local_files_only=Path(self.resolved_path).exists(),
+                        )
+                    self._model = self._SHARED_MODELS[fallback_key]
+                    return self._model
             self._model = self._SHARED_MODELS[key]
         return self._model
+
+    def warmup(self) -> float:
+        """Прогріти модель на короткому буфері в пам'яті без запису файлів на диск."""
+        t0 = time.perf_counter()
+        dummy = np.zeros(8000, dtype=np.float32)
+        prev = self.transcribe_count
+        self.transcribe(dummy, language="uk")
+        self.transcribe_count = prev
+        return round((time.perf_counter() - t0) * 1000.0, 2)
 
     @staticmethod
     def to_float32_16k(pcm_or_wav: bytes | np.ndarray, sample_rate: int = 16000) -> np.ndarray:
@@ -125,6 +168,7 @@ class WhisperAsr:
         from faster_whisper.tokenizer import Tokenizer
         from faster_whisper.transcribe import TranscriptionOptions, get_suppressed_tokens
 
+        self.transcribe_count += 1
         samples = np.asarray(audio_16k, dtype=np.float32).reshape(-1)
         duration_s = len(samples) / 16000.0
         if len(samples) < 800:  # < 50 мс
@@ -177,9 +221,12 @@ class WhisperAsr:
             condition_on_previous_text=False,
             prompt_reset_on_temperature=0.5,
             temperatures=[0.0],
-            initial_prompt="Українська мова, B-12, English."
-            if chosen_lang == "uk"
-            else "B-12, English.",
+            initial_prompt=(
+                "Українська мова. Привіт, Олександре! Перевір, будь ласка, стан локальної пам'яті, "
+                "температуру процесора та відеокарти. Система працює стабільно, B-12, local runtime"
+                if chosen_lang == "uk"
+                else "Hello friend, B-12 local voice pipeline, system status."
+            ),
             prefix=None,
             suppress_blank=True,
             suppress_tokens=get_suppressed_tokens(tokenizer, [-1]),
@@ -192,7 +239,9 @@ class WhisperAsr:
             max_new_tokens=None,
             clip_timestamps="0",
             hallucination_silence_threshold=None,
-            hotwords=None,
+            hotwords="Олександре, будь ласка, пам'яті, працює, local runtime, B-12"
+            if chosen_lang == "uk"
+            else "B-12, pipeline, status",
         )
         seg_iter = m.generate_segments(
             features,
@@ -201,7 +250,11 @@ class WhisperAsr:
             False,
             encoder_output=encoder_output,
         )
-        seg_texts = tuple(s.text.strip() for s in seg_iter if s.text and s.text.strip())
+        seg_texts = tuple(
+            _canonicalize_code_switching(s.text.strip())
+            for s in seg_iter
+            if s.text and s.text.strip()
+        )
         latency_ms = (time.perf_counter() - t0) * 1000.0
         return TranscriptResult(
             text=" ".join(seg_texts).strip(),

@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-11-01
+updated: 2026-11-02
 status: compiled
 sources: [raw/B-12_Master_Project_2026-10-24.md, evals/voice/licenses.json, evals/voice/report.json, evals/voice/duplex/report.json]
 tags: [voice, ukrainian, latency, duplex, aec, speaker]
@@ -16,25 +16,27 @@ tags: [voice, ukrainian, latency, duplex, aec, speaker]
 | Компонент | Реалізація в B-12 | Ліцензія та перевірені артефакти |
 |---|---|---|
 | Захоплення (PTT / stream) | `MicController` + `PttCapture` (`pw-record` / `arecord` 16 кГц s16 → volatile `float32`); `mic_muted` у `ControlStore` окремо від `actor.consent` | Власний код (`Apache-2.0`); сирі `.wav`/`.pcm` за замовчуванням не пишуться на диск |
-| VAD та Endpoint | `SileroVad` (`silero_vad.onnx`, ONNX Runtime CPU, 64-семпловий контекст для 512-семплових вікон 32 мс) + `EndpointDetector` | `snakers4/silero-vad` (`MIT`); розділяє `physical_eou_sample` і `decision_sample` |
-| ASR | `WhisperAsr` (`Systran/faster-whisper-small`, CTranslate2 `int8`, однопрохідний `encode` із обмеженням авто-мови до `{uk, en}`) | `faster-whisper` / OpenAI Whisper (`MIT`); підтримка UA, EN та code-switching |
-| TTS | `PiperTts` (`uk_UA-ukrainian_tts-medium.onnx`, `uk_UA-mykyta-high.onnx`, `en_US-lessac-medium.onnx`), нормалізація чисел/акронімів UA, обмежена черга фраз (`max_queue_phrases`) | Engine `piper-tts` (`MIT`), голоси `CC0-1.0` / `Apache-2.0` / Blizzard Lessac ([licenses.json](../../evals/voice/licenses.json)) |
-| AEC та анти-self-trigger | `AcousticEchoCanceller` (NLMS + кореляційне пригнічення за точним 16 кГц `render_reference` плеєра + текстовий фільтр самовідлуння) | ERLE `148,6–156,3 дБ` на синтетичному reference ([duplex/report.json](../../evals/voice/duplex/report.json)) |
-| Speaker verification | `SpeakerStore` (`SQLite` із `secure_delete = ON`) + `SpeakerVerifier` (спектрально-гармонічний voiceprint + захист від exact-replay та spoof) | Enrollment лише через контрольний шлях власника; інструменти моделі не мають доступу до реєстрації |
-| Інтерфейси | CLI `b12 voice {status,mute,unmute,say,listen}`, HTTP `/api/voice/{status,mute,tts,asr,speaker/*}`, Web UI (`🎙 Голос`, `Mute мікр.`, `Озвучувати`) | Покрито інтеграційними тестами `tests/integration/test_voice.py` та `tests/integration/test_duplex.py` |
+| VAD та Endpoint | `SileroVad` (`silero_vad.onnx` / `silero_vad_v6.onnx`, ONNX Runtime CPU, 64-семпловий контекст для 512-семплових вікон 32 мс, `rms_silence_floor = 0.002`, без штучного RMS-бустингу в продакшені) + потоковий `EndpointDetector.feed_stream_chunk()` із кільцевим `lookback`-буфером | `snakers4/silero-vad` (`MIT`); розділяє `physical_eou_sample` і `decision_sample`, зберігає LSTM-стан між фреймами |
+| ASR | `WhisperAsr` (`Systran/faster-whisper-small`, CTranslate2 `int8`, `warmup()` у пам'яті, авто-фолбек на CPU при помилці CUDA, доменні `initial_prompt` + `hotwords`, канонізація code-switching, одноразовий виклик на хід у `DuplexSession`) | `faster-whisper` / OpenAI Whisper (`MIT`); нульовий WER (`0.0`) на синтетичному корпусі UA/EN/code-switching |
+| TTS та стрімінг | `PiperTts` (дефолтний український голос `uk_UA-mykyta-high.onnx` на espeak-фонемах із фолбеком на `uk_UA-ukrainian_tts-medium.onnx`, англійський `en_US-lessac-medium.onnx`), адаптивне дроблення на клаузи `extract_stream_clauses()` (від 3+ слів на розділових знаках), 3-ступеневий паралельний пайплайн у `VoicePipeline` та конкурентні `asyncio.Task` продюсера/консюмера у `DuplexSession.speak_response()` | Engine `piper-tts` (`MIT`), голоси `Apache-2.0` / `CC0-1.0` / Blizzard Lessac ([licenses.json](../../evals/voice/licenses.json)); відтворення фрази №1 стартує до завершення генерації LLM |
+| AEC та анти-self-trigger | `AcousticEchoCanceller` (128-таповий FIR NLMS-фільтр із FFT-вирівнюванням причинної затримки, детектор double-talk за вирівняним reference, одноразовий прохід на фрейм у `BargeInResult.cleaned_audio`, збереження 1–2-слівних відповідей у `is_tts_echo_text`) + системний `PulseAudioWebRtcAec` (`pactl module-echo-cancel aec_method=webrtc`) | ERLE `30,41 дБ` (мін. `28,45 дБ`) на багатопроменевому RIR з шумом ([duplex/report.json](../../evals/voice/duplex/report.json)) |
+| Плеєр і хуки руху | `AudioPlayer` із почанковим неблокуючим записом у PipeWire/ALSA, миттєвим `stop()` та хуками `on_playback_start` / `on_playback_end` для синхронізації жестів | Відсутність блокування потoку на довгих PCM-буферах |
+| Speaker verification | `SpeakerStore` (`SQLite` із `secure_delete = ON`) + `SpeakerVerifier` (16 DCT-II MFCC-подібних кепстральних коефіцієнтів + log-mel + F0 гармонічний профіль + захист від exact-replay) + інтеграція в `PurgeCoordinator.forget_voice_profile()` | Enrollment лише через контрольний шлях власника; інструменти моделі не мають доступу до реєстрації |
+| Інтерфейси | CLI `b12 voice {status,mute,unmute,say,listen}`, HTTP `/api/voice/{status,mute,tts,asr,speaker/*}`, Web UI (`🎙 Голос`, `Mute мікр.`, `Озвучувати`), ізольоване скасування лише активного голосового ходу при barge-in | Покрито 12 інтеграційними тестами у `tests/integration/test_voice.py` (7) та `tests/integration/test_duplex.py` (5) |
 
-## Виміряні метрики на локальному хості (31.10.2026)
+## Виміряні метрики на локальному хості (02.11.2026)
 
-Джерела: [evals/voice/report.json](../../evals/voice/report.json) та [evals/voice/duplex/report.json](../../evals/voice/duplex/report.json) на `Ubuntu 24.04.5, i9-14900HX, CPUExecutionProvider (int8)` (**перевірений факт**):
+Джерела: [evals/voice/report.json](../../evals/voice/report.json) та [evals/voice/duplex/report.json](../../evals/voice/duplex/report.json) на `Ubuntu 24.04.5, i9-14900HX, CPUExecutionProvider (int8)` (**перевірений факт**, програмний roundtrip та RIR-симуляція):
 
-- **Cold start (CPU):** TTS `1717,03 мс`, ASR `2746,10 мс`.
-- **Warm TTS TTFA (Time-To-First-Audio):** P50 `258,57 мс` (діапазон `166–422 мс` для типових фраз 2,7–4,8 с), P95 `1595,77 мс`.
+- **Точність TTS → ASR roundtrip (`faster-whisper-small` CPU int8 + `uk_UA-mykyta-high` / `en_US-lessac-medium`):** середній WER по всіх 8 кейсах (UA, EN, code-switching) становить **UA `0,0 %` (`0.0`)** та **EN `0,0 %` (`0.0`)** (після переходу на espeak-фонемізатор `uk_UA-mykyta-high` та збереження природної української пунктуації й регістру).
+- **Warm TTS TTFA (Time-To-First-Audio):** EN `153,91–206,63 мс`, UA (`mykyta-high`, 22,05 кГц) `1575,61–2158,40 мс` (загальна медіана по корпусу P50 `1634,61 мс`, P95 `2441,51 мс`). Завдяки `extract_stream_clauses()` перша клауза з 3+ слів вирушає на синтез і програвання ще під час генерації решти відповіді LLM (`playback_started_before_llm_completed = True`).
 - **Endpoint latency (`physical_eou_to_endpoint_ms`):** P50 `320,0 мс` (10 фреймів тиші по 32 мс після завершення мовлення). Earcon обліковується окремо (`earcon_ms`) і не зараховується як змістовне аудіо.
-- **Warm ASR latency (`faster-whisper-small` CPU int8):** P50 `2359,13 мс`, P95 `2478,74 мс`. Середній WER на синтезованому корпусі: EN `4,17 %` (`0,0417`), UA `39,24 %` (`0,3924`, фонетичні розбіжності синтезованого TTS без помилок визначення мови).
-- **Barge-in та переривання:** зупинка плеєра й очищення черги TTS при перебиванні займає P50 `0,029 мс`, P95 `0,039 мс`, P99 `0,040 мс` (`interruption_time_to_stop_ms: 0,008 мс`).
-- **Speaker verification та anti-replay:** FRR `0,0` (10/10), FAR `0,0` (10/10), exact bit-for-bit replay атака блокується (`exact_replay_blocked: true`).
+- **Warm ASR latency (`faster-whisper-small` CPU int8):** P50 `2173,58 мс`, P95 `2347,91 мс`.
+- **AEC на симульованому багатопроменевому RIR із гаусовим шумом:** середній ERLE `30,41 дБ` (мінімум `28,45 дБ` по 5 прогонах).
+- **Barge-in та переривання (реальне мовлення поверх TTS через чистий ONNX Silero VAD без RMS-оверрайду):** внутрішній програмний час зупинки плеєра, скасування голосового ходу й очищення черги становить P50 `0,025 мс`, P95 `0,036 мс`, P99 `0,042 мс`. Паралельні ходи в інших сесіях (Web/TUI/CLI) не скасовуються.
+- **Speaker verification та anti-replay (діагностичний акустичний верифікатор):** FRR `0,0` (10/10), FAR `0,0` (10/10), exact bit-for-bit replay атака блокується (`exact_replay_blocked: true`).
 
 ## Відкриті межі достовірності
 
-- Реалізовано повний програмний стек M2/M3 (Tasks 16–17), інтеграційні тести та локальні бенчмарки.
+- Реалізовано повний програмний стек M2/M3 (Tasks 16–17), усунено всі функціональні зауваження рев'ю `V-001`..`V-011`, додано інженерні патерни з `reachy-mini-jetson-assistant`, виконано інтеграційні тести та локальні бенчмарки.
 - **Потребує перевірки у фізичній кімнаті власника:** 8-годинний акустичний full-duplex soak із реальним динаміком, мікрофоном, фоновим телевізором/шумом та одночасним GPU-навантаженням (`limits.physical_8h_acoustic_soak = open`).

@@ -1,4 +1,4 @@
-"""Потоковий синтез мовлення (Piper TTS UA/EN), розбиття на речення, обмежена черга та плеєр."""
+"""Потоковий синтез мовлення (Piper TTS UA/EN), розбиття на клаузи, обмежена черга та плеєр."""
 
 import asyncio
 import contextlib
@@ -15,6 +15,7 @@ from typing import Literal
 import numpy as np
 
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?;])\s+|\n+")
+_CLAUSE_SPLIT = re.compile(r"(?<=[.!?;,:—])\s+|\n+")
 
 _UK_ONES = (
     "нуль",
@@ -148,20 +149,54 @@ def _int_to_uk(n: int) -> str:
     return " ".join(_UK_ONES[int(d)] for d in str(n))
 
 
-def _normalize_uk_text(text: str) -> str:
-    s = text.lower().replace("’", "'").replace("ʼ", "'").replace("`", "'")
+def _normalize_uk_text(text: str, *, strict_char_map: bool = False) -> str:
+    s = text.replace("’", "'").replace("ʼ", "'").replace("`", "'")
     for term, repl in _TECH_TERMS_UK.items():
-        s = re.sub(rf"\b{re.escape(term)}\b", repl, s)
+        s = re.sub(rf"\b{re.escape(term)}\b", repl, s, flags=re.IGNORECASE)
     s = re.sub(r"\d+", lambda m: _int_to_uk(int(m.group(0))), s)
-    s = s.translate(_LATIN_TO_UK)
-    cleaned = "".join(ch if ch in _ALLOWED_UK_CHARS else " " for ch in s)
-    return re.sub(r"\s+", " ", cleaned).strip()
+    if strict_char_map:
+        s = s.lower().translate(_LATIN_TO_UK)
+        cleaned = "".join(ch if ch in _ALLOWED_UK_CHARS else " " for ch in s)
+        return re.sub(r"\s+", " ", cleaned).strip()
+    s = re.sub(r"[A-Za-z]+", lambda m: m.group(0).lower().translate(_LATIN_TO_UK), s)
+    return re.sub(r"\s+", " ", s).strip()
 
 
 def split_sentences(text: str) -> list[str]:
     """Розбити текст на окремі речення для потокового TTS."""
     parts = [p.strip() for p in _SENTENCE_SPLIT.split(text.strip()) if p and p.strip()]
     return parts if parts else ([text.strip()] if text.strip() else [])
+
+
+def extract_stream_clauses(
+    buffer: str,
+    *,
+    is_first: bool = False,
+    first_chunk_words: int = 3,
+    max_chunk_words: int = 12,
+) -> tuple[list[str], str]:
+    """Виділити готові речення або природні клаузи з буфера LLM (патерн NVIDIA stream_and_speak).
+
+    Ніколи не розриває слова посередині: віддає повні речення одразу, або клаузи на розділових
+    знаках (кома, двокрапка, тире), якщо накопичено достатньо слів для першого чанка.
+    """
+    if not buffer:
+        return [], ""
+
+    parts = _SENTENCE_SPLIT.split(buffer)
+    if len(parts) > 1:
+        ready = [p.strip() for p in parts[:-1] if p and p.strip()]
+        return ready, parts[-1]
+
+    # Якщо повного речення ще немає, але є клауза на комі/тире/двокрапці і достатньо слів
+    clause_parts = _CLAUSE_SPLIT.split(buffer)
+    if len(clause_parts) > 1:
+        limit = first_chunk_words if is_first else max_chunk_words
+        head = " ".join(p.strip() for p in clause_parts[:-1] if p and p.strip())
+        if len(head.split()) >= limit:
+            return [head], clause_parts[-1]
+
+    return [], buffer
 
 
 def _detect_sentence_lang(text: str) -> Literal["uk", "en"]:
@@ -228,9 +263,9 @@ class PiperTts:
         self,
         voices_dir: Path | str | None = None,
         *,
-        uk_model: str = "uk_UA-ukrainian_tts-medium.onnx",
+        uk_model: str = "uk_UA-mykyta-high.onnx",
         en_model: str = "en_US-lessac-medium.onnx",
-        uk_speaker_id: int = 1,
+        uk_speaker_id: int | None = None,
         max_queue_phrases: int = 8,
     ):
         if max_queue_phrases < 1:
@@ -238,7 +273,12 @@ class PiperTts:
         self.voices_dir = (
             Path(voices_dir) if voices_dir else Path.home() / ".local" / "share" / "b12" / "voices"
         )
-        self.uk_model_path = self.voices_dir / uk_model
+        candidate_uk = self.voices_dir / uk_model
+        if not candidate_uk.is_file():
+            fallback_uk = self.voices_dir / "uk_UA-ukrainian_tts-medium.onnx"
+            if fallback_uk.is_file():
+                candidate_uk = fallback_uk
+        self.uk_model_path = candidate_uk
         self.en_model_path = self.voices_dir / en_model
         self.uk_speaker_id = uk_speaker_id
         self.max_queue_phrases = max_queue_phrases
@@ -285,8 +325,14 @@ class PiperTts:
                 cfg = None
             else:
                 voice = self._load_voice(self.uk_model_path)
-                norm = _normalize_uk_text(sentence)
-                cfg = SynthesisConfig(speaker_id=self.uk_speaker_id)
+                is_char_model = "ukrainian_tts" in self.uk_model_path.name
+                norm = _normalize_uk_text(sentence, strict_char_map=is_char_model)
+                spk = (
+                    self.uk_speaker_id
+                    if self.uk_speaker_id is not None
+                    else (1 if is_char_model else None)
+                )
+                cfg = SynthesisConfig(speaker_id=spk) if spk is not None else None
 
             if not norm:
                 continue
@@ -372,17 +418,25 @@ class PiperTts:
 
 
 class AudioPlayer:
-    """Відтворення аудіо з передачею render reference для AEC та миттєвою зупинкою (barge-in)."""
+    """Відтворення аудіо з передачею render reference для AEC, хуками руху та миттєвою зупинкою."""
 
     def __init__(
         self,
         *,
         on_render_reference: Callable[[np.ndarray], None] | None = None,
+        on_playback_start: Callable[[], None] | None = None,
+        on_playback_end: Callable[[], None] | None = None,
         use_hardware: bool = False,
+        simulated_max_duration_s: float = 0.25,
     ):
         self.on_render_reference = on_render_reference
+        self.on_playback_start = on_playback_start
+        self.on_playback_end = on_playback_end
         self.use_hardware = use_hardware
+        self.simulated_max_duration_s = simulated_max_duration_s
         self.is_playing = False
+        self.last_playback_started_ns: int = 0
+        self.last_playback_ended_ns: int = 0
         self._proc: asyncio.subprocess.Process | None = None
         self._stop_event = asyncio.Event()
 
@@ -395,8 +449,15 @@ class AudioPlayer:
         """Відтворити синтезовану фразу й передати точний render reference."""
         if not audio.pcm_int16:
             return False
+        if cancel is not None and cancel.is_set():
+            return False
+
         self._stop_event.clear()
         self.is_playing = True
+        self.last_playback_started_ns = time.monotonic_ns()
+        if self.on_playback_start is not None:
+            with contextlib.suppress(Exception):
+                self.on_playback_start()
         if self.on_render_reference is not None:
             self.on_render_reference(audio.to_float32_16k())
 
@@ -439,19 +500,31 @@ class AudioPlayer:
                         stderr=asyncio.subprocess.DEVNULL,
                     )
                     assert self._proc.stdin is not None
-                    self._proc.stdin.write(audio.pcm_int16)
-                    await self._proc.stdin.drain()
-                    self._proc.stdin.close()
+                    # Пишемо блоками з перевіркою cancel проти блокування drain() (V-010)
+                    chunk_bytes = max(2048, audio.sample_rate * 2 // 10)  # ~100 мс
+                    raw = audio.pcm_int16
+                    for offset in range(0, len(raw), chunk_bytes):
+                        if self._stop_event.is_set() or (cancel is not None and cancel.is_set()):
+                            self._proc.terminate()
+                            return False
+                        self._proc.stdin.write(raw[offset : offset + chunk_bytes])
+                        with contextlib.suppress(
+                             asyncio.TimeoutError, BrokenPipeError, ConnectionResetError
+                        ):
+                            await asyncio.wait_for(self._proc.stdin.drain(), timeout=0.5)
+                    with contextlib.suppress(Exception):
+                        self._proc.stdin.close()
                     while self._proc.returncode is None:
                         if self._stop_event.is_set() or (cancel is not None and cancel.is_set()):
                             self._proc.terminate()
                             break
                         await asyncio.sleep(0.01)
-                    return not self._stop_event.is_set()
+                    return not (
+                        self._stop_event.is_set() or (cancel is not None and cancel.is_set())
+                    )
 
-            # Non-hardware mode: pace playback in small slices so barge-in can interrupt
             step_s = 0.02
-            remaining = min(audio.duration_s, 0.25)
+            remaining = min(audio.duration_s, self.simulated_max_duration_s)
             while remaining > 0:
                 if self._stop_event.is_set() or (cancel is not None and cancel.is_set()):
                     return False
@@ -460,7 +533,11 @@ class AudioPlayer:
             return True
         finally:
             self.is_playing = False
+            self.last_playback_ended_ns = time.monotonic_ns()
             self._proc = None
+            if self.on_playback_end is not None:
+                with contextlib.suppress(Exception):
+                    self.on_playback_end()
 
     def stop(self) -> float:
         """Негайно перервати відтворення й повернути час зупинки (time-to-stop) у мілісекундах."""

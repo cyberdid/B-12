@@ -494,12 +494,17 @@ async def cmd_voice(args, settings) -> int:
         mic = MicController(runtime.control)
         tts = PiperTts()
         if args.action == "status":
+            from b12.audio.aec import PulseAudioWebRtcAec
+            from b12.audio.endpoint import SileroVad
+
             emit_json(
                 {
                     "muted": mic.muted,
                     "consent": owner.actor().consent,
                     "uk_tts_ready": tts.uk_model_path.is_file(),
                     "en_tts_ready": tts.en_model_path.is_file(),
+                    "vad_backend": SileroVad().backend,
+                    "webrtc_aec_supported": PulseAudioWebRtcAec.is_supported(),
                     "devices": inventory_devices(),
                 }
             )
@@ -539,16 +544,14 @@ async def cmd_voice(args, settings) -> int:
                 return 1
             if args.chat:
                 pipe = VoicePipeline(runtime, tts=tts)
+                live_player = AudioPlayer(use_hardware=True) if args.play else None
                 res = await pipe.process_utterance(
                     session_id=owner.session_id,
                     actor_id=owner.actor_id,
                     audio_16k=audio_16k,
                     language=args.lang,
+                    player=live_player,
                 )
-                if args.play and res.tts_chunks:
-                    player = AudioPlayer(use_hardware=True)
-                    for chunk in res.tts_chunks:
-                        await player.play(chunk)
                 emit_json(
                     {
                         "state": res.state,

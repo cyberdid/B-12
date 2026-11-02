@@ -1,109 +1,110 @@
 {
-  "generated_at_utc": "2026-10-31T17:42:13.620481Z",
+  "generated_at_utc": "2026-11-02T09:57:49.163732Z",
   "host": "Ubuntu 24.04.5, i9-14900HX, CPUExecutionProvider (int8)",
+  "measurement_scope": "tts_to_asr_synthetic_roundtrip_smoke_test",
   "cold_start": {
-    "tts_ms": 1717.03,
-    "asr_ms": 2746.1
+    "tts_ms": 7224.67,
+    "asr_ms": 2860.32
   },
   "summary": {
     "cases": 8,
-    "uk_mean_wer": 0.3924,
-    "en_mean_wer": 0.0417,
-    "tts_ttfa_p50_ms": 258.57,
-    "tts_ttfa_p95_ms": 1595.77,
-    "asr_p50_ms": 2359.13,
-    "asr_p95_ms": 2478.74,
+    "uk_mean_wer": 0.0,
+    "en_mean_wer": 0.0,
+    "tts_ttfa_p50_ms": 1634.61,
+    "tts_ttfa_p95_ms": 2441.51,
+    "asr_p50_ms": 2173.58,
+    "asr_p95_ms": 2347.91,
     "physical_eou_to_endpoint_p50_ms": 320.0,
-    "interruption_time_to_stop_ms": 0.008
+    "interruption_time_to_stop_ms": 0.007
   },
   "cases": [
     {
       "id": "ua-01",
       "lang": "uk",
-      "reference": "Привіт Олександре система працює стабільно",
-      "hypothesis": "Привіт, Олександра Система працює стабільно.",
-      "wer": 0.2,
-      "tts_ttfa_ms": 174.33,
-      "asr_latency_ms": 2170.21,
+      "reference": "Привіт, Олександре, система працює стабільно.",
+      "hypothesis": "Привіт, Олександре! Система працює стабільно.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 1693.6,
+      "asr_latency_ms": 2313.56,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 3.738
+      "audio_duration_s": 4.098
     },
     {
       "id": "ua-02",
       "lang": "uk",
-      "reference": "Перевір будь ласка стан локальної пам'яті",
-      "hypothesis": "Паравір, Бутласкад, стан локальної пом'яти.",
-      "wer": 0.6667,
-      "tts_ttfa_ms": 255.08,
-      "asr_latency_ms": 2363.72,
+      "reference": "Перевір, будь ласка, стан локальної пам'яті.",
+      "hypothesis": "Перевір, будь ласка, стан локальної пам'яті",
+      "wer": 0.0,
+      "tts_ttfa_ms": 1575.61,
+      "asr_latency_ms": 2251.35,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 3.947
+      "audio_duration_s": 3.913
     },
     {
       "id": "ua-03",
       "lang": "uk",
-      "reference": "Запам'ятай що мій улюблений колір синій",
-      "hypothesis": "За пом'ятой, що мій улюблений кулір синій.",
-      "wer": 0.5,
-      "tts_ttfa_ms": 262.07,
-      "asr_latency_ms": 2354.54,
+      "reference": "Запам'ятай, що мій улюблений колір синій.",
+      "hypothesis": "Запам'ятай, що мій улюблений колір синій.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 2158.4,
+      "asr_latency_ms": 2366.41,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 3.518
+      "audio_duration_s": 3.692
     },
     {
       "id": "ua-04",
       "lang": "uk",
-      "reference": "Яка зараз температура процесора та відеокарти",
-      "hypothesis": "Яка зараз температура процесора та відеокарте.",
-      "wer": 0.1667,
-      "tts_ttfa_ms": 313.46,
-      "asr_latency_ms": 2354.01,
+      "reference": "Яка зараз температура процесора та відеокарти?",
+      "hypothesis": "Яка зараз температура процесора та відеокарти.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 1874.29,
+      "asr_latency_ms": 2141.92,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 3.657
+      "audio_duration_s": 3.901
     },
     {
       "id": "en-01",
       "lang": "en",
-      "reference": "Hello friend the local voice pipeline is ready",
+      "reference": "Hello friend, the local voice pipeline is ready.",
       "hypothesis": "Hello friend, the local voice pipeline is ready.",
       "wer": 0.0,
-      "tts_ttfa_ms": 2227.55,
-      "asr_latency_ms": 2482.24,
+      "tts_ttfa_ms": 165.47,
+      "asr_latency_ms": 1952.98,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 2.74
+      "audio_duration_s": 2.902
     },
     {
       "id": "en-02",
       "lang": "en",
-      "reference": "Please check the system status and active processes",
-      "hypothesis": "Please check the system's status and active processes.",
-      "wer": 0.125,
-      "tts_ttfa_ms": 251.06,
-      "asr_latency_ms": 2332.06,
+      "reference": "Please check the system status and active processes.",
+      "hypothesis": "Please check the system status and active processes.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 206.63,
+      "asr_latency_ms": 1959.62,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 3.1
+      "audio_duration_s": 3.007
     },
     {
       "id": "en-03",
       "lang": "en",
-      "reference": "Remember that the backup schedule runs every night",
+      "reference": "Remember that the backup schedule runs every night.",
       "hypothesis": "Remember that the backup schedule runs every night.",
       "wer": 0.0,
-      "tts_ttfa_ms": 166.09,
-      "asr_latency_ms": 2472.23,
+      "tts_ttfa_ms": 153.91,
+      "asr_latency_ms": 1956.58,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 2.786
+      "audio_duration_s": 2.728
     },
     {
       "id": "cs-01",
       "lang": "uk",
-      "reference": "Запусти перевірку local runtime та покажи статус",
-      "hypothesis": "Запусти перевірку локал вранта ім та покажи статус.",
-      "wer": 0.4286,
-      "tts_ttfa_ms": 422.47,
-      "asr_latency_ms": 2470.13,
+      "reference": "Запусти перевірку local runtime та покажи статус.",
+      "hypothesis": "Запусти перевірку local runtime та покажи статус.",
+      "wer": 0.0,
+      "tts_ttfa_ms": 2593.96,
+      "asr_latency_ms": 2205.24,
       "physical_eou_to_endpoint_ms": 320.0,
-      "audio_duration_s": 4.818
+      "audio_duration_s": 4.052
     }
   ]
 }

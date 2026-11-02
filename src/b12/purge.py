@@ -37,10 +37,19 @@ class PurgeCoordinator:
         agent=None,
         goals=None,
         operations=None,
+        speakers=None,
     ):
         self.control, self.memory, self.sessions, self.goals = control, memory, sessions, goals
         self.operations = operations
         self.backups, self.knowledge, self.agent = backups, knowledge, agent
+        self.speakers = speakers
+
+    def forget_voice_profile(self, actor_id: str) -> bool:
+        """Видалити біометричний голосовий профіль актора через координований контрольний шлях."""
+        actor = self.control.resolve_actor(actor_id)
+        if self.speakers is not None:
+            return bool(self.speakers.delete_actor(actor.id))
+        return False
 
     async def purge(self, memory_id: str, context, guard) -> PurgeReceipt:
         """GlobalPurge port for the memory_forget tool (approval enforced by registry)."""
