@@ -458,3 +458,11 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-03] fix | A-02: CLI і запущений сервер
 
 Рішення власника: запущений `b12 serve` — єдиний власник runtime. CLI визначає режим за `RuntimeLock`: лок зайнятий → API; лок вільний → локальний runtime під локом; API недоступний при зайнятому локу → `server_unavailable` без переходу до прямого доступу. Реалізовано в `src/b12/cli.py` (`main`, `run_remote`) і `src/b12/cli_remote.py`; додано `GET /api/cli-session`. Зіставлення команд, яких бракує в API, у [topics/cli-server-mode.md](topics/cli-server-mode.md). Тести: `tests/e2e/test_cli_server.py` (3); мутація примусового локального режиму ламає сценарій `memory forget` під час активного ходу. Повний набір: 564 пройшли, 3 пропущено.
+
+## [2026-11-03] fix | A-03 транзитивне походження; A-09 векторні знімки
+
+- **A-03:** хід, що цитує історію сесії, переносить теги доказів цієї історії у свій стан (`SessionStore.history_with_tags`, `Agent.history_with_tags`). Тепер `forget` факту прибирає і пізніший хід, що його процитував. Тест: `test_forgetting_a_fact_also_removes_the_later_turn_that_quoted_it` (падав до змін).
+- **A-09 (частково):** `purge_snapshots` видаляє вектори забутих спогадів з `semantic/vectors.sqlite3` у кожному знімку. Тест: `tests/integration/test_snapshot_purge.py` (падав до змін). Не зроблено: відновлення (`restore`) пропускає повторне забуття для вже неживих записів; потребує окремої перевірки.
+- **A-10 не зроблено:** `evidence.evidence_id REFERENCES memories(id)` і `remember` вимагають, щоб доказ був живим спогадом; доказ з документа неможливий. Потрібна міграція схеми і зміна логіки забуття, тому окремим кроком.
+
+Повний набір: 566 пройшли, 3 пропущено.

@@ -385,6 +385,17 @@ class Agent:
             live=lambda evidence_id, kind: self.resolver.live(evidence_id, kind, actor),
         )
 
+    def history_with_tags(self, session_id: str, actor: Actor) -> tuple[list[dict], dict]:
+        """History for a new round, and the evidence tags it carries into the current turn."""
+        if not actor.consent:
+            return self.history_messages(session_id, actor), {}
+        return self.sessions.history_with_tags(
+            session_id,
+            actor.id,
+            max_turns=self.history_turns,
+            live=lambda evidence_id, kind: self.resolver.live(evidence_id, kind, actor),
+        )
+
     def purge_volatile(self, actor_id: str, evidence_ids) -> None:
         targets = set(evidence_ids)
         for session_id, entries in self._volatile.items():
@@ -665,7 +676,9 @@ class Agent:
                         {"id": str(uuid4()), "role": "user", "content": _NUDGE_REPORT}
                     )
                 tools = [] if last or state.get("force_text") else self.registry.schemas(context)
-                history = self.history_messages(context.session_id, actor)
+                history, carried = self.history_with_tags(context.session_id, actor)
+                # Transitive evidence: what this turn quotes from history belongs to this turn too.
+                state["tags"].update(carried)
                 messages = [
                     {k: m[k] for k in _MESSAGE_KEYS if k in m}
                     for m in [*history, *state["turn_messages"]]

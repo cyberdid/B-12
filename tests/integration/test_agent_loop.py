@@ -1079,3 +1079,22 @@ async def test_a_tool_name_mentioned_in_prose_is_not_a_pseudo_call(runtime_facto
     result, _ = await run_turn(runtime, who, "опиши інструменти", persist=True)
     assert result.state == "completed"
     assert len(state["requests"]) == 1
+
+
+async def test_forgetting_a_fact_also_removes_the_later_turn_that_quoted_it(runtime_factory):
+    """Regression (A-03): turn 2 repeated a fact it had from turn 1's history, and forgetting the
+    memory left turn 2 in the session with the fact in it."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    fact = runtime.memory.remember("Бірюзовий колір — улюблений", who.actor)
+    state["script"] = [
+        {"tool_calls": [("memory_search", {"query": "колір"})]},
+        {"content": "Ви любите бірюзовий."},
+        {"content": "Пам'ятаю: улюблений колір — бірюзовий."},
+    ]
+    await run_turn(runtime, who, "який мій колір?")
+    await run_turn(runtime, who, "нагадай ще раз")
+    await runtime.purge.forget(fact.id, who.actor.id)
+    remaining = [m["content"] for m in runtime.sessions.history(who.session, who.actor.id)]
+    assert not any("бірюзовий" in (c or "") for c in remaining)

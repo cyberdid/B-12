@@ -152,25 +152,44 @@ class SessionStore:
         live: Callable[[str, str], bool] | None = None,
     ) -> list[dict]:
         """Latest complete turns, oldest first; `live` hides turns with dead evidence."""
+        return self.history_with_tags(session_id, actor_id, max_turns=max_turns, live=live)[0]
+
+    def history_with_tags(
+        self,
+        session_id: str,
+        actor_id: str,
+        *,
+        max_turns: int = 20,
+        live: Callable[[str, str], bool] | None = None,
+    ) -> tuple[list[dict], dict[str, str]]:
+        """Like `history`, plus the evidence tags of every turn it returned.
+
+        A later turn built on this history carries those tags too, so forgetting one of
+        them removes the later turn that quoted it, not only the turn that first had it.
+        """
         if type(max_turns) is not int or max_turns < 0:
             raise ValueError("max_turns must be a nonnegative integer")
-        selected = []
+        selected: list[tuple[str, dict[str, str]]] = []
         for row in self.db.execute(
             "SELECT turn_id FROM turns WHERE session_id=? AND actor_id=? ORDER BY sequence DESC",
             (session_id, actor_id),
         ):
             if len(selected) >= max_turns:
                 break
-            if live is not None and not all(
-                live(tag["evidence_id"], tag["kind"])
+            tags = {
+                tag["evidence_id"]: tag["kind"]
                 for tag in self.db.execute(
                     "SELECT evidence_id,kind FROM tags WHERE turn_id=?", (row["turn_id"],)
                 )
-            ):
+            }
+            if live is not None and not all(live(e, k) for e, k in tags.items()):
                 continue
-            selected.append(row["turn_id"])
+            selected.append((row["turn_id"], tags))
+        carried: dict[str, str] = {}
+        for _, tags in selected:
+            carried.update(tags)
         result = []
-        for turn_id in reversed(selected):
+        for turn_id, _ in reversed(selected):
             for message in self.db.execute(
                 "SELECT * FROM messages WHERE turn_id=? ORDER BY position", (turn_id,)
             ):
@@ -186,7 +205,7 @@ class SessionStore:
                     if message[key] is not None:
                         item[key] = message[key]
                 result.append(item)
-        return result
+        return result, carried
 
     def save_checkpoint(
         self, turn_id: str, session_id: str, actor_id: str, state: dict, *, tags: Mapping[str, str]

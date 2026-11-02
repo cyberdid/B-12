@@ -211,6 +211,20 @@ class Operations:
                     backups.purge(actor_id, turn_ids=tuple(turns))
                 finally:
                     backups.close()
+            semantic_db = root / "semantic" / "vectors.sqlite3"
+            if semantic_db.exists() and target_ids:
+                # Vectors are derived from the memories: a purged memory leaves no vector behind.
+                import sqlite3
+
+                vectors = sqlite3.connect(semantic_db)
+                try:
+                    vectors.executemany(
+                        "DELETE FROM vectors WHERE actor_id=? AND memory_id=?",
+                        [(actor_id, target) for target in target_ids],
+                    )
+                    vectors.commit()
+                finally:
+                    vectors.close()
             for leftover in root.rglob("*"):
                 if leftover.name.endswith(("-wal", "-shm", "-journal")):
                     leftover.unlink()
