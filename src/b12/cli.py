@@ -320,13 +320,33 @@ async def cmd_approvals(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_knowledge(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        actor = owner.actor()
+        if args.action == "index":
+            emit_json(runtime.knowledge.index_document(Path(args.value), actor))
+        elif args.action == "remove":
+            emit_json(runtime.knowledge.remove_document(Path(args.value), actor))
+        else:
+            emit_json(runtime.knowledge.search(args.value, actor))
+        if args.action != "search":
+            await runtime.purge.sync_knowledge(actor)  # dependent memories become stale now
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_memory(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
         owner = require_owner(runtime)
         actor = owner.actor()
         if args.action == "remember":
-            record = runtime.memory.remember(args.value, actor, source="cli")
+            record = runtime.memory.remember(
+                args.value, actor, source="cli", documents=tuple(args.document or ())
+            )
             emit_json(record.model_dump(mode="json"))
         elif args.action == "search":
             emit_json([r.model_dump(mode="json") for r in runtime.memory.search(args.value, actor)])
@@ -727,6 +747,15 @@ def parser() -> argparse.ArgumentParser:
     memory = sub.add_parser("memory", help="пам’ять власника")
     memory.add_argument("action", choices=("remember", "search", "forget", "pending"))
     memory.add_argument("value", nargs="?", default="")
+    memory.add_argument(
+        "--document",
+        action="append",
+        default=[],
+        help="evidence_id з knowledge search; спогад застаріє, якщо документ зміниться",
+    )
+    knowledge = sub.add_parser("knowledge", help="документи власника для пошуку й доказів")
+    knowledge.add_argument("action", choices=("index", "remove", "search"))
+    knowledge.add_argument("value")
     session = sub.add_parser("session", help="робоча історія CLI")
     session.add_argument("action", choices=("clear",))
     sub.add_parser("tools", help="каталог інструментів")
@@ -812,9 +841,16 @@ def _remote_command(args, session_id: str = "") -> tuple[str, str, dict | None, 
             {"approve": cmd == "approve"},
             "json",
         )
+    if cmd == "knowledge":
+        if args.action == "index":
+            return ("POST", "/api/knowledge/index", {"path": args.value}, "json")
+        if args.action == "remove":
+            return ("POST", "/api/knowledge/remove", {"path": args.value}, "json")
+        return ("GET", "/api/knowledge/search", {"q": args.value}, "json")
     if cmd == "memory":
         if args.action == "remember":
-            return ("POST", "/api/memory", {"text": args.value}, "json")
+            body = {"text": args.value, "documents": list(args.document or [])}
+            return ("POST", "/api/memory", body, "json")
         if args.action == "search":
             return ("GET", "/api/memory", {"q": args.value}, "json")
         if args.action == "forget":
@@ -928,6 +964,7 @@ def main(argv=None) -> int:
         "deny": lambda a, s: cmd_decide(a, s, False),
         "approvals": cmd_approvals,
         "memory": cmd_memory,
+        "knowledge": cmd_knowledge,
         "session": cmd_session_clear,
         "tools": cmd_tools,
         "serve": cmd_serve,

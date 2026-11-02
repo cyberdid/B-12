@@ -74,6 +74,11 @@ class MemoryRecord(_Contract):
     source: Annotated[str, Field(min_length=1)]
     created_at: str
     evidence_ids: tuple[str, ...] = ()
+    # Typed sources: {"kind": "memory" | "document", "id": ..., "revision": ...}. For memories
+    # the revision is empty; for documents it is the KnowledgeIndex revision that was cited.
+    sources: tuple[dict, ...] = ()
+    status: Literal["active", "stale"] = "active"
+    status_reason: str = ""
 
     _validate_id = field_validator("id")(_uuid)
     _validate_identifiers = field_validator("owner_id", "kind", "source")(_identifier)

@@ -71,6 +71,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     control = ControlStore(root / "control")
     memory = MemoryStore(root / "memory" / "memory.sqlite3")
     knowledge = KnowledgeIndex(root / "knowledge")
+    memory.document_resolver = knowledge.resolve_evidence  # citations are checked at write time
     backups = BackupStore(root / "backups")
     sessions = SessionStore(root / "sessions")
     goals = GoalStore(root / "goals")

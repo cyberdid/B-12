@@ -1,10 +1,18 @@
-"""Версійована canonical SQLite schema; жодних автоматичних downgrade."""
+"""Версійована canonical SQLite schema; жодних автоматичних downgrade.
 
+v1: спогади з evidence на спогади. v2: типізовані джерела (`memory_sources`: спогад або
+документ KnowledgeIndex з ревізією) і статус спогаду (`active` / `stale`). Оновлення v1→v2
+починається з перевіреної резервної копії і не втрачає жодного спогаду чи зв'язку.
+"""
+
+import os
 import sqlite3
+from datetime import UTC, datetime
+from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
-_SCHEMA = (
+_SCHEMA_V1 = (
     """CREATE TABLE memories (
         rowid INTEGER PRIMARY KEY AUTOINCREMENT,
         id TEXT NOT NULL UNIQUE,
@@ -78,19 +86,85 @@ _SCHEMA = (
 )
 
 
+_UPGRADE_V1_TO_V2 = (
+    """CREATE TABLE memory_sources (
+        memory_id TEXT NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL CHECK(kind IN ('memory', 'document')),
+        ref_id TEXT NOT NULL,
+        ref_revision TEXT NOT NULL DEFAULT '',
+        position INTEGER NOT NULL,
+        PRIMARY KEY(memory_id, kind, ref_id)
+    )""",
+    """INSERT INTO memory_sources(memory_id, kind, ref_id, ref_revision, position)
+       SELECT memory_id, 'memory', evidence_id, '', position FROM evidence""",
+    "DROP INDEX evidence_parent",
+    "DROP TABLE evidence",
+    "CREATE INDEX memory_sources_ref ON memory_sources(kind, ref_id)",
+    "ALTER TABLE memories ADD COLUMN status TEXT NOT NULL DEFAULT 'active' "
+    "CHECK(status IN ('active', 'stale'))",
+    "ALTER TABLE memories ADD COLUMN status_reason TEXT NOT NULL DEFAULT ''",
+)
+
+
 def check_schema(connection: sqlite3.Connection) -> int:
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version not in (0, SCHEMA_VERSION):
+    if version not in (0, 1, SCHEMA_VERSION):
         raise RuntimeError(f"unsupported memory schema version: {version}")
     return version
+
+
+def _counts(connection: sqlite3.Connection) -> dict:
+    return {
+        "memories": connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0],
+        "evidence": connection.execute("SELECT COUNT(*) FROM evidence").fetchone()[0],
+    }
+
+
+def backup_before_upgrade(
+    connection: sqlite3.Connection, path: Path, *, expected: dict | None = None
+) -> Path:
+    """Copy a v1 store next to itself and verify the copy before any change is made.
+
+    The copy must pass integrity_check and carry the same row counts as the source; otherwise
+    the upgrade is refused and the source is left as it was.
+    """
+    expected = expected if expected is not None else _counts(connection)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    target = Path(path).with_name(f"{Path(path).stem}.v1-{stamp}.sqlite3")
+    copy = sqlite3.connect(target)
+    try:
+        connection.backup(copy)
+    finally:
+        copy.close()
+    os.chmod(target, 0o600)
+    check = sqlite3.connect(f"file:{target}?mode=ro", uri=True)
+    try:
+        ok = check.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+        found = _counts(check)
+    finally:
+        check.close()
+    if not ok or found != expected:
+        raise RuntimeError("backup verification failed; the upgrade was not started")
+    return target
 
 
 def migrate(connection: sqlite3.Connection) -> None:
     connection.execute("BEGIN IMMEDIATE")
     try:
-        if check_schema(connection) == 0:
-            for statement in _SCHEMA:
+        version = check_schema(connection)
+        if version == 0:
+            for statement in _SCHEMA_V1:
                 connection.execute(statement)
+            version = 1
+        if version == 1:
+            before = _counts(connection)
+            for statement in _UPGRADE_V1_TO_V2:
+                connection.execute(statement)
+            moved = connection.execute(
+                "SELECT COUNT(*) FROM memory_sources WHERE kind='memory'"
+            ).fetchone()[0]
+            if moved != before["evidence"]:
+                raise RuntimeError("evidence migration lost links; rolled back")
             connection.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
         connection.commit()
     except BaseException:

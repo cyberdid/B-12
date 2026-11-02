@@ -42,6 +42,11 @@ class ChatBody(_Body):
 
 class MemoryBody(_Body):
     text: str = Field(min_length=1, max_length=8192)
+    documents: list[str] = Field(default_factory=list, max_length=32)
+
+
+class KnowledgePathBody(_Body):
+    path: str = Field(min_length=1, max_length=1024)
 
 
 class GuestBody(_Body):
@@ -454,6 +459,36 @@ def create_app(
             raise HTTPException(403, "consent_required") from None
         return [r.model_dump(mode="json") for r in records]
 
+    @app.post("/api/knowledge/index")
+    async def knowledge_index(request: Request, body: KnowledgePathBody, who: Identity):
+        require_owner(who)
+        runtime = runtime_of(request)
+        actor = runtime.control.resolve_actor(who.actor.id)
+        try:
+            receipt = runtime.knowledge.index_document(Path(body.path), actor)
+        except (PermissionError, OSError, UnicodeDecodeError, ValueError) as exc:
+            raise HTTPException(422, type(exc).__name__) from None
+        await runtime.purge.sync_knowledge(actor)
+        return receipt
+
+    @app.post("/api/knowledge/remove")
+    async def knowledge_remove(request: Request, body: KnowledgePathBody, who: Identity):
+        require_owner(who)
+        runtime = runtime_of(request)
+        actor = runtime.control.resolve_actor(who.actor.id)
+        try:
+            receipt = runtime.knowledge.remove_document(Path(body.path), actor)
+        except (PermissionError, OSError, ValueError) as exc:
+            raise HTTPException(422, type(exc).__name__) from None
+        await runtime.purge.sync_knowledge(actor)
+        return receipt
+
+    @app.get("/api/knowledge/search")
+    async def knowledge_search(request: Request, q: str, who: Identity):
+        require_owner(who)
+        runtime = runtime_of(request)
+        return runtime.knowledge.search(q[:256], runtime.control.resolve_actor(who.actor.id))
+
     @app.post("/api/memory")
     async def memory_remember(request: Request, body: MemoryBody, who: Identity):
         runtime = runtime_of(request)
@@ -461,10 +496,15 @@ def create_app(
             raise HTTPException(403, "capability_denied")
         try:
             record = runtime.memory.remember(
-                body.text, runtime.control.resolve_actor(who.actor.id), source="api"
+                body.text,
+                runtime.control.resolve_actor(who.actor.id),
+                source="api",
+                documents=tuple(body.documents),
             )
         except PermissionError:
             raise HTTPException(403, "consent_required") from None
+        except ValueError:
+            raise HTTPException(422, "invalid_document_evidence") from None
         return record.model_dump(mode="json")
 
     @app.delete("/api/memory/{memory_id}")

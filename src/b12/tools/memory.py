@@ -39,7 +39,15 @@ class StoreArgs(Args):
     evidence_ids: list[str] = Field(
         default_factory=list,
         max_length=32,
-        description="Optional UUIDs of existing evidence only; leave empty, never invent ids",
+        description="Optional UUIDs of existing memories only; leave empty, never invent ids",
+    )
+    document_evidence_ids: list[str] = Field(
+        default_factory=list,
+        max_length=32,
+        description=(
+            "Optional evidence_id values from knowledge_search results; the memory then cites "
+            "that document and becomes stale if the document changes or is removed"
+        ),
     )
 
     @field_validator("text")
@@ -123,6 +131,7 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                 kind=args.kind,
                 source="tool:" + guard.operation_id,
                 evidence_ids=tuple(args.evidence_ids),
+                documents=tuple(args.document_evidence_ids),
                 expected_deletion_revision=expected_revision,
             )
         except PermissionError:

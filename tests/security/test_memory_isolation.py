@@ -49,7 +49,7 @@ def test_exact_actor_namespaces_apply_to_search_evidence_audit_and_forget(tmp_pa
     assert store.deletion_revision(guest) == 0
     assert store.search("shared", guest)[0].text == two.text
     with sqlite3.connect(path) as connection:
-        assert connection.execute("SELECT count(*) FROM evidence").fetchone()[0] == 0
+        assert connection.execute("SELECT count(*) FROM memory_sources").fetchone()[0] == 0
     store.close()
 
 

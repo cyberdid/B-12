@@ -287,6 +287,28 @@ class GoalStore:
         live = [p for p in self.preference_history(actor_id, key) if not p["redacted"]]
         return live[-1] if live else None
 
+    def pause_for_stale_evidence(self, actor_id: str, evidence_ids) -> list[str]:
+        """Pause active goals whose evidence went stale; the owner reviews and may resume."""
+        targets = set(evidence_ids)
+        if not targets:
+            return []
+        with self._atomic():
+            paused = [
+                row["id"]
+                for row in self.db.execute(
+                    "SELECT id, evidence_ids FROM goals WHERE actor_id=? AND status='active'",
+                    (actor_id,),
+                )
+                if targets & set(json.loads(row["evidence_ids"]))
+            ]
+            for goal_id in paused:
+                self.db.execute(
+                    "UPDATE goals SET status='paused', status_reason='evidence_stale',"
+                    " updated_at=? WHERE id=?",
+                    (_now(), goal_id),
+                )
+        return paused
+
     def purge_evidence(self, actor_id: str, evidence_ids) -> dict:
         """Idempotent purge hook: delete tagged goals/proposals, redact preferences."""
         targets = set(evidence_ids)

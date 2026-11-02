@@ -61,7 +61,7 @@ def test_forget_cascades_transitively_and_retains_unrelated_payload(tmp_path):
     assert store.search("private", actor) == []
     assert [m.id for m in store.search("microphone", actor)] == [keep.id]
     with sqlite3.connect(path) as connection:
-        assert connection.execute("SELECT count(*) FROM evidence").fetchone()[0] == 0
+        assert connection.execute("SELECT count(*) FROM memory_sources").fetchone()[0] == 0
         assert connection.execute("SELECT count(*) FROM memories").fetchone()[0] == 1
     for file in tmp_path.iterdir():
         data = file.read_bytes()

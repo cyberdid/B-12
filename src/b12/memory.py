@@ -18,7 +18,7 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 from b12.contracts import Actor, MemoryRecord, PurgeReceipt, _identifier
-from b12.migrations import check_schema, migrate
+from b12.migrations import backup_before_upgrade, check_schema, migrate
 
 _FTS_OPERATORS = frozenset({"and", "or", "not", "near"})
 _STOP_TERMS = frozenset(
@@ -268,9 +268,14 @@ class MemoryStore:
             self.path, isolation_level=None, check_same_thread=False, timeout=5
         )
         self._connection.row_factory = sqlite3.Row
+        # Set by the runtime: resolves a document evidence ID for this actor, or None.
+        self.document_resolver = None
         try:
             # Reject future schema before journal, schema, permissions or payload mutation.
-            check_schema(self._connection)
+            version = check_schema(self._connection)
+            if version == 1:
+                # The upgrade rewrites the evidence table: keep a verified copy first.
+                backup_before_upgrade(self._connection, self.path)
             os.chmod(self.path, 0o600)
             self._connection.execute("PRAGMA foreign_keys=ON")
             self._connection.execute("PRAGMA secure_delete=ON")
@@ -426,7 +431,7 @@ class MemoryStore:
             return self._revision(actor)
 
     def is_live(self, memory_id: str, actor: Actor) -> bool:
-        """Payload-free liveness for trusted resolvers; tombstoned IDs are never live."""
+        """Payload-free liveness for trusted resolvers; tombstoned and stale IDs are not live."""
         try:
             UUID(memory_id)
         except (ValueError, TypeError, AttributeError):
@@ -434,7 +439,7 @@ class MemoryStore:
         with self._transaction():
             return bool(
                 self._connection.execute(
-                    """SELECT 1 FROM memories m WHERE id=? AND actor_id=?
+                    """SELECT 1 FROM memories m WHERE id=? AND actor_id=? AND status='active'
                        AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
                     (memory_id, actor.id),
                 ).fetchone()
@@ -448,6 +453,7 @@ class MemoryStore:
         kind: str = "fact",
         source: str = "user",
         evidence_ids: tuple[str, ...] = (),
+        documents: tuple[str, ...] = (),
         expected_deletion_revision: int | None = None,
     ) -> MemoryRecord:
         self._consent(actor)
@@ -455,8 +461,14 @@ class MemoryStore:
             type(expected_deletion_revision) is not int or expected_deletion_revision < 0
         ):
             raise ValueError("expected deletion revision must be a nonnegative integer")
-        record = MemoryRecord(
-            id=str(uuid4()),
+        if len(set(evidence_ids)) != len(evidence_ids):
+            raise ValueError("duplicate evidence IDs")
+        if len(set(documents)) != len(documents):
+            raise ValueError("duplicate document evidence IDs")
+        record_id = str(uuid4())
+        # Validate identifiers and text before any payload is written.
+        MemoryRecord(
+            id=record_id,
             owner_id=actor.id,
             kind=kind,
             text=text,
@@ -464,8 +476,7 @@ class MemoryStore:
             created_at=_now(),
             evidence_ids=evidence_ids,
         )
-        if len(set(evidence_ids)) != len(evidence_ids):
-            raise ValueError("duplicate evidence IDs")
+        cited_documents = []
         with self._transaction(write=True):
             if (
                 expected_deletion_revision is not None
@@ -475,21 +486,87 @@ class MemoryStore:
             for evidence_id in evidence_ids:
                 if not self._connection.execute(
                     """SELECT 1 FROM memories m WHERE id=? AND actor_id=?
+                       AND status='active'
                        AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
                     (evidence_id, actor.id),
                 ).fetchone():
                     raise ValueError("evidence must be live memory in the exact actor namespace")
+            for document_id in documents:
+                # The document must be live for this actor right now: exists, current revision,
+                # not removed. The check and the write share one transaction.
+                ref = self.document_resolver(document_id, actor) if self.document_resolver else None
+                if (
+                    ref is None
+                    or ref.owner_id != actor.id
+                    or ref.kind != "document"
+                    or not ref.active
+                ):
+                    raise ValueError("document evidence must be a live document of this actor")
+                cited_documents.append((document_id, ref.revision))
+            created = _now()
             self._connection.execute(
                 """INSERT INTO memories(id, actor_id, kind, text, source, created_at)
                    VALUES (?,?,?,?,?,?)""",
-                (record.id, actor.id, record.kind, record.text, record.source, record.created_at),
+                (record_id, actor.id, kind, text, source, created),
             )
+            links = [(record_id, "memory", item, "", i) for i, item in enumerate(evidence_ids)]
+            links += [
+                (record_id, "document", item, revision, len(evidence_ids) + i)
+                for i, (item, revision) in enumerate(cited_documents)
+            ]
             self._connection.executemany(
-                "INSERT INTO evidence VALUES (?,?,?)",
-                ((record.id, item, i) for i, item in enumerate(evidence_ids)),
+                "INSERT INTO memory_sources(memory_id, kind, ref_id, ref_revision, position)"
+                " VALUES (?,?,?,?,?)",
+                links,
             )
-            self._audit(actor, "remember", memory_id=record.id)
-        return record
+            self._audit(actor, "remember", memory_id=record_id)
+        return MemoryRecord(
+            id=record_id,
+            owner_id=actor.id,
+            kind=kind,
+            text=text,
+            source=source,
+            created_at=created,
+            evidence_ids=evidence_ids,
+            sources=tuple(
+                [{"kind": "memory", "id": item, "revision": ""} for item in evidence_ids]
+                + [
+                    {"kind": "document", "id": item, "revision": revision}
+                    for item, revision in cited_documents
+                ]
+            ),
+        )
+
+    def mark_stale_for_documents(self, actor: Actor, evidence_ids) -> list[str]:
+        """Mark the memories that cite invalidated document evidence stale, and everything
+        built on them. Stale memories are kept (the owner can see and forget them) but are
+        not live evidence and are not used for reflection. Idempotent per memory."""
+        targets = sorted(set(evidence_ids))
+        if not targets:
+            return []
+        with self._transaction(write=True):
+            rows = self._connection.execute(
+                """WITH RECURSIVE stale(id, reason) AS (
+                       SELECT s.memory_id, 'document_changed' FROM memory_sources s
+                       JOIN memories m ON m.id=s.memory_id
+                       WHERE s.kind='document' AND s.ref_id IN (SELECT value FROM json_each(?))
+                         AND m.actor_id=? AND m.status='active'
+                       UNION
+                       SELECT s.memory_id, 'source_stale' FROM memory_sources s
+                       JOIN memories m ON m.id=s.memory_id
+                       JOIN stale st ON s.kind='memory' AND s.ref_id=st.id
+                       WHERE m.actor_id=? AND m.status='active'
+                   )
+                   SELECT id, MIN(reason) AS reason FROM stale GROUP BY id ORDER BY id""",
+                (_encoded(targets), actor.id, actor.id),
+            ).fetchall()
+            for row in rows:
+                self._connection.execute(
+                    "UPDATE memories SET status='stale', status_reason=? WHERE id=?",
+                    (row["reason"], row["id"]),
+                )
+                self._audit(actor, "stale", memory_id=row["id"])
+        return [row["id"] for row in rows]
 
     def get(self, memory_id: str, actor: Actor) -> MemoryRecord | None:
         self._consent(actor)
@@ -508,7 +585,7 @@ class MemoryStore:
         excluded = list(exclude_kinds)
         with self._transaction():
             rows = self._connection.execute(
-                """SELECT m.* FROM memories m WHERE actor_id=?
+                """SELECT m.* FROM memories m WHERE actor_id=? AND status='active'
                    AND kind NOT IN (SELECT value FROM json_each(?))
                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
                    ORDER BY m.rowid DESC LIMIT ?""",
@@ -517,11 +594,15 @@ class MemoryStore:
             return [self._record(row) for row in rows]
 
     def _record(self, row: sqlite3.Row) -> MemoryRecord:
-        evidence = tuple(
-            item[0]
-            for item in self._connection.execute(
-                "SELECT evidence_id FROM evidence WHERE memory_id=? ORDER BY position", (row["id"],)
-            )
+        links = self._connection.execute(
+            "SELECT kind, ref_id, ref_revision FROM memory_sources"
+            " WHERE memory_id=? ORDER BY position",
+            (row["id"],),
+        ).fetchall()
+        evidence = tuple(link["ref_id"] for link in links if link["kind"] == "memory")
+        sources = tuple(
+            {"kind": link["kind"], "id": link["ref_id"], "revision": link["ref_revision"]}
+            for link in links
         )
         return MemoryRecord(
             id=row["id"],
@@ -531,6 +612,9 @@ class MemoryStore:
             source=row["source"],
             created_at=row["created_at"],
             evidence_ids=evidence,
+            sources=sources,
+            status=row["status"],
+            status_reason=row["status_reason"],
         )
 
     def search(self, query: str, actor: Actor, *, limit: int = 8) -> list[MemoryRecord]:
@@ -650,7 +734,8 @@ class MemoryStore:
                     """WITH RECURSIVE closure(id) AS (
                        SELECT id FROM memories WHERE id=? AND actor_id=?
                        UNION
-                       SELECT e.memory_id FROM evidence e JOIN closure c ON e.evidence_id=c.id
+                       SELECT e.memory_id FROM memory_sources e
+                       JOIN closure c ON e.kind='memory' AND e.ref_id=c.id
                        JOIN memories m ON m.id=e.memory_id WHERE m.actor_id=?
                    ) SELECT id FROM closure ORDER BY id""",
                     (memory_id, actor.id, actor.id),
@@ -706,9 +791,9 @@ class MemoryStore:
                 if not operation[0]:
                     # JSON closure avoids SQL placeholder limits for large transitive purges.
                     self._connection.execute(
-                        """DELETE FROM evidence WHERE memory_id IN
-                           (SELECT value FROM json_each(?)) OR evidence_id IN
-                           (SELECT value FROM json_each(?))""",
+                        """DELETE FROM memory_sources WHERE memory_id IN
+                           (SELECT value FROM json_each(?)) OR (kind='memory' AND ref_id IN
+                           (SELECT value FROM json_each(?)))""",
                         (_encoded(receipt.target_ids), _encoded(receipt.target_ids)),
                     )
                     self._connection.execute(

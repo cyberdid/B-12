@@ -148,6 +148,9 @@ class PurgeCoordinator:
             ids = tuple(receipt["invalidated_evidence_ids"])
             if not ids or self.sessions.invalidation_applied(operation):
                 continue
+            stale = self.memory.mark_stale_for_documents(actor, ids)
+            if stale and self.goals is not None:
+                self.goals.pause_for_stale_evidence(actor.id, stale)
             self.sessions.purge_evidence(operation, actor.id, ids)
             if self.goals is not None:
                 self.goals.purge_evidence(actor.id, ids)
