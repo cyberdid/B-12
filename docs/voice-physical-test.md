@@ -73,15 +73,18 @@ pw-cli load-module libpipewire-module-echo-cancel \
 **Перевірка перед запуском** (тільки читання):
 
 ```
-b12 voice status              # uk_tts_ready, en_tts_ready, vad_backend, devices
-b12 voice unmute
-b12 doctor
+.venv/bin/b12 voice status    # uk_tts_ready, en_tts_ready, vad_backend, devices; muted должно быть false
+.venv/bin/b12 doctor
 ```
+
+Якщо `muted` дорівнює `true`, спершу виконайте `.venv/bin/b12 voice unmute` (це змінює стан мікрофона).
+Сервер `b12 serve` має бути зупинений: інакше `voice live` поверне `requires_stopped_server`.
 
 **Запуск.** Події пишуться у файл (по одному JSON на рядок):
 
 ```
-b12 voice live | tee ~/b12-voice-$(date +%Y%m%d-%H%M).jsonl
+# запуск з теки worktree: .venv/bin/b12 (b12 не в PATH)
+.venv/bin/b12 voice live | tee ~/b12-voice-$(date +%Y%m%d-%H%M).jsonl
 ```
 
 Зупинка: Ctrl-C. Підсумок `stats` (utterances, asr_calls, barge_ins) друкується останнім рядком.
