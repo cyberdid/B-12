@@ -144,3 +144,25 @@ async def test_a_command_without_an_api_endpoint_asks_for_a_stopped_server(scrip
         assert json.loads(out)["error"] == "requires_stopped_server"
     finally:
         _stop(process)
+
+
+async def test_voice_live_refuses_while_the_microphone_is_muted(scripted_ollama, env):
+    code, _, err = await asyncio.to_thread(_cli, env, "init")
+    assert code == 0, err
+    code, _, err = await asyncio.to_thread(_cli, env, "voice", "mute")
+    assert code == 0, err
+    code, out, _ = await asyncio.to_thread(_cli, env, "voice", "live")
+    assert code == 1
+    assert json.loads(out)["error"] == "microphone_muted"
+
+
+async def test_voice_live_needs_a_stopped_server_because_the_device_is_local(scripted_ollama, env):
+    code, _, err = await asyncio.to_thread(_cli, env, "init")
+    assert code == 0, err
+    process, url = await _start_server(env, _free_port())
+    try:
+        code, out, _ = await asyncio.to_thread(_cli, env, "voice", "live", api_url=url)
+        assert code == 5
+        assert json.loads(out)["error"] == "requires_stopped_server"
+    finally:
+        _stop(process)

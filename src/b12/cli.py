@@ -552,6 +552,36 @@ async def cmd_voice(args, settings) -> int:
                 }
             )
             return 0
+        if args.action == "live":
+            from b12.audio.duplex import DuplexSession
+            from b12.audio.live import LiveMic, LiveSession
+
+            duplex = DuplexSession(
+                runtime,
+                session_id=owner.session_id,
+                actor_id=owner.actor_id,
+                use_hardware_audio=True,
+            )
+            stop = asyncio.Event()
+            loop = asyncio.get_running_loop()
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.add_signal_handler(sig, stop.set)
+            session = LiveSession(
+                duplex,
+                LiveMic(mic),
+                on_event=lambda event: print(json.dumps(event, ensure_ascii=False), flush=True),
+            )
+            try:
+                stats = await session.run(stop)
+            except PermissionError:
+                emit_json({"error": "microphone_muted"})
+                return 1
+            finally:
+                duplex.close()
+                for sig in (signal.SIGINT, signal.SIGTERM):
+                    loop.remove_signal_handler(sig)
+            emit_json(stats)
+            return 0
         if args.action == "listen":
             try:
                 if args.file:
@@ -792,7 +822,7 @@ def parser() -> argparse.ArgumentParser:
     autonomy = sub.add_parser("autonomy", help="один прохід scheduler")
     autonomy.add_argument("--reflect", action="store_true", help="лише idle рефлексія")
     voice = sub.add_parser("voice", help="локальний голосовий шар (PTT, ASR, TTS)")
-    voice.add_argument("action", choices=("status", "mute", "unmute", "say", "listen"))
+    voice.add_argument("action", choices=("status", "mute", "unmute", "say", "listen", "live"))
     voice.add_argument("value", nargs="?", default="")
     voice.add_argument("--lang", choices=("auto", "uk", "en"), default="auto")
     voice.add_argument("--out", help="записати синтезований WAV у файл")

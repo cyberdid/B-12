@@ -698,6 +698,10 @@ class Agent:
                         request, on_delta=delta, cancel=context.cancel, deadline=context.deadline
                     )
                 state.setdefault("model_metrics", []).append(dict(reply.metrics))
+                if context.cancel.is_set() or active.invalidated:
+                    # Cancelled while the model was answering (for example, the user barged in):
+                    # the partial answer is not a completed turn.
+                    return await finish("cancelled", code="cancelled")
                 if not reply.tool_calls:
                     text = (reply.content or "").strip()
                     if state.get("finalized"):

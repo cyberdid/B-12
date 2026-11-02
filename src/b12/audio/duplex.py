@@ -242,13 +242,29 @@ class DuplexSession:
         if barge.aec_stats.is_echo_dominant or barge.aec_stats.is_media_contaminated:
             return None
 
-        # Використовуємо вже очищений буфер із feed_capture_frame без повторного виклику AEC (V-002)
+        # Використовуємо вже очищений буфер із feed_capture_frame без повторного виклику AEC (V-00
         cleaned = barge.cleaned_audio
         ep = self.pipeline.endpoint.detect_utterance(cleaned)
         target_audio = ep.speech_audio if len(ep.speech_audio) > 0 else cleaned
 
         # Виконуємо ASR рівно один раз і передаємо готовий транскрипт у конвеєр (V-003)
         transcript = await asyncio.to_thread(self.pipeline.asr.transcribe, target_audio)
+        return await self.process_cleaned_utterance(
+            cleaned, transcript, live_playback=live_playback
+        )
+
+    async def process_cleaned_utterance(
+        self,
+        cleaned: np.ndarray,
+        transcript,
+        *,
+        live_playback: bool = True,
+    ) -> VoiceTurnResult | None:
+        """Хід агента для репліки, яку вже очищено AEC і розпізнано один раз.
+
+        Live-режим подає сюди репліки, сегментовані з безперервного потоку: AEC і ASR
+        виконано раніше, тож тут немає ні повторного AEC, ні повторного ASR.
+        """
         if not transcript.text.strip() or self.aec.is_tts_echo_text(transcript.text):
             return None
 
@@ -259,18 +275,16 @@ class DuplexSession:
             self._active_turn_id = tid
 
         try:
-            res = await self.pipeline.process_utterance(
+            return await self.pipeline.process_utterance(
                 session_id=self.session_id,
                 actor_id=self.actor_id,
                 audio_16k=cleaned,
                 cancel=cancel,
                 precomputed_transcript=transcript,
-                precomputed_endpoint=ep,
                 player=self.player if live_playback else None,
                 on_tts_chunk=lambda ch: self.aec.record_tts_utterance(ch.text),
                 on_turn_started=_set_turn_id,
             )
-            return res
         finally:
             if self._active_cancel is cancel:
                 self._active_cancel = None
