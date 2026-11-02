@@ -529,6 +529,12 @@ def create_app(
         require_owner(who)  # synchronous copy inside the event loop: consistent across stores
         return runtime_of(request).operations.create_snapshot()
 
+    @app.get("/api/cli-session")
+    async def cli_session(request: Request, who: Identity):
+        """The owner's CLI session, so `b12 chat` through the server continues the same history."""
+        require_owner(who)
+        return {"session_id": runtime_of(request).control.get_meta("cli_session")}
+
     @app.get("/api/goals")
     async def goal_list(request: Request, who: Identity):
         return runtime_of(request).goals.for_actor(who.actor.id)

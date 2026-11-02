@@ -774,6 +774,139 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
+# Commands that run without the CLI taking the state lock: `serve` takes it itself, and `tui`
+# only talks to the API.
+SERVER_OWNED = frozenset({"serve", "tui"})
+EXIT_SERVER_UNAVAILABLE = 4
+EXIT_REQUIRES_STOPPED_SERVER = 5
+
+
+def _try_state_lock(settings):
+    """The runtime lock, or None when a running B-12 (serve or restore) already holds it."""
+    from b12.service import RuntimeLock
+
+    settings.state_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+    try:
+        return RuntimeLock(settings.state_dir)
+    except RuntimeError:
+        return None
+
+
+def _remote_command(args, session_id: str = "") -> tuple[str, str, dict | None, str] | None:
+    """(method, path, json body, how to read the answer) for a command the API serves.
+
+    `how` is "json" for a plain answer, "turn" for a streaming turn, or "approve"/"deny" for
+    approvals. None means the API has no equivalent yet.
+    """
+    cmd = args.command
+    if cmd == "status":
+        return ("GET", "/api/status", None, "json")
+    if cmd == "tools":
+        return ("GET", "/api/tools", None, "json")
+    if cmd == "approvals":
+        return ("GET", "/api/approvals", None, "json")
+    if cmd in ("approve", "deny"):
+        return (
+            "POST",
+            f"/api/approvals/{args.operation_id}",
+            {"approve": cmd == "approve"},
+            "json",
+        )
+    if cmd == "memory":
+        if args.action == "remember":
+            return ("POST", "/api/memory", {"text": args.value}, "json")
+        if args.action == "search":
+            return ("GET", "/api/memory", {"q": args.value}, "json")
+        if args.action == "forget":
+            return ("DELETE", f"/api/memory/{args.value}", None, "json")
+        return None  # `memory pending` has no API endpoint yet
+    if cmd == "goals":
+        if args.action == "list":
+            return ("GET", "/api/goals", None, "json")
+        if args.action in ("pause", "resume", "abandon"):
+            status = {"pause": "paused", "resume": "active", "abandon": "abandoned"}[args.action]
+            return ("POST", f"/api/goals/{args.value}/status", {"status": status}, "json")
+        return None  # `goals add` maps to GoalBody with an owner-capability default; not yet
+    if cmd in ("quiet", "stop"):
+        key = "quiet" if cmd == "quiet" else "stopped"
+        return ("POST", "/api/attention", {key: args.value == "on"}, "json")
+    if cmd == "backup":
+        if args.action == "create":
+            return ("POST", "/api/backups", None, "json")
+        if args.action == "list":
+            return ("GET", "/api/backups", None, "json")
+        return None  # verify, restore and delete are not on the API yet
+    if cmd == "voice":
+        if args.action == "status":
+            return ("GET", "/api/voice/status", None, "json")
+        if args.action in ("mute", "unmute"):
+            return ("POST", "/api/voice/mute", {"muted": args.action == "mute"}, "json")
+        return None
+    if cmd == "chat" and args.message is not None:
+        body = {
+            "session_id": session_id,
+            "text": args.message,
+            "timeout_s": args.timeout,
+            "persist": args.persist,
+        }
+        return ("POST", "/api/chat", body, "turn")
+    if cmd == "resume":
+        return ("POST", f"/api/turns/{args.turn_id}/resume", None, "turn")
+    return None
+
+
+def run_remote(args, settings) -> int:
+    """Answer the command through the running server's API; never open the databases directly."""
+    from b12.cli_remote import (
+        RemoteClient,
+        RemoteError,
+        ServerUnavailable,
+        api_url,
+        read_owner_token,
+    )
+
+    try:
+        client = RemoteClient(api_url(), read_owner_token(settings.state_dir))
+    except ServerUnavailable as exc:
+        emit_json({"error": "server_unavailable", "detail": str(exc)})
+        return EXIT_SERVER_UNAVAILABLE
+    try:
+        session_id = ""
+        if args.command == "chat" and args.message is not None:
+            session_id = client.call("GET", "/api/cli-session")["session_id"] or ""
+        plan = _remote_command(args, session_id)
+        if plan is None:
+            emit_json(
+                {
+                    "error": "requires_stopped_server",
+                    "command": args.command,
+                    "detail": "ця команда ще не має API; зупиніть b12 serve або дочекайтесь API",
+                }
+            )
+            return EXIT_REQUIRES_STOPPED_SERVER
+        method, path, body, how = plan
+        if how == "turn":
+            result = client.stream_result(method, path, json_body=body)
+            if getattr(args, "json", False):
+                emit_json(result)
+            else:
+                print(result.get("content", ""))
+            return 0 if result.get("state") == "completed" else 1
+        if method == "GET":
+            emit_json(client.call(method, path, params=body))
+        else:
+            emit_json(client.call(method, path, json=body))
+        return 0
+    except ServerUnavailable as exc:
+        emit_json({"error": "server_unavailable", "detail": str(exc)})
+        return EXIT_SERVER_UNAVAILABLE
+    except RemoteError as exc:
+        emit_json({"error": exc.code})
+        return 1
+    finally:
+        client.close()
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     # `b12 mcp add NAME --capability C -- server argv...`: everything after -- is the argv.
@@ -808,10 +941,18 @@ def main(argv=None) -> int:
         "status": cmd_status,
         "voice": cmd_voice,
     }
+    lock = None
+    if args.command not in SERVER_OWNED:
+        lock = _try_state_lock(settings)
+        if lock is None:
+            return run_remote(args, settings)
     try:
         return asyncio.run(handlers[args.command](args, settings))
     except SystemExit as exc:
         return int(exc.code or 0)
+    finally:
+        if lock is not None:
+            lock.release()
 
 
 if __name__ == "__main__":
