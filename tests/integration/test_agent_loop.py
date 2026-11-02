@@ -1001,11 +1001,7 @@ async def test_persist_counts_files_and_dirs_inspected_via_run_command_and_file_
                 )
             ]
         },
-        {
-            "tool_calls": [
-                ("file_search", {"path": str(folder / "sub"), "query": "def c"})
-            ]
-        },
+        {"tool_calls": [("file_search", {"path": str(folder / "sub"), "query": "def c"})]},
         {"content": "Повний звіт. ГОТОВО"},
     ]
     result, _ = await run_turn(runtime, who, "Проаналізуй проєкт", persist=True)
@@ -1073,3 +1069,13 @@ async def test_resumed_persist_turn_keeps_extended_deadline_and_persist_coverage
     assert body(done.content) == "Усе прочитано. ГОТОВО"
     assert seen_remaining and seen_remaining[0] > 1500.0
 
+
+async def test_a_tool_name_mentioned_in_prose_is_not_a_pseudo_call(runtime_factory):
+    """Regression: a report naming a tool in a sentence was taken for a call written as text."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "Інструмент file_read(path) читає файл. ГОТОВО"}]
+    result, _ = await run_turn(runtime, who, "опиши інструменти", persist=True)
+    assert result.state == "completed"
+    assert len(state["requests"]) == 1

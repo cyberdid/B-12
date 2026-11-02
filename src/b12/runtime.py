@@ -41,12 +41,15 @@ class Runtime:
     attention: AttentionPolicy
     operations: Operations
     mcp_servers: list = field(default_factory=list)
+    speakers: object = None
 
     def close(self):
         for server in self.mcp_servers:
             server.close()
         if self.agent.semantic is not None:
             self.agent.semantic.close()
+        if self.speakers is not None:
+            self.speakers.close()
         for store in (
             self.attention,
             self.goals,
@@ -85,6 +88,9 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         resolver=EvidenceResolver(memory, knowledge),
         tool_result_bytes=settings.tool_result_bytes,
     )
+    from b12.audio.speaker import SpeakerStore
+
+    speakers = SpeakerStore(settings.state_dir / "voice" / "speakers.sqlite3")
     purge = PurgeCoordinator(
         control=control,
         memory=memory,
@@ -94,6 +100,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         agent=agent,
         goals=goals,
         operations=operations,
+        speakers=speakers,
     )
     agent.purge = purge
     if settings.embedding_python:
@@ -134,4 +141,5 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         goals,
         attention,
         operations,
+        speakers=speakers,
     )

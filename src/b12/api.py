@@ -220,6 +220,18 @@ def stream_turn(start) -> StreamingResponse:
     return StreamingResponse(body(), media_type="application/x-ndjson")
 
 
+def _voice_model(request, name: str, factory):
+    """One speech model per app: built on first use and reused, not cold-loaded per request."""
+    state = request.app.state
+    models = getattr(state, "voice_models", None)
+    if models is None:
+        models = {}
+        state.voice_models = models
+    if name not in models:
+        models[name] = factory()
+    return models[name]
+
+
 def create_app(
     settings: Settings,
     *,
@@ -410,7 +422,11 @@ def create_app(
     @app.post("/api/turns/{turn_id}/cancel")
     async def cancel(request: Request, turn_id: str, who: Identity):
         own_turn(request, who, turn_id)
-        runtime_of(request).control.cancel_turn(turn_id)
+        runtime = runtime_of(request)
+        runtime.control.cancel_turn(turn_id)
+        from b12.agent import Agent
+
+        Agent.discard_waiting(runtime.sessions, runtime.agent._waiting, turn_id, who.actor.id)
         return {"cancelled": turn_id}
 
     @app.get("/api/memory/records")
@@ -595,7 +611,7 @@ def create_app(
 
         runtime = runtime_of(request)
         mic = MicController(runtime.control)
-        tts = PiperTts()
+        tts = _voice_model(request, "tts", PiperTts)
         vad = SileroVad()
         actor = runtime.control.resolve_actor(who.actor.id)
         return {
@@ -620,7 +636,7 @@ def create_app(
     async def voice_tts(request: Request, body: VoiceTtsBody, who: Identity):
         from b12.audio.tts import PiperTts
 
-        tts = PiperTts()
+        tts = _voice_model(request, "tts", PiperTts)
         audio = await asyncio.to_thread(tts.synthesize, body.text, lang=body.lang)
         return Response(
             content=audio.to_wav_bytes(),
@@ -650,7 +666,7 @@ def create_app(
         except Exception:
             raise HTTPException(400, "invalid_audio_base64") from None
 
-        asr = WhisperAsr()
+        asr = _voice_model(request, "asr", WhisperAsr)
         audio_16k = asr.to_float32_16k(raw, sample_rate=body.sample_rate)
         ep = EndpointDetector().detect_utterance(audio_16k)
         target_audio = ep.speech_audio if len(ep.speech_audio) > 0 else audio_16k

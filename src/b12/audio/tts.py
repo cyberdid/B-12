@@ -509,7 +509,7 @@ class AudioPlayer:
                             return False
                         self._proc.stdin.write(raw[offset : offset + chunk_bytes])
                         with contextlib.suppress(
-                             asyncio.TimeoutError, BrokenPipeError, ConnectionResetError
+                            asyncio.TimeoutError, BrokenPipeError, ConnectionResetError
                         ):
                             await asyncio.wait_for(self._proc.stdin.drain(), timeout=0.5)
                     with contextlib.suppress(Exception):

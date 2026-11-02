@@ -154,17 +154,30 @@ class GoalStore:
             )
         ]
 
-    def checkpoint(self, goal_id: str, actor_id: str, text: str, next_review: datetime):
-        """Consume one turn of budget; exhaustion pauses the goal durably."""
+    def checkpoint(
+        self,
+        goal_id: str,
+        actor_id: str,
+        text: str,
+        next_review: datetime,
+        *,
+        evidence_ids=(),
+    ):
+        """Consume one turn of budget; exhaustion pauses the goal durably.
+
+        The evidence the checkpoint was built from is kept on the goal, so forgetting
+        any of those memories purges the goal and its checkpoint text as well.
+        """
         with self._atomic():
             goal = self.get(goal_id, actor_id)
             if goal is None or goal["status"] != "active":
                 raise PermissionError("goal is not active")
             consumed = goal["consumed_turns"] + 1
             exhausted = consumed >= goal["budget_turns"]
+            merged = sorted(set(goal["evidence_ids"]) | set(evidence_ids))
             self.db.execute(
                 "UPDATE goals SET checkpoint=?, consumed_turns=?, next_review=?, updated_at=?, "
-                "status=?, status_reason=? WHERE id=?",
+                "status=?, status_reason=?, evidence_ids=? WHERE id=?",
                 (
                     text[:4000],
                     consumed,
@@ -172,6 +185,7 @@ class GoalStore:
                     _now(),
                     "paused" if exhausted else "active",
                     "budget_exhausted" if exhausted else None,
+                    json.dumps(merged),
                     goal_id,
                 ),
             )

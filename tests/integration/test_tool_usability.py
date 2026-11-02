@@ -108,4 +108,3 @@ async def test_run_command_fills_default_cwd_and_declared_effects_when_omitted(
     result = await rig.invoke("run_command", command=f"wc -l < {target}")
     assert result.status == "completed" and result.content["command_succeeded"] is True
     assert result.content["stdout"].strip() == "2"
-

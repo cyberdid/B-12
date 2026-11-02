@@ -302,3 +302,40 @@ async def test_autonomous_goal_never_runs_shell_without_approval(rig, tmp_path):
     [outcome] = await scheduler.tick()
     assert not marker.exists()
     assert outcome["state"] == "awaiting_approval" and outcome["status"] == "paused"
+
+
+async def test_reflection_passes_its_timeout_to_the_model(rig, monkeypatch):
+    """Regression: timeout_s was ignored; the model call had no deadline."""
+    from b12.reflection import Reflector
+
+    state, runtime, _, actor, *_ = rig
+    runtime.memory.remember("спостереження один", actor)
+    runtime.memory.remember("спостереження два", actor)
+    seen = {}
+    original = runtime.agent.model.chat
+
+    async def spy(request, **kwargs):
+        seen["deadline"] = kwargs.get("deadline")
+        return await original(request, **kwargs)
+
+    monkeypatch.setattr(runtime.agent.model, "chat", spy)
+    state["script"] = [{"content": "не JSON"}]
+    await Reflector(runtime).reflect(actor, timeout_s=30)
+    assert seen["deadline"] is not None
+
+
+async def test_reflection_marks_the_interval_only_after_it_finishes(rig, monkeypatch):
+    """Regression: last_reflection was written before the reflection ran."""
+    state, runtime, scheduler, actor, *_ = rig
+    runtime.memory.remember("спостереження один", actor)
+    runtime.memory.remember("спостереження два", actor)
+    seen = {}
+
+    async def fake_reflect(self, actor, **kwargs):
+        seen["marked_before"] = runtime.control.get_meta(f"last_reflection:{actor.id}")
+        return {"state": "skipped", "reason": "test"}
+
+    monkeypatch.setattr("b12.reflection.Reflector.reflect", fake_reflect)
+    await scheduler.reflect_idle()
+    assert seen["marked_before"] is None
+    assert runtime.control.get_meta(f"last_reflection:{actor.id}") is not None

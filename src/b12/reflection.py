@@ -9,6 +9,7 @@ during reflection rejects the late write. Hidden model reasoning is never stored
 import asyncio
 import json
 import re
+import time
 from uuid import uuid4
 
 from b12.agent import _Active
@@ -60,7 +61,9 @@ class Reflector:
         agent.active[key] = active
         try:
             async with agent.model_lock:
-                reply = await agent.model.chat(request, cancel=active.cancel, deadline=None)
+                reply = await agent.model.chat(
+                    request, cancel=active.cancel, deadline=time.monotonic() + timeout_s
+                )
         except ModelError as exc:
             return {"state": "failed", "reason": exc.code}
         finally:

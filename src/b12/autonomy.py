@@ -96,7 +96,9 @@ class Scheduler:
         now = self.clock()
         next_review = now + timedelta(seconds=goal["review_interval_s"])
         checkpoint = f"[{result.state}] {result.content}"[:4000]
-        updated = rt.goals.checkpoint(goal["id"], actor.id, checkpoint, next_review)
+        updated = rt.goals.checkpoint(
+            goal["id"], actor.id, checkpoint, next_review, evidence_ids=result.evidence_ids
+        )
         outcome = {
             "goal_id": goal["id"],
             "state": result.state,
@@ -164,8 +166,9 @@ class Scheduler:
                 or (last and now - datetime.fromisoformat(last) < self.reflection_interval)
             ):
                 continue
-            rt.control.set_meta(key, now.isoformat())
             outcomes.append({"actor_id": actor_id, **await Reflector(rt).reflect(actor)})
+            # Marked only once the reflection has finished, so an interrupted run is not counted.
+            rt.control.set_meta(key, now.isoformat())
         return outcomes
 
     async def run(self, stop: asyncio.Event):

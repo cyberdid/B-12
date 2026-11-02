@@ -257,4 +257,3 @@ def test_search_handles_ukrainian_apostrophe_inflections_and_natural_questions(t
     assert [r.id for r in store.search("імені", actor)] == [name.id]
     assert [r.id for r in store.search("комп'ютера", actor)] == [name.id]
     store.close()
-

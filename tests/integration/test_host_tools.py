@@ -487,4 +487,3 @@ async def test_file_search_supports_single_file_path_and_large_files(host_factor
     assert any(
         m["path"] == "large_module.py" and m["line"] == 1001 for m in by_dir.content["matches"]
     )
-

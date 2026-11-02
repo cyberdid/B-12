@@ -110,7 +110,9 @@ _TOOL_NAMES = (
     "http_fetch|system_info|process_list|current_time"
 )
 # A call written as prose: tool(...), or tool{...} / the model's own token syntax.
-_PSEUDO_CALL = re.compile(rf"\b({_TOOL_NAMES})\s*\(|\b({_TOOL_NAMES})\{{|<\|\"\|>")
+# A call written as text starts a line (tool(...)), or uses the model's own token syntax.
+# A tool named inside a sentence is prose, not a call.
+_PSEUDO_CALL = re.compile(rf"(?m)^\s*({_TOOL_NAMES})\s*[({{]|<\|\"\|>|\b({_TOOL_NAMES})\{{")
 _NATIVE_CALL = re.compile(rf"\b({_TOOL_NAMES})\{{|<\|\"\|>")
 PERSIST_HISTORY_CHARS = 6000  # characters of older tool results and replies the window keeps
 _LARGE_FILE_CHUNKS = 4
@@ -846,9 +848,7 @@ class Agent:
                 rel = match.get("path") if isinstance(match, dict) else None
                 if isinstance(rel, str) and rel:
                     full = (
-                        os.path.normpath(os.path.join(path, rel))
-                        if is_dir and rel != "."
-                        else path
+                        os.path.normpath(os.path.join(path, rel)) if is_dir and rel != "." else path
                     )
                     listed[full] = True
                     state["last_read"] = full
@@ -1060,6 +1060,12 @@ class Agent:
             )
         else:
             self._waiting[context.turn_id] = state
+
+    @staticmethod
+    def discard_waiting(sessions, waiting: dict, turn_id: str, actor_id: str) -> None:
+        """Forget a turn that waited for approval and was cancelled: its checkpoint and memory."""
+        waiting.pop(turn_id, None)
+        sessions.drop_checkpoint(turn_id, actor_id)
 
     def _drop_checkpoint(self, context, actor) -> None:
         self._waiting.pop(context.turn_id, None)

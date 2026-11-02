@@ -189,3 +189,7 @@ TurnResult та events спільні для CLI/API/Web/audio: turn_started, te
 ### 15.6. Durable goals
 
 Goal зберігає actor/scope, grant reference, immutable original intent, acceptance criteria/evidence IDs, checkpoint/next action, consumed budgets і status reason. Restart не дублює effect і не скидає budget. Achieved потребує перевіреного evidence, не лише model proposal. Quiet mode керує initiative speech окремо від execution pause. Один scheduler з process ownership guard; goal/checkpoint payload підпорядковується consent/forget.
+
+### 15.7. Режим «Не зупинятися» (persist)
+
+Доповнення 2026-11-03, за аудитом відповідності. Режим у `Agent.turn` (`persist=True`) дозволяє довгий аналіз без перериву: ліміт раундів 150 (`PERSIST_ROUNDS`), ліміт викликів 300, покриття файлів з переліку, нагадування про незавершене і звіт у останні раунди (`PERSIST_REPORT_ROUNDS`). Історія ходу тримається в бюджеті символів (`PERSIST_HISTORY_CHARS`): новіші повідомлення повні, старіші результати інструментів і відповіді стискаються. Довгий хід, що не завершився, зберігається з позначкою `[хід не завершено: …]`, щоб його можна було продовжити. Це відхилення від §7 (неповні ходи не комітяться) визнано свідомим; рішення про те, зберігати такі ходи, за власником.

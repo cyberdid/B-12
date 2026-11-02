@@ -41,9 +41,7 @@ def test_aec_nlms_render_reference_delay_alignment_and_short_reply_guard():
     # V-011: Текстовий anti-self-trigger блокує точне повторення фрази B-12,
     # але НЕ відхиляє короткі відповіді користувача («Так», «Зараз», «Ні»)
     aec.record_tts_utterance("Ти хочеш запустити перевірку системи зараз чи пізніше?")
-    assert (
-        aec.is_tts_echo_text("Ти хочеш запустити перевірку системи зараз чи пізніше") is True
-    )
+    assert aec.is_tts_echo_text("Ти хочеш запустити перевірку системи зараз чи пізніше") is True
     assert aec.is_tts_echo_text("Зараз") is False
     assert aec.is_tts_echo_text("Так, зараз") is False
     assert aec.is_tts_echo_text("Яка зараз година у Києві?") is False

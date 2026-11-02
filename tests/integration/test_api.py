@@ -260,3 +260,22 @@ async def test_memory_records_lists_all_live_records_newest_first(api):
     assert first["id"] not in [r["id"] for r in after]
     big = await client.get("/api/memory/records?limit=5000", headers=auth(token))
     assert big.status_code == 200
+
+
+def test_voice_endpoints_reuse_one_speech_model_per_app(monkeypatch):
+    """Regression: each voice request built a new Whisper or Piper model. Cold start each time."""
+    from types import SimpleNamespace
+
+    from b12 import api
+
+    built = []
+
+    class Fake:
+        def __init__(self):
+            built.append(self)
+
+    request = SimpleNamespace(app=SimpleNamespace(state=SimpleNamespace()))
+    first = api._voice_model(request, "tts", Fake)
+    second = api._voice_model(request, "tts", Fake)
+    assert first is second
+    assert len(built) == 1

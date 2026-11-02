@@ -8,6 +8,7 @@ erasure). Complete only after every hook acknowledged. Failures stay pending/fai
 and are retried by resume() at startup. Unmanaged originals/snapshots are untouched.
 """
 
+import asyncio
 import logging
 
 from b12.contracts import Actor, PurgeReceipt
@@ -102,7 +103,10 @@ class PurgeCoordinator:
             return True
         if store == "snapshots":
             if self.operations is not None:
-                self.operations.purge_snapshots(receipt.operation_id, actor.id, targets)
+                # Snapshot rewrites are blocking file and SQLite work: keep them off the event loop.
+                await asyncio.to_thread(
+                    self.operations.purge_snapshots, receipt.operation_id, actor.id, targets
+                )
             return True
         if store == "provider_cache":
             if self.agent is None:
