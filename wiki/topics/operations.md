@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-10-27
+updated: 2026-11-04
 status: partially_implemented
 sources: [src/b12/service.py, src/b12/telemetry.py, deploy/b12.service, scripts/install-user-service.sh, scripts/soak.py, scripts/load_memory.py, scripts/daily_check.py, tests/e2e/test_recovery.py, tests/performance/test_growth.py]
 tags: [operations, backup, restore, soak, growth, long-horizon]
@@ -16,6 +16,8 @@ tags: [operations, backup, restore, soak, growth, long-horizon]
 **Перевірений факт:** `b12 serve` тримає ексклюзивний runtime lock (другий сервер на тому самому state не стартує), пише rotating-логи, де форматер відкидає тексти винятків, і має обмежене graceful-завершення: відкриті стріми скасовуються, turn і дочірні process groups зупиняються. Після SIGKILL дочірній `shell_exec` помирає разом із сервером (PDEATHSIG), стан зберігає цілісність, а операції в стані `started` стають `unknown`. `/api/status` і `b12 status` дають uptime, затримки P50/P95, RSS, pending purges, розміри сховищ. Юніт `deploy/b12.service` рендериться інсталером без root і без автозапуску. **Відкрите:** справжнє `systemctl --user enable --now` класифікатор дозволів заблокував як постійну зміну системи — це робить власник.
 
 ## Soak і ріст (Task 15 — 8 год активного часу виконано)
+
+**Уточнення стану сервісів 04.11:** read-only `systemctl --user show` підтвердив, що `b12.service` встановлений (`loaded`), але `disabled/inactive`; `b12-daily-check.timer` — `enabled/active/waiting`. Попередня примітка про неможливість установки є історією первинного запуску, не поточним станом установлених юнітів.
 
 **Перевірений факт:** soak 26.10.2026 тривав 1 год 19 хв із запланованих 8 год і був зупинений за проханням власника. За цей час знайдено й виправлено:
 
@@ -36,8 +38,8 @@ Purge залишається O(store) через повний FTS rebuild (~1 с
 
 ## Довгий горизонт (Task 19)
 
-**Перевірений факт:** `scripts/daily_check.py seed|check` записує датовані якорі з відомою відповіддю, забуває один і щодня перевіряє recall, відсутність забутого маркера в байтах стану, цілісність, snapshots і повний audit. **День 0 на реальному стані:** 27.10.2026 09:34 EET (07:34 UTC), за дозволом власника. Записано 3 якорі й один забутий запис (`receipt: complete`); дані драйвера — `~/.local/state/b12/long_horizon` (поза git, 0700). Базова перевірка: recall 3/3, забутий маркер відсутній у пошуку й у байтах стану, цілісність баз `ok`, audit 25 подій, `ok: true`. Перший запис `checks.jsonl` має `ok: false`: драйвер скандив власний `seed.json` як «витік» (дефект драйвера, виправлено в `ee667a4`, лишено в історії). Контрольні дати: **день 1 — 28.10, день 7 — 03.11, день 30 — 26.11**. Запуск: `scripts/daily_check.py check --out ~/.local/state/b12/long_horizon` (конфіг береться з `~/.config/b12/config.toml`). Автоматичний щоденний запуск (cron або systemd timer) не встановлено: це постійна зміна системи, яку виконує власник.
+**Перевірений факт:** `scripts/daily_check.py seed|check` записує датовані якорі з відомою відповіддю, забуває один і перевіряє recall, відсутність забутого маркера в байтах стану, цілісність, snapshots і повний audit. **День 0 на реальному стані:** 27.10.2026 09:34 EET (07:34 UTC), за дозволом власника. Записано 3 якорі й один забутий запис (`receipt: complete`); дані драйвера — `~/.local/state/b12/long_horizon` (поза git, 0700). Базова перевірка: recall 3/3, забутий маркер відсутній у пошуку й у байтах стану, цілісність баз `ok`, audit 25 подій, `ok: true`. Перший запис `checks.jsonl` має `ok: false`: драйвер сканував власний `seed.json` як «витік» (дефект драйвера, виправлено в `ee667a4`, запис лишено в історії). Контрольні дати: **день 1 — 28.10, день 7 — 03.11, день 30 — 26.11**. Запуск: `scripts/daily_check.py check --out ~/.local/state/b12/long_horizon` (конфіг береться з `~/.config/b12/config.toml`). На момент первинного запису 27.10 автоматичний timer ще не був встановлений.
 
-Раніше драйвер перевіряли на тестовому стані. **Не доведено:** реальні день 1/7/30 на живому стані власника — потрібен справжній час і таймер, який встановлює власник.
+**Перевірений факт, день 7 (04.11.2026 11:46 EET):** `b12-daily-check.timer` виконав `scripts/daily_check.py check --out ~/.local/state/b12/long_horizon`; systemd завершив `status=0/SUCCESS`. Вік стану — `8.091` дня; `ok=true`, `integrity_ok=true`, `snapshots_ok=true`, `pending_purges=0`, `audit_events_verified=80`, forgotten marker відсутній у пошуку та в байтах. Перевірено тільки агрегований результат і метадані; текст якорів не читався й не копіювався до документації. Наступний календарний gate — **день 30, 26.11.2026**.
 
 Див. [agent loop і забуття](agent-loop.md), [стан](../project/status.md).

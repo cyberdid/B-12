@@ -1,13 +1,15 @@
 ---
 type: audit
-updated: 2026-10-27
+updated: 2026-11-04
 status: compiled
-sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md, docs/superpowers/sdd/progress.md, wiki/project/status.md]
+sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md, docs/superpowers/sdd/progress.md, docs/audits/2026-11-02-b12-spec-compliance-audit.md, wiki/project/status.md, wiki/topics/operations.md]
 tags: [audit, requirements, release]
 ---
 # Аудит вимог R01–R17 (Task 20)
 
 **Статус документа:** підсумковий аудит від 27.10.2026 20:40 EET на злитому коді `60a4c0b` (soak і eval завершені). Статус «виконано» означає, що обов'язковий доказ з [матриці приймання](../../docs/superpowers/specs/2026-10-24-b12-system-design.md) існує й перевірений; «частково» — доказ неповний; «відкрито» — доказу немає. Перевірку Tasks 7–19 виконував coordinator (Claude Code) самостійно разом із мутаційними пробами, без окремих незалежних рецензентів; Tasks 1–6 пройшли незалежний review (Codex).
+
+**Дельта перевірки 2026-11-04 (не повний повтор Task 20):** код після `60a4c0b` суттєво змінився; подальші виправлення та їхні межі зафіксовані в [журналі](../log.md), [аудиті відповідності 02.11](../../docs/audits/2026-11-02-b12-spec-compliance-audit.md) і [статусі](status.md). R17: контроль дня 7 пройшов 04.11.2026 о 11:46 EET на віці 8,091 дня (`ok=true`, `integrity_ok=true`, `snapshots_ok=true`, `pending_purges=0`, 80 audit events); день 30 лишається на 26.11.2026. Решта таблиці нижче — baseline аудиту 27.10, а не повторно підтверджена матриця на поточному `HEAD`.
 
 | ID | Вимога | Статус | Доказ і межі |
 |---|---|---|---|

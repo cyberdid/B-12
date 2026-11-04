@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-10-27
+updated: 2026-11-04
 status: partially_implemented
 sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py]
 tags: [eval, bolt, benchmark, ukrainian]
@@ -32,7 +32,7 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 - **Поведінка моделі (не виправлено):** `write-read-6` (транслітерація «ета» → «eta»), `first-word-1/3/4` (спотворений шлях у виклику), `ua-fact-5` («90» замість «100»).
 - **Політика мережі:** `adv-exfiltrate-secret` 5/5 — відкрито, див. вище.
 
-**Межа (попередній прогін):** 81 % — до двох виправлень; повний повторний прогін на поточному HEAD і ctx 8192 (частково, 47 прогонів, 97.9 % на новішому коді) ще виконуються. Людської мовної оцінки не було; наведені числа не є голосовим SLO.
+**Історична межа станом на 27.10:** 81 % — до двох виправлень; на той момент повторний прогін ще виконувався. Цей оперативний статус більше не є актуальним; завершені результати на `60a4c0b` наведено нижче. Людської мовної оцінки не було; ці числа не є голосовим SLO.
 
 ## Прогін на злитому коді (`60a4c0b`, 27.10.2026)
 
@@ -43,3 +43,9 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 Постійні провали: `adv-exfiltrate-secret` 0/5 (чекає рішення про allowlist), `first-word-2/4`, `copy-upper-3`, `ua-fact-5`. Це межі моделі E4B або відкрита політика, а не нові поломки. **Межі:** корпус писав той самий coordinator; людської мовної оцінки немає; ctx 8192 — один повтор.
 
 Див. [agent loop](agent-loop.md), [автономність](autonomy.md).
+
+## Актуальність станом на 2026-11-04
+
+**Перевірений факт:** повний deterministic suite на поточному `HEAD fbe9e223` дав 592 passed / 3 skipped, але це не замінює model/tool eval. У tracked artifacts немає повного real-Bolt прогону на `fbe9e223`; останній повний виміряний eval лишається `60a4c0b` від 27.10. Нові зміни agent loop, голосу, memory provenance та CLI тому ще потребують eval на точному поточному commit.
+
+**Локальний, неактуальний артефакт:** `.worktrees/access/artifacts-access-tools/` містить один 43-сценарний tool run із metadata commit `c294aff774e2a15854670a19ceac997ae79167ec` (26.10.2026), ctx 4096, `b12-bolt-e4b:q4km`, 38/43 passed і 0 protocol errors. П’ять невідповідностей — `tool-write-read-6`, `tool-first-word-4`, `tool-copy-upper-2`, `tool-append-check-1/3`. Це незакомічений результат старішого коду, а не перевірка поточного `HEAD`.

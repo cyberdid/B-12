@@ -2,12 +2,22 @@
 type: status
 updated: 2026-11-04
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md]
 tags: [progress, next]
 ---
 # Стан проєкту
 
-На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control, 13 реальних host tools, agent loop із sessions і global purge; owner CLI, автентифікований loopback API, Web UI і обмежена автономність (цілі/ініціатива/рефлексія); сервіс, голос і фізичні acceptance ще попереду.
+На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef`. На початок аудиту 04.11 `main`, `feat/b12-runtime` та обидва remote refs збігалися на `fbe9e223`; `feat/b12-access` був предком на 8 комітів позаду. Подальший локальний fix `baed10d` виправляє pytest entrypoint. Датовані зрізи внизу сторінки зберігають історію.
+
+## Поточний стан (2026-11-04)
+
+- **Перевірений факт:** на точному `HEAD fbe9e223` повний suite через `uv run --no-sync python -m pytest -q` дав 592 passed / 3 skipped; `uv run --no-sync ruff check src tests` пройшов.
+- **Перевірений факт:** R17 7-day checkpoint пройдено. `b12-daily-check.service` завершив перевірку 04.11.2026 11:46 EET на віці 8,091 дня: `ok=true`, SQLite та snapshots цілісні, забутий маркер відсутній у пошуку й байтах, pending purges — 0, перевірено 80 audit events. Доказ і межі — у [operations](../topics/operations.md#довгий-горизонт-task-19).
+- **Перевірений факт:** кодова частина голосу, live full-duplex та AEC synchronization є; фізична акустична перевірка лишається відкритою. Реального Reachy/Jetson acceptance немає. 30-day checkpoint R17 очікується 26.11.2026.
+- **Перевірений факт:** CLI використовує один runtime через `RuntimeLock`; global purge має hooks для керованих stores; документальні докази проходять через schema v2. Подальші зміни та їхні обмеження — у [журналі](../log.md) від 03.11.
+- **Потребує перевірки:** останній повний Bolt eval у wiki — на `60a4c0b` від 27.10, не на поточному `HEAD`. Локальний 43-run artifact у старому worktree прив'язаний до `c294aff` і не є свідченням якості поточного коду; див. [evals](../topics/evals.md#актуальність-станом-на-2026-11-04).
+- **Відкрито:** власник окремо відклав security findings A-01, A-07, A-08, A-18, A-19, A-22 та F-03; їх не слід трактувати як виправлені. Також лишаються безперервний 8-hour soak із перевіркою RSS, людська UA/EN оцінка, фізичний R15 soak і R16 hardware acceptance.
+- **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 
 ## Наявне
 
@@ -20,13 +30,13 @@ tags: [progress, next]
 - [Review archive-index-public](../sources/archive-index-public.md): 16 source files за pinned commit, 17 core tests passed; synthetic lexical/provenance і cache-refresh probe виконані без production DB/embedding load. Pinned lexical modules тепер інтегровані через actor-scoped derived index; приватний production archive не імпортовано.
 - [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
 - [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
-- [Tool control](../topics/tool-control.md): Task 5 reviewed у `bc07196`; Task 6 host tools — `7d7809e` після двох fix rounds. Filesystem/process/HTTP/memory handlers перевірені на temp/local fixtures. API authentication і глобальний purge ще не реалізовано.
+- [Tool control](../topics/tool-control.md): Tasks 5–6 перевірені; API authentication і global purge реалізовані. Security межі та відкладені знахідки описані в [самоогляді](security-self-review.md) й аудитах.
 
 ## Не підтверджено
 
-Старий SQLite kernel і його попередні latency results не знайдені; це не стосується нового Task 2 MemoryStore. Не перевірено купівлю Reachy/особистого Jetson, full-duplex, загальну українську якість моделей, simultaneous residency Bolt/Cosmos/voice та тривалу автономну роботу. Окремі дослідження voice згадані в brief, але їхніх оригіналів у `raw/` немає.
+Старий SQLite kernel і його попередні latency results не знайдені; це не стосується нового Task 2 MemoryStore. Потрібні фізичне R15 випробування з мікрофоном/динаміком, R16 наявне обладнання, оцінювання української якості людиною, поточний великий model/tool eval і тривала безперервна автономна перевірка. Окремі ранні дослідження voice з brief не мають оригіналів у `raw/`.
 
-## Активний етап
+## Історичний snapshot: 2026-10-26
 
 **Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–7 реалізовані; Task 7 `740629a`, full suite 350 passed / 2 skipped, Ruff clean; реальний Bolt виконує file write/read, system_info і memory recall після restart (3/3 у run2/run3). Task 8 owner CLI `964709b` (361 passed / 2 skipped; живий запуск із реальним Bolt). Task 9 API/auth `9632cdc` (382 passed / 2 skipped). Task 10 Web UI `6610f85` (headless Chrome acceptance 20/20, реальний Bolt). Task 11 автономність `6032a15`. **Пауза 26.10.2026 ~15:35 UTC за рішенням власника.** Tasks 12 (MCP і semantic через archive-index власника) і 13 (snapshots, deletion replay, restore, user unit — встановлює власник) завершено. Task 14: ctx4096 541 прогін, 81%, 0 протокольних помилок (до виправлень мови й морфології); ctx8192 частковий. Task 15: soak лише 1 год 19 хв (НЕ 8 год); виправлено дві лінійні деградації; ріст RSS ще відкритий. Tasks 16–17 відкладено власником. Task 18 — лише протокол на симуляторі; Task 19 — лише драйвер. Порядок продовження й деталі — у [звіті паузи](../../docs/superpowers/sdd/task-12-15-18-19-report.md). Full suite 450 passed / 3 skipped. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
 

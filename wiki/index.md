@@ -15,7 +15,7 @@ tags: [navigation]
 |---|---|
 | [Поточний статус](project/status.md) | Що є локально, чого ще немає, наступна дія |
 | [Реалізація повної системи](project/implementation.md) | Авторизований scope, повний plan/spec, worktree та execution ledger |
-| [План тестування TUI й агента](project/test-plan.md) | Рівні перевірки та release gates |
+| [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |

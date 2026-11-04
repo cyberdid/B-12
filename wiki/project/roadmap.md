@@ -1,23 +1,23 @@
 ---
 type: roadmap
-updated: 2026-10-26
+updated: 2026-11-04
 status: in_progress
-sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md]
+sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md, wiki/project/status.md, wiki/topics/operations.md, evals/voice/report.json, evals/voice/duplex/report.json, docs/audits/2026-11-02-b12-spec-compliance-audit.md]
 tags: [milestones, acceptance]
 ---
 # Дорожня карта й критерії переходу
 
-Етапи M0–M6 походять з brief §12; критерії нижче конкретизовані в цьому аналізі. Tasks 1–5 реалізовані та reviewed у `feat/b12-runtime`; M0/M1 лишаються частковими. Календарні строки не призначені: голосове та апаратне середовища ще потребують вимірювання. [Поточний стан](status.md).
+Етапи M0–M6 походять з brief §12; критерії нижче конкретизовані в цьому аналізі. Стан оновлено 04.11 за Git, аудитами та наявними artifacts. Наявність коду і проходження програмних тестів не закривають фізичні gates. [Поточний стан](status.md), [execution path](implementation.md).
 
 | Етап | Робота | Доказ завершення | Залежності / стан |
 |---|---|---|---|
-| M0 — специфікація | Походження коду; Event/Observation/Action/Memory/Consent/Tool/Identity; permission/retention; telemetry/heartbeat | Узгоджені versioned contracts, негативні сценарії policy, відтворюваний software-only запуск, інструкція й логи | Частково: contracts, consent-aware memory, durable forget primitives, reviewed control/grants; heartbeat і global hooks попереду |
-| M1 — текстове ядро | SQLite, retrieval, змінний LLM adapter, один tool, малий event loop та idle reflection | Дозволена подія згадується з evidence після restart; заборонена не зберігається; tool проходить policy; результати model A/B | Частково: canonical memory, lexical retrieval, pinned streaming/admission і reviewed tool registry/control. Task6 real handlers, Task7 agent/global purge, Task8–10 CLI/API/Web реалізовано; A/B та reflection попереду |
-| M2 — голос desktop | PTT, UA/EN ASR, streaming TTS, speaker verification baseline | Версійований corpus, WER, TTS оцінка, latency traces P50/P95 та повтори | Реалізовано (`src/b12/audio/`, `evals/voice/report.json`): Piper UA/EN TTS (TTFA P50 258,6 мс), faster-whisper UA/EN ASR (P50 2359 мс), Silero VAD/endpoint (320 мс), speaker verification з anti-replay |
-| M3 — full-duplex | AEC render reference, endpoint, barge-in, consent/mute | 8h soak з ТБ/шумом/GPU load; виміряний time-to-stop; немає self-trigger loops; policy tests | Програмна частина реалізована (`src/b12/audio/{aec,duplex,speaker}.py`, `evals/voice/duplex/report.json`): ERLE 156,3 дБ, barge-in stop P99 0,04 мс, FAR/FRR 0/0; фізичний 8h кімнатний soak відкритий |
-| M4 — робот | Вибір платформи; Wireless transport proof за потреби; один writer рухів; reconnect | Media proof без LLM; bounded motion, stop/mute, контрольна згода; recovery при Wi-Fi loss | Доступне обладнання й стабільне аудіо; не почато |
+| M0 — специфікація | Походження коду; Event/Observation/Action/Memory/Consent/Tool/Identity; permission/retention; telemetry/heartbeat | Узгоджені versioned contracts, негативні сценарії policy, відтворюваний software-only запуск, інструкція й логи | Contracts, control/grants, purge hooks і telemetry є; Observation та audit schema розриви F-06/F-09 ще відкриті |
+| M1 — текстове ядро | SQLite, retrieval, змінний LLM adapter, один tool, малий event loop та idle reflection | Дозволена подія згадується з evidence після restart; заборонена не зберігається; tool проходить policy; результати model A/B | Реалізовані agent, memory/retrieval, tools, CLI/API/Web/TUI та reflection; поточний великий eval, model A/B і людська оцінка ще потрібні |
+| M2 — голос desktop | PTT, UA/EN ASR, streaming TTS, speaker verification baseline | Версійований corpus, WER, TTS оцінка, latency traces P50/P95 та повтори | Програмний стек є. Report 02.11 — synthetic TTS→ASR smoke, n=8: TTS TTFA P50 1634,61 / P95 2441,51 мс; ASR P50 2173,58 мс. Попередні 258,6 мс застаріли; фізичний end-to-end SLO ще не виміряно |
+| M3 — full-duplex | AEC render reference, endpoint, barge-in, consent/mute | 8h soak з ТБ/шумом/GPU load; виміряний time-to-stop; немає self-trigger loops; policy tests | Live duplex і AEC synchronization є. Report 02.11: ERLE mean 30,41 дБ на simulated RIR (n=5), internal software stop P95 0,036 мс (n=10). Попередні 156,3 дБ замінено; ці метрики не вимірюють фізичне стихання динаміка. Фізичний soak відкритий |
+| M4 — робот | Вибір платформи; Wireless transport proof за потреби; один writer рухів; reconnect | Media proof без LLM; bounded motion, stop/mute, контрольна згода; recovery при Wi-Fi loss | Motion controller і simulator є; speed/lease findings A-16/A-23 та фізичний transport ще відкриті |
 | M5 — Jetson | Окремі й спільні model workloads, audio under load, degraded mode | Manifest конфігурації й raw traces unified memory/swap/TTFT/thermal/dropout; немає OOM або swap stalls у прийнятому сценарії | Персональний Jetson; частина profiling може передувати M4; не почато |
-| M6 — тривала експлуатація | Recall, self-model, доречна ініціатива, review/forget, recovery | Recall через реальні 1/7/30 днів; 24–72h operation; quiet-mode та deletion evidence; журнал збоїв/виправлень | Попередні перевірки; не почато |
+| M6 — тривала експлуатація | Recall, self-model, доречна ініціатива, review/forget, recovery | Recall через реальні 1/7/30 днів; 24–72h operation; quiet-mode та deletion evidence; журнал збоїв/виправлень | Перевірки реального state пройшли 1-day і 7-day рубежі; timer активний. 30-day gate 26.11, тривала автономність і безперервний soak відкриті |
 
 ## Перший вертикальний зріз — пропозиція
 

@@ -509,3 +509,31 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-04] lint | Документація нового TUI
 
 Нова UI-сторінка включена в index; також додано раніше пропущений TUI/agent test plan. Усі 39 wiki-сторінок охоплені index. Нові/змінені UI documentation links, source paths і screenshot перевірено. У чистій managed worktree лишаються 13 історичних посилань/source refs на ігноровані local benchmark artifacts та `.superpowers`, яких Git не переносить; ці джерела не копіювалися і не переписувалися в рамках UI-доручення. Raw originals та source manifest незмінні.
+
+## [2026-11-04] verification | Git-аудит, повний suite та R17 day-7
+
+**Git, перевірений факт:** локальний `main` і `feat/b12-runtime` дорівнюють `origin/main` / `origin/feat/b12-runtime` на `fbe9e223bcba78b38244c63b3ab20b58506c830a`; `feat/b12-access` (`c1cfecc`) є предком і відстає на 8 комітів. Від baseline `78daaef` — 146 досяжних комітів, 229 змінених tracked paths, +36 266 / −71 рядків. Main/runtime tracked trees чисті. Access worktree має локальні незакомічені `artifacts-access-tools/` та `.log`; це один старий eval на `c294aff`, описаний у [evals](topics/evals.md#актуальність-станом-на-2026-11-04). Ігнорований `.superpowers` execution ledger не є актуальним source of truth.
+
+**Перевірений факт:** на точному `fbe9e223` `uv run --no-sync python -m pytest -q` — 592 passed / 3 skipped за 193,79 с; `uv run --no-sync ruff check src tests` — clean. Прямий console запуск `uv run --no-sync pytest -q` падає під час collection двох модулів (`ModuleNotFoundError: tests`), бо вони імпортують helper як `tests.integration...`, а pytest config додає лише `src` до `pythonpath`; модульний запуск пройшов повністю. Це відтворюваний недолік test entrypoint, ще не виправлений.
+
+**Перевірений факт, R17:** user timer `b12-daily-check.timer` запустив перевірку 04.11.2026 11:46 EET. З агрегованих метаданих (без читання тексту якорів): `elapsed_days=8.091`, `ok=true`, `integrity_ok=true`; systemd status `0/SUCCESS`; journal показав `snapshots_ok=true`, `pending_purges=0`, забутий маркер відсутній у пошуку та байтах, 80 audit events. День 7 пройдено; 30-day gate — 26.11.2026.
+
+**Межа оцінювання:** повний real-Bolt eval на поточному `fbe9e223` не знайдено. Найновіший повний recorded eval у wiki — `60a4c0b` від 27.10; локальні 38/43 від `c294aff` — інший, давніший commit. Security findings A-01, A-07, A-08, A-18, A-19, A-22 і F-03 лишаються відкладеними за записаним рішенням власника.
+
+## [2026-11-04] lint | Актуальність wiki після Git-аудиту
+
+**Перевірений факт:** 38 wiki-сторінок, 313 локальних Markdown-посилань/якорів, frontmatter і source paths змінених сторінок пройшли перевірку; broken links — 0, неіндексованих сторінок — 0. `wiki/project/test-plan.md` був відсутній у каталозі; доданий до `wiki/index.md`.
+
+**Застарілість і межі:** status/evals сторінки отримали current-state notes; R01–R17 таблиця лишається baseline на `60a4c0b`, а не новим повним audit. `wiki/project/implementation.md` і `wiki/project/roadmap.md` залишаються старими зрізами від 26.10 і потребують окремої синхронізації. Ігнорований локальний `.superpowers` ledger також не є повним журналом після 26.10. `raw/` та `raw/source-manifest.json` не змінювалися.
+
+## [2026-11-04] fix | Console pytest та синхронізація execution path
+
+**Перевірений факт:** `baed10d` додає `.` до pytest `pythonpath`. RED: console collection двох voice-модулів завершився двома `ModuleNotFoundError: tests`; GREEN: 8 тестів збираються. Повний звичайний `uv run --no-sync pytest -q` на фінальній зміні — 592 passed / 3 skipped за 193,99 с; `ruff check src tests` — clean. Додаткові тести, які перевіряли б саму конфігурацію, не створювалися; відтворенням є оригінальна команда запуску.
+
+**Оновлення попереднього lint:** `implementation.md` і `roadmap.md` синхронізовано з поточними artifacts та відкритими gates. Застарілі TTS P50 258,6 мс і ERLE 156,3 дБ замінені показниками report 02.11: TTS TTFA P50 1634,61 мс (synthetic roundtrip, n=8), ERLE mean 30,41 дБ (simulated RIR, n=5); internal software stop відокремлено від фізичного припинення звуку.
+
+**Preflight без inference:** `ModelProfile` перевірив hashes трьох tokenizer/template assets; `OllamaModel._check_deployment` підтвердив version 0.33.3, pinned alias manifest і native template. Power profile — `performance`. Локальний звіт: `artifacts/preflight-2026-11-04/report.json` (поза Git). GPU зайнятий `gemma4:12b` (~7,4 ГБ VRAM); спосіб планування Bolt eval запитано у власника. Перед великим прогоном також потрібні актуалізація corpus checks для `run_command` і середовище, яке ізолює adversarial host effects від файлів власника.
+
+## [2026-11-04] lint | Синхронізовані milestone та execution pages
+
+38 wiki-сторінок, 317 локальних посилань/якорів, усі frontmatter source paths і охоплення індексом перевірено: помилок і неіндексованих сторінок немає; `git diff --check` пройшов. Історичні checkpoints збережено, поточні статуси й метрики відокремлено від них. Raw originals та source manifest незмінні.

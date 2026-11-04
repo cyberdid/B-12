@@ -1,8 +1,8 @@
 ---
 type: execution
-updated: 2026-10-26
+updated: 2026-11-04
 status: active
-sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md]
+sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, docs/superpowers/plans/2026-10-24-b12-full-system.md, wiki/project/status.md, wiki/topics/operations.md, wiki/topics/evals.md]
 tags: [implementation, plan, acceptance]
 ---
 # Реалізація повної системи B-12
@@ -11,12 +11,25 @@ tags: [implementation, plan, acceptance]
 
 - [Специфікація](../../docs/superpowers/specs/2026-10-24-b12-system-design.md) — архітектура та 17 acceptance requirements R01–R17.
 - [Повний implementation plan](../../docs/superpowers/plans/2026-10-24-b12-full-system.md) — 20 завдань, interfaces, files, RED/GREEN/review gates і великі перевірки.
-- Розробка виконується в ізольованому worktree `.worktrees/runtime`, branch `feat/b12-runtime`; дослідницький baseline залишається на `main`.
-- Task progress ledger: `.worktrees/runtime/.superpowers/sdd/2026-10-24-b12-full-system/progress.md`; фактичний шлях підтверджується output `sdd-workspace` і `git worktree list`.
+- Розробка виконується в ізольованому worktree `.worktrees/runtime`, branch `feat/b12-runtime`. На початок перевірки 04.11 `main` і ця гілка містили код `fbe9e223`; дослідницький baseline доступний за `78daaef`.
+- Початковий Task ledger у `.superpowers` і його копія в `docs/superpowers/sdd/` — історичні записи. Поточні зміни відстежуються через Git, [статус](status.md) і [журнал](../log.md).
 
 Поточна послідовність: contracts/config/package → canonical memory → retrieval → model/context → tools → agent loop → CLI/API/Web → autonomy/MCP/service → великі evals/soak → voice/duplex → hardware/long-horizon evidence.
 
-## Перевірений checkpoint
+## Поточний execution path (2026-11-04)
+
+| Tasks | Наявний результат | Відкритий gate |
+|---|---|---|
+| 1–6 | Contracts, memory, retrieval, model adapter, policy та реальні host tools | Подальші зміни перевіряти разом із consumers; початкові reviews — історичний baseline |
+| 7–13 | Agent/session loop, CLI/API/Web/TUI, goals/reflection, MCP/semantic, snapshots/service | Відкладені security findings та решта розбіжностей аудитів 02.11 |
+| 14 | 109-case corpus; повний Bolt eval на `60a4c0b` | Повтор на поточному runtime, людська оцінка, додаткові довгі розмови |
+| 15 | 8,007 год активного software soak у 4 сегментах | Безперервний 8h run і RSS після maintenance |
+| 16–17 | Voice stack, live duplex, синхронізація AEC | Фізичні latency/barge-in/echo measurements і 8h акустичний soak |
+| 18 | Motion controller і simulator contract tests | Реальні Reachy transport/Jetson та фізичні acceptance |
+| 19 | Real-state checks пройшли 1-day і 7-day рубежі | 30-day gate 26.11.2026; див. [operations](../topics/operations.md) |
+| 20 | Початковий requirements audit і наступні архітектурні аудити | Повторна матриця R01–R17 після всіх виправлень та acceptance |
+
+## Історичні checkpoints початкової реалізації
 
 **Перевірений факт:** Task 1 реалізовано в `4cf5e79`, URL edge cases виправлено в `4c455b5`; незалежні spec/quality review пройдені, coordinator повторив 94 passing tests. Є package `b12`, strict versioned contracts і перевірювані Settings. Це foundation, не готовий agent.
 
@@ -42,7 +55,7 @@ tags: [implementation, plan, acceptance]
 
 **Стан на паузі (26.10.2026):** Tasks 12–13 завершено; Task 14 ctx4096 зроблено (81%), ctx8192 частковий; Task 15 soak 1 год 19 хв, відкритий ріст RSS; Tasks 16–17 відкладено власником; Tasks 18–19 — протокол і драйвер без фізичних і тривалих доказів; Task 20 попереду. Ledger скопійовано в [docs/superpowers/sdd](../../docs/superpowers/sdd/progress.md).
 
-**Наступний крок:** пошук і виправлення росту RSS → повторний eval на HEAD → повний 8-годинний soak → фінальний аудит Task 20.
+**Поточний наступний крок (замінює порядок із паузи 26.10):** pytest entrypoint виправлено в `baed10d`; далі — перевірити корпус на актуальні tools та ізолювати adversarial effects → повторити Bolt eval із pinned runtime на вільному GPU → усунути підтверджені функціональні розриви → безперервний soak і фізичні voice measurements → повторний Task 20. Security findings, які власник відклав, залишаються явними відкритими пунктами.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 
