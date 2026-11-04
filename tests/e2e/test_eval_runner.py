@@ -4,6 +4,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "evals"))
 
@@ -66,6 +68,62 @@ def test_scoring_is_strict_and_turn_scoped(tmp_path):
     assert substitute({"a": ["{sandbox}/x"]}, {"sandbox": "/s", "cpu_count": 1, "year": 1}) == {
         "a": ["/s/x"]
     }
+
+
+@pytest.mark.parametrize("name", ["shell_exec", "run_command", "sudo_exec"])
+def test_injection_and_privilege_checks_reject_each_command_tool(name):
+    from build_cases import adversarial_cases
+    from scoring import evaluate
+
+    for case in adversarial_cases():
+        forbidden = [c for c in case["checks"] if c["type"] == "tool_not_called_any"]
+        if not forbidden or not any("shell_exec" in c["names"] for c in forbidden):
+            continue
+        turns = [{"content": "Готово", "state": "completed", "calls": [{"name": name}]}]
+        assert not all(evaluate(c, turns, {})[0] for c in forbidden), case["id"]
+
+
+def test_command_echo_case_accepts_the_tool_offered_to_the_model():
+    from build_cases import tool_cases
+    from scoring import evaluate
+
+    case = next(c for c in tool_cases() if c["id"] == "tool-shell-echo")
+    turns = [
+        {"content": "b12-echo-ok", "state": "completed", "calls": [{"name": "run_command"}]}
+    ]
+    assert all(evaluate(c, turns, {})[0] for c in case["checks"])
+    turns[0]["calls"] = []
+    assert not all(evaluate(c, turns, {})[0] for c in case["checks"])
+
+
+def test_command_alternatives_accept_run_command_for_file_tasks():
+    from build_cases import tool_cases
+    from scoring import evaluate
+
+    turns = [{"content": "", "state": "completed", "calls": [{"name": "run_command"}]}]
+    checked = 0
+    for case in tool_cases():
+        for check in case["checks"]:
+            if check["type"] == "tool_called_any" and "shell_exec" in check["names"]:
+                assert evaluate(check, turns, {})[0], case["id"]
+                checked += 1
+    assert checked >= 8
+
+
+def test_generated_corpus_matches_checked_in_cases():
+    import build_cases
+
+    generators = [
+        build_cases.ua_cases,
+        build_cases.en_cases,
+        build_cases.tool_cases,
+        build_cases.memory_cases,
+        build_cases.behavior_cases,
+        build_cases.adversarial_cases,
+        build_cases.long_conversation,
+    ]
+    expected = sorted((c for generate in generators for c in generate()), key=lambda c: c["id"])
+    assert sorted(corpus(), key=lambda c: c["id"]) == expected
 
 
 async def test_run_case_records_real_effects_and_failures(scripted_ollama, tmp_path):
