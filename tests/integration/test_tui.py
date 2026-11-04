@@ -1,5 +1,9 @@
 """Terminal UI driven headlessly against a scripted client (no network, no model)."""
 
+import asyncio
+
+import pytest
+
 from b12.tui.app import B12App, _summary
 from b12.tui.client import parse_ndjson
 
@@ -200,3 +204,237 @@ async def test_switch_labels_show_their_state_in_words():
         persist.value = True
         await pilot.pause()
         assert "ВКЛ" in str(persist.label)
+
+
+async def test_cybercat_follows_mouse_and_can_be_petted_without_sending_a_message():
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=(140, 44)) as pilot:
+        await pilot.pause()
+        pet = app.query_one("#pet")
+        app.action_toggle_motion()
+        await pilot.hover("#pet", offset=(2, 3))
+        await pilot.pause()
+        assert pet.look_x < 0
+        await pilot.hover("#pet", offset=(pet.size.width - 3, 3))
+        await pilot.pause()
+        assert pet.look_x > 0
+        await pilot.click("#pet")
+        await pilot.pause()
+        assert "мур" in pet.status_text.plain.casefold()
+        assert app.focused.id == "prompt"
+        assert app.client.sent == []
+
+
+async def test_cybercat_reacts_to_typing_model_tool_and_final_response():
+    class LiveClient(FakeClient):
+        def __init__(self):
+            super().__init__([])
+            self.queue = asyncio.Queue()
+
+        async def chat(self, *args, **kwargs):
+            yield {"type": "turn_started", "turn_id": "live-1"}
+            while True:
+                event = await self.queue.get()
+                yield event
+                if event["type"] == "result":
+                    return
+
+    client = LiveClient()
+    app = B12App(client)
+    async with app.run_test(size=(140, 44)) as pilot:
+        await pilot.pause()
+        pet = app.query_one("#pet")
+        app.query_one("#prompt").value = "досліди теку"
+        await pilot.pause()
+        assert pet.phase == "typing"
+        await pilot.press("enter")
+        await pilot.pause()
+        assert pet.phase == "thinking"
+        await client.queue.put(
+            {"type": "tool_started", "call_id": "c", "name": "file_list", "arguments": {}}
+        )
+        await pilot.pause()
+        assert pet.phase == "working" and "file_list" in pet.status_text.plain
+        await client.queue.put({"type": "text_delta", "text": "Знайшов файли."})
+        await pilot.pause()
+        assert pet.phase == "speaking"
+        await client.queue.put(
+            {"type": "result", "state": "completed", "content": "Знайшов файли."}
+        )
+        await pilot.pause()
+        assert pet.phase == "success" and app.turn is None
+
+
+@pytest.mark.parametrize("size", [(80, 24), (120, 36), (160, 48)])
+async def test_chat_composer_and_cat_remain_visible_at_terminal_sizes(size):
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=size) as pilot:
+        await pilot.pause()
+        prompt, pet = app.query_one("#prompt"), app.query_one("#pet")
+        assert prompt.region.width >= 20 and pet.region.width >= 20
+        assert prompt.region.bottom <= size[1] and pet.region.bottom <= size[1]
+        assert app.query_one("#send").region.right <= size[0]
+        assert app.query_one("#sidebar").display is (size[0] >= 110)
+
+
+async def test_animation_can_pause_without_disabling_mouse_interaction():
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=(120, 36)) as pilot:
+        await pilot.pause()
+        pet = app.query_one("#pet")
+        await pilot.press("f8")
+        frame = pet.frame
+        await pilot.pause(0.3)
+        assert pet.frame == frame
+        await pilot.click("#pet")
+        await pilot.pause()
+        assert "мур" in pet.status_text.plain.casefold()
+
+
+async def test_pet_shortcut_preserves_draft_and_control_panel_shortcut_opens_panel():
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=(80, 24)) as pilot:
+        await pilot.pause()
+        prompt = app.query_one("#prompt")
+        prompt.value = "не загуби цю думку"
+        await pilot.press("ctrl+k")
+        await pilot.pause()
+        assert prompt.value == "не загуби цю думку"
+        assert "мур" in app.query_one("#pet").status_text.plain.casefold()
+        await pilot.press("ctrl+p")
+        await pilot.pause()
+        assert app.query_one("#panel").has_class("open")
+        assert app.query_one("#pet").region.height > 0
+        assert app.query_one("#mem-query").region.y < 24
+        assert app.client.sent == []
+
+
+async def test_small_terminal_can_open_navigation_and_return_to_chat():
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=(80, 24)) as pilot:
+        await pilot.pause()
+        await pilot.press("f2")
+        await pilot.pause()
+        assert app.query_one("#sidebar").display
+        await pilot.click("#s-s-1")
+        await pilot.pause()
+        assert app.current == "s-1"
+        assert not app.query_one("#sidebar").display
+        assert app.focused.id == "prompt"
+
+
+async def test_offline_preview_is_labelled_and_responds_without_a_server():
+    from b12.tui.preview import PreviewApp, PreviewClient
+
+    app = PreviewApp(PreviewClient())
+    async with app.run_test(size=(120, 36)) as pilot:
+        await pilot.pause()
+        assert "ДЕМО" in app.query_one("#top").render().plain
+        app.query_one("#prompt").value = "привіт, кіберкоте"
+        await pilot.press("enter")
+        await pilot.pause(0.15)
+        assert app.query_one("#pet").phase == "thinking"
+        await app.workers.wait_for_complete()
+        await pilot.pause()
+        assert app.turn is None
+        assert "офлайн" in str(await app.client.history(app.current)).casefold()
+
+
+async def test_new_tui_uses_real_api_events_and_displays_a_real_tool_result(api, tmp_path):
+    import httpx
+    from textual.widgets import Collapsible
+
+    from b12.tui.client import ApiClient
+
+    state, _, token, service, _ = api
+    target = tmp_path / "tui-tool-proof.txt"
+    state["script"] = [
+        {"tool_calls": [("file_write", {"path": str(target), "text": "через новий TUI"})]},
+        {"content": "Файл записано."},
+    ]
+    client = ApiClient("http://testserver", token, transport=httpx.ASGITransport(app=service))
+    try:
+        app = B12App(client)
+        async with app.run_test(size=(120, 36)) as pilot:
+            await pilot.pause()
+            app.query_one("#prompt").value = "запиши тестовий файл"
+            await pilot.press("enter")
+            await app.workers.wait_for_complete()
+            await pilot.pause()
+            assert target.read_text() == "через новий TUI"
+            assert app.query_one("#pet").phase == "success"
+            assert any("file_write" in str(card.title) for card in app.query(Collapsible))
+            assert app.turn is None
+    finally:
+        await client.close()
+
+
+async def test_opening_long_history_shows_latest_messages_in_compact_layout():
+    class LongHistory(FakeClient):
+        async def history(self, _):
+            return [
+                {"role": "assistant", "content": f"Повідомлення {i}. " + "текст " * 25}
+                for i in range(12)
+            ]
+
+    app = B12App(LongHistory([]))
+    async with app.run_test(size=(80, 24)) as pilot:
+        await pilot.pause()
+        chat = app.query_one("#chat")
+        assert chat.max_scroll_y > 0
+        assert chat.scroll_y == chat.max_scroll_y
+
+
+async def test_lost_server_leaves_the_cat_in_error_state_without_closing_the_tui():
+    import httpx
+
+    class Disconnected(FakeClient):
+        checks = 0
+
+        async def approvals(self):
+            self.checks += 1
+            if self.checks > 1:
+                raise httpx.ConnectError("offline")
+            return []
+
+        async def chat(self, *args, **kwargs):
+            raise httpx.ConnectError("offline")
+            yield  # make this an async event iterator
+
+    app = B12App(Disconnected([]))
+    async with app.run_test(size=(120, 36)) as pilot:
+        await pilot.pause()
+        app.query_one("#prompt").value = "ти тут?"
+        await pilot.press("enter")
+        await app.workers.wait_for_complete()
+        await pilot.pause()
+        assert app.is_running and app.turn is None
+        assert app.query_one("#pet").phase == "error"
+        assert "OFFLINE" in app.query_one("#top").render().plain
+
+
+async def test_raster_companion_renders_changed_gaze_and_releases_frames_on_exit():
+    from rich.console import Console
+
+    app = B12App(FakeClient([]))
+    async with app.run_test(size=(140, 44)) as pilot:
+        await pilot.pause()
+        pet = app.query_one("#pet")
+        assert hasattr(pet, "portrait"), "the approved raster cat is not connected to the TUI"
+        await pilot.press("f8")
+        console = Console(
+            width=pet.size.width, force_terminal=True, color_system="truecolor", no_color=False
+        )
+        await pilot.hover("#pet", offset=(2, pet.size.height // 2))
+        await pilot.pause()
+        with console.capture() as left:
+            console.print(pet.render())
+        await pilot.hover("#pet", offset=(pet.size.width - 3, pet.size.height // 2))
+        await pilot.pause()
+        with console.capture() as right:
+            console.print(pet.render())
+        assert left.get() != right.get()  # actual visible image, not just a state property
+        assert app.client.sent == []
+        portrait = pet.portrait
+        assert portrait.cache
+    assert not portrait.cache

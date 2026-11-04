@@ -1,0 +1,39 @@
+#!/bin/sh
+# Open this checkout in a graphics-capable terminal. Does not start the backend.
+set -eu
+
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+case "${1:-}" in
+    --help|-h)
+        printf '%s\n' 'Usage: scripts/tui-cybercat [--demo | b12-tui-options]' \
+            'Without --demo, connect to an already running b12 serve.'
+        exit 0 ;;
+    --demo)
+        shift
+        set -- python -m b12.tui.preview "$@" ;;
+    *) set -- b12 tui "$@" ;;
+esac
+
+kitty_bin=${B12_KITTY:-}
+if [ -z "$kitty_bin" ]; then
+    kitty_bin=$(command -v kitty || true)
+fi
+if [ -z "$kitty_bin" ]; then
+    kitty_bin="$HOME/.local/opt/b12-visual/kitty.app/bin/kitty"
+fi
+if [ ! -x "$kitty_bin" ]; then
+    printf '%s\n' 'Kitty not found. Install https://sw.kovidgoyal.net/kitty/binary/ or set B12_KITTY.' >&2
+    exit 1
+fi
+
+exec "$kitty_bin" --config NONE --class B12-Cybercat --title 'B-12 · Кіберкіт' \
+    --override 'font_size=12' \
+    --override 'background=#080c16' \
+    --override 'foreground=#d4def1' \
+    --override 'initial_window_width=144c' \
+    --override 'initial_window_height=44c' \
+    --override 'remember_window_size=no' \
+    --override 'confirm_os_window_close=0' \
+    --override 'shell_integration=disabled' \
+    --directory "$project_dir" \
+    env -u NO_COLOR uv run --frozen --extra tui "$@"

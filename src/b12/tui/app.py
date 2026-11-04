@@ -1,8 +1,7 @@
-# ruff: noqa: E501  (the CSS block below is one rule per line on purpose)
 """B-12 terminal UI: sessions, conversation, approvals and memory in one console.
 
-Design: a monospace console with square frames, role tags and inverse video for the selected
-session. Colors are fixed (dark terminal). The app talks only to the loopback API.
+Neon conversation workspace with an animated local cybercat companion. The app talks
+only to the loopback API; pet interactions never invoke a model or tool.
 """
 
 import json
@@ -10,41 +9,16 @@ from dataclasses import dataclass, field
 
 import httpx
 from rich.markup import escape
-from textual import work
+from textual import events, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.widgets import Button, Checkbox, Collapsible, Input, Markdown, Static
+from textual.widgets import Button, Checkbox, Collapsible, Footer, Input, Markdown, Static
 
+from b12.tui.chrome import NeonHeader, Welcome
 from b12.tui.client import ApiClient
-
-CSS = """
-Screen { background: #07090d; color: #cdeee9; }
-#top { height: 1; background: #07090d; color: #5f7f7b; padding: 0 1; }
-#main { height: 1fr; }
-#sidebar { width: 26; border-right: solid #173338; padding: 0 1; background: #090d12; }
-#sidebar Static.head { color: #5f7f7b; margin-top: 1; }
-#sidebar Button { width: 100%; margin: 0; min-width: 0; height: 1; border: none; background: transparent; color: #cdeee9; text-align: left; }
-#sidebar Button.current { background: #00e5ff; color: #04161a; }
-#sidebar Button#new { background: transparent; color: #00e5ff; margin-bottom: 1; }
-#chat { width: 1fr; padding: 0 2; }
-.msg-user { color: #ff3c9e; margin: 1 0 0 0; }
-.msg-tag { color: #00e5ff; margin-top: 1; }
-.msg-state { color: #ffcc33; }
-Markdown { margin: 0; padding: 0; background: #07090d; }
-Collapsible { margin: 0 0 0 2; padding: 0; border-top: none; border-bottom: none; background: #07090d; }
-CollapsibleTitle { color: #5f7f7b; background: #07090d; }
-#panel { width: 40; border-left: solid #173338; padding: 0 1; background: #090d12; display: none; }
-#panel.open { display: block; }
-#panel Static.head { color: #ff3c9e; margin-top: 1; }
-.item { color: #cdeee9; margin: 0 0 1 0; }
-.item Button { min-width: 8; height: 1; margin-right: 1; border: none; }
-#bar { height: 3; dock: bottom; border-top: solid #173338; padding: 0 1; background: #090d12; }
-#bar Checkbox { width: auto; margin-right: 2; color: #5f7f7b; background: transparent; border: none; }
-#prompt { width: 1fr; border: solid #173338; background: #07090d; color: #cdeee9; }
-#prompt:focus { border: solid #00e5ff; }
-#send { min-width: 10; border: none; background: #ff3c9e; color: #0a0309; }
-"""
+from b12.tui.pet import CyberCat
+from b12.tui.theme import CSS
 
 CHAT_INTENT = {"completed": "", "failed": "ПОМИЛКА", "cancelled": "СКАСОВАНО"}
 
@@ -61,10 +35,14 @@ class Turn:
 class B12App(App):
     CSS = CSS
     TITLE = "B-12"
+    ENABLE_COMMAND_PALETTE = False
     BINDINGS = [
         Binding("ctrl+n", "new_session", "Нова розмова"),
         Binding("ctrl+p", "toggle_panel", "Панель"),
         Binding("escape", "cancel", "Зупинити"),
+        Binding("ctrl+k", "pet", "Погладити", priority=True),
+        Binding("f2", "toggle_nav", "Розмови", show=False),
+        Binding("f8", "toggle_motion", "Анімації"),
         Binding("ctrl+q", "quit", "Вихід"),
     ]
 
@@ -78,27 +56,46 @@ class B12App(App):
 
     # ---- layout -------------------------------------------------------------
     def compose(self) -> ComposeResult:
-        yield Static("// B-12 · термінал", id="top")
+        yield NeonHeader(id="top")
         with Horizontal(id="main"):
             with Vertical(id="sidebar"):
-                yield Button("+ нова розмова", id="new")
-                yield Static("СЕСІЇ", classes="head")
-                yield Vertical(id="sessions")
-            yield VerticalScroll(id="chat")
-            with Vertical(id="panel"):
-                yield Static("ПІДТВЕРДЖЕННЯ", classes="head")
-                yield Vertical(id="approvals")
-                yield Static("ПАМ'ЯТЬ", classes="head")
-                yield Input(placeholder="пошук у пам'яті", id="mem-query")
-                yield Vertical(id="memories")
-        with Horizontal(id="bar"):
-            yield Checkbox("ПАМ'ЯТЬ", value=True, id="consent")
-            yield Checkbox("НЕ ЗУПИНЯТИСЯ", value=self.persist_default, id="persist")
-            yield Input(placeholder="напишіть повідомлення і натисніть Enter", id="prompt")
-            yield Button("НАДІСЛАТИ", id="send")
+                yield Static("◈  ТВОЯ ОРБІТА\n   LOCAL-FIRST", id="nav-brand")
+                yield Button("＋ нова розмова", id="new")
+                yield Static("РОЗМОВИ", classes="head")
+                with VerticalScroll(id="session-scroll"):
+                    yield Vertical(id="sessions")
+                yield Static("F2  навігація\nТвій простір. Твої історії.", id="nav-note")
+            with Vertical(id="conversation"):
+                with Horizontal(id="chat-heading"):
+                    yield Static("ЗВ’ЯЗОК ІЗ B-12", id="chat-title")
+                    yield Static("// CHAT", id="channel-tag")
+                yield VerticalScroll(id="chat")
+                with Vertical(id="bar"):
+                    yield Static("ТВОЯ ДУМКА  /  Enter — надіслати", id="compose-label")
+                    with Horizontal(id="compose-line"):
+                        yield Input(placeholder="Напиши B-12…", id="prompt")
+                        yield Button("НАДІСЛАТИ", id="send")
+                    with Horizontal(id="compose-options"):
+                        yield Checkbox("ПАМ'ЯТЬ", value=True, id="consent")
+                        yield Checkbox("НЕ ЗУПИНЯТИСЯ", value=self.persist_default, id="persist")
+            with Vertical(id="right-rail"):
+                with Vertical(id="companion"):
+                    yield Static("COMPANION  /  01", id="companion-title")
+                    yield Static("B-12  ·  КІБЕРКІТ", id="companion-name")
+                    yield CyberCat(id="pet")
+                    yield Static("мишка · клік · Ctrl+K", id="pet-hint")
+                with VerticalScroll(id="panel"):
+                    yield Static("ПІДТВЕРДЖЕННЯ", classes="head")
+                    yield Vertical(id="approvals")
+                    yield Static("ПАМ'ЯТЬ", classes="head")
+                    yield Input(placeholder="пошук у пам'яті", id="mem-query")
+                    yield Vertical(id="memories")
+        yield Footer()
 
     async def on_mount(self) -> None:
+        self._sync_layout(self.size.width, self.size.height)
         me = await self.client.me()
+        self.query_one(NeonHeader).set_connected(True)
         self.query_one("#consent", Checkbox).value = bool(me.get("consent"))
         for box in self.query(Checkbox):
             box.label = _switch_label(box.id, box.value)
@@ -106,6 +103,44 @@ class B12App(App):
         await self.refresh_approvals()
         await self.refresh_memories()
         self.query_one("#prompt", Input).focus()
+
+    def _sync_layout(self, width: int, height: int):
+        self.screen.set_class(width < 110, "compact-nav")
+        self.screen.set_class(width < 90, "narrow")
+        self.screen.set_class(height < 30, "short")
+        for button in self.query("#send"):
+            button.label = "↑" if width < 90 else "НАДІСЛАТИ"
+        for label in self.query("#compose-label"):
+            label.update(
+                "F2 — розмови  /  Enter — надіслати"
+                if width < 110
+                else "ТВОЯ ДУМКА  /  Enter — надіслати"
+            )
+
+    def on_resize(self, event: events.Resize):
+        self._sync_layout(event.size.width, event.size.height)
+
+    def on_mouse_move(self, event: events.MouseMove):
+        for pet in self.query(CyberCat):
+            pet.track_pointer(event.screen_x, event.screen_y)
+
+    def _pet_phase(self, phase: str, detail: str = ""):
+        for pet in self.query(CyberCat):
+            pet.set_phase(phase, detail)
+
+    def action_pet(self):
+        self.query_one(CyberCat).pat()
+
+    def action_toggle_motion(self):
+        pet = self.query_one(CyberCat)
+        pet.motion = not pet.motion
+        self.query_one("#pet-hint", Static).update(
+            "рух увімкнено · F8" if pet.motion else "анімації на паузі · F8"
+        )
+        pet.refresh()
+
+    def action_toggle_nav(self):
+        self.screen.toggle_class("nav-open" if self.size.width < 110 else "nav-hidden")
 
     # ---- sessions -----------------------------------------------------------
     async def load_sessions(self, preferred: str | None = None) -> None:
@@ -125,7 +160,10 @@ class B12App(App):
     async def load_history(self) -> None:
         chat = self.query_one("#chat", VerticalScroll)
         await chat.remove_children()
-        for message in await self.client.history(self.current):
+        history = await self.client.history(self.current)
+        if not history:
+            await chat.mount(Welcome(id="welcome"))
+        for message in history:
             role = message.get("role")
             if role == "user":
                 await self.add_user(message.get("content") or "")
@@ -133,11 +171,12 @@ class B12App(App):
                 await self.add_assistant(message["content"])
             elif role == "tool":
                 await self.add_tool_from_history(message)
-        chat.scroll_end(animate=False)
+        self.call_after_refresh(chat.scroll_end, animate=False)
 
     async def action_new_session(self) -> None:
         session_id = await self.client.new_session()
         await self.load_sessions(session_id)
+        self.query_one("#prompt", Input).focus()
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id or ""
@@ -147,6 +186,8 @@ class B12App(App):
             await self.submit_prompt()
         elif button_id.startswith("s-"):
             await self.load_sessions(button_id[2:])
+            self.screen.remove_class("nav-open")
+            self.query_one("#prompt", Input).focus()
         elif button_id.startswith("ok-"):
             await self.decide(button_id[3:], True)
         elif button_id.startswith("no-"):
@@ -156,7 +197,9 @@ class B12App(App):
 
     # ---- panel --------------------------------------------------------------
     def action_toggle_panel(self) -> None:
-        self.query_one("#panel").toggle_class("open")
+        panel = self.query_one("#panel")
+        panel.toggle_class("open")
+        self.query_one("#right-rail").set_class(panel.has_class("open"), "controls-open")
 
     async def refresh_approvals(self) -> None:
         box = self.query_one("#approvals", Vertical)
@@ -164,6 +207,7 @@ class B12App(App):
         items = await self.client.approvals()
         if items:
             self.query_one("#panel").add_class("open")
+            self.query_one("#right-rail").add_class("controls-open")
         if not items:
             await box.mount(Static("нема дій, що очікують", classes="item"))
         for item in items:
@@ -192,6 +236,8 @@ class B12App(App):
     async def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "mem-query":
             await self.refresh_memories(event.value.strip())
+        elif event.input.id == "prompt" and self.turn is None and self.waiting_turn is None:
+            self._pet_phase("typing" if event.value.strip() else "idle")
 
     async def forget(self, memory_id: str) -> None:
         await self.client.memory_forget(memory_id)
@@ -202,6 +248,7 @@ class B12App(App):
         await self.refresh_approvals()
         turn_id, self.waiting_turn = self.waiting_turn, None
         if turn_id:
+            self._pet_phase("thinking")
             self.stream_resume(turn_id)
 
     # ---- chat ---------------------------------------------------------------
@@ -223,6 +270,7 @@ class B12App(App):
         prompt.value = ""
         await self.add_user(text)
         self.turn = Turn(session_id=self.current)
+        self._pet_phase("thinking")
         self.stream_chat(text)
 
     @work(exclusive=False)
@@ -232,10 +280,11 @@ class B12App(App):
             stream = self.client.chat(self.current, text, persist=persist)
             await self.consume(stream)
         except httpx.HTTPError as error:
+            self.query_one(NeonHeader).set_connected(False)
+            self._pet_phase("error")
             await self.add_state(f"СЕРВЕР НЕДОСТУПНИЙ: {escape(str(error))}")
         finally:
-            self.turn = None
-            await self.refresh_approvals()
+            await self._stream_finished()
 
     @work(exclusive=False)
     async def stream_resume(self, turn_id: str) -> None:
@@ -243,10 +292,18 @@ class B12App(App):
         try:
             await self.consume(self.client.resume(turn_id))
         except httpx.HTTPError as error:
+            self._pet_phase("error")
             await self.add_state(f"СЕРВЕР НЕДОСТУПНИЙ: {escape(str(error))}")
         finally:
-            self.turn = None
+            await self._stream_finished()
+
+    async def _stream_finished(self):
+        self.turn = None
+        try:
             await self.refresh_approvals()
+        except httpx.HTTPError:
+            self.query_one(NeonHeader).set_connected(False)
+            self._pet_phase("error")
 
     async def consume(self, stream) -> None:
         chat = self.query_one("#chat", VerticalScroll)
@@ -254,8 +311,11 @@ class B12App(App):
         async for event in stream:
             kind = event.get("type")
             if kind == "turn_started":
+                self.query_one(NeonHeader).set_connected(True)
+                self._pet_phase("thinking")
                 self.turn.turn_id = event.get("turn_id")
             elif kind == "text_delta":
+                self._pet_phase("speaking")
                 if md is None:
                     md = await self.add_assistant("")
                     self.turn.streamed = ""
@@ -263,6 +323,7 @@ class B12App(App):
                 await md.update(self.turn.streamed)
                 chat.scroll_end(animate=False)
             elif kind == "tool_started":
+                self._pet_phase("working", event.get("name", ""))
                 md = None
                 self.turn.streamed = ""
                 self.turn.tools[event["call_id"]] = await self.add_tool(event)
@@ -271,12 +332,14 @@ class B12App(App):
                 if node is not None:
                     node.title = escape(f"$ {event.get('name')}  → {event.get('status')}")
             elif kind == "approval_pending":
+                self._pet_phase("approval")
                 self.waiting_turn = self.turn.turn_id
                 await self.add_state(f"ОЧІКУЄ ПІДТВЕРДЖЕННЯ: {event.get('name')}")
                 await self.refresh_approvals()
             elif kind == "result":
                 await self.finish(event)
             elif kind == "error":
+                self._pet_phase("error")
                 await self.add_state(f"ПОМИЛКА: {event.get('error')}")
             chat.scroll_end(animate=False)
 
@@ -288,6 +351,11 @@ class B12App(App):
         if result.get("content") and not (self.turn and self.turn.shown):
             await self.add_assistant(result["content"])
         state = result.get("state", "")
+        self._pet_phase(
+            {"completed": "success", "awaiting_approval": "approval", "cancelled": "cancelled"}.get(
+                state, "error"
+            )
+        )
         if state != "completed":
             label = CHAT_INTENT.get(state, state.upper())
             reason = f" ({result['error_code']})" if result.get("error_code") else ""
@@ -295,17 +363,20 @@ class B12App(App):
 
     async def action_cancel(self) -> None:
         if self.turn and self.turn.turn_id:
+            self._pet_phase("cancelled")
             await self.client.cancel(self.turn.turn_id)
 
     # ---- widgets ------------------------------------------------------------
     async def add_user(self, text: str) -> None:
         chat = self.query_one("#chat", VerticalScroll)
+        for welcome in chat.query(Welcome):
+            await welcome.remove()
         await chat.mount(Static(f"[ ТИ ]\n{escape(text)}", classes="msg-user"))
         chat.scroll_end(animate=False)
 
     async def add_assistant(self, text: str) -> Markdown:
         chat = self.query_one("#chat", VerticalScroll)
-        await chat.mount(Static("[ B-12 ]", classes="msg-tag"))
+        await chat.mount(Static("◆ B-12   /   відповідь", classes="msg-tag", markup=False))
         md = Markdown(text)
         await chat.mount(md)
         if self.turn:

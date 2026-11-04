@@ -495,3 +495,17 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 - **Вимірювання.** `b12/audio/measure.py` (ERLE, похибка затримки, частота хибних VAD, P50/P95 з n). `AudioPlayer.stop_measured` розділяє час сигналу і час виходу процесу. Подія `aec` раз на секунду в `voice live`.
 - **Тести:** `tests/unit/test_aec_quality.py` (4), `tests/unit/test_render_pacing.py` (3). Синтетичні, позначені як такі. Повний набір: 592 пройшли, 3 пропущено.
 - **Не виконано:** фізичний тест. Документ: `docs/voice-physical-test.md` (стан AEC, два варіанти, сценарій з п'яти кроків, пропоновані критерії, які треба погодити з власником).
+
+## [2026-11-04] implementation | Кіберпанковий TUI та кіберкіт
+
+**Вимога власника:** красивий cyberpunk TUI з бічним virtual pet, mouse reactions і реакціями на спілкування; власник обрав кіберкота. Реалізація зроблена в окремій managed worktree від `main fbe9e223`, без відновлення зупиненої великої задачі runtime/eval. [Опис і запуск](topics/cyberpunk-tui.md).
+
+**Перевірений факт:** нові neon layout/header/composer, half-block pixel cybercat, blinking/breathing/tail motion, cursor gaze, pat/click/Ctrl+K, UI/API phases та F8 reduced motion. На 80×24 кіт залишається збоку, навігація доступна через F2; пам’ять/approvals — через Ctrl+P. Збережено реальний API client та chat/tool protocol. Офлайн `python -m b12.tui.preview` позначений «ДЕМО / БЕЗ СЕРВЕРА» і використовує лише ephemeral sample data.
+
+**Перевірка:** baseline TUI — 7 passed; початковий pet/layout RED — 6 failures. Подальші RED відтворили compact navigation/focus, history scroll і worker crash при втраті сервера; виправлення перевірено. Фінальний `python -m pytest -q tests/integration/test_tui.py tests/integration/test_api.py` — **28 passed за 19,46 с**; Ruff для TUI/test і diff check — clean. Один UI scenario пройшов через справжній API stack із synthetic model endpoint та реальною file_write дією лише в temp directory. PTY smoke: preview exit 0, SGR mouse reporting увімкнений. Render review — 144×44, 80×24 та компактна control panel; screenshot містить синтетичну розмову.
+
+**Review:** окремий read-only reviewer `/root/cybercat_tui_review` переглянув фінальний TUI diff і не знайшов підтверджених функціональних дефектів; reviewer не запускав тести й не оцінював фізичний terminal rendering. Джерелом результатів тестів і PTY/render evidence є прогони головного агента. Код не комітився, не зливався в main і не публікувався.
+
+## [2026-11-04] lint | Документація нового TUI
+
+Нова UI-сторінка включена в index; також додано раніше пропущений TUI/agent test plan. Усі 39 wiki-сторінок охоплені index. Нові/змінені UI documentation links, source paths і screenshot перевірено. У чистій managed worktree лишаються 13 історичних посилань/source refs на ігноровані local benchmark artifacts та `.superpowers`, яких Git не переносить; ці джерела не копіювалися і не переписувалися в рамках UI-доручення. Raw originals та source manifest незмінні.
