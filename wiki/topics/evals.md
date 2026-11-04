@@ -2,7 +2,7 @@
 type: topic
 updated: 2026-11-04
 status: partially_implemented
-sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, pyproject.toml, uv.lock]
+sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, evals/ollama_broker.py, evals/socket_bridge.py, tests/integration/test_eval_model_transport.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, pyproject.toml, uv.lock]
 tags: [eval, bolt, benchmark, ukrainian]
 ---
 # Eval: корпус, runner і результати
@@ -61,3 +61,11 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 **Перевірка коду `069bbd5`:** full suite у цих двох environments — 598 passed / 3 skipped: 188,52 с (Python 3.12.3) та 189,80 с (Python 3.13.14); `ruff check src tests evals`, `uv lock --check` і locked requirements export пройшли. Три skips — opt-in real-model tests. Це functional verification; real-Bolt corpus v4 score ще відсутній.
 
 **Підготовка ізоляції:** bubblewrap probe завершився `setting up uid map: Permission denied`. Docker probe на pinned Python image підтвердив read-only root mount, доступ до одного writable output, приховані host sentinel/config/socket та відсутність доступу до host loopback і зовнішньої IP-адреси. Це disposable capability probe, інтегрованого Docker eval runner ще немає. Звіти й hashes — локально в `artifacts/preflight-2026-11-04/`; підключення pinned Ollama до ізольованого runner ще потребує окремого transport без відкриття host network.
+
+## Unix model transport для ізольованого eval (2026-11-04)
+
+**Перевірений факт:** `ModelBroker` у `evals/ollama_broker.py` надає private Unix listener 0600. Він дозволяє тільки metadata GET, pinned-model show/chat і порожній unload generate; відхиляє інший model, admin routes, query strings, некоректний JSON, дублікати JSON keys і request body понад 1 MiB до upstream. Response обмежений 8 MiB. `/api/tags` і `/api/ps` показують тільки pinned alias; upstream redirects не виконуються. `SocketBridge` усередині контейнера передає loopback TCP у цей Unix socket, тому HTTP adapter B-12 не змінюється.
+
+**Перевірка:** 21 focused integration tests пройшли на Python 3.12.3 і 3.13.14. Реальні sockets підтвердили NDJSON streaming до завершення upstream, cancellation до headers і під час body, active relay shutdown, fixed upstream error, response bound, private permissions та збереження стороннього occupied-path файла. Opt-in Docker test (`B12_DOCKER_TEST=1`) виконав metadata, admin denial, streaming і disconnect через справжній контейнер `--network none` з read-only root і тільки channel/bridge mounts. Усі upstream запити йшли в synthetic HTTP fixture; host Ollama inference/unload не виконувався.
+
+**Відкрите:** Docker image з locked B-12 dependencies, worker/supervisor, provenance metadata і запуск повного corpus ще не інтегровані. Цей transport є test infrastructure; він не змінює відкладену runtime security policy. [Implementation plan](../../docs/superpowers/plans/2026-11-04-eval-model-transport.md).

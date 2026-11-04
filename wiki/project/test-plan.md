@@ -1,6 +1,6 @@
 ---
 type: plan
-updated: 2026-10-29
+updated: 2026-11-04
 status: active
 sources: [tests/, src/b12/tui/, src/b12/agent.py, src/b12/context.py, wiki/log.md]
 tags: [testing, tui, agent, release]
@@ -17,7 +17,7 @@ tags: [testing, tui, agent, release]
 - Коміт не робимо з відомою помилкою лінтера.
 
 ## Рівень 1. Юніт (щоразу, хвилина)
-- Повний `pytest -q`. Очікування: 0 падінь, skip лише для реальної моделі.
+- Повний `pytest -q`. Очікування: 0 падінь; skips лише явно позначені opt-in real-model та Docker tests. При змінах ізольованого eval Docker gate обов'язковий: `B12_DOCKER_TEST=1 uv run --no-sync pytest -q tests/integration/test_eval_model_transport.py` на host із Docker. Skip цього сценарію не підтверджує Docker integration.
 - Кожен виправлений дефект має тест, який падає без виправлення. Перевірка мутацією обов'язкова.
 
 ## Рівень 2. Контракт і API на живому сервері (щоразу, хвилини)
