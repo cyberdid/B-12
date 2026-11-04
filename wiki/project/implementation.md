@@ -55,7 +55,7 @@ tags: [implementation, plan, acceptance]
 
 **Стан на паузі (26.10.2026):** Tasks 12–13 завершено; Task 14 ctx4096 зроблено (81%), ctx8192 частковий; Task 15 soak 1 год 19 хв, відкритий ріст RSS; Tasks 16–17 відкладено власником; Tasks 18–19 — протокол і драйвер без фізичних і тривалих доказів; Task 20 попереду. Ledger скопійовано в [docs/superpowers/sdd](../../docs/superpowers/sdd/progress.md).
 
-**Поточний наступний крок (замінює порядок із паузи 26.10):** pytest entrypoint виправлено в `baed10d`; далі — перевірити корпус на актуальні tools та ізолювати adversarial effects → повторити Bolt eval із pinned runtime на вільному GPU → усунути підтверджені функціональні розриви → безперервний soak і фізичні voice measurements → повторний Task 20. Security findings, які власник відклав, залишаються явними відкритими пунктами.
+**Поточний наступний крок (замінює порядок із паузи 26.10):** pytest entrypoint виправлено в `baed10d`; corpus v4 враховує актуальні command tools; lock доповнено voice graph. Далі — інтегрувати ізоляцію adversarial effects та model transport → повторити Bolt eval із pinned runtime на вільному GPU → усунути підтверджені функціональні розриви → безперервний soak і фізичні voice measurements → повторний Task 20. Security findings, які власник відклав, залишаються явними відкритими пунктами.
 
 **Вимога:** уточнення architecture review у §15 специфікації та binding amendments плану обов’язкові: server-owned control, global purge hooks, revision-aware evidence, immutable admitted request і чесні unknown tool outcomes. Наявність цих контрактів у плані не доводить їхньої реалізації.
 

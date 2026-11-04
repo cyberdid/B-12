@@ -537,3 +537,15 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-04] lint | Синхронізовані milestone та execution pages
 
 38 wiki-сторінок, 317 локальних посилань/якорів, усі frontmatter source paths і охоплення індексом перевірено: помилок і неіндексованих сторінок немає; `git diff --check` пройшов. Історичні checkpoints збережено, поточні статуси й метрики відокремлено від них. Raw originals та source manifest незмінні.
+
+## [2026-11-04] fix | Corpus v4 і відтворюваний voice extra
+
+**Перевірений факт:** `069bbd5` закриває blind spot корпусу: `run_command`/`sudo_exec` більше не проходять checks, що забороняють command execution, через відсутність імені у списку. Echo та файлові сценарії приймають актуальний `run_command`. RED — 4 регресії відтворили false PASS / false FAIL; GREEN — усі 9 runner tests. Збережено 109 IDs, змінено 14 cases; додано exact generator↔files comparison. Історичні benchmark artifacts не змінено; новий real-model score потребує окремого прогону v4.
+
+**Перевірений факт:** `uv lock --check` / locked export до `f61f9ba` падали, бо graph не містив оголошеного `voice` extra. Commit додав 11 пакетів без зміни версій попередніх packages. Чисті ізольовані environments встановлені через `uv sync --locked --extra dev --extra tui --extra voice`; full console pytest — 598 passed / 3 skipped на Python 3.12.3 за 188,52 с і на Python 3.13.14 за 189,80 с. Ruff src/tests/evals, lock check, locked export і diff check пройшли. Оригінальне робоче `.venv` не змінювалося.
+
+**Перевірка ізоляції:** bwrap user namespace недоступний (`setting up uid map: Permission denied`). Disposable Docker probe на pinned image `python@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258` перевірив read-only root mount через `statvfs`, один writable output, приховані host sentinel/config/docker socket, недоступні host loopback і external IP; sentinel лишився незмінним, контейнер видалений. Це перевірка середовища, не завершений B-12 Docker runner; transport до pinned Ollama ще не інтегрований. Агреговані звіти/hashes — `artifacts/preflight-2026-11-04/` поза Git. GPU inference не запускали; питання планування зайнятого GPU лишається відкритим.
+
+## [2026-11-04] lint | Corpus v4 та locked environments
+
+38 wiki-сторінок, 318 локальних посилань/якорів, frontmatter sources та index coverage пройшли перевірку; broken links і неіндексовані сторінки — 0. Поточний статус містить нові functional results, historical model/voice metrics збережено окремо. Raw originals та source manifest незмінні.

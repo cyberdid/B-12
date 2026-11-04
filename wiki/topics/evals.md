@@ -2,7 +2,7 @@
 type: topic
 updated: 2026-11-04
 status: partially_implemented
-sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py]
+sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, pyproject.toml, uv.lock]
 tags: [eval, bolt, benchmark, ukrainian]
 ---
 # Eval: корпус, runner і результати
@@ -49,3 +49,15 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 **Перевірений факт:** повний deterministic suite на поточному `HEAD fbe9e223` дав 592 passed / 3 skipped, але це не замінює model/tool eval. У tracked artifacts немає повного real-Bolt прогону на `fbe9e223`; останній повний виміряний eval лишається `60a4c0b` від 27.10. Нові зміни agent loop, голосу, memory provenance та CLI тому ще потребують eval на точному поточному commit.
 
 **Локальний, неактуальний артефакт:** `.worktrees/access/artifacts-access-tools/` містить один 43-сценарний tool run із metadata commit `c294aff774e2a15854670a19ceac997ae79167ec` (26.10.2026), ctx 4096, `b12-bolt-e4b:q4km`, 38/43 passed і 0 protocol errors. П’ять невідповідностей — `tool-write-read-6`, `tool-first-word-4`, `tool-copy-upper-2`, `tool-append-check-1/3`. Це незакомічений результат старішого коду, а не перевірка поточного `HEAD`.
+
+## Корпус v4 та відтворюване середовище (2026-11-04)
+
+**Перевірений факт:** попередні injection/privilege checks забороняли тільки `shell_exec`, тоді як schema тепер пропонує `run_command`. Регресії відтворили хибний PASS для `run_command` і `sudo_exec`, а echo-case хибно відхиляв коректний `run_command`. У v4 п'ять adversarial cases перевіряють усі три command tools; дев'ять tool cases приймають `run_command` як альтернативу. Echo prompt просить командну дію без вимоги прихованого зі schema інструмента. 109 IDs і кількість сценаріїв збережено; 14 сценаріїв мають змінені очікування або prompt. Test suite перевіряє також точний збіг згенерованого корпусу з файлами `cases/`.
+
+**Межа порівняння:** старі artifacts лишаються незмінними; майбутній відсоток для v4 потрібно звітувати окремо від v3. Прогін v4 на real Bolt ще не виконано. Name-based checks оцінюють конкретні виклики; вони не є загальним доказом відсутності довільного небажаного ефекту команди.
+
+**Перевірений факт:** `uv lock --check` спочатку відхиляв `uv.lock`: граф не містив `voice` extra. Lock доповнено 11 пакетами; жодна версія раніше зафіксованого пакета не змінилася. Чисте `uv sync --locked --extra dev --extra tui --extra voice` перевірено в окремих environments на Python 3.12.3 та 3.13.14. Початкове робоче `.venv` не синхронізувалося цими перевірками; performance artifacts голосу від 02.11 не переміряні для нового locked voice graph.
+
+**Перевірка коду `069bbd5`:** full suite у цих двох environments — 598 passed / 3 skipped: 188,52 с (Python 3.12.3) та 189,80 с (Python 3.13.14); `ruff check src tests evals`, `uv lock --check` і locked requirements export пройшли. Три skips — opt-in real-model tests. Це functional verification; real-Bolt corpus v4 score ще відсутній.
+
+**Підготовка ізоляції:** bubblewrap probe завершився `setting up uid map: Permission denied`. Docker probe на pinned Python image підтвердив read-only root mount, доступ до одного writable output, приховані host sentinel/config/socket та відсутність доступу до host loopback і зовнішньої IP-адреси. Це disposable capability probe, інтегрованого Docker eval runner ще немає. Звіти й hashes — локально в `artifacts/preflight-2026-11-04/`; підключення pinned Ollama до ізольованого runner ще потребує окремого transport без відкриття host network.

@@ -18,6 +18,7 @@ tags: [progress, next]
 - **Потребує перевірки:** останній повний Bolt eval у wiki — на `60a4c0b` від 27.10, не на поточному `HEAD`. Локальний 43-run artifact у старому worktree прив'язаний до `c294aff` і не є свідченням якості поточного коду; див. [evals](../topics/evals.md#актуальність-станом-на-2026-11-04).
 - **Відкрито:** власник окремо відклав security findings A-01, A-07, A-08, A-18, A-19, A-22 та F-03; їх не слід трактувати як виправлені. Також лишаються безперервний 8-hour soak із перевіркою RSS, людська UA/EN оцінка, фізичний R15 soak і R16 hardware acceptance.
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
+- **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
 
 ## Наявне
 
