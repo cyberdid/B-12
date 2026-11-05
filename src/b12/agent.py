@@ -748,8 +748,23 @@ class Agent:
                         {"id": str(uuid4()), "role": "assistant", "content": reply.content}
                     )
                     nudge = redirect
+                    partial_now = _continuable(state)
                     if not reply.content.strip() and not state.get("empty_nudged"):
                         state["empty_nudged"], nudge = True, _NUDGE_EMPTY
+                    elif (
+                        partial_now
+                        and not last
+                        and redirect is None
+                        and state["nudges"] < PERSIST_NUDGES
+                    ):
+                        # A file read only part of the way is finished by reading its next part,
+                        # in every mode: a normal reply must not stop the reading.
+                        path, offset = next(iter(partial_now.items()))
+                        state["nudges"] += 1
+                        nudge = (
+                            "[авто-продовження] Файл прочитано не до кінця. Продовж: "
+                            f"file_read з path={path} і offset={offset}"
+                        )
                     elif (
                         persist
                         and not last

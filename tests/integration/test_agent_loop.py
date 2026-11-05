@@ -1098,3 +1098,26 @@ async def test_forgetting_a_fact_also_removes_the_later_turn_that_quoted_it(runt
     await runtime.purge.forget(fact.id, who.actor.id)
     remaining = [m["content"] for m in runtime.sessions.history(who.session, who.actor.id)]
     assert not any("бірюзовий" in (c or "") for c in remaining)
+
+
+async def test_a_partly_read_file_is_continued_in_normal_mode_too(runtime_factory, tmp_path):
+    """Regression: a normal turn stopped after the first 2400 bytes of a script and asked the user
+    whether to go on; the continue-reading nudge only existed in persist mode."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    big = tmp_path / "script.sh"
+    big.write_text("echo line\n" * 600)  # about 6 KB: three 2400-byte pieces
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(big)})]},
+        {"content": "Прочитав першу частину. Продовжити?"},
+        {"tool_calls": [("file_read", {"path": str(big), "offset": 2400})]},
+        {"tool_calls": [("file_read", {"path": str(big), "offset": 4800})]},
+        {"content": "Файл прочитано повністю."},
+    ]
+    result, _ = await run_turn(runtime, who, "прочитай всі частини")
+    assert result.state == "completed"
+    reads = [r for r in result.tool_results if r.name == "file_read"]
+    assert len(reads) == 3, [r.name for r in result.tool_results]
+    nudge = [m["content"] for m in state["requests"][2]["messages"] if m["role"] == "user"][-1]
+    assert "offset=2400" in nudge
