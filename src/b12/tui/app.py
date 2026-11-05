@@ -92,10 +92,19 @@ class B12App(App):
                     yield Vertical(id="memories")
         yield Footer()
 
+    async def check_link(self) -> None:
+        connected = await self.client.health()
+        header = self.query_one(NeonHeader)
+        if header.connected != connected:
+            header.set_connected(connected)
+            if not connected:
+                self._pet_phase("error")
+
     async def on_mount(self) -> None:
         self._sync_layout(self.size.width, self.size.height)
         me = await self.client.me()
         self.query_one(NeonHeader).set_connected(True)
+        self.set_interval(5, self.check_link)  # the indicator follows the server, even when idle
         self.query_one("#consent", Checkbox).value = bool(me.get("consent"))
         for box in self.query(Checkbox):
             box.label = _switch_label(box.id, box.value)

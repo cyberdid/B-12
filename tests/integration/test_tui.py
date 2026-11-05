@@ -18,6 +18,9 @@ class FakeClient:
     async def me(self):
         return {"consent": True, "owner": True}
 
+    async def health(self):
+        return True
+
     async def sessions(self):
         return ["s-1", "s-2"]
 
@@ -438,3 +441,35 @@ async def test_raster_companion_renders_changed_gaze_and_releases_frames_on_exit
         portrait = pet.portrait
         assert portrait.cache
     assert not portrait.cache
+
+
+async def test_link_indicator_follows_the_server_while_idle():
+    class Flaky(FakeClient):
+        up = True
+
+        async def health(self):  # same contract as ApiClient.health: False on transport failure
+            return self.up
+
+    client = Flaky([])
+    app = B12App(client)
+    async with app.run_test(size=(120, 36)) as pilot:
+        await pilot.pause()
+        assert "LOCAL LINK" in app.query_one("#top").render().plain
+        client.up = False
+        await app.check_link()
+        await pilot.pause()
+        assert "OFFLINE" in app.query_one("#top").render().plain
+        client.up = True
+        await app.check_link()
+        await pilot.pause()
+        assert "LOCAL LINK" in app.query_one("#top").render().plain
+
+
+async def test_api_client_reports_a_stopped_server_as_offline_instead_of_raising():
+    from b12.tui.client import ApiClient
+
+    client = ApiClient("http://127.0.0.1:1", "token")
+    try:
+        assert await client.health() is False
+    finally:
+        await client.close()

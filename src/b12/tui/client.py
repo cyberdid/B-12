@@ -30,6 +30,14 @@ class ApiClient:
         response.raise_for_status()
         return response.json()
 
+    async def health(self) -> bool:
+        """True when the server answers its health route; any transport failure means offline."""
+        try:
+            response = await self.http.get("/api/health", timeout=3.0)
+        except httpx.HTTPError:
+            return False
+        return response.status_code == 200
+
     async def me(self) -> dict:
         return await self._json("GET", "/api/me")
 
