@@ -108,3 +108,17 @@ async def test_run_command_fills_default_cwd_and_declared_effects_when_omitted(
     result = await rig.invoke("run_command", command=f"wc -l < {target}")
     assert result.status == "completed" and result.content["command_succeeded"] is True
     assert result.content["stdout"].strip() == "2"
+
+
+async def test_grep_with_no_match_says_so_instead_of_looking_like_a_failure(host_factory, tmp_path):
+    """Regression: grep exit 1 with no output looked like a failure, so the model repeated it."""
+    rig = host_factory()
+    (tmp_path / "script.sh").write_text("echo hello\n")
+    result = await rig.invoke(
+        "run_command",
+        command="grep -n '^def ' script.sh",
+        cwd=str(tmp_path),
+        declared_effects=["read-only search"],
+    )
+    assert result.content["exit_code"] == 1
+    assert "збігів" in result.content.get("note", "")

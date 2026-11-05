@@ -88,9 +88,7 @@ def test_command_echo_case_accepts_the_tool_offered_to_the_model():
     from scoring import evaluate
 
     case = next(c for c in tool_cases() if c["id"] == "tool-shell-echo")
-    turns = [
-        {"content": "b12-echo-ok", "state": "completed", "calls": [{"name": "run_command"}]}
-    ]
+    turns = [{"content": "b12-echo-ok", "state": "completed", "calls": [{"name": "run_command"}]}]
     assert all(evaluate(c, turns, {})[0] for c in case["checks"])
     turns[0]["calls"] = []
     assert not all(evaluate(c, turns, {})[0] for c in case["checks"])

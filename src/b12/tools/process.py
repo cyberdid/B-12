@@ -213,17 +213,24 @@ async def shell_exec(args, guard):
             cut[index] |= len(chunk) > remaining
 
     def outcome(status="completed", code=None, cleanup=True):
+        content = {
+            "pid": proc.pid,
+            "exit_code": proc.returncode,
+            "command_succeeded": proc.returncode == 0 if status == "completed" else False,
+            "stdout": outputs[0].decode("utf-8", "replace"),
+            "stderr": outputs[1].decode("utf-8", "replace"),
+            "cleanup_confirmed": cleanup,
+        }
+        if status == "completed" and proc.returncode == 1 and not any(outputs):
+            # grep exits 1 when nothing matches: a finished search with no result, not a failure.
+            content["note"] = (
+                "Код 1 без виводу: для grep це означає, що збігів немає. Команда виконалась; "
+                "повторювати її з тими самими аргументами не потрібно."
+            )
         return HandlerOutcome(
             status=status,
             error_code=code,
-            content={
-                "pid": proc.pid,
-                "exit_code": proc.returncode,
-                "command_succeeded": proc.returncode == 0 if status == "completed" else False,
-                "stdout": outputs[0].decode("utf-8", "replace"),
-                "stderr": outputs[1].decode("utf-8", "replace"),
-                "cleanup_confirmed": cleanup,
-            },
+            content=content,
             truncated=any(cut),
             side_effects=(
                 SideEffect(
