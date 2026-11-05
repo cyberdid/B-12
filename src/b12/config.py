@@ -27,8 +27,10 @@ class Settings(BaseModel):
     seed: Annotated[int, Field(ge=0, le=2**31 - 1)] = 42
     # Bytes of one tool result shown to the model before clipping (context budget).
     tool_result_bytes: Annotated[int, Field(ge=512, le=16384)] = 4096
-    max_rounds: Annotated[int, Field(gt=0)] = 8
-    max_tool_calls: Annotated[int, Field(gt=0)] = 16
+    max_rounds: Annotated[int, Field(gt=0)] = (
+        150  # no practical cap; the wall-clock timeout and repeat guards still stop a loop
+    )
+    max_tool_calls: Annotated[int, Field(gt=0)] = 300
     tool_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 30
     host_access: Literal["full", "read_only", "none"] = "full"
     # Owner-chosen wide access. Both are control-channel settings; model output cannot set them.

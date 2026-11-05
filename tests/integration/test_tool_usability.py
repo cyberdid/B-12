@@ -129,3 +129,10 @@ def test_prompt_does_not_send_shell_scripts_to_a_python_grep_pattern():
 
     assert "для скриптів .sh" in SYSTEM_PROMPT
     assert "Маленькі файли читай цілком" in SYSTEM_PROMPT
+
+
+def test_prompt_batches_many_files_into_one_shell_loop_and_never_invents_names():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "file_list" in SYSTEM_PROMPT and "for f in" in SYSTEM_PROMPT
+    assert "не вигадуй імен файлів" in SYSTEM_PROMPT.lower()
