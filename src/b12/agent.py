@@ -120,6 +120,13 @@ _TOOL_NAMES = (
 _PSEUDO_CALL = re.compile(rf"(?m)^\s*({_TOOL_NAMES})\s*[({{]|<\|\"\|>|\b({_TOOL_NAMES})\{{")
 _NATIVE_CALL = re.compile(rf"\b({_TOOL_NAMES})\{{|<\|\"\|>")
 PERSIST_HISTORY_CHARS = 6000  # characters of older tool results and replies the window keeps
+# Budgets tried in order when a persist request overflows: (window chars, whole messages kept)
+_PERSIST_FIT = (
+    (PERSIST_HISTORY_CHARS, 2),
+    (PERSIST_HISTORY_CHARS // 2, 1),
+    (PERSIST_HISTORY_CHARS // 4, 1),
+    (0, 1),
+)
 _LARGE_FILE_CHUNKS = 12  # 12 x 2400 bytes covers a 28 KB script whole
 _NUDGE_EMPTY = "[авто] Відповідь порожня. Дай користувачеві відповідь за результатами інструментів."
 
@@ -192,14 +199,14 @@ def _unlisted_dirs(state) -> list[str]:
     return [d for d, done in dirs.items() if not done and not _is_noise(os.path.basename(d))]
 
 
-def _fit_history(messages: list[dict], budget: int) -> None:
+def _fit_history(messages: list[dict], budget: int, keep: int = 2) -> None:
     """Keep the newest messages whole within `budget` characters; shrink older tool results and
     model replies to stubs. Prompts and nudges are instructions and are never shrunk."""
     used = 0
     for index in range(len(messages) - 1, -1, -1):
         message = messages[index]
         text = message.get("content") or ""
-        if index >= len(messages) - 2 or used + len(text) <= budget:
+        if index >= len(messages) - keep or used + len(text) <= budget:
             used += len(text)
             continue
         if message["role"] in ("tool", "assistant") and len(text) > 80:
@@ -684,24 +691,10 @@ class Agent:
                 history, carried = self.history_with_tags(context.session_id, actor)
                 # Transitive evidence: what this turn quotes from history belongs to this turn too.
                 state["tags"].update(carried)
-                messages = [
-                    {k: m[k] for k in _MESSAGE_KEYS if k in m}
-                    for m in [*history, *state["turn_messages"]]
-                ]
-                if persist:  # long reads: the history stays inside a fixed budget
-                    _fit_history(messages, PERSIST_HISTORY_CHARS)
-                if state.get("notes"):  # fresh each round, never trimmed: findings must survive
-                    messages.append(
-                        {
-                            "role": "user",
-                            "content": "[журнал знахідок] Записано в цьому ході:\n"
-                            + "\n".join(f"- {note}" for note in state["notes"]),
-                        }
-                    )
                 system = f"{self.system_prompt} Домашня тека власника: {Path.home()}."
                 if state.get("language"):
                     system += "\n" + state["language"]
-                request = self.builder.build(system, messages, state["evidence"], tools)
+                request = self._admit(system, history, state, tools, persist)
 
                 async def delta(text):
                     await emit("text_delta", {"text": text})
@@ -974,6 +967,32 @@ class Agent:
             if suffix in _CODE_SUFFIXES or suffix in read_suffixes:
                 out.append(path)
         return out
+
+    def _admit(self, system, history, state, tools, persist):
+        """Build the model request. In persist mode, when the request does not fit the context,
+        older history shrinks further and the request is built again, instead of ending the turn."""
+        ladder = _PERSIST_FIT if persist else ((None, 2),)
+        for attempt, (budget, keep) in enumerate(ladder):
+            messages = [
+                {k: m[k] for k in _MESSAGE_KEYS if k in m}
+                for m in [*history, *state["turn_messages"]]
+            ]
+            if budget is not None:  # long reads: the history stays inside a fixed budget
+                _fit_history(messages, budget, keep)
+            if state.get("notes"):  # fresh each round, never trimmed: findings must survive
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "[журнал знахідок] Записано в цьому ході:\n"
+                        + "\n".join(f"- {note}" for note in state["notes"]),
+                    }
+                )
+            try:
+                return self.builder.build(system, messages, state["evidence"], tools)
+            except ModelError as exc:
+                if exc.code != "context_overflow" or attempt == len(ladder) - 1:
+                    raise
+        raise AssertionError("unreachable: the ladder always returns or raises")
 
     async def _run_calls(self, context, actor, state, emit) -> bool:
         """Execute queued calls in order; True when waiting for an approval decision."""
