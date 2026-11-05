@@ -122,3 +122,10 @@ async def test_grep_with_no_match_says_so_instead_of_looking_like_a_failure(host
     )
     assert result.content["exit_code"] == 1
     assert "збігів" in result.content.get("note", "")
+
+
+def test_prompt_does_not_send_shell_scripts_to_a_python_grep_pattern():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "для скриптів .sh" in SYSTEM_PROMPT
+    assert "Маленькі файли читай цілком" in SYSTEM_PROMPT
