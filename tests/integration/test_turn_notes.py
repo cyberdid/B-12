@@ -87,3 +87,19 @@ async def test_a_persist_turn_shrinks_history_until_the_request_fits(runtime_fac
     result, _ = await run_turn(runtime, who, "прочитай весь файл", persist=True)
     assert result.state == "completed", result.error_code
     assert refusals, "the tight budget was never hit, so the retry was not exercised"
+
+
+async def test_a_persist_read_result_reminds_the_model_to_write_findings(runtime_factory, tmp_path):
+    """Regression: 80 reads and no note_add; the report covered only the first file."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime, capabilities=NOTE_CAPABILITIES)
+    small = tmp_path / "a.sh"
+    small.write_text("echo one\n")
+    state["script"] = [
+        {"tool_calls": [("file_read", {"path": str(small)})]},
+        {"content": "Прочитано."},
+    ]
+    await run_turn(runtime, who, "прочитай", persist=True)
+    tool_texts = [m["content"] for m in state["requests"][-1]["messages"] if m["role"] == "tool"]
+    assert any("note_add" in text for text in tool_texts), "the read result carries no reminder"

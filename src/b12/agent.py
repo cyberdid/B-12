@@ -120,6 +120,7 @@ _TOOL_NAMES = (
 _PSEUDO_CALL = re.compile(rf"(?m)^\s*({_TOOL_NAMES})\s*[({{]|<\|\"\|>|\b({_TOOL_NAMES})\{{")
 _NATIVE_CALL = re.compile(rf"\b({_TOOL_NAMES})\{{|<\|\"\|>")
 PERSIST_HISTORY_CHARS = 6000  # characters of older tool results and replies the window keeps
+_NOTE_HINT = "Запиши знахідки з цієї частини командою note_add: файл, номер рядка і що саме не так."
 # Budgets tried in order when a persist request overflows: (window chars, whole messages kept)
 _PERSIST_FIT = (
     (PERSIST_HISTORY_CHARS, 2),
@@ -1091,6 +1092,15 @@ class Agent:
                 )
             else:
                 result = await self.registry.execute(call, context)
+                if (
+                    state.get("persist")
+                    and call.name == "file_read"
+                    and result.status == "completed"
+                ):
+                    # The reminder rides on every long-read result, where the model is reading.
+                    result = result.model_copy(
+                        update={"content": {**result.content, "hint": _NOTE_HINT}}
+                    )
                 if result.status == "approval_pending":
                     state["pending_operation"] = result.content["operation_id"]
                     await emit(
