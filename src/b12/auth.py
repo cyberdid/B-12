@@ -25,6 +25,7 @@ HOST_CAPABILITIES = {
         "memory.forget",
         "knowledge.read",
         "time.read",
+        "turn.notes",
     ),
     "read_only": (
         "system.read",
@@ -33,11 +34,12 @@ HOST_CAPABILITIES = {
         "memory.read",
         "knowledge.read",
         "time.read",
+        "turn.notes",
     ),
-    "none": ("time.read",),
+    "none": ("time.read", "turn.notes"),
 }
 GUEST_CAPABILITIES = frozenset(
-    {"time.read", "memory.read", "memory.write", "knowledge.read", "system.read"}
+    {"time.read", "memory.read", "memory.write", "knowledge.read", "system.read", "turn.notes"}
 )
 
 

@@ -127,8 +127,8 @@ async def test_grep_with_no_match_says_so_instead_of_looking_like_a_failure(host
 def test_prompt_does_not_send_shell_scripts_to_a_python_grep_pattern():
     from b12.agent import SYSTEM_PROMPT
 
-    assert "для скриптів .sh" in SYSTEM_PROMPT
-    assert "Маленькі файли читай цілком" in SYSTEM_PROMPT
+    assert "Файли до 28 КБ читай цілком" in SYSTEM_PROMPT
+    assert "note_add" in SYSTEM_PROMPT
 
 
 def test_prompt_batches_many_files_into_one_shell_loop_and_never_invents_names():

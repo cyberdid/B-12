@@ -18,10 +18,11 @@ def register_host_tools(
     Missing memory/revision/global-purge ports return coordinator_unavailable.
     No model field can supply these ports or authorize a grant/approval.
     """
-    from b12.tools import filesystem, network, process
+    from b12.tools import filesystem, network, notes, process
     from b12.tools import memory as memory_tools
 
     filesystem.register(registry, backups)
+    notes.register(registry)
     process.register(registry)
     if sudo or sudo_path:
         process.register_sudo(registry, sudo_path)

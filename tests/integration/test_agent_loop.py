@@ -755,13 +755,13 @@ async def test_a_large_file_is_not_read_chunk_by_chunk_forever(runtime_factory, 
     big = tmp_path / "big.py"
     big.write_text("def f():\n    pass\n" * 4000)
     script = [
-        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(8)
+        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(14)
     ]
     state["script"] = script + [{"content": "ГОТОВО"}]
     result, _ = await run_turn(runtime, who, "прочитай", persist=True)
     codes = [r.error_code for r in result.tool_results]
     assert codes.count("use_search") >= 1
-    assert codes[:4] == [None] * 4
+    assert codes[:12] == [None] * 12  # 12 chunks (about 28 KB) are allowed before the stop
 
 
 async def test_a_closed_file_is_not_sent_back_to_file_read(runtime_factory, tmp_path):
@@ -772,7 +772,7 @@ async def test_a_closed_file_is_not_sent_back_to_file_read(runtime_factory, tmp_
     big = tmp_path / "big.md"
     big.write_text("# readme\n" + "line of text\n" * 3000)
     script = [
-        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(7)
+        {"tool_calls": [("file_read", {"path": str(big), "offset": i * 2400})]} for i in range(13)
     ]
     script += [
         {"content": "Не можу продовжити читання."},

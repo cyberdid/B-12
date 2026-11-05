@@ -163,7 +163,8 @@ async def test_tools_lists_catalog_without_secrets(cli):
     _, run, _ = cli
     code, out, _ = await run("tools")
     tools = {t["name"]: t for t in parse(out)}
-    assert code == 0 and len(tools) == 14 and "run_command" in tools
+    assert code == 0 and len(tools) == 15 and "run_command" in tools
+    assert tools["note_add"]["capability"] == "turn.notes"
     assert tools["shell_exec"]["risk"] == "arbitrary"
     assert tools["memory_forget"]["risk"] == "destructive"
 
