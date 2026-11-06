@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-10-26
-status: compiled
-sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/tools/outcomes.py, src/b12/tools/filesystem.py, src/b12/tools/process.py, src/b12/tools/network.py, src/b12/tools/memory.py, tests/security/test_tool_policy.py, tests/unit/test_registry.py, tests/integration/test_host_tools.py, tests/security/test_host_boundaries.py]
+updated: 2026-11-06
+status: partially_implemented
+sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/tools/outcomes.py, src/b12/tools/filesystem.py, src/b12/tools/process.py, src/b12/tools/network.py, src/b12/tools/memory.py, src/b12/agent.py, tests/security/test_tool_policy.py, tests/unit/test_registry.py, tests/integration/test_host_tools.py, tests/security/test_host_boundaries.py, tests/integration/test_web_search.py, tests/integration/test_agent_loop.py, tests/integration/test_turn_notes.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md]
 tags: [tools, control, approval, provenance]
 ---
 # Контроль і результати інструментів
@@ -62,3 +62,13 @@ Review: перший незалежний review знайшов I1 (resolver Non
 Реальні effects перевірено лише на temp/local fixtures; production файли користувача не змінювались. **Не реалізовано:** global `PurgeCoordinator` і original-revision lookup (Task 7), agent/session loop (Task 7), загальний service backup (Task 13). Blocking OS/Python I/O не має hard preemption. Staging, батьківський каталог якого видалено поза B-12, лишається `pending` — coordinator має показувати причину. Код і тести не доводять 24/7 або physical hardware acceptance.
 
 Див. [план усієї реалізації](../project/implementation.md), [стан](../project/status.md), [пам’ять і приватність](memory.md) та [архітектуру](architecture.md).
+
+## Вебпошук і повний огляд файлів (2026-11-06)
+
+**Вимога власника:** B-12 має шукати інформацію в інтернеті. `web_search` спершу звертається до DuckDuckGo Lite, а за відсутності результатів використовує Bing RSS; повертає обмежені заголовки, URL і описи. `http_fetch` окремо отримує сторінку за URL. Обидва використовують capability `network.http` і контрольований `network_allow`. Пошукові результати — недовірені дані, а tool не виконує URL, знайдені у видачі.
+
+**Перевірений факт:** інтеграційний тест прямого handler-а та тест повного tool loop проходять. У live Bolt-перевірці модель викликала `web_search` і повернула офіційну сторінку NVIDIA Developer для сімейства Nemotron. У тестовій ізольованій конфігурації обидва пошукові домени явно дозволені; робоча конфігурація власника вже містить `network_allow = ["*"]`.
+
+**Перевірений факт:** інструкції multi-file review не вимагають `run_command`, якого може не бути у grant. Вони вимагають продовжити `file_list` точним `next_offset` до `null`, потім читати відповідні файли послідовними offset до EOF, не повторювати відмовлений tool і не виконувати файли, які перевіряються. Agent coverage guard зберігає очікувану сторінку в turn state, відхиляє пропуск сторінки і не закриває теку раніше останнього offset. `note_add` призначено для конкретних знахідок, а не для кожного фрагмента; аналіз сам по собі не дає дозволу писати в довгу пам’ять.
+
+**Межі:** зовнішні пошукові сервіси можуть змінити HTML/RSS та якість результатів; проведено один live запит, а не стійке вимірювання. Деталі NVIDIA toolkit і Helix — у [картці джерела](../sources/nvidia-agent-frameworks-2026-11-06.md).

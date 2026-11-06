@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-10-26
+updated: 2026-11-06
 status: partially_implemented
 sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/agent.py, src/b12/sessions.py, src/b12/purge.py, src/b12/evidence.py, src/b12/runtime.py, tests/integration/test_agent_loop.py, tests/unit/test_sessions.py, tests/e2e/test_bolt_tools.py]
 tags: [agent, sessions, purge, evidence, tools]
@@ -18,6 +18,12 @@ tags: [agent, sessions, purge, evidence, tools]
 **Перевірений факт:** `SessionStore` зберігає лише завершені turns і лише для actor із consent. Без consent історія volatile, у RAM процесу, а tools недоступні, бо Task 5 вимагає consent. Кожен turn має evidence tags (memory/document/tool_result): recall, memory_search/store/forget, knowledge_search. Commit відхиляється, якщо будь-яке evidence уже не live. Історія ховає turns із мертвим evidence ще до purge hook.
 
 **Межа (пропозиція для майбутнього):** provenance працює на рівні turn. Текст, який користувач повторив в іншому turn без зв’язку з tool чи evidence, не відстежується; його прибирає лише `clear_session`.
+
+## Неповна історія у вікні моделі
+
+**Перевірений факт:** `SessionStore` може передати збережені репліки, яких не вміщує context window. `ContextBuilder` атомарно прибирає найстаріші завершені turns і повертає їхні `dropped_ids`. `Agent._admit` використовує ці ID, а також ID урізаних старих повідомлень у persist-режимі, щоб додати в system context до трьох коротких пар user/assistant із пропущеної історії. Уривки позначені як недовірені дані, а інструкція забороняє моделі заперечувати попередню розмову; якщо уривків недостатньо, модель має сказати, що повний контекст недоступний.
+
+**Межа:** це короткий extractive breadcrumb, не повний transcript і не довготривала пам’ять. Історія за межами ліміту `history_turns`, вилучені turns після purge та повідомлення без текстового вмісту не відновлюються цим механізмом. Context overflow обов’язкових system/evidence/tools/latest-turn даних усе ще завершується помилкою замість тихого обрізання. Регресійний тест змушує реальний `ContextBuilder` вилучити стару розмову й перевіряє, що уривки доходять до модельного запиту.
 
 ## Глобальний purge
 
