@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-04
+updated: 2026-11-06
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -60,6 +60,8 @@ tags: [navigation]
 | [archive-index-public](sources/archive-index-public.md) | Pinned source review, 17 core tests і локальна інсталяція |
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
+| [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
+| [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
-Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 116 URL](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).
+Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 120 зовнішніх джерел](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).

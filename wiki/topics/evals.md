@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-11-04
+updated: 2026-11-06
 status: partially_implemented
-sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, evals/ollama_broker.py, evals/socket_bridge.py, tests/integration/test_eval_model_transport.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, pyproject.toml, uv.lock]
+sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, evals/ollama_broker.py, evals/socket_bridge.py, tests/integration/test_eval_model_transport.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, tests/integration/test_web_search.py, tests/integration/test_agent_loop.py, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, pyproject.toml, uv.lock]
 tags: [eval, bolt, benchmark, ukrainian]
 ---
 # Eval: корпус, runner і результати
@@ -69,3 +69,32 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 **Перевірка:** 21 focused integration tests пройшли на Python 3.12.3 і 3.13.14. Реальні sockets підтвердили NDJSON streaming до завершення upstream, cancellation до headers і під час body, active relay shutdown, fixed upstream error, response bound, private permissions та збереження стороннього occupied-path файла. Opt-in Docker test (`B12_DOCKER_TEST=1`) виконав metadata, admin denial, streaming і disconnect через справжній контейнер `--network none` з read-only root і тільки channel/bridge mounts. Усі upstream запити йшли в synthetic HTTP fixture; host Ollama inference/unload не виконувався.
 
 **Відкрите:** Docker image з locked B-12 dependencies, worker/supervisor, provenance metadata і запуск повного corpus ще не інтегровані. Цей transport є test infrastructure; він не змінює відкладену runtime security policy. [Implementation plan](../../docs/superpowers/plans/2026-11-04-eval-model-transport.md).
+
+## Live Bolt-перевірки інтернету та кодового review (2026-11-06)
+
+### Умови
+
+**Перевірений факт:** ізольований B-12 сервер слухав тільки `127.0.0.1:18712`, `--no-autonomy`, окрема тестова база, `host_access=read_only`, grants лише для читання файлів, `network.http`, часу й turn notes. Не запускали перевірювані скрипти та не змінювали їх. Конфігурація власника має `network_allow = ["*"]`; тестова конфігурація явно дозволяла пошукові домени. Основний server на 8712 не перезапускався.
+
+Host: Ubuntu 24.04.5, kernel 7.0.0-38-generic x86_64, Python 3.12.3, RTX 4060 Laptop 8 GB. Ollama client 0.33.1/server 0.33.3. Model alias `b12-bolt-e4b:q4km`, digest `7eaa0c0553b856cf4f02f9bf1ccf580c859ec7d51d31e75a0f0e71efefd5ad09`, Q4_K_M, `num_ctx=8192`, `num_predict=1024`, temperature 0, seed 42. Після першого тестового запиту модель залишалася warm; power mode та точний VRAM allocation per trial не фіксувалися. Інші GPU-процеси не зупинялися. Артефакти виконання локальні й gitignored.
+
+### Пошук в інтернеті
+
+**Перевірений факт:** один live-запит за офіційною сторінкою NVIDIA Nemotron викликав `web_search` і повернув `https://developer.nvidia.com/topics/ai/nemotron` серед офіційних результатів. Результат підтверджує end-to-end маршрутизацію моделі через інструмент, але один приклад не міряє точність, повноту чи стійкість пошуку.
+
+### Review зовнішніх shell-скриптів
+
+Порівняння проводилося з десятьма категоріями попередньої відповіді Claude для локальної теки shell-скриптів; ті категорії мають статус **зі слів Claude / неперевірений звіт**, не еталон істини. Див. [картку baseline](../sources/claude-password-policy-baseline-2026-11-04.md). В оригінальні скрипти не вносили змін, результати VM-тестів Claude не відтворювали.
+
+| Прогін | Час | Траєкторія | Вихід |
+|---|---:|---|---|
+| v1, до coverage guard, Bing-only | ≈819 с | 91 tool calls: 80 успішних `file_read`, 3 успішні й 2 відхилені `file_list`, 3 відхилені `run_command`, 3 повторні `file_read` | Неповний інвентар і непідтверджені твердження; модель усе одно поставила `completed` |
+| v2, coverage guard і нові інструкції | 365 с | 101 виклик: 97 успішних `file_read`, 3 `file_list`, одне `file_read/not_found` через хибний шлях; без shell і запису нотаток | «ГОТОВО» та перелік, без конкретного аудиту |
+| v3, вимога доказових знахідок | 395 с | 95 викликів: 90 успішних читань, 4 повтори відхилені, одна успішна `file_list`; EOF для 10/11 скриптів | `failed/incomplete_coverage`; один скрипт неповний; список файлів, не аудит |
+| v4, додатковий coverage budget | 410 с | 95 викликів: 90 успішних читань, 4 повтори відхилені, одна успішна `file_list`; той самий скрипт лишився неповним | `failed/incomplete_coverage`; фінал знову не містив обґрунтованих знахідок |
+
+**Інтерпретація:** v1 підтвердив дефект обліку покриття: модель могла позначити неповний огляд завершеним. Guard виправив саме цю хибну класифікацію. Додаткові 60 раундів у v4 не змусили модель завершити останній файл; вона повторювала читання без `offset` та видала слабкий інвентар. Це негативний eval якості конкретної E4B-конфігурації, а не підтвердження чи спростування тверджень Claude про shell-скрипти. Не можна виставити осмислений score збігу з десятьма категоріями без повного доказового звіту і незалежної ground truth перевірки.
+
+**Висновок для B-12:** збережено чесний status `failed/incomplete_coverage`, додано bounded coverage extension, але подальше prompt-only підсилення ще не довело якісний multi-file audit. Для такого сценарію треба оцінити потужнішу модель або керований file-by-file workflow із точним audit trail; нову модель ще не обирали.
+
+**Межі benchmark:** це 1 live search query і до 4 read-only review trials на одній host/model configuration; повтори не були рандомізовані, немає cold/warm latency-розкладу для кожного run, power mode невідомий, оцінювання фінального аудиту якісне, а Claude baseline неперевірений. Ці результати не порівнюються з 109-case eval corpus чи попередніми 541-trial benchmark.

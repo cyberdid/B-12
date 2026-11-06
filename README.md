@@ -12,7 +12,7 @@
   <img src="docs/images/web-dark.png" alt="Web UI B-12: tool-виклики, підтвердження і скасування" width="900">
 </p>
 
-> **Стан на 01.11.2026:** desktop runtime працює end-to-end з реальною моделлю. Реалізовано: пам’ять зі згодою та глобальним забуттям, 14 host tools + MCP (+ опційний `sudo_exec`), agent loop (включно з режимом «Не зупинятися»), CLI/API/Web/TUI, автономність, backup/restore, локальний голосовий шар (PTT, Silero VAD/endpoint, faster-whisper UA/EN, Piper TTS UA/EN, NLMS AEC, barge-in, speaker verification). Фізичний Reachy/Jetson, 8h акустичний soak у кімнаті та 30-денні докази ще попереду. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
+> **Стан на 06.11.2026:** desktop runtime працює end-to-end із реальною моделлю. Реалізовано пам’ять зі згодою та глобальним забуттям, host tools і MCP (зокрема пошук в інтернеті через `web_search`), agent loop із режимом «Не зупинятися», CLI/API/Web/TUI, автономність, backup/restore та локальний голосовий шар (PTT, Silero VAD/endpoint, faster-whisper UA/EN, Piper TTS UA/EN, NLMS AEC, barge-in, speaker verification). Context admission повідомляє моделі про вилучену історію короткими позначеними уривками; обов’язковий контекст усе ще fail-closed при overflow. Модельний пошук пройшов один live smoke test; повний multi-file review на Bolt завершився `incomplete_coverage`, тож це обмеження зафіксоване. Фізичний Reachy/Jetson, 8-годинний акустичний soak і 30-денні докази ще попереду. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
 
 ## Архітектура
 
@@ -154,7 +154,7 @@ Web UI обслуговується тим самим API зі строгим CS
 
 | # | Задача | Стан |
 |---|---|---|
-| 1–6 | Контракти, canonical memory, retrieval, model/context admission, контроль tools, 14 host tools | ✅ |
+| 1–6 | Контракти, canonical memory, retrieval, model/context admission, контроль tools і host tools | ✅ |
 | 7 | Agent loop, сесії, evidence, глобальне забуття | ✅ |
 | 8–10 | CLI, автентифікований API, Web UI | ✅ |
 | 11 | Цілі, ініціатива, рефлексія, уподобання | ✅ реальний Bolt 3/3 |

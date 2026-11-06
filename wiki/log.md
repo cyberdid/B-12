@@ -1,6 +1,6 @@
 ---
 type: log
-updated: 2026-10-24
+updated: 2026-11-06
 status: append-only
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [history]
@@ -549,3 +549,39 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-04] lint | Corpus v4 та locked environments
 
 38 wiki-сторінок, 318 локальних посилань/якорів, frontmatter sources та index coverage пройшли перевірку; broken links і неіндексовані сторінки — 0. Поточний статус містить нові functional results, historical model/voice metrics збережено окремо. Raw originals та source manifest незмінні.
+
+## [2026-11-06] implementation | Повторні фрагменти й пошук в інтернеті
+
+За дорученням власника розпочато покращення аналізу коду та інтернет-доступу. У `feat/b12-runtime` додано облік унікальних offset для ліміту читання: повтор тієї самої частини не витрачає ліміт нових частин. Регресійний тест падав до зміни. Додано `web_search` через Bing RSS з наявною capability `network.http` і перевіркою `network_allow`; прямий HTTP probe повернув три результати. Модельний пошуковий сценарій і новий повний аналіз зовнішньої теки shell-скриптів ще не перевірені. Процес сервера не перезапускався. Подальші зміни й перевірки залишаються відкритими.
+
+## [2026-11-06] research | NVIDIA agent evaluation і live web search
+
+Перевірено вибрані офіційні сторінки NVIDIA: NeMo Agent Toolkit позначено deprecated із жовтня 2026 та EOL до кінця 2026; Relay/Fabric/Helix описані як наступні напрями. Рішення для B-12 — не додавати deprecated runtime; використати поділ task/runner/trial і окреме оцінювання відповіді та trajectory як eval-принципи. Картка джерела й статус кожного URL — [wiki/sources/nvidia-agent-frameworks-2026-11-06.md](sources/nvidia-agent-frameworks-2026-11-06.md) та `raw/source-manifest.json`; локального snapshot немає.
+
+Додано `web_search`: DuckDuckGo Lite, Bing RSS fallback, bounded результат і перевірка `network_allow` через `network.http`. Mock-тести та один live-запит Bolt повернули офіційну NVIDIA Nemotron сторінку. Це підтверджує інструментальний шлях, але не точність пошуку загалом.
+
+## [2026-11-06] fix | Coverage guard для довгого read-only review
+
+Persist-turn тепер не рахує повторний offset як нову частину; `file_search` і shell grep не є доказом повного читання. Фінальний маркер проходить coverage guard, а неповний хід завершується `failed/incomplete_coverage` із назвами прогалин. Доданий TDD regression для продовження інструментів до 60 додаткових раундів, поки перелічені code/config/docs лишаються неповними. Інструкції більше не вимагають `run_command`, якого може не бути у grant; аналіз коду не надає дозволу змінювати long-term memory.
+
+Live Bolt review зовнішньої теки shell-скриптів (v3 і v4) усе ще завершився `failed/incomplete_coverage`: 10/11 файлів до EOF, один файл лише частково прочитаний. Фінал не містив надійних, прив’язаних до рядків знахідок. Це негативний eval якості моделі; Claude baseline залишається неперевіреним і не використаний як ground truth. Умови й межі — [evals](topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06).
+
+Виконані зміни лежать у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, без commit. Ізольований server на 18712 зупинений; основний процес на 8712 не перезапускався під час активного з’єднання, тому ще не завантажив поточний код.
+
+## [2026-11-06] lint | Runtime search і coverage зміни
+
+Повний suite на точному робочому дереві: 663 passed, 4 skipped за 151,76 с. `ruff check src tests evals` та `git diff --check` пройшли. Перший повний прогін виявив чотири застарілі очікування тестів; тести оновлено під новий контракт incomplete coverage і granted file tools, після чого повторний повний suite пройшов.
+
+Wiki validation: 41 сторінка, 340 локальних посилань, биті шляхи/якорі — 0, відсутні `sources` — 0, сторінки поза індексом — 0. SHA-256 `raw/B-12_Master_Project_2026-10-24.md` лишився `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, що збігається з `raw/source-manifest.json`. У `raw/` master brief не змінювався; маніфест містить 120 external references, з новими перевірками NVIDIA та межами прочитаного.
+
+## [2026-11-06] fix | Контекстна безперервність після обрізання історії
+
+`Agent._admit` більше не ігнорує `AdmittedRequest.dropped_ids`: після вилучення старих turns повторно збирає запит із короткими цитатами до трьох пропущених user/assistant turns. У system context явно зазначено, що це недовірені уривки, історія неповна і не можна заперечувати попередній діалог. У persist-режимі враховано старі assistant/tool повідомлення, скорочені `_fit_history`. Обов’язкові повідомлення поточного ходу та context fail-closed не змінені.
+
+TDD regression використовує реальний `ContextBuilder`: великий старий turn справді вилучається, запит моделі містить уривок із нього, а поточне запитання лишається останнім. Повний `uv run pytest -q`: **664 passed, 4 skipped** за 148,89 с; `uv run ruff check src tests` і `git diff --check` пройшли.
+
+**Операційна перевірка:** B-12 API перезапущено з worktree `.worktrees/runtime` на `127.0.0.1:8712`; `/api/health` повернув `ok=true`. Kitty TUI перезапущено та підключено до API (активне loopback-з’єднання). Live `/api/tools` показав 19 записів каталогу, серед них `web_search`. Ollama та процеси GPU не перезапускалися й не зупинялися.
+
+## [2026-11-06] lint | Context fix і GitHub підготовка
+
+Перевірено 41 wiki-сторінку, 340 локальних Markdown-посилань і якорів, frontmatter, усі `sources` paths та охоплення індексом: помилок немає, неіндексованих сторінок — 0. Перевірено відсутність нових локальних transcript/download paths у baseline-картці; до публічної wiki перенесені лише широкі категорії неперевірених тверджень. Master brief байтово незмінний, SHA-256 збігається з маніфестом. README/status синхронізовані з датою 06.11 та зафіксованими межами benchmark.

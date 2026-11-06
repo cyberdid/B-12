@@ -69,9 +69,11 @@ async def test_run_command_reports_exit_status_and_bounds_output(host_factory, t
     assert len(big.content["stdout"].encode()) <= 4096
 
 
-def test_prompt_tells_the_model_to_grep_large_files_not_read_them_in_chunks():
+def test_prompt_uses_available_file_tools_without_requiring_command_access():
     text = SYSTEM_PROMPT.lower()
-    assert "run_command" in text and "grep" in text
+    assert "file_read" in text and "file_search" in text
+    assert "лише інструменти, які показані" in text
+    assert "один run_command" not in text
 
 
 async def test_wrong_fields_for_run_command_name_the_allowed_fields(host_factory, tmp_path):
@@ -124,15 +126,16 @@ async def test_grep_with_no_match_says_so_instead_of_looking_like_a_failure(host
     assert "збігів" in result.content.get("note", "")
 
 
-def test_prompt_does_not_send_shell_scripts_to_a_python_grep_pattern():
+def test_prompt_requires_complete_reads_and_evidence_for_findings():
     from b12.agent import SYSTEM_PROMPT
 
-    assert "Файли до 28 КБ читай цілком" in SYSTEM_PROMPT
+    assert "file_read" in SYSTEM_PROMPT and "offset до eof" in SYSTEM_PROMPT
     assert "note_add" in SYSTEM_PROMPT
 
 
-def test_prompt_batches_many_files_into_one_shell_loop_and_never_invents_names():
+def test_prompt_lists_directories_once_and_never_invents_names():
     from b12.agent import SYSTEM_PROMPT
 
-    assert "file_list" in SYSTEM_PROMPT and "for f in" in SYSTEM_PROMPT
+    assert "file_list" in SYSTEM_PROMPT and "один раз склади перелік" in SYSTEM_PROMPT
+    assert "for f in" not in SYSTEM_PROMPT
     assert "не вигадуй імен файлів" in SYSTEM_PROMPT.lower()

@@ -1,8 +1,8 @@
 ---
 type: status
-updated: 2026-11-04
+updated: 2026-11-06
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -20,9 +20,19 @@ tags: [progress, next]
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 - **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
 
+## Поточний стан (2026-11-06)
+
+- **Перевірений факт:** зміни реалізації та перевірки виконані у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, від бази `5f6ba90`. Публікація до GitHub ще триває.
+- **Перевірений факт:** додано `web_search` з DuckDuckGo Lite та Bing RSS fallback; обидва шляхи проходять через `network.http` і `network_allow`. Ізольований live-запит реальним `b12-bolt-e4b:q4km` повернув офіційну сторінку NVIDIA Nemotron. Це один запит, не гарантія сталої якості пошуку.
+- **Перевірений факт:** у persist-аналізі фіксуються неповні діапазони читання й непрочитані файли; фінальний маркер не завершує хід при прогалинах. Додано обмежене продовження до 60 додаткових раундів, поки журнал доводить незавершене покриття.
+- **Перевірений факт із межами:** read-only review зовнішньої теки shell-скриптів завершився `failed/incomplete_coverage` у v3 і v4. У v4 EOF підтверджено для 10 з 11 скриптів; один залишився частково прочитаним. Фінальна відповідь Bolt була інвентарем файлів, а не доказовим аудитом. Claude baseline у wiki має статус неперевіреного звіту, не ground truth. Деталі та умови — у [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06).
+- **Перевірений факт:** після змін перезапущено B-12 server на 8712 із `.worktrees/runtime`; Kitty TUI знову підключено до цього API. `web_search` видно в live tool registry. GPU не перезапускався і сторонні GPU-процеси не чіпалися.
+- **Перевірений факт:** повний suite на робочому дереві — 664 passed, 4 skipped; `ruff check src tests` і `git diff --check` пройшли. Wiki lint: 41 сторінка, 340 локальних посилань, 0 битих посилань/якорів, 0 відсутніх source paths та 0 неіндексованих сторінок. SHA-256 незмінного master brief збігається з маніфестом: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
+- **Потребує перевірки:** живий Bolt multi-file audit поки не дає доказового звіту; див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06). GPU лишався спільним з іншим процесом; сторонні процеси не зупинялися.
+
 ## Наявне
 
-- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 116 зовнішніх URL.
+- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 120 зовнішніх джерел.
 - [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
 - [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
 - Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.

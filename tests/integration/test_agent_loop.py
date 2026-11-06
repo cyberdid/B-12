@@ -79,6 +79,18 @@ def tool_messages(request):
     return [m for m in request["messages"] if m["role"] == "tool"]
 
 
+def test_project_review_guidance_uses_granted_file_tools():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "ОДИН run_command" not in SYSTEM_PROMPT
+    assert "file_list" in SYSTEM_PROMPT and "file_read" in SYSTEM_PROMPT
+    assert "Не повторюй відмовлений виклик" in SYSTEM_PROMPT
+    assert "не пиши проміжних звітів" in SYSTEM_PROMPT
+    assert "Не завершуй аудит переліком прочитаних файлів" in SYSTEM_PROMPT
+    assert "шлях:рядок" in SYSTEM_PROMPT
+    assert "Не підміняй висновок загальними ризиками" in SYSTEM_PROMPT
+
+
 async def test_model_drives_real_file_write_then_read_and_grounded_final(runtime_factory, tmp_path):
     state, factory = runtime_factory
     runtime = factory()
@@ -138,6 +150,48 @@ async def test_errors_unknown_and_invalid_calls_become_structured_results(
     payloads = [json.loads(m["content"]) for m in tool_messages(state["requests"][1])]
     assert [p["error_code"] for p in payloads] == ["unknown_tool", "invalid_arguments", "not_found"]
     assert_event_stream(events, result, terminal="turn_completed")
+
+
+def test_context_evictions_are_returned_as_untrusted_continuity_excerpts(
+    runtime_factory, profile_settings
+):
+    from b12.context import ContextBuilder
+
+    _, factory = runtime_factory
+    runtime = factory()
+    agent = runtime.agent
+    agent.builder = ContextBuilder(
+        profile_settings.model_copy(update={"num_ctx": 3072, "output_tokens": 32})
+    )
+    history = [
+        {
+            "id": "old-user",
+            "turn_id": "old-turn",
+            "role": "user",
+            "content": "Перед помилкою ми налаштовували NVIDIA NeMo Agent Toolkit. " + "A" * 3500,
+        },
+        {
+            "id": "old-assistant",
+            "turn_id": "old-turn",
+            "role": "assistant",
+            "content": "Далі треба було описати встановлення й перевірити вимоги. " + "B" * 3500,
+        },
+    ]
+    state = {
+        "turn_messages": [{"id": "current", "role": "user", "content": "Що було перед цим?"}],
+        "evidence": [],
+        "notes": [],
+    }
+
+    request = agent._admit("system", history, state, [], persist=False)
+
+    continuity = request.messages[0]["content"]
+    assert "NVIDIA NeMo Agent Toolkit" in continuity
+    assert "встановлення й перевірити вимоги" in continuity
+    assert "недовірені" in continuity
+    assert "не стверджуй, що попередніх повідомлень не було" in continuity.lower()
+    assert {"old-user", "old-assistant"}.issubset(request.dropped_ids)
+    assert request.messages[-1]["content"] == "Що було перед цим?"
 
 
 async def test_duplicate_call_id_across_rounds_is_not_executed_again(runtime_factory, tmp_path):
@@ -542,6 +596,36 @@ async def test_persist_blocks_early_finish_while_listed_files_are_unread(runtime
     assert unread and "b.py" in unread[0]["content"] and "notes.md" not in unread[0]["content"]
 
 
+async def test_persist_keeps_tools_available_past_report_reserve_when_coverage_is_incomplete(
+    runtime_factory, tmp_path, monkeypatch
+):
+    import b12.agent as agent_module
+
+    monkeypatch.setattr(agent_module, "PERSIST_ROUNDS", 4)
+    monkeypatch.setattr(agent_module, "PERSIST_COVERAGE_EXTRA_ROUNDS", 4, raising=False)
+    monkeypatch.setattr(agent_module, "PERSIST_REPORT_ROUNDS", 1)
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "review"
+    folder.mkdir()
+    (folder / "a.py").write_text("# a")
+    (folder / "b.py").write_text("# b")
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "a.py")})]},
+        {"content": "Частковий звіт. ГОТОВО"},
+        {"tool_calls": [("file_read", {"path": str(folder / "b.py")})]},
+        {"content": "Повний звіт. ГОТОВО"},
+    ]
+
+    result, _ = await run_turn(runtime, who, "Прочитай обидва файли", persist=True)
+
+    assert result.state == "completed"
+    assert body(result.content) == "Повний звіт. ГОТОВО"
+    assert [r.name for r in result.tool_results] == ["file_list", "file_read", "file_read"]
+
+
 async def test_persist_continues_a_partially_read_file_from_the_exact_offset(
     runtime_factory, tmp_path
 ):
@@ -663,8 +747,8 @@ async def test_same_failing_program_is_refused_after_two_failures_in_any_mode(ru
     assert statuses[2] == ("denied", "repeated_failure"), statuses
 
 
-async def test_stalled_turn_with_reads_ends_with_a_report_without_tools(runtime_factory, tmp_path):
-    """Regression: a stalled analysis ended empty; now the model reports on what it read."""
+async def test_stalled_turn_with_partial_reads_cannot_complete_coverage(runtime_factory, tmp_path):
+    """A report on a partial read stays failed even when it is non-empty."""
     state, factory = runtime_factory
     runtime = factory()
     who = owner(runtime)
@@ -682,8 +766,9 @@ async def test_stalled_turn_with_reads_ends_with_a_report_without_tools(runtime_
         {"content": "Звіт: прочитано частину."},
     ]
     result, _ = await run_turn(runtime, who, "Проаналізуй файл", persist=True)
-    assert (result.state, result.error_code) == ("completed", None)
-    assert body(result.content) == "Звіт: прочитано частину."
+    assert (result.state, result.error_code) == ("failed", "incomplete_coverage")
+    assert body(result.content).startswith("Звіт: прочитано частину.")
+    assert "не дочитано до кінця" in result.content.lower()
     assert state["requests"][-1]["tools"] == []
 
 
@@ -838,6 +923,37 @@ async def test_round_budget_end_without_a_report_is_failed_not_completed(
     assert "не встигаю звіт" in result.content
 
 
+async def test_report_with_finish_marker_does_not_complete_with_unread_code_files(
+    runtime_factory, tmp_path, monkeypatch
+):
+    """Even after the bounded extension, an incomplete report must remain failed."""
+    import b12.agent as agent_mod
+
+    monkeypatch.setattr(agent_mod, "PERSIST_ROUNDS", 3)
+    monkeypatch.setattr(agent_mod, "PERSIST_COVERAGE_EXTRA_ROUNDS", 0)
+    monkeypatch.setattr(agent_mod, "PERSIST_REPORT_ROUNDS", 1)
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    root = tmp_path / "project"
+    root.mkdir()
+    first, second = root / "first.py", root / "second.py"
+    first.write_text("print('read')\n")
+    second.write_text("print('unread')\n")
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(root)})]},
+        {"tool_calls": [("file_read", {"path": str(first)})]},
+        {"content": "Перевірив перший файл. ГОТОВО"},
+    ]
+
+    result, _ = await run_turn(runtime, who, "проаналізуй усі файли теки", persist=True)
+
+    assert result.state == "failed"
+    assert result.error_code == "incomplete_coverage"
+    assert "ГОТОВО" in result.content
+    assert "second.py" in result.content
+
+
 async def test_continue_nudge_skips_a_file_at_the_chunk_limit(
     runtime_factory, tmp_path, monkeypatch
 ):
@@ -978,10 +1094,10 @@ async def test_long_persist_turn_keeps_the_window_within_a_fixed_budget(
     assert total < 6000 + 4000, total
 
 
-async def test_persist_counts_files_and_dirs_inspected_via_run_command_and_file_search(
+async def test_search_results_do_not_claim_full_file_or_directory_coverage(
     runtime_factory, tmp_path
 ):
-    """Files inspected via run_command (grep/sed/head/cat) or file_search count as covered."""
+    """Searching a file or directory does not count as a full read or listing."""
     state, factory = runtime_factory
     runtime = factory()
     who = owner(runtime)
@@ -1003,11 +1119,15 @@ async def test_persist_counts_files_and_dirs_inspected_via_run_command_and_file_
         },
         {"tool_calls": [("file_search", {"path": str(folder / "sub"), "query": "def c"})]},
         {"content": "Повний звіт. ГОТОВО"},
+        {"tool_calls": [("file_read", {"path": str(folder / "b.py")})]},
+        {"tool_calls": [("file_list", {"path": str(folder / "sub")})]},
+        {"tool_calls": [("file_read", {"path": str(folder / "sub" / "c.py")})]},
+        {"content": "Фінальний звіт після читання. ГОТОВО"},
     ]
     result, _ = await run_turn(runtime, who, "Проаналізуй проєкт", persist=True)
     assert result.state == "completed"
-    assert body(result.content) == "Повний звіт. ГОТОВО"
-    assert len(state["requests"]) == 5  # no extra unread/unlisted nudges
+    assert body(result.content) == "Фінальний звіт після читання. ГОТОВО"
+    assert len(state["requests"]) == 9
     assert "a.py" in result.content and "b.py" in result.content and "sub/c.py" in result.content
 
 
