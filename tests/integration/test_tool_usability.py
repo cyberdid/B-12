@@ -133,9 +133,10 @@ def test_prompt_requires_complete_reads_and_evidence_for_findings():
     assert "note_add" in SYSTEM_PROMPT
 
 
-def test_prompt_lists_directories_once_and_never_invents_names():
+def test_prompt_requires_all_directory_pages_and_never_invents_names():
     from b12.agent import SYSTEM_PROMPT
 
-    assert "file_list" in SYSTEM_PROMPT and "один раз склади перелік" in SYSTEM_PROMPT
+    assert "file_list" in SYSTEM_PROMPT and "усі сторінки кожної теки" in SYSTEM_PROMPT
+    assert "next_offset=null" in SYSTEM_PROMPT
     assert "for f in" not in SYSTEM_PROMPT
     assert "не вигадуй імен файлів" in SYSTEM_PROMPT.lower()

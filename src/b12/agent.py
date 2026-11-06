@@ -64,7 +64,8 @@ SYSTEM_PROMPT = (
     "зробити самому; питай лише перед руйнівною дією або коли бракує даних. "
     "Описуй файл або модуль лише тоді, коли його прочитав; інакше пиши «за назвою, не читав». "
     "Ігноруй LICENSE, .gitignore, файли блокування та кеш. Звіт має бути повним, не обривай його. "
-    "Під час огляду кількох файлів один раз склади перелік кожної теки через file_list. Якщо "
+    "Під час огляду кількох файлів переглянь усі сторінки кожної теки через file_list до "
+    "next_offset=null; продовжуй із повернутим offset. Якщо "
     "власник просить перевірити всі файли, читай кожен відповідний файл від початку через "
     "file_read, послідовно використовуючи offset до eof. Під час читання не пиши проміжних "
     "звітів: роби інструментальні виклики й підготуй одну відповідь після огляду. "
@@ -105,8 +106,9 @@ _NUDGE_PERSIST = (
     f"{PERSIST_MARKER}."
 )
 _NUDGE_DIRS = (
-    "[авто-продовження] Ти не переглянув підкаталоги проєкту. Переглянь їх через file_list і "
-    "прочитай їхній код, перш ніж писати підсумок: "
+    "[авто-продовження] Не всі теки повністю перелічені. Продовжуй file_list із точного "
+    "наступного offset; завершено лише коли next_offset=null. Після повного переліку прочитай "
+    "відповідні файли: "
 )
 _NUDGE_UNREAD = "[авто-продовження] Ти ще не прочитав файли з переліку, яких той самий тип: "
 _NUDGE_REDIRECT = (
@@ -212,7 +214,7 @@ def _is_noise(name: str) -> bool:
 
 
 def _unlisted_dirs(state) -> list[str]:
-    """Folders named in a listing and not yet looked into; their code is still unread."""
+    """Folders whose full paginated listing has not reached its final page."""
     dirs = state.get("dirs") or {}
     return [d for d, done in dirs.items() if not done and not _is_noise(os.path.basename(d))]
 
@@ -862,14 +864,16 @@ class Agent:
                                 "[авто-продовження] Файл прочитано не до кінця. Продовж: "
                                 f"file_read з path={path} і offset={offset}"
                             )
+                        elif unlisted := _unlisted_dirs(state):
+                            state["nudges"] += 1
+                            offsets = state.get("dir_offsets") or {}
+                            nudge = _NUDGE_DIRS + "; ".join(
+                                f"file_list з path={d} і offset={offsets.get(d, 0)}"
+                                for d in unlisted[:8]
+                            )
                         elif unread:  # the marker is the model's word; coverage is the system's
                             state["nudges"] += 1
                             nudge = _NUDGE_UNREAD + "; ".join(unread[:8])
-                        elif unlisted := _unlisted_dirs(state):
-                            state["nudges"] += 1
-                            nudge = _NUDGE_DIRS + "; ".join(
-                                f"file_list з path={d}" for d in unlisted[:8]
-                            )
                         elif (
                             PERSIST_MARKER not in reply.content.upper()
                             and state.get("generic", 0) < PERSIST_GENERIC
@@ -940,7 +944,24 @@ class Agent:
         path = str(call.arguments.get("path", "")).rstrip("/")
         if call.name == "file_list" and isinstance(result.content, dict):
             dirs = state.setdefault("dirs", {})
-            dirs[path] = True  # this folder has been looked into
+            offsets = state.setdefault("dir_offsets", {})
+            expected_offset = offsets.get(path, 0)
+            page_offset = result.content.get("offset", call.arguments.get("offset", 0))
+            next_offset = result.content.get("next_offset")
+            if page_offset != expected_offset:
+                # A page out of sequence cannot prove the gap before it was listed.
+                dirs[path] = False
+                offsets[path] = expected_offset
+            elif "next_offset" in result.content and next_offset is None:
+                dirs[path] = True  # only the last page completes the directory listing
+                offsets.pop(path, None)
+            else:
+                dirs[path] = False
+                offsets[path] = (
+                    next_offset
+                    if isinstance(next_offset, int)
+                    else page_offset
+                )
             for entry in result.content.get("entries", []):
                 if isinstance(entry, str) and entry.endswith("/"):
                     dirs.setdefault(f"{path}/{entry.rstrip('/')}", False)
@@ -989,7 +1010,10 @@ class Agent:
         options += [(path, 0) for path in Agent._unread_listed(state) if path not in closed]
         if not options:
             folders = _unlisted_dirs(state)
-            return f"file_list з path={folders[0]}" if folders else None
+            if folders:
+                offset = (state.get("dir_offsets") or {}).get(folders[0], 0)
+                return f"file_list з path={folders[0]} і offset={offset}"
+            return None
         others = [option for option in options if option[0] != state.get("last_read")]
         path, offset = (others or options)[0]
         if offset:
@@ -1019,7 +1043,13 @@ class Agent:
             if path not in gaps:
                 gaps.append(f"{path} (не дочитано до кінця)")
         for path in _unlisted_dirs(state):
-            label = f"{path}/ (не переглянуто)"
+            offset = (state.get("dir_offsets") or {}).get(path)
+            detail = (
+                f"не переглянуто; наступний offset={offset}"
+                if offset is not None
+                else "не переглянуто"
+            )
+            label = f"{path}/ ({detail})"
             if label not in gaps:
                 gaps.append(label)
         return gaps

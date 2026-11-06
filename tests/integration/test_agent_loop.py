@@ -596,6 +596,42 @@ async def test_persist_blocks_early_finish_while_listed_files_are_unread(runtime
     assert unread and "b.py" in unread[0]["content"] and "notes.md" not in unread[0]["content"]
 
 
+async def test_persist_finishes_paginated_directory_listing_before_report(
+    runtime_factory, tmp_path
+):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    folder = tmp_path / "many_entries"
+    folder.mkdir()
+    for n in range(201):
+        (folder / f"entry-{n:03}.txt").write_text("data")
+
+    def next_page(request):
+        nudges = [
+            m["content"]
+            for m in request["messages"]
+            if m["role"] == "user" and m["content"].startswith("[авто-продовження]")
+        ]
+        assert nudges and f"path={folder}" in nudges[-1] and "offset=200" in nudges[-1]
+        return {"tool_calls": [("file_list", {"path": str(folder), "offset": 200})]}
+
+    state["script"] = [
+        {"tool_calls": [("file_list", {"path": str(folder)})]},
+        {"content": "Перша сторінка переглянута. ГОТОВО"},
+        {"tool_calls": [("file_list", {"path": str(folder), "offset": 400})]},
+        {"content": "І ця сторінка готова. ГОТОВО"},
+        next_page,
+        {"content": "Список переглянуто. ГОТОВО"},
+    ]
+
+    result, _ = await run_turn(runtime, who, "Переглянь теку", persist=True)
+
+    assert result.state == "completed"
+    assert [r.name for r in result.tool_results] == ["file_list"] * 3
+    assert [r.content["offset"] for r in result.tool_results] == [0, 400, 200]
+
+
 async def test_persist_keeps_tools_available_past_report_reserve_when_coverage_is_incomplete(
     runtime_factory, tmp_path, monkeypatch
 ):

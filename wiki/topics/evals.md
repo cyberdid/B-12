@@ -97,4 +97,6 @@ Host: Ubuntu 24.04.5, kernel 7.0.0-38-generic x86_64, Python 3.12.3, RTX 4060 La
 
 **Висновок для B-12:** збережено чесний status `failed/incomplete_coverage`, додано bounded coverage extension, але подальше prompt-only підсилення ще не довело якісний multi-file audit. Для такого сценарію треба оцінити потужнішу модель або керований file-by-file workflow із точним audit trail; нову модель ще не обирали.
 
+**Follow-up перевірка надійності (2026-11-06):** code review знайшов, що `file_list` позначав теку завершеною вже після першої сторінки. Виправлення тримає pending offset у журналі ходу, вимагає послідовних сторінок аж до `next_offset=null` і передає точний offset у авто-продовження. Integration regression створює 201 елемент, пробує пропустити offset уперед, а потім перевіряє продовження з очікуваного offset. Повний suite після виправлення: 665 passed / 4 skipped.
+
 **Межі benchmark:** це 1 live search query і до 4 read-only review trials на одній host/model configuration; повтори не були рандомізовані, немає cold/warm latency-розкладу для кожного run, power mode невідомий, оцінювання фінального аудиту якісне, а Claude baseline неперевірений. Ці результати не порівнюються з 109-case eval corpus чи попередніми 541-trial benchmark.
