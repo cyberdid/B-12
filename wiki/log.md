@@ -599,3 +599,11 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-06] publish | PR з runtime, пошуком і документацією
 
 За дорученням власника три коміти гілки `feat/b12-runtime` опубліковано в публічному `cyberdid/B-12`; відкрито [PR #1 у `main`](https://github.com/cyberdid/B-12/pull/1). PR містить детальний опис змін, перевірок, benchmark меж і негативного live code-review результату. На момент запису PR має стан OPEN і не злитий; `main` не змінювався.
+
+## [2026-11-07] research | Capri / Capricorn desktop-компаньйони
+
+За дорученням власника закріплено та порівняно pinned HEAD чотирьох вказаних GitHub-репозиторіїв. Три з них мають desktop pet/assistant компоненти; `CHNFTQ/Capricorn` є diffusion-моделлю для Hi-C genomics і не стосується desktop. Розділено UX-приклади від фактичних можливостей, зафіксовано README/code розбіжності й межі ліцензій. Перевірені Qt for Python прозорість X11 та системний трей. Джерельні pins/scope записані у `raw/source-manifest.json`; зовнішні source snapshots у `raw/` не додавалися.
+
+## [2026-11-07] plan | Desktop-компаньйон B-12
+
+За прямим дорученням власника підготовлено архітектурний дизайн і поетапний implementation plan. Обрано окремий optional Qt shell, що використовує існуючий owner-authenticated loopback API та B-12 cybercat art. Нові host tools, скринкасти/віконний моніторинг, автозапуск і власний runtime не додаються; мікрофон/audio playback не стартують. Робота винесена в гілку `feat/b12-desktop-companion`; на базовому `3e7fb07` перевірений TUI baseline — 22 passed.

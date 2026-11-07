@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-06
+updated: 2026-11-07
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -14,6 +14,7 @@ tags: [navigation]
 | Сторінка | Призначення |
 |---|---|
 | [Поточний статус](project/status.md) | Що є локально, чого ще немає, наступна дія |
+| [План desktop-компаньйона](project/desktop-companion-plan.md) | Дизайн, етапи, scope та стан реалізації |
 | [Реалізація повної системи](project/implementation.md) | Авторизований scope, повний plan/spec, worktree та execution ledger |
 | [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
@@ -38,6 +39,7 @@ tags: [navigation]
 | [Порівняння з NVIDIA Reachy Jetson](topics/reachy-jetson-comparison.md) | Їхній голос і зір, наш контроль дій і пам'ять; ризики й розбіжності у джерелах |
 | [CLI і запущений сервер](topics/cli-server-mode.md) | Один власник runtime: API при запущеному сервері, лок без нього; зіставлення команд і ендпоінтів |
 | [Кіберпанковий TUI та кіберкіт](topics/cyberpunk-tui.md) | Анімований pet, mouse/keyboard reactions, адаптивний layout і offline preview |
+| [Desktop-компаньйон](topics/desktop-companion.md) | Qt кіберкіт, tray, authenticated API клієнт, дозволи й межі платформи |
 | [Модель доказів (A-10)](topics/evidence-model.md) | Спогади з посиланням на документи, міграція v1→v2 з резервною копією, застарілість і життєвий цикл |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
@@ -61,7 +63,8 @@ tags: [navigation]
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
 | [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
+| [Capri / Capricorn desktop-компаньйони](sources/capri-desktop-companions-2026-11-07.md) | Чотири pinned repositories, ліцензії, Qt reference та рішення для B-12 |
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
-Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 120 зовнішніх джерел](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).
+Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 128 зовнішніх джерел](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).

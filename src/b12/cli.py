@@ -718,6 +718,34 @@ async def cmd_tui(args, settings) -> int:
     return 0
 
 
+async def cmd_desktop(args, settings) -> int:
+    """Run the optional Qt companion against the existing owner API."""
+    try:
+        from b12.desktop.app import run_desktop
+        from b12.desktop.client import DesktopApiError
+    except ModuleNotFoundError as exc:
+        if exc.name and exc.name.startswith("PySide6"):
+            emit_json({"error": "desktop_extra_missing", "hint": "uv sync --extra desktop"})
+            return 1
+        raise
+    try:
+        return run_desktop(settings, args.url, persist_default=args.persist)
+    except DesktopApiError as exc:
+        detail = {"error": exc.code}
+        if exc.code == "owner_token_missing":
+            detail["hint"] = "run: b12 init"
+        emit_json(detail)
+        return 1
+    except ValueError as exc:
+        code = (
+            str(exc)
+            if str(exc) in {"api_url_invalid", "api_url_must_be_loopback"}
+            else "api_url_invalid"
+        )
+        emit_json({"error": code})
+        return 1
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -792,6 +820,9 @@ def parser() -> argparse.ArgumentParser:
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
+    desktop = sub.add_parser("desktop", help="кіберкіт і desktop-компаньйон (optional Qt extra)")
+    desktop.add_argument("--url", default=os.environ.get("B12_API_URL", "http://127.0.0.1:8712"))
+    desktop.add_argument("--persist", action="store_true", help="початково ввімкнути довгий хід")
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)
@@ -833,9 +864,9 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
-# Commands that run without the CLI taking the state lock: `serve` takes it itself, and `tui`
-# only talks to the API.
-SERVER_OWNED = frozenset({"serve", "tui"})
+# Commands that run without the CLI taking the state lock: `serve` takes it itself, while
+# `tui` and `desktop` only talk to the already running API.
+SERVER_OWNED = frozenset({"serve", "tui", "desktop"})
 EXIT_SERVER_UNAVAILABLE = 4
 EXIT_REQUIRES_STOPPED_SERVER = 5
 
@@ -999,6 +1030,7 @@ def main(argv=None) -> int:
         "tools": cmd_tools,
         "serve": cmd_serve,
         "tui": cmd_tui,
+        "desktop": cmd_desktop,
         "goals": cmd_goals,
         "quiet": cmd_flag,
         "stop": cmd_flag,

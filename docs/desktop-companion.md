@@ -1,0 +1,47 @@
+# Desktop-компаньйон B-12
+
+## Встановлення і запуск
+
+Qt desktop-клієнт постачається як optional extra. У теці репозиторію встанови залежності:
+
+```bash
+uv sync --extra tui --extra desktop
+```
+
+Потрібна ініціалізація власника (`b12 init`) і запущений B-12 API. Сервер запускається окремою командою:
+
+```bash
+b12 serve --port 8712
+```
+
+В іншому терміналі:
+
+```bash
+b12 desktop --url http://127.0.0.1:8712
+```
+
+`--url` необов’язковий; значення за замовчуванням — `http://127.0.0.1:8712`. Змінна `B12_API_URL` також може задати адресу. Клієнт приймає лише loopback URL (`localhost`, `127.0.0.1` або loopback IPv6); віддалений API відхиляється. Для інсталяції без Qt встанови extra `desktop`. Якщо owner token відсутній, спершу виконай `b12 init`.
+
+## Що вміє клієнт
+
+- Плаваючий прозорий кіберкіт B-12: анімація, погляд за курсором, drag, клік для відкриття чату, фази набору, обдумування, відповіді, tool work, approval, успіху, помилки й скасування.
+- Tray/menu, якщо системне середовище надає tray; у fallback режимі контекстне меню доступне правим кліком по коту. Без tray режим сну лишає кота видимим, щоб його можна було розбудити.
+- Чат із сесіями та історією, streaming-відповідями, зупинкою ходу й перемикачем довгого ходу.
+- Черга точних owner approval/deny, пошук/додавання/видалення пам’яті, контроль згоди та панель стану.
+- Перегляд стану голосового сервісу та перемикання його mute-прапорця через API.
+
+Усі API-виклики виконуються поза Qt GUI thread. Owner token читається з наявного `$B12_STATE_DIR/api/owner.token` і надсилається лише у `Authorization: Bearer`; клієнт не копіює його, не пише у налаштування та не виводить у логи. Сесії, інструменти, grants, approvals, згода, пам’ять і модель залишаються під контролем B-12 API.
+
+Desktop успадковує можливості автентифікованого owner API й поточну конфігурацію B-12. Він не створює нових grants і не розширює права Linux-користувача; host tool actions проходять через наявні control/grant/approval правила.
+
+Панель підтверджень завжди показує назву дії та короткий ідентифікатор. API черги навмисно не повертає аргументи очікуючої операції. Якщо аргументи надійшли у live-потоці, картка спрямовує до них у transcript; для старої/відновленої черги UI прямо попереджає, що параметри недоступні.
+
+## Межі запуску
+
+Desktop не запускає B-12 server, Ollama/model, host commands, мікрофон або audio playback. Він не встановлює автозапуск, не додає host tools, глобальні клавіатурні hooks, скринкасти чи стеження за іншими вікнами. Голосові кнопки змінюють лише mute/status через API; це не запуск запису аудіо.
+
+Перший deployment target — Linux/X11 із compositor. Прозорість top-level Qt widget у X11 вимагає ARGB visual і compositing window manager; `WindowStaysOnTopHint` є запитом до window manager. Tray залежить від StatusNotifierItem або XEmbed і має fallback, якщо недоступний. [Офіційні пояснення Qt QWidget](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html), [window flags](https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html) та [QSystemTrayIcon](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSystemTrayIcon.html). Wayland, інші дистрибутиви та фактична візуальна поведінка на різних window managers ще потребують перевірки.
+
+## Порівняння з референсами
+
+Результати та pinned revisions чотирьох наданих Capricorn-репозиторіїв зафіксовані у [wiki огляді](../wiki/sources/capri-desktop-companions-2026-11-07.md). У B-12 використано наявний власний cybercat atlas та існуючий authenticated API; код і персонажі інших проєктів не копіювалися. Порівняння зафіксоване в окремому [плані](../wiki/project/desktop-companion-plan.md).

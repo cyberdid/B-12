@@ -37,6 +37,7 @@ voice = [
   "piper-tts>=1.2,<2",
   "soundfile>=0.12,<1",
 ]
+desktop = ["PySide6-Essentials>=6.8,<7"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/b12"]

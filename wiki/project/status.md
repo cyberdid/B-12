@@ -1,8 +1,8 @@
 ---
 type: status
-updated: 2026-11-06
+updated: 2026-11-07
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -20,6 +20,13 @@ tags: [progress, next]
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 - **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
 
+## Поточний стан (2026-11-07)
+
+- **Перевірений факт:** досліджено чотири надані репозиторії та офіційні Qt сторінки; pins, межі ліцензій і висновки — у [джерельному огляді](../sources/capri-desktop-companions-2026-11-07.md). Три desktop-референси дали UX-приклади; `CHNFTQ/Capricorn` — genomics diffusion-проєкт.
+- **Перевірений факт у локальній feature-гілці:** реалізовано optional Qt клієнт `b12 desktop` із плаваючим cybercat, tray/fallback, API chat, sessions/history, streamed turns, cancel/resume, exact approvals, memory/consent/persist і статусом. Деталі — у [тематичній сторінці](../topics/desktop-companion.md) й [плані](desktop-companion-plan.md).
+- **Перевірений факт:** повний suite на цій гілці пройшов: 718 passed, 4 skipped; `ruff check src tests`, `uv lock --check`, wheel/sdist build і `git diff --check` також пройшли. Гілку ще потрібно перенести на актуальний `main` та повторно перевірити. Жоден server, модель, desktop app, мікрофон або GPU-процес не запускався.
+- **Потребує перевірки:** реальне X11 вікно/tray, Wayland, чисте системне пакування й довгий живий API stream. Qt offscreen tests не доводять поведінку window manager.
+
 ## Поточний стан (2026-11-06)
 
 - **Перевірений факт:** зміни реалізації та перевірки виконані у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, від бази `5f6ba90`. На GitHub відкрито [PR #1 до `main`](https://github.com/cyberdid/B-12/pull/1); він ще не злитий.
@@ -32,7 +39,7 @@ tags: [progress, next]
 
 ## Наявне
 
-- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 120 зовнішніх джерел.
+- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 128 зовнішніх джерел.
 - [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
 - [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
 - Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.
