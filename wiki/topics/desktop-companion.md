@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-11-07
+updated: 2026-11-08
 status: compiled
 sources: [wiki/sources/capri-desktop-companions-2026-11-07.md, docs/desktop-companion.md, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, src/b12/api.py]
 tags: [desktop, companion, Qt, cybercat]
@@ -13,7 +13,7 @@ tags: [desktop, companion, Qt, cybercat]
 
 ## Межі архітектури
 
-- **Перевірений факт:** B-12 API надає owner-authenticated loopback endpoints для сесій, history, streaming chat, cancel/resume, approvals, consent, memory, status та voice mute/status. Desktop клієнт викликає ці endpoints через окремий HTTPX клієнт і не відкриває БД/store напряму.
+- **Перевірений факт:** B-12 API надає owner-authenticated loopback endpoints для сесій, history, streaming chat, cancel/resume, exact approvals, memory, consent, service status та voice mute/status. Desktop клієнт також читає owner-scoped boolean стан конкретного turn через `GET /api/turns/{id}/status`, щоб після втрати потоку не розблокувати новий prompt раніше, ніж завершився попередній. HTTPX клієнт не відкриває БД/store напряму.
 - **Вимога:** модель, grants, consent, пам’ять і tool execution залишаються в runtime B-12; модельний текст не надає дозволів. UI кнопки передають точний operation ID до наявного approval API.
 - **Перевірений факт:** адресу клієнта обмежено loopback; owner token читається із наявного `api/owner.token`, не записується у UI settings чи логи. HTTP proxy із середовища вимкнений.
 - **Вимога:** desktop успадковує лише можливості поточного owner API та конфігурацію B-12; він не створює grants і не розширює host access.
@@ -29,6 +29,8 @@ Cybercat використовує власний B-12 atlas із TUI. Прозо
 ## Докази й невідоме
 
 **Перевірений факт у коді:** optional `desktop` extra; окремий `b12 desktop` CLI subcommand; owner-authenticated HTTPX loopback client; worker-thread API calls; Qt overlay/tray fallback; sessions/chat/approvals/memory/consent/status. Цільові offscreen tests покривають ці UI paths.
+
+**Перевірений факт:** якщо NDJSON-потік обривається після `turn_started`, клієнт зберігає lock і показує recovery cancel. Лише після успішного cancel acknowledgement він перевіряє стан саме цього turn через authenticated API; тільки актуальна відповідь `active=false` знімає блокування та ініціює повторне завантаження історії. Кожне завантаження очищує маркер свіжої історії; помилка лишає надсилання заблокованим і дозволяє bootstrap retry. Старі stream, cancel, history та status callbacks ігноруються за поколінням і turn ID.
 
 **Потребує перевірки:** візуальна якість на реальному X11 compositor/window manager, Qt tray на фактичному desktop session, Wayland behavior, package artifacts і реальний довготривалий streaming із B-12 API. Qt офіційно зазначає ARGB visual/compositing вимоги для translucent X11 top-level widgets; topmost — hint, залежний від window manager. Див. [Qt QWidget](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html), [Qt flags](https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html), [QSystemTrayIcon](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSystemTrayIcon.html).
 

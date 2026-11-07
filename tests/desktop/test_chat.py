@@ -159,9 +159,22 @@ def test_memory_text_is_plain_text(qapp):
     window.close()
 
 
-def test_stream_error_keeps_recovery_cancel_and_cancel_result_unlocks_composer(qapp):
-    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+def test_stream_error_cancel_waits_for_authoritative_turn_status(qapp):
+    class Client:
+        def cancel(self, turn_id):
+            return {"cancelled": turn_id}
+
+        def turn_status(self, turn_id):
+            return {"turn_id": turn_id, "active": False}
+
+        def history(self, session_id):
+            return []
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
     window._current_session = "session-recover"
+    window._history_loaded_session = "session-recover"
     window._active_turn_id = "turn-recover"
     window.pending_turn_id = "turn-recover"
     window.send_button.setEnabled(False)
@@ -172,17 +185,124 @@ def test_stream_error_keeps_recovery_cancel_and_cancel_result_unlocks_composer(q
     assert window.cancel_button.isEnabled()
     assert not window.send_button.isEnabled()
 
-    window._on_job_result("cancel", {"cancelled": "turn-recover"})
+    window.cancel_turn()
+    cancel_tag, cancel_operation = jobs[-1]
+    assert cancel_tag.startswith("cancel:")
+    window._on_job_result(cancel_tag, cancel_operation())
+    assert window._active_turn_id == "turn-recover"
+    assert not window.send_button.isEnabled()
+
+    status_tag, status_operation = jobs[-1]
+    assert status_tag.startswith("turn_status:")
+    window._on_job_result(status_tag, status_operation())
+
     assert window._active_turn_id is None
     assert window.pending_turn_id is None
+    history_tag, history_operation = jobs[-1]
+    assert history_tag.startswith("history:")
+    window._on_job_result(history_tag, history_operation())
     assert window.send_button.isEnabled()
     assert not window.cancel_button.isEnabled()
+    window.close()
+
+
+def test_stream_error_waits_for_cancel_ack_before_requesting_turn_status(qapp):
+    class Client:
+        def cancel(self, turn_id):
+            return {"cancelled": turn_id}
+
+        def turn_status(self, turn_id):
+            return {"turn_id": turn_id, "active": False}
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._active_turn_id = "turn-delayed-cancel"
+    window.pending_turn_id = "turn-delayed-cancel"
+    window._stream_generation = 1
+    window.cancel_turn()
+    cancel_tag, cancel_operation = jobs[-1]
+
+    window._on_job_error("chat:1", "server_unavailable")
+
+    assert window._stream_lost_turn_id == "turn-delayed-cancel"
+    assert all(not tag.startswith("turn_status:") for tag, _ in jobs)
+    assert window._active_turn_id == "turn-delayed-cancel"
+
+    window._on_job_result(cancel_tag, cancel_operation())
+    status_tag, status_operation = jobs[-1]
+    assert status_tag.startswith("turn_status:")
+    window._on_job_result(status_tag, status_operation())
+    assert window._active_turn_id is None
+    window.close()
+
+
+def test_failed_recovery_history_load_keeps_session_locked(qapp):
+    class Client:
+        def history(self, session_id):
+            return []
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-recovered"
+    window._history_loaded_session = "session-recovered"
+    window._entries = [("ТИ", "старий контекст")]
+    window._render_transcript()
+
+    window._load_history("session-recovered")
+    history_tag = jobs[-1][0]
+    assert window._history_loaded_session is None
+    window._on_job_error(history_tag, "server_unavailable")
+
+    assert window._history_loaded_session is None
+    assert not window.send_button.isEnabled()
+    window.close()
+
+
+def test_recovery_status_keeps_live_turn_locked_until_server_finishes(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window._current_session = "session-recover"
+    window._history_loaded_session = "session-recover"
+    window._active_turn_id = "turn-recover"
+    window._stream_lost_turn_id = "turn-recover"
+    window._cancel_acknowledged_for = "turn-recover"
+    window._turn_status_sequence = 1
+    window._start_job = lambda *args, **kwargs: None
+
+    window._on_job_result(
+        "turn_status:1:turn-recover", {"turn_id": "turn-recover", "active": True}
+    )
+
+    assert window._active_turn_id == "turn-recover"
+    assert not window.send_button.isEnabled()
+    assert window.cancel_button.isEnabled()
+    window.close()
+
+
+def test_inactive_status_without_cancel_ack_cannot_release_lost_turn(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window._turn_status_sequence = 1
+    window._stream_lost_turn_id = "turn-pending-cancel"
+    window._active_turn_id = "turn-pending-cancel"
+    window.pending_turn_id = "turn-pending-cancel"
+    window.send_button.setEnabled(False)
+
+    window._on_job_result(
+        "turn_status:1:turn-pending-cancel",
+        {"turn_id": "turn-pending-cancel", "active": False},
+    )
+
+    assert window._active_turn_id == "turn-pending-cancel"
+    assert window.pending_turn_id == "turn-pending-cancel"
+    assert not window.send_button.isEnabled()
     window.close()
 
 
 def test_terminal_error_event_clears_pending_turn(qapp):
     window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
     window._current_session = "session-stale"
+    window._history_loaded_session = "session-stale"
     window._active_turn_id = "turn-stale"
     window.pending_turn_id = "turn-stale"
     window.send_button.setEnabled(False)
@@ -219,7 +339,7 @@ def test_approval_resume_exposes_cancel_for_same_turn(qapp):
     assert window.pending_turn_id == "turn-resume"
     assert window.cancel_button.isEnabled()
     assert not window.send_button.isEnabled()
-    resume = next(job for job in jobs if job[0] == "resume")
+    resume = next(job for job in jobs if job[0].startswith("resume:"))
     assert resume[2] is True
     window.close()
 
@@ -253,6 +373,7 @@ def test_approval_in_another_session_does_not_block_current_session(qapp):
     jobs = []
     window._start_job = lambda tag, operation, streaming=False: jobs.append(tag)
     window._current_session = "session-current"
+    window._history_loaded_session = "session-current"
     window._render_approvals(
         [
             {
@@ -267,7 +388,7 @@ def test_approval_in_another_session_does_not_block_current_session(qapp):
 
     window.send_prompt()
 
-    assert jobs == ["chat"]
+    assert len(jobs) == 1 and jobs[0].startswith("chat:")
     window.close()
 
 
@@ -341,7 +462,6 @@ def test_failed_history_load_keeps_approval_controls_disabled(qapp):
     window.client = type("Client", (), {"history": lambda self, session_id: []})()
     window._start_job = lambda *args, **kwargs: None
     window._current_session = "session-approval"
-    window._history_loaded_session = "session-approval"
     approval = {
         "operation_id": "op-history-error",
         "turn_id": "turn-history-error",
@@ -356,6 +476,38 @@ def test_failed_history_load_keeps_approval_controls_disabled(qapp):
         not button.isEnabled()
         for button in window._approval_cards["op-history-error"].findChildren(QPushButton)
     )
+    window.close()
+
+
+def test_failed_new_session_history_load_schedules_bootstrap_retry(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append(tag)
+    window._current_session = "session-new"
+    window.session_box.blockSignals(True)
+    window.session_box.addItem("old", "session-old")
+    window.session_box.addItem("new", "session-new")
+    window.session_box.setCurrentIndex(1)
+    window.session_box.blockSignals(False)
+    window._history_loading_session = "session-new"
+    window._history_loaded_session = None
+    window._history_request_sequence = 1
+    window._session_change_inflight = True
+    window._session_before_change = "session-old"
+    window._session_before_change_history_loaded = False
+    window._loaded = True
+
+    window._on_job_error("history:1:session-new", "server_unavailable")
+
+    assert window._current_session == "session-old"
+    assert window._history_loaded_session is None
+    assert not window._loaded
+    window._on_job_result(
+        "poll",
+        {"connected": True, "approvals": [], "status": {"active_turns": 0}},
+    )
+    assert "bootstrap" in jobs
+    assert not window.send_button.isEnabled()
     window.close()
 
 
@@ -397,6 +549,374 @@ def test_new_session_cannot_change_context_during_live_turn(qapp):
     assert not window.new_session_button.isEnabled()
     window.create_session()
     assert jobs == []
+    window.close()
+
+
+def test_new_session_request_blocks_send_until_new_history_loads(qapp):
+    class Client:
+        def new_session(self):
+            return "session-new"
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-old"
+    window._history_loaded_session = "session-old"
+    window.session_box.addItem("РОЗМОВА 01", "session-old")
+    window.session_box.setCurrentIndex(0)
+    window.create_session()
+    window.composer.setPlainText("не відправляти у стару розмову")
+
+    window.send_prompt()
+
+    assert [tag for tag, _ in jobs] == ["new_session"]
+    window._on_job_result("new_session", jobs[0][1]())
+    assert window._current_session == "session-new"
+    window.send_prompt()
+    assert [tag for tag, _ in jobs] == ["new_session", "bootstrap"]
+    assert window._history_loaded_session != "session-new"
+    window.close()
+
+
+def test_new_session_bootstrap_failure_restores_previous_context(qapp):
+    class Client:
+        def new_session(self):
+            return "session-new"
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-old"
+    window._history_loaded_session = "session-old"
+    window.session_box.addItem("РОЗМОВА 01", "session-old")
+    window.session_box.setCurrentIndex(0)
+    window.create_session()
+    window._on_job_result("new_session", jobs[0][1]())
+    assert window._current_session == "session-new"
+    assert window._session_change_inflight
+
+    window._on_job_error("bootstrap", "server_unavailable")
+
+    assert window._current_session == "session-old"
+    assert window._history_loaded_session == "session-old"
+    assert window.session_box.currentData() == "session-old"
+    assert window.send_button.isEnabled()
+    window.close()
+
+
+def test_new_session_is_disabled_while_selected_history_loads(qapp):
+    class Client:
+        def new_session(self):
+            return "session-new"
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-loading"
+    window._history_loading_session = "session-loading"
+    window.session_box.addItem("РОЗМОВА 01", "session-loading")
+    window._sync_session_selector()
+
+    assert not window.new_session_button.isEnabled()
+    window.create_session()
+    assert jobs == []
+    window.close()
+
+
+def test_new_session_is_disabled_during_initial_bootstrap(qapp):
+    class Client:
+        def bootstrap(self):
+            return {"sessions": [], "me": {"consent": False}}
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window.bootstrap()
+
+    assert not window.new_session_button.isEnabled()
+    window.create_session()
+    assert [tag for tag, _ in jobs] == ["bootstrap"]
+    window.close()
+
+
+def test_session_change_failure_does_not_mark_unloaded_history_ready(qapp):
+    class Client:
+        def new_session(self):
+            return "session-new"
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-old"
+    window.session_box.addItem("РОЗМОВА 01", "session-old")
+    window.session_box.setCurrentIndex(0)
+    window.create_session()
+    window._on_job_result("new_session", jobs[0][1]())
+    window._on_job_error("bootstrap", "server_unavailable")
+
+    assert window._current_session == "session-old"
+    assert window._history_loaded_session is None
+    assert not window.send_button.isEnabled()
+    window.close()
+
+
+def test_old_approval_snapshot_cannot_erase_a_new_live_approval(qapp):
+    class Client:
+        def health(self):
+            return True
+
+        def approvals(self):
+            return []
+
+        def status(self):
+            return {}
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-live"
+    window._history_loaded_session = "session-live"
+    window.handle_turn_event({"type": "turn_started", "turn_id": "turn-live"})
+    window.refresh_dashboard()
+    snapshot_tag = jobs[0][0]
+    window.handle_turn_event(
+        {
+            "type": "approval_pending",
+            "operation_id": "op-live-new",
+            "turn_id": "turn-live",
+            "session_id": "session-live",
+        }
+    )
+    window.handle_turn_event(
+        {"type": "result", "turn_id": "turn-live", "state": "awaiting_approval"}
+    )
+
+    window._on_job_result(
+        snapshot_tag,
+        {"connected": True, "approvals": [], "status": {}},
+    )
+
+    assert "op-live-new" in window._approval_cards
+    assert window.pending_turn_id == "turn-live"
+    assert window._approval_turns["op-live-new"] == "turn-live"
+    window.close()
+
+
+def test_older_history_reply_for_same_session_is_ignored(qapp):
+    class Client:
+        def history(self, session_id):
+            return []
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-repeat"
+    window._load_history("session-repeat")
+    first_tag = jobs[-1][0]
+    window._load_history("session-repeat")
+    second_tag = jobs[-1][0]
+    assert first_tag != second_tag
+
+    window._on_job_result(first_tag, [{"role": "assistant", "content": "старий зріз"}])
+
+    assert window._history_loaded_session is None
+    assert window._history_loading_session == "session-repeat"
+    assert "старий зріз" not in window.transcript.toPlainText()
+    window._on_job_result(second_tag, [{"role": "assistant", "content": "актуальний зріз"}])
+    assert window._history_loaded_session == "session-repeat"
+    assert "актуальний зріз" in window.transcript.toPlainText()
+    window.close()
+
+
+def test_history_reply_during_live_turn_is_deferred(qapp):
+    class Client:
+        def history(self, session_id):
+            return []
+
+        def sessions(self):
+            return ["session-live"]
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-live"
+    window._load_history("session-live")
+    history_tag = jobs[-1][0]
+    window._active_turn_id = "turn-live"
+    window.handle_turn_event({"type": "text_delta", "text": "новий текст ходу"})
+
+    window._on_job_result(
+        history_tag,
+        [{"role": "assistant", "content": "старий текст з історії"}],
+    )
+
+    assert "новий текст ходу" in window.transcript.toPlainText()
+    assert "старий текст з історії" not in window.transcript.toPlainText()
+    assert window._history_reload_deferred
+    window.handle_turn_event({"type": "result", "turn_id": "turn-live", "state": "completed"})
+    assert jobs[-1][0].startswith("history:")
+    window.close()
+
+
+def test_poll_snapshot_preserves_metadata_for_inflight_decision(qapp):
+    class Client:
+        def approvals(self):
+            return []
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-decision"
+    window._history_loaded_session = "session-decision"
+    approval = {
+        "operation_id": "op-inflight",
+        "turn_id": "turn-inflight",
+        "session_id": "session-decision",
+    }
+    window._render_approvals([approval])
+    window._decide_approval("op-inflight", True)
+
+    window._render_approvals([])
+    assert window._approval_turns["op-inflight"] == "turn-inflight"
+    assert window._approval_sessions["op-inflight"] == "session-decision"
+
+    window._on_job_result("decision:op-inflight", {"approved": True})
+
+    assert window._active_turn_id == "turn-inflight"
+    assert any(tag.startswith("resume:") for tag, _ in jobs)
+    window.close()
+
+
+def test_late_cancel_response_cannot_clear_new_turn(qapp):
+    class Client:
+        def cancel(self, turn_id):
+            return {"cancelled": turn_id}
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._active_turn_id = "turn-old"
+    window.pending_turn_id = "turn-old"
+    window.cancel_turn()
+    cancel_tag = jobs[-1][0]
+
+    window.handle_turn_event(
+        {"type": "result", "turn_id": "turn-old", "state": "completed"}
+    )
+    window.handle_turn_event({"type": "turn_started", "turn_id": "turn-new"})
+    window._on_job_result(cancel_tag, {"cancelled": "turn-old"})
+
+    assert window._active_turn_id == "turn-new"
+    assert window.pending_turn_id == "turn-new"
+    assert not window.send_button.isEnabled()
+    window.close()
+
+
+def test_late_recovery_status_cannot_clear_a_new_turn(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window._turn_status_sequence = 1
+    window._stream_lost_turn_id = "turn-old"
+    window._active_turn_id = "turn-old"
+
+    window._stream_lost_turn_id = None
+    window._active_turn_id = "turn-new"
+    window.pending_turn_id = "turn-new"
+    window.send_button.setEnabled(False)
+    window._on_job_result(
+        "turn_status:1:turn-old", {"turn_id": "turn-old", "active": False}
+    )
+
+    assert window._active_turn_id == "turn-new"
+    assert window.pending_turn_id == "turn-new"
+    assert not window.send_button.isEnabled()
+    window.close()
+
+
+def test_events_from_superseded_stream_are_ignored(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-streams"
+    window._history_loaded_session = "session-streams"
+    window.composer.setPlainText("old request")
+    window.send_prompt()
+    old_stream_tag = jobs[-1][0]
+    window.handle_turn_event({"type": "turn_started", "turn_id": "turn-old"})
+    window.handle_turn_event({"type": "result", "turn_id": "turn-old", "state": "completed"})
+
+    window.composer.setPlainText("new request")
+    window.send_prompt()
+    new_stream_tag = jobs[-1][0]
+    assert old_stream_tag != new_stream_tag
+    window.handle_turn_event({"type": "turn_started", "turn_id": "turn-new"})
+    window._on_job_event(old_stream_tag, {"type": "text_delta", "text": "late old text"})
+    window._on_job_result(
+        old_stream_tag,
+        {"turn_id": "turn-old", "state": "completed", "content": "late old result"},
+    )
+
+    assert window._active_turn_id == "turn-new"
+    assert "late old text" not in window.transcript.toPlainText()
+    assert "late old result" not in window.transcript.toPlainText()
+    window.close()
+
+
+def test_stale_history_error_does_not_replace_current_status(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window._current_session = "session-same"
+    window._history_request_sequence = 2
+    window.status_label.setText("АКТУАЛЬНИЙ СТАН")
+
+    window._on_job_error("history:1:session-same", "server_unavailable")
+
+    assert window.status_label.text() == "АКТУАЛЬНИЙ СТАН"
+    window.close()
+
+
+def test_expired_approval_failure_unlocks_its_session(qapp):
+    class Client:
+        def approvals(self):
+            return []
+
+    window = ChatWindow(Client(), auto_load=False, auto_poll=False)
+    jobs = []
+    window._start_job = lambda tag, operation, streaming=False: jobs.append((tag, operation))
+    window._current_session = "session-expired"
+    window._history_loaded_session = "session-expired"
+    window.session_box.addItem("РОЗМОВА 01", "session-expired")
+    window.session_box.setCurrentIndex(0)
+    window.pending_turn_id = "turn-expired"
+    window._approval_turns["op-expired"] = "turn-expired"
+    window._approval_sessions["op-expired"] = "session-expired"
+    window._upsert_approval(
+        {"operation_id": "op-expired", "turn_id": "turn-expired", "session_id": "session-expired"}
+    )
+    window._sync_approval_actions()
+    window._decide_approval("op-expired", True)
+
+    window._on_job_error("decision:op-expired", "approval_not_pending")
+    window._on_job_result("approvals", [])
+
+    assert window.pending_turn_id is None
+    assert window._active_turn_id is None
+    assert window.session_box.isEnabled()
+    assert window.new_session_button.isEnabled()
+    assert not window.cancel_button.isEnabled()
+    window.close()
+
+
+def test_poll_removing_pending_approval_clears_stale_turn_lock(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window._current_session = "session-expired"
+    window._history_loaded_session = "session-expired"
+    window.pending_turn_id = "turn-expired"
+    window.session_box.addItem("РОЗМОВА 01", "session-expired")
+
+    window._render_approvals([])
+
+    assert window.pending_turn_id is None
+    assert window.session_box.isEnabled()
+    assert window.new_session_button.isEnabled()
     window.close()
 
 

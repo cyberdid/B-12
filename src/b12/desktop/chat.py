@@ -5,6 +5,7 @@ from __future__ import annotations
 import html
 import json
 from functools import partial
+from urllib.parse import quote, unquote
 
 from PySide6.QtCore import Qt, QTimer, Signal, Slot
 from PySide6.QtGui import QKeySequence, QShortcut
@@ -97,6 +98,14 @@ class ChatWindow(QWidget):
         self._assistant_index: int | None = None
         self._active_turn_id: str | None = None
         self.pending_turn_id: str | None = None
+        self._stream_generation = 0
+        self._stream_lost_turn_id: str | None = None
+        self._turn_status_sequence = 0
+        self._turn_status_inflight = False
+        self._cancel_sequence = 0
+        self._cancel_requests: dict[str, str] = {}
+        self._cancel_requested_for: str | None = None
+        self._cancel_acknowledged_for: str | None = None
         self._approval_turns: dict[str, str | None] = {}
         self._approval_sessions: dict[str, str | None] = {}
         self._decision_inflight: set[str] = set()
@@ -106,6 +115,14 @@ class ChatWindow(QWidget):
         self._bootstrap_inflight = False
         self._history_loading_session: str | None = None
         self._history_loaded_session: str | None = None
+        self._history_request_sequence = 0
+        self._history_reload_deferred = False
+        self._session_change_inflight = False
+        self._session_before_change: str | None = None
+        self._session_before_change_history_loaded = False
+        self._sessions_after_turn: list[str] | None = None
+        self._approval_refresh_sequence = 0
+        self._approval_state_revision = 0
         self._poll_inflight = False
         self._voice_muted: bool | None = None
         self._auto_load = auto_load
@@ -119,6 +136,10 @@ class ChatWindow(QWidget):
         self._memory_debounce.setSingleShot(True)
         self._memory_debounce.setInterval(300)
         self._memory_debounce.timeout.connect(self.refresh_memory)
+        self._turn_recovery_timer = QTimer(self)
+        self._turn_recovery_timer.setSingleShot(True)
+        self._turn_recovery_timer.setInterval(1000)
+        self._turn_recovery_timer.timeout.connect(self._request_lost_turn_status)
         self.session_box.currentIndexChanged.connect(self._session_selected)
         self.memory_search.textChanged.connect(lambda _: self._memory_debounce.start())
         self.new_session_button.clicked.connect(self.create_session)
@@ -283,43 +304,122 @@ class ChatWindow(QWidget):
     def _on_job_finished(self, job) -> None:
         self._jobs.discard(job)
 
+    @staticmethod
+    def _stream_kind(tag: str) -> str | None:
+        kind = tag.partition(":")[0]
+        return kind if kind in {"chat", "resume"} else None
+
+    def _stream_tag_is_current(self, tag: str) -> bool:
+        if tag in {"chat", "resume"}:
+            return True
+        kind, separator, generation = tag.partition(":")
+        return (
+            separator == ":"
+            and kind in {"chat", "resume"}
+            and generation.isdigit()
+            and int(generation) == self._stream_generation
+        )
+
+    def _next_stream_tag(self, kind: str) -> str:
+        self._stream_generation += 1
+        return f"{kind}:{self._stream_generation}"
+
+    def _clear_cancel_requests(self, turn_id: str | None) -> None:
+        if turn_id is None:
+            return
+        for tag, requested_turn in tuple(self._cancel_requests.items()):
+            if requested_turn == turn_id:
+                self._cancel_requests.pop(tag, None)
+
     @Slot(str, object)
     def _on_job_event(self, tag: str, event: dict) -> None:
-        if tag in {"chat", "resume"} and event.get("type") != "result":
+        if (
+            self._stream_kind(tag)
+            and self._stream_tag_is_current(tag)
+            and event.get("type") != "result"
+        ):
             self.handle_turn_event(event)
 
     @Slot(str, object)
     def _on_job_result(self, tag: str, result) -> None:
         if tag == "bootstrap":
             self._bootstrap_inflight = False
-            self._set_sessions(result["sessions"])
             self.consent_toggle.blockSignals(True)
             self.consent_toggle.setChecked(bool(result["me"].get("consent")))
             self.consent_toggle.blockSignals(False)
             self._loaded = True
-            if self._current_session:
-                self._load_history(self._current_session)
+            if self._active_turn_id or self.pending_turn_id:
+                self._sessions_after_turn = result["sessions"]
+                if self._current_session and self._history_loaded_session != self._current_session:
+                    self._history_reload_deferred = True
+            else:
+                self._set_sessions(result["sessions"])
+                if self._current_session:
+                    self._load_history(self._current_session)
             self.refresh_dashboard()
         elif tag == "sessions":
-            self._set_sessions(result)
+            if self._active_turn_id or self.pending_turn_id:
+                self._sessions_after_turn = result
+            else:
+                self._set_sessions(result)
+                if self._current_session:
+                    self._load_history(self._current_session)
         elif tag == "new_session":
             self._current_session = result
             self.bootstrap()
         elif tag.startswith("history:"):
-            session_id = tag.partition(":")[2]
-            if session_id == self._current_session:
+            session_id, generation = self._history_job_parts(tag)
+            if session_id == self._current_session and generation == self._history_request_sequence:
                 self._history_loading_session = None
-                self._history_loaded_session = session_id
-                self._set_history(result)
+                if self._active_turn_id or self.pending_turn_id:
+                    if self._history_loaded_session != session_id:
+                        self._history_reload_deferred = True
+                else:
+                    self._history_loaded_session = session_id
+                    self._history_reload_deferred = False
+                    self._session_change_inflight = False
+                    self._session_before_change = None
+                    self._session_before_change_history_loaded = False
+                    self._set_history(result)
                 self._sync_send_state()
+                self._sync_session_selector()
                 self._sync_approval_actions()
-        elif tag in {"chat", "resume"}:
-            self.handle_turn_event(result)
+        elif tag.startswith("turn_status:"):
+            sequence, turn_id = self._turn_status_job_parts(tag)
+            if (
+                sequence != self._turn_status_sequence
+                or turn_id != self._stream_lost_turn_id
+                or turn_id != self._active_turn_id
+            ):
+                return
+            self._turn_status_inflight = False
+            if self._cancel_acknowledged_for != turn_id:
+                return
+            if result.get("turn_id") != turn_id or type(result.get("active")) is not bool:
+                self.status_label.setText(
+                    "⚠  НЕВДАЛО ПЕРЕВІРИТИ СТАН ХОДУ · СПРОБУЙ ЗУПИНИТИ ЩЕ РАЗ"
+                )
+                self.cancel_button.setEnabled(True)
+                self._cancel_requested_for = None
+            elif result["active"]:
+                self._cancel_requested_for = None
+                self.status_label.setText("◈  ХІД ЩЕ АКТИВНИЙ · МОЖНА ПОВТОРИТИ ЗУПИНКУ")
+                self.cancel_button.setEnabled(True)
+                self._sync_send_state()
+                self._sync_session_selector()
+                self._sync_approval_actions()
+                self._turn_recovery_timer.start()
+            else:
+                self._release_lost_turn(turn_id)
+        elif self._stream_kind(tag):
+            if self._stream_tag_is_current(tag):
+                self.handle_turn_event(result)
         elif tag.startswith("decision:"):
             operation_id = tag.partition(":")[2]
             approval_session = self._approval_sessions.get(operation_id)
             turn_id = self._approval_turns.get(operation_id) or self.pending_turn_id
             self._decision_inflight.discard(operation_id)
+            self._approval_state_revision += 1
             self._remove_approval_card(operation_id)
             self.refresh_approvals()
             if self._active_turn_id == "starting":
@@ -330,8 +430,9 @@ class ChatWindow(QWidget):
                 self.send_button.setEnabled(False)
                 self.cancel_button.setEnabled(True)
                 self._sync_session_selector()
+                stream_tag = self._next_stream_tag("resume")
                 self._start_job(
-                    "resume",
+                    stream_tag,
                     lambda emit: self.client.resume(turn_id, emit),
                     streaming=True,
                 )
@@ -341,7 +442,10 @@ class ChatWindow(QWidget):
                 self._sync_approval_actions()
         elif tag == "approvals":
             self._render_approvals(result)
-        elif tag == "poll":
+        elif tag.startswith("approvals:"):
+            if self._approval_snapshot_matches(tag):
+                self._render_approvals(result)
+        elif tag == "poll" or tag.startswith("poll:"):
             self._poll_inflight = False
             if not result.get("connected"):
                 self._set_connected(False)
@@ -350,7 +454,8 @@ class ChatWindow(QWidget):
                 )
             else:
                 self._set_connected(True)
-                self._render_approvals(result.get("approvals", []))
+                if tag == "poll" or self._approval_snapshot_matches(tag):
+                    self._render_approvals(result.get("approvals", []))
                 if not self._loaded and not self._bootstrap_inflight:
                     self.bootstrap()
                 status = result.get("status", {})
@@ -362,13 +467,17 @@ class ChatWindow(QWidget):
                 )
         elif tag == "consent":
             self.status_label.setText("◈  НАЛАШТУВАННЯ ПАМ’ЯТІ ОНОВЛЕНО")
-        elif tag == "cancel":
-            self._active_turn_id = None
-            self.pending_turn_id = None
-            self.cancel_button.setEnabled(False)
-            self._sync_send_state()
-            self._sync_session_selector()
-            self.status_label.setText("◈  ХІД ЗУПИНЕНО")
+        elif tag == "cancel" or tag.startswith("cancel:"):
+            turn_id = self._cancel_requests.pop(tag, None)
+            if tag == "cancel":
+                turn_id = result.get("cancelled")
+            if turn_id and turn_id == self._active_turn_id:
+                self._cancel_requested_for = turn_id
+                self._cancel_acknowledged_for = turn_id
+                self.cancel_button.setEnabled(False)
+                self.status_label.setText("◈  ЗАПИТ НА ЗУПИНКУ НАДІСЛАНО · ОЧІКУЮ ЗАВЕРШЕННЯ ХОДУ")
+                if self._stream_lost_turn_id == turn_id:
+                    self._request_lost_turn_status()
         elif tag == "memory_search":
             self._render_memory(result)
         elif tag in {"memory_add", "memory_forget"}:
@@ -387,45 +496,105 @@ class ChatWindow(QWidget):
         elif tag == "voice_mute":
             self._voice_muted = bool(result.get("muted"))
             self.request_voice_status()
-        if tag == "sessions" and self._current_session:
-            self._load_history(self._current_session)
-
     @Slot(str, str)
     def _on_job_error(self, tag: str, code: str) -> None:
-        if tag == "poll":
+        if tag == "poll" or tag.startswith("poll:"):
             self._poll_inflight = False
             self._set_connected(False)
             return
         if tag == "bootstrap":
             self._bootstrap_inflight = False
             self._loaded = False
+            self._restore_previous_session_after_change()
             self._set_connected(False)
             return
-        if tag.startswith("history:") and tag.partition(":")[2] == self._current_session:
-            self._history_loading_session = None
-            self._history_loaded_session = None
+        if tag == "new_session":
+            self._session_before_change = None
+            self._session_before_change_history_loaded = False
+            self._session_change_inflight = False
             self._sync_send_state()
-            self._sync_approval_actions()
+            self._sync_session_selector()
+        if tag.startswith("history:"):
+            session_id, generation = self._history_job_parts(tag)
+            if session_id != self._current_session or generation != self._history_request_sequence:
+                return
+            else:
+                self._history_loading_session = None
+                if self._active_turn_id or self.pending_turn_id:
+                    if self._history_loaded_session != session_id:
+                        self._history_reload_deferred = True
+                elif self._session_change_inflight:
+                    previous_history_loaded = self._session_before_change_history_loaded
+                    self._restore_previous_session_after_change()
+                    if not previous_history_loaded:
+                        self._loaded = False
+                elif self._history_loaded_session != session_id:
+                    self._loaded = False
+                self._sync_send_state()
+                self._sync_approval_actions()
+                self._sync_session_selector()
+        if tag.startswith("turn_status:"):
+            sequence, turn_id = self._turn_status_job_parts(tag)
+            if sequence != self._turn_status_sequence or turn_id != self._stream_lost_turn_id:
+                return
+            self._turn_status_inflight = False
+            if self._cancel_acknowledged_for != turn_id:
+                return
+            self._cancel_requested_for = None
+            self.cancel_button.setEnabled(self._active_turn_id == turn_id)
+            self.status_label.setText(f"⚠  НЕВДАЛО ПЕРЕВІРИТИ СТАН ХОДУ · {code.upper()}")
+            return
+        stream_kind = self._stream_kind(tag)
+        if stream_kind and not self._stream_tag_is_current(tag):
+            return
+        if tag.startswith("cancel:"):
+            turn_id = self._cancel_requests.pop(tag, None)
+            if turn_id != self._active_turn_id:
+                return
+            self._cancel_requested_for = None
+            self._cancel_acknowledged_for = None
+            self.cancel_button.setEnabled(True)
         self.status_label.setText(f"⚠  {code.upper()}")
         self.status_label.setProperty("error", "true")
         self.status_label.style().unpolish(self.status_label)
         self.status_label.style().polish(self.status_label)
-        if tag in {"chat", "resume"}:
-            if self._active_turn_id == "starting":
+        if stream_kind:
+            failed_turn_id = self._active_turn_id
+            if failed_turn_id == "starting":
                 self._active_turn_id = None
+                self._stream_lost_turn_id = None
+            else:
+                self._stream_lost_turn_id = failed_turn_id
+            retry_status = bool(
+                failed_turn_id
+                and failed_turn_id != "starting"
+                and self._cancel_acknowledged_for == failed_turn_id
+            )
+            self._cancel_requested_for = None
             self.cancel_button.setEnabled(bool(self._active_turn_id))
             self._sync_send_state()
             self._sync_session_selector()
             self.phase_changed.emit("error", code)
             self._append_entry("ЗВ’ЯЗОК", f"Запит не завершився: {code}")
+            self._apply_deferred_context_refresh()
+            self._stream_generation += 1
+            if retry_status:
+                self._request_lost_turn_status()
         elif tag.startswith("decision:"):
-            self._decision_inflight.discard(tag.partition(":")[2])
+            operation_id = tag.partition(":")[2]
+            turn_id = self._approval_turns.get(operation_id)
+            self._decision_inflight.discard(operation_id)
+            self._approval_state_revision += 1
             if self._active_turn_id == "starting":
                 self._active_turn_id = None
+            if self.pending_turn_id and self.pending_turn_id == turn_id:
+                self.pending_turn_id = None
+            self.cancel_button.setEnabled(bool(self._active_turn_id))
             self._sync_send_state()
             self._sync_session_selector()
             self._sync_approval_actions()
             self.refresh_approvals()
+            self._apply_deferred_context_refresh()
 
     def _set_connected(self, connected: bool) -> None:
         self.status_label.setText("●  API B-12 ONLINE" if connected else "○  API B-12 OFFLINE")
@@ -438,6 +607,7 @@ class ChatWindow(QWidget):
         if self._bootstrap_inflight:
             return
         self._bootstrap_inflight = True
+        self._sync_session_selector()
 
         def load():
             identity = self.client.me()
@@ -483,25 +653,51 @@ class ChatWindow(QWidget):
 
     def _sync_send_state(self) -> None:
         can_send = (
-            self._active_turn_id is None
+            self._current_session is not None
+            and self._history_loaded_session == self._current_session
+            and self._history_loading_session != self._current_session
+            and not self._session_change_inflight
+            and self._active_turn_id is None
             and self.pending_turn_id is None
             and not self._current_session_has_pending_approval()
-            and (
-                self._current_session is None
-                or self._history_loading_session != self._current_session
-            )
         )
         self.send_button.setEnabled(can_send)
 
     def _sync_session_selector(self) -> None:
         unlocked = self._active_turn_id is None and self.pending_turn_id is None
+        unlocked = unlocked and not self._session_change_inflight and not self._bootstrap_inflight
         self.session_box.setEnabled(self.session_box.count() > 0 and unlocked)
-        self.new_session_button.setEnabled(unlocked)
+        history_loading = bool(self._current_session) and (
+            self._history_loading_session == self._current_session
+        )
+        self.new_session_button.setEnabled(unlocked and not history_loading)
+
+    def _restore_previous_session_after_change(self) -> None:
+        previous = self._session_before_change
+        previous_history_loaded = self._session_before_change_history_loaded
+        self._session_change_inflight = False
+        self._session_before_change = None
+        self._session_before_change_history_loaded = False
+        self._history_loading_session = None
+        if previous is not None:
+            index = self.session_box.findData(previous)
+            if index >= 0:
+                self._current_session = previous
+                self._history_loaded_session = previous if previous_history_loaded else None
+                self.session_box.blockSignals(True)
+                self.session_box.setCurrentIndex(index)
+                self.session_box.blockSignals(False)
+        else:
+            self._history_loaded_session = None
+        self._sync_send_state()
+        self._sync_session_selector()
+        self._sync_approval_actions()
 
     def _sync_approval_actions(self) -> None:
         history_ready = bool(self._current_session) and (
             self._history_loaded_session == self._current_session
             and self._history_loading_session != self._current_session
+            and not self._session_change_inflight
         )
         for operation_id, card in self._approval_cards.items():
             session_id = self._approval_sessions.get(operation_id)
@@ -520,11 +716,44 @@ class ChatWindow(QWidget):
                 button.setEnabled(enabled)
 
     def _load_history(self, session_id: str) -> None:
-        self._history_loading_session = session_id
+        if self._active_turn_id or self.pending_turn_id:
+            self._history_reload_deferred = True
+            return
+        self._history_request_sequence += 1
+        generation = self._history_request_sequence
         self._history_loaded_session = None
+        self._history_loading_session = session_id
         self._sync_send_state()
+        self._sync_session_selector()
         self._sync_approval_actions()
-        self._start_job(f"history:{session_id}", partial(self.client.history, session_id))
+        encoded_session = quote(session_id, safe="")
+        tag = f"history:{generation}:{encoded_session}"
+        self._start_job(tag, partial(self.client.history, session_id))
+
+    def _apply_deferred_context_refresh(self) -> None:
+        if self._active_turn_id or self.pending_turn_id or self._session_change_inflight:
+            return
+        if self._sessions_after_turn is not None:
+            sessions = self._sessions_after_turn
+            self._sessions_after_turn = None
+            previous = self._current_session
+            self._set_sessions(sessions)
+            if self._current_session != previous and self._current_session:
+                self._history_reload_deferred = False
+                self._load_history(self._current_session)
+                return
+        if self._history_reload_deferred and self._current_session:
+            self._history_reload_deferred = False
+            self._load_history(self._current_session)
+
+    def _history_job_parts(self, tag: str) -> tuple[str, int]:
+        payload = tag.partition(":")[2]
+        try:
+            generation_text, encoded_session = payload.split(":", 1)
+            return unquote(encoded_session), int(generation_text)
+        except ValueError:
+            # Compatibility with direct/unit callers using the pre-generation tag form.
+            return payload, self._history_request_sequence
 
     def _set_history(self, messages: list[dict]) -> None:
         self._entries.clear()
@@ -543,8 +772,25 @@ class ChatWindow(QWidget):
         self._render_transcript()
 
     def create_session(self) -> None:
-        if self._active_turn_id or self.pending_turn_id:
+        if (
+            self._active_turn_id
+            or self.pending_turn_id
+            or self._session_change_inflight
+            or self._bootstrap_inflight
+            or (
+                self._current_session
+                and self._history_loading_session == self._current_session
+            )
+        ):
             return
+        self._session_before_change = self._current_session
+        self._session_before_change_history_loaded = (
+            self._current_session is not None
+            and self._history_loaded_session == self._current_session
+        )
+        self._session_change_inflight = True
+        self._sync_send_state()
+        self._sync_session_selector()
         self._start_job("new_session", self.client.new_session)
 
     def _composer_changed(self) -> None:
@@ -563,6 +809,9 @@ class ChatWindow(QWidget):
             not text
             or not self._current_session
             or self._active_turn_id
+            or self._session_change_inflight
+            or self._history_loaded_session != self._current_session
+            or self._history_loading_session == self._current_session
             or self._current_session_has_pending_approval()
         ):
             return
@@ -574,13 +823,14 @@ class ChatWindow(QWidget):
         self._assistant_index = None
         self._active_turn_id = "starting"
         self.send_button.setEnabled(False)
-        self.cancel_button.setEnabled(True)
+        self.cancel_button.setEnabled(False)
         self._sync_session_selector()
         self.phase_changed.emit("thinking", "")
         session_id = self._current_session
         persist = self.persist_toggle.isChecked()
+        stream_tag = self._next_stream_tag("chat")
         self._start_job(
-            "chat",
+            stream_tag,
             lambda emit: self.client.stream_turn(session_id, text, persist=persist, on_event=emit),
             streaming=True,
         )
@@ -588,13 +838,69 @@ class ChatWindow(QWidget):
     def cancel_turn(self) -> None:
         if self._active_turn_id and self._active_turn_id != "starting":
             turn_id = self._active_turn_id
-            self._start_job("cancel", partial(self.client.cancel, turn_id))
+            if self._cancel_requested_for == turn_id:
+                return
+            self._cancel_sequence += 1
+            tag = f"cancel:{self._cancel_sequence}"
+            self._cancel_requests[tag] = turn_id
+            self._cancel_requested_for = turn_id
+            self._cancel_acknowledged_for = None
+            self.cancel_button.setEnabled(False)
+            self.status_label.setText("◈  НАДСИЛАЮ ЗАПИТ НА ЗУПИНКУ…")
+            self._start_job(tag, partial(self.client.cancel, turn_id))
+
+    def _request_lost_turn_status(self) -> None:
+        turn_id = self._stream_lost_turn_id
+        if (
+            not turn_id
+            or self._active_turn_id != turn_id
+            or self._turn_status_inflight
+        ):
+            return
+        self._turn_status_sequence += 1
+        sequence = self._turn_status_sequence
+        self._turn_status_inflight = True
+        tag = f"turn_status:{sequence}:{quote(turn_id, safe='')}"
+        self._start_job(tag, partial(self.client.turn_status, turn_id))
+
+    def _turn_status_job_parts(self, tag: str) -> tuple[int, str]:
+        try:
+            _, sequence, encoded_turn_id = tag.split(":", 2)
+            return int(sequence), unquote(encoded_turn_id)
+        except (TypeError, ValueError):
+            return -1, ""
+
+    def _release_lost_turn(self, turn_id: str) -> None:
+        if self._stream_lost_turn_id != turn_id or self._active_turn_id != turn_id:
+            return
+        self._turn_recovery_timer.stop()
+        self._stream_lost_turn_id = None
+        self._turn_status_inflight = False
+        self._cancel_requested_for = None
+        self._cancel_acknowledged_for = None
+        self._clear_cancel_requests(turn_id)
+        self._active_turn_id = None
+        if self.pending_turn_id == turn_id:
+            self.pending_turn_id = None
+        self._approval_state_revision += 1
+        self.status_label.setText("◈  ХІД ЗАВЕРШИВСЯ · ОНОВЛЮЮ ІСТОРІЮ")
+        self.cancel_button.setEnabled(False)
+        self._sync_send_state()
+        self._sync_session_selector()
+        self._sync_approval_actions()
+        self._history_reload_deferred = True
+        self._apply_deferred_context_refresh()
+        if self._auto_poll:
+            self.refresh_approvals()
 
     def handle_turn_event(self, event: dict) -> None:
         kind = event.get("type")
         if kind == "turn_started":
             self._active_turn_id = event.get("turn_id")
+            self._stream_lost_turn_id = None
+            self._cancel_acknowledged_for = None
             self.pending_turn_id = self._active_turn_id
+            self.cancel_button.setEnabled(bool(self._active_turn_id))
             self._sync_session_selector()
             self.phase_changed.emit("thinking", "")
         elif kind == "text_delta":
@@ -622,6 +928,7 @@ class ChatWindow(QWidget):
                 self._entries[index] = (role, current + "\n\nРезультат:\n\n" + outcome)
                 self._render_transcript()
         elif kind == "approval_pending":
+            self._approval_state_revision += 1
             operation_id = str(event.get("operation_id", ""))
             self.phase_changed.emit("approval", str(event.get("name", "")))
             self.pending_turn_id = self._active_turn_id
@@ -652,23 +959,38 @@ class ChatWindow(QWidget):
         elif kind == "error":
             self.phase_changed.emit("error", str(event.get("error", "internal_error")))
             self._append_entry("ПОМИЛКА", str(event.get("error", "internal_error")))
+            turn_id = self._active_turn_id
+            self._clear_cancel_requests(turn_id)
             self._active_turn_id = None
             self.pending_turn_id = None
+            self._cancel_requested_for = None
+            self._cancel_acknowledged_for = None
+            self._stream_lost_turn_id = None
+            self._turn_recovery_timer.stop()
+            self._stream_generation += 1
             self.cancel_button.setEnabled(False)
             self._sync_send_state()
             self._sync_session_selector()
+            self._apply_deferred_context_refresh()
 
     def _finish_turn(self, result: dict) -> None:
         state = result.get("state", "failed")
         turn_id = result.get("turn_id") or self._active_turn_id
+        self._clear_cancel_requests(turn_id)
         if result.get("content") and self._assistant_index is None:
             self._append_entry("B-12", str(result["content"]))
         if state == "awaiting_approval":
+            self._approval_state_revision += 1
             self.pending_turn_id = turn_id
             self._active_turn_id = None
         else:
             self._active_turn_id = None
             self.pending_turn_id = None
+        self._cancel_requested_for = None
+        self._cancel_acknowledged_for = None
+        self._stream_lost_turn_id = None
+        self._turn_recovery_timer.stop()
+        self._stream_generation += 1
         phase = PHASE_FOR_RESULT.get(state, "error")
         self.phase_changed.emit(phase, str(result.get("error_code") or ""))
         self.status_label.setText(
@@ -684,6 +1006,7 @@ class ChatWindow(QWidget):
         self._render_transcript()
         if self._auto_poll:
             self.refresh_approvals()
+        self._apply_deferred_context_refresh()
 
     def _append_entry(self, role: str, text: str) -> int:
         self._entries.append((role, text))
@@ -746,8 +1069,21 @@ class ChatWindow(QWidget):
 
     def _render_approvals(self, approvals: list[dict]) -> None:
         active = {str(item.get("operation_id")): item for item in approvals}
+        if self.pending_turn_id and self._active_turn_id is None:
+            pending_present = any(
+                item.get("turn_id") == self.pending_turn_id for item in active.values()
+            ) or any(
+                operation_id in self._decision_inflight
+                and turn_id == self.pending_turn_id
+                for operation_id, turn_id in self._approval_turns.items()
+            )
+            if not pending_present:
+                self.pending_turn_id = None
+                self.cancel_button.setEnabled(False)
+                self.status_label.setText("◈  ОЧІКУЮЧИЙ ХІД ВЖЕ НЕ МАЄ ПІДТВЕРДЖЕННЯ")
+                self._sync_session_selector()
         for operation_id in tuple(self._approval_cards):
-            if operation_id not in active:
+            if operation_id not in active and operation_id not in self._decision_inflight:
                 self._remove_approval_card(operation_id)
         for operation_id, item in active.items():
             self._approval_turns[operation_id] = item.get("turn_id")
@@ -755,7 +1091,9 @@ class ChatWindow(QWidget):
             self._upsert_approval(item)
         self.approvals_title.setText(f"ПІДТВЕРДЖЕННЯ  ·  {len(self._approval_cards)}")
         self._sync_send_state()
+        self._sync_session_selector()
         self._sync_approval_actions()
+        self._apply_deferred_context_refresh()
 
     def _remove_approval_card(self, operation_id: str) -> None:
         card = self._approval_cards.pop(operation_id, None)
@@ -786,6 +1124,7 @@ class ChatWindow(QWidget):
         ):
             return
         self._decision_inflight.add(operation_id)
+        self._approval_state_revision += 1
         self._active_turn_id = "starting"
         self._sync_session_selector()
         self._sync_approval_actions()
@@ -801,7 +1140,7 @@ class ChatWindow(QWidget):
         )
 
     def refresh_approvals(self) -> None:
-        self._start_job("approvals", self.client.approvals)
+        self._start_job(self._next_approval_query_tag("approvals"), self.client.approvals)
 
     def refresh_dashboard(self) -> None:
         if self._poll_inflight:
@@ -817,7 +1156,21 @@ class ChatWindow(QWidget):
                 "status": self.client.status(),
             }
 
-        self._start_job("poll", poll)
+        self._start_job(self._next_approval_query_tag("poll"), poll)
+
+    def _next_approval_query_tag(self, prefix: str) -> str:
+        self._approval_refresh_sequence += 1
+        return f"{prefix}:{self._approval_refresh_sequence}:{self._approval_state_revision}"
+
+    def _approval_snapshot_matches(self, tag: str) -> bool:
+        try:
+            _, sequence, revision = tag.split(":", 2)
+            return (
+                int(sequence) == self._approval_refresh_sequence
+                and int(revision) == self._approval_state_revision
+            )
+        except (TypeError, ValueError):
+            return False
 
     def set_consent(self, consent: bool) -> None:
         if self._loaded:

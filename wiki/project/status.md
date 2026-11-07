@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-11-07
+updated: 2026-11-08
 status: active
 sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
 tags: [progress, next]
@@ -20,12 +20,18 @@ tags: [progress, next]
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 - **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
 
+## Поточний стан (2026-11-08)
+
+- **Перевірений факт:** desktop-функцію реалізовано в окремій гілці `feat/b12-desktop-companion`; `main` є її предком (`merge-base` — `5f6ba90`). README, desktop guide і план описують optional Qt оболонку, B-12 atlas, tray, sessions/chat/history, streamed turns, exact approval, memory/consent і voice mute/status.
+- **Перевірений факт:** після втрати потоку відомого turn клієнт зберігає lock, пропонує cancel і звіряє точний стан через owner-scoped `GET /api/turns/{id}/status`. Запит має перевірку власника; тільки `active=false` розблоковує composer і запускає reload історії. Подробиці — у [темі](../topics/desktop-companion.md) та [архітектурному огляді API](../topics/cli-server-mode.md).
+- **Перевірений факт:** повний locked suite — 740 passed / 4 skipped за 163,94 с; `ruff check src tests`, `uv lock --check`, `git diff --check` і `uv build` пройшли. Wheel містить desktop chat/cat modules і B-12 cybercat atlas. Wiki lint знайшов 11 давніх відсутніх artifact links і 1 відсутній source snapshot, без битих якорів і неіндексованих сторінок; див. запис 08.11 у [журналі](../log.md).
+- **Перевірений факт:** для цієї перевірки жоден B-12 server, model, desktop app, microphone, audio playback або GPU workload не запускався. Перевірено лише код, pytest/ASGI fixtures, лінтер і пакування.
+- **Потребує перевірки:** реальне X11 compositor/window manager і tray, Wayland, чисте системне пакування та тривалий живий model stream. Qt offscreen suite цього не підтверджує.
+
 ## Поточний стан (2026-11-07)
 
 - **Перевірений факт:** досліджено чотири надані репозиторії та офіційні Qt сторінки; pins, межі ліцензій і висновки — у [джерельному огляді](../sources/capri-desktop-companions-2026-11-07.md). Три desktop-референси дали UX-приклади; `CHNFTQ/Capricorn` — genomics diffusion-проєкт.
-- **Перевірений факт у локальній feature-гілці:** реалізовано optional Qt клієнт `b12 desktop` із плаваючим cybercat, tray/fallback, API chat, sessions/history, streamed turns, cancel/resume, exact approvals, memory/consent/persist і статусом. Деталі — у [тематичній сторінці](../topics/desktop-companion.md) й [плані](desktop-companion-plan.md).
-- **Перевірений факт:** повний suite на цій гілці пройшов: 718 passed, 4 skipped; `ruff check src tests`, `uv lock --check`, wheel/sdist build і `git diff --check` також пройшли. Гілку ще потрібно перенести на актуальний `main` та повторно перевірити. Жоден server, модель, desktop app, мікрофон або GPU-процес не запускався.
-- **Потребує перевірки:** реальне X11 вікно/tray, Wayland, чисте системне пакування й довгий живий API stream. Qt offscreen tests не доводять поведінку window manager.
+- **Перевірений факт:** підготовлено дизайн і покроковий план desktop-функції. Деталі — у [плані](desktop-companion-plan.md); тестовий baseline до змін — 22 TUI integration tests passed.
 
 ## Поточний стан (2026-11-06)
 

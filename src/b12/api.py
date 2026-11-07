@@ -434,6 +434,12 @@ def create_app(
         Agent.discard_waiting(runtime.sessions, runtime.agent._waiting, turn_id, who.actor.id)
         return {"cancelled": turn_id}
 
+    @app.get("/api/turns/{turn_id}/status")
+    async def turn_status(request: Request, turn_id: str, who: Identity):
+        own_turn(request, who, turn_id)
+        runtime = runtime_of(request)
+        return {"turn_id": turn_id, "active": turn_id in runtime.agent.active}
+
     @app.get("/api/memory/records")
     async def memory_records(request: Request, who: Identity, limit: int = 500):
         """Every live record in the caller's namespace, newest first (full memory view)."""

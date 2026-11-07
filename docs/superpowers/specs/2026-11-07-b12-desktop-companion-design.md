@@ -46,7 +46,7 @@ Alternatives considered:
 
 - Missing owner token: exit with a clear server/initialization hint; never create or print a token.
 - API offline: keep the pet available, show offline state, retry on a timer, and show request errors in chat.
-- Stream interrupted: preserve rendered text and show a connection error. If the turn ID is known, retain the cancel path; if no turn started, allow another prompt.
+- Stream interrupted: preserve rendered text and show a connection error. If the turn ID is known, keep the chat locked and allow cancellation. Query the owner-scoped turn-status endpoint only after the cancel request is acknowledged; unlock after the server confirms the turn ended, then reload history. If history reload fails, keep sending disabled until a fresh load succeeds. If no turn started, allow another prompt.
 - Approval gone/stale: refresh pending approvals and explain that the operation is no longer pending; do not retry automatically.
 - Missing Qt extra: print the install command without affecting other commands.
 - Missing tray support: use the overlay menu.
@@ -62,7 +62,7 @@ This release does not port Windows-only window tracking, screen capture, OS sett
 1. The desktop extra resolves, and remains optional.
 2. The CLI command is available; running it does not start the API, Ollama, microphone, or any child process.
 3. The overlay loads the B-12 atlas, renders alpha, tracks the pointer, moves by drag, and maps B-12 events to visual states.
-4. Companion uses authenticated API for sessions, history, chat streaming, cancel, exact approval/deny and resume, consent/persist controls, memory CRUD, status, and microphone mute/status.
+4. Companion uses authenticated API for sessions, history, chat streaming, cancel, owner-scoped turn status, exact approval/deny and resume, consent/persist controls, memory CRUD, status, and microphone mute/status.
 5. All network calls run off the GUI thread; widget changes occur on the Qt GUI thread.
 6. Tests cover client auth/streams/errors, event-to-pet mapping, overlay interactions, and CLI behavior without live model/microphone.
 7. Full tests, lint, and wheel build pass; wiki records sources, implementation status, checks, and platform limits.

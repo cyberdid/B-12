@@ -131,6 +131,24 @@ def test_opaque_identifiers_remain_one_encoded_path_segment():
     assert requests[0].url.raw_path == b"/api/approvals/op%2Fwith%3Freserved"
 
 
+def test_turn_status_is_scoped_to_the_exact_opaque_turn_id():
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json={"turn_id": "turn/one", "active": False})
+
+    client = DesktopApiClient(
+        "http://127.0.0.1:8712", "token", transport=httpx.MockTransport(handler)
+    )
+    try:
+        assert client.turn_status("turn/one") == {"turn_id": "turn/one", "active": False}
+    finally:
+        client.close()
+
+    assert requests[0].url.raw_path == b"/api/turns/turn%2Fone/status"
+
+
 def test_transport_failure_is_reported_as_server_unavailable():
     def handler(request):
         raise httpx.ConnectError("offline", request=request)

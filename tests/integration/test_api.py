@@ -99,6 +99,52 @@ async def test_cancel_route_requires_turn_ownership(api):
     assert response.status_code == 404
 
 
+async def test_turn_status_requires_ownership_and_reports_live_runtime_turn(api):
+    import time
+
+    _, client, token, app, _ = api
+    session = (await client.post("/api/sessions", json={}, headers=auth(token))).json()
+    runtime = app.state.runtime
+    actor_id = runtime.control.get_meta("owner_actor")
+    session_id = session["session_id"]
+    task_id = runtime.control.create_task(session_id)
+    grant_id = runtime.control.issue_grant(
+        actor_id, session_id, ("time.read",), task_id=task_id
+    )
+    context = runtime.control.begin_turn(
+        session_id, grant_id, task_id=task_id, deadline=time.monotonic() + 30
+    )
+    runtime.agent.active[context.turn_id] = object()
+
+    try:
+        active = await client.get(
+            f"/api/turns/{context.turn_id}/status", headers=auth(token)
+        )
+        assert active.status_code == 200
+        assert active.json() == {"turn_id": context.turn_id, "active": True}
+
+        runtime.agent.active.pop(context.turn_id)
+        inactive = await client.get(
+            f"/api/turns/{context.turn_id}/status", headers=auth(token)
+        )
+        assert inactive.json() == {"turn_id": context.turn_id, "active": False}
+    finally:
+        runtime.agent.active.pop(context.turn_id, None)
+        runtime.control.release_turn(context.turn_id)
+
+    guest = (
+        await client.post(
+            "/api/guests",
+            json={"consent": True, "capabilities": ["time.read"]},
+            headers=auth(token),
+        )
+    ).json()
+    forbidden = await client.get(
+        f"/api/turns/{context.turn_id}/status", headers=auth(guest["token"])
+    )
+    assert forbidden.status_code == 404
+
+
 def free_port():
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))

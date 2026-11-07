@@ -607,3 +607,15 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-07] plan | Desktop-компаньйон B-12
 
 За прямим дорученням власника підготовлено архітектурний дизайн і поетапний implementation plan. Обрано окремий optional Qt shell, що використовує існуючий owner-authenticated loopback API та B-12 cybercat art. Нові host tools, скринкасти/віконний моніторинг, автозапуск і власний runtime не додаються; мікрофон/audio playback не стартують. Робота винесена в гілку `feat/b12-desktop-companion`; на базовому `3e7fb07` перевірений TUI baseline — 22 passed.
+
+## [2026-11-08] review fix | Відновлення desktop turn і історії сесій
+
+Закрито race conditions після обриву NDJSON-потоку: клієнт чекає успішного підтвердження cancel, перевіряє статус саме цього turn через owner-scoped endpoint і не приймає запізнілі callbacks попереднього turn. Composer розблоковується лише після `active=false` і успішного оновлення історії. Помилка завантаження історії лишає надсилання заблокованим; при відкаті зміни сесії незавантажена історія отримує bootstrap retry. Додані regressions для cancel/status ordering, stale callbacks, failed history та rollback retry. Незалежний rereview останньої зміни не знайшов підтверджених дефектів.
+
+## [2026-11-08] lint | Desktop-компаньйон: фінальна перевірка
+
+**Перевірений факт:** повний locked suite після останнього fix: 740 passed / 4 skipped за 163,94 с. `ruff check src tests`, `uv lock --check`, `git diff --check` і `uv build` пройшли. Побудований wheel містить `b12/desktop/chat.py`, `b12/desktop/cat.py` і `b12/tui/assets/cybercat-atlas.png`.
+
+Wiki audit: 44 сторінки, 358 локальних посилань, 0 битих anchors і 0 сторінок поза index. Залишаються 11 історичних посилань на відсутні benchmark artifacts і одна source reference до відсутнього snapshot; відсутні докази не відновлювалися. SHA-256 незміненого `raw/B-12_Master_Project_2026-10-24.md` — `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, збігається з manifest.
+
+Для цієї реалізації не запускали B-12 server, desktop app, модель, microphone capture, audio playback або GPU workload; pytest використовував API fixtures/fakes. Фізичні X11/Wayland, tray та живий model stream залишаються неперевіреними. Робоча гілка `feat/b12-desktop-companion` базується на `main` через merge-base `5f6ba905`; код ще не опубліковано.

@@ -122,6 +122,9 @@ class DesktopApiClient:
     def cancel(self, turn_id: str) -> dict:
         return self.call("POST", f"/api/turns/{_segment(turn_id)}/cancel", json={})
 
+    def turn_status(self, turn_id: str) -> dict:
+        return self.call("GET", f"/api/turns/{_segment(turn_id)}/status")
+
     def set_consent(self, consent: bool) -> dict:
         return self.call("POST", "/api/control/consent", json={"consent": consent})
 

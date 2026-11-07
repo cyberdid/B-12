@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-07
+updated: 2026-11-08
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
