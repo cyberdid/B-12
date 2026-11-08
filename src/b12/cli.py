@@ -720,15 +720,31 @@ async def cmd_tui(args, settings) -> int:
     return 0
 
 
+def _emit_tui_hook_noop(args) -> None:
+    """Protocol response depends only on recognized CLI configuration, never payload."""
+    if getattr(args, "source", None) != "antigravity":
+        return
+    response = {
+        "SessionStart": "{}",
+        "PostToolUse": "{}",
+        "PostInvocation": '{"injectSteps":[],"terminationBehavior":""}',
+    }.get(getattr(args, "event", None))
+    if response is not None:
+        try:
+            print(response, flush=True)
+        except (OSError, ValueError):
+            pass  # A closed provider pipe must not turn telemetry into an error.
+
+
 async def cmd_tui_hook(args, settings) -> int:
     """Best-effort telemetry: return only documented Antigravity no-op envelopes."""
-    import select
-    import time
-
-    from b12.tui.activity import ActivityStore
-    from b12.tui.hook import MAX_INPUT_BYTES, normalize_hook
-
     try:
+        import select
+        import time
+
+        from b12.tui.activity import ActivityStore
+        from b12.tui.hook import MAX_INPUT_BYTES, normalize_hook
+
         # One bounded JSON object on a pipe; do not wait indefinitely for a broken hook.
         deadline = time.monotonic() + 0.5
         fd = sys.stdin.fileno()
@@ -749,14 +765,10 @@ async def cmd_tui_hook(args, settings) -> int:
         if normalize_hook(args.source, payload, time.time(), event=args.event) is None:
             return 0
         ActivityStore(settings.state_dir).append(args.source, payload, event=args.event)
-        if args.source == "antigravity":
-            # These safe post-event envelopes neither approve execution nor add steps.
-            if args.event == "PostInvocation":
-                print('{"injectSteps":[],"terminationBehavior":""}')
-            else:
-                print("{}")
-    except (OSError, ValueError, TypeError, RecursionError):
-        pass
+    except Exception:
+        pass  # Telemetry failures never change a provider action.
+    finally:
+        _emit_tui_hook_noop(args)
     return 0
 
 
@@ -1063,6 +1075,7 @@ def main(argv=None) -> int:
         settings = load_settings(args.config)
     except (ValueError, OSError, tomllib.TOMLDecodeError) as exc:
         if args.command == "tui-hook":
+            _emit_tui_hook_noop(args)
             return 0
         emit_json({"error": "invalid_settings", "detail": type(exc).__name__})
         return 1
@@ -1070,6 +1083,7 @@ def main(argv=None) -> int:
         # Telemetry must not fail a provider action if settings loading breaks.
         # Other commands keep their existing unexpected-exception behavior.
         if args.command == "tui-hook":
+            _emit_tui_hook_noop(args)
             return 0
         raise
     handlers = {
