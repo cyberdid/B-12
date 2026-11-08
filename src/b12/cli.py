@@ -721,12 +721,12 @@ async def cmd_tui(args, settings) -> int:
 
 
 async def cmd_tui_hook(args, settings) -> int:
-    """Best-effort metadata only: silent success must never change a provider decision."""
+    """Best-effort telemetry: return only documented Antigravity no-op envelopes."""
     import select
     import time
 
     from b12.tui.activity import ActivityStore
-    from b12.tui.hook import MAX_INPUT_BYTES
+    from b12.tui.hook import MAX_INPUT_BYTES, normalize_hook
 
     try:
         # One bounded JSON object on a pipe; do not wait indefinitely for a broken hook.
@@ -744,8 +744,17 @@ async def cmd_tui_hook(args, settings) -> int:
             if len(data) > MAX_INPUT_BYTES:
                 return 0
         payload = json.loads(data)
-        if isinstance(payload, dict):
-            ActivityStore(settings.state_dir).append(args.source, payload)
+        if not isinstance(payload, dict):
+            return 0
+        if normalize_hook(args.source, payload, time.time(), event=args.event) is None:
+            return 0
+        ActivityStore(settings.state_dir).append(args.source, payload, event=args.event)
+        if args.source == "antigravity":
+            # These safe post-event envelopes neither approve execution nor add steps.
+            if args.event == "PostInvocation":
+                print('{"injectSteps":[],"terminationBehavior":""}')
+            else:
+                print("{}")
     except (OSError, ValueError, TypeError, RecursionError):
         pass
     return 0
@@ -827,6 +836,11 @@ def parser() -> argparse.ArgumentParser:
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
     hook = sub.add_parser("tui-hook", help="локальні metadata lifecycle hooks без provider decisions")
     hook.add_argument("--source", required=True, choices=("claude-code", "codex", "antigravity"))
+    hook.add_argument(
+        "--event",
+        choices=("SessionStart", "PostToolUse", "PostInvocation"),
+        help="явна безпечна lifecycle-подія Antigravity",
+    )
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)

@@ -76,7 +76,7 @@ class ActivityStore:
         )
         connection.execute("DELETE FROM tasks WHERE task_id NOT IN (SELECT task_id FROM events)")
 
-    def append(self, source: str, payload: dict) -> int:
+    def append(self, source: str, payload: dict, *, event: str | None = None) -> int:
         """Normalize a single bounded JSON object, persist it, or return 0 on drop."""
         try:
             if not isinstance(payload, dict):
@@ -87,33 +87,33 @@ class ActivityStore:
                 if size > MAX_INPUT_BYTES:
                     return 0
             now = time.time()
-            event = normalize_hook(source, payload, now)
-            if event is None:
+            metadata = normalize_hook(source, payload, now, event=event)
+            if metadata is None:
                 return 0
             with self._connect() as connection, connection:
                 connection.execute("BEGIN IMMEDIATE")
                 self._prune(connection, now)
                 task = connection.execute(
                     "SELECT task_id FROM tasks WHERE source=? AND session_id=?",
-                    (event["source"], event["session_id"]),
+                    (metadata["source"], metadata["session_id"]),
                 ).fetchone()
                 task_id = task[0] if task else uuid.uuid4().hex
-                if event["kind"] in ("session_started", "prompt_submitted"):
+                if metadata["kind"] in ("session_started", "prompt_submitted"):
                     task_id = uuid.uuid4().hex
                 connection.execute(
                     "INSERT OR REPLACE INTO tasks VALUES (?, ?, ?)",
-                    (event["source"], event["session_id"], task_id),
+                    (metadata["source"], metadata["session_id"], task_id),
                 )
-                event["task_id"] = task_id
-                columns = ", ".join(event)
-                marks = ", ".join("?" for _ in event)
+                metadata["task_id"] = task_id
+                columns = ", ".join(metadata)
+                marks = ", ".join("?" for _ in metadata)
                 cursor = connection.execute(
-                    f"INSERT INTO events ({columns}) VALUES ({marks})", tuple(event.values())
+                    f"INSERT INTO events ({columns}) VALUES ({marks})", tuple(metadata.values())
                 )
-                if event["kind"] in ("turn_completed", "session_ended"):
+                if metadata["kind"] in ("turn_completed", "session_ended"):
                     connection.execute(
                         "DELETE FROM tasks WHERE source=? AND session_id=?",
-                        (event["source"], event["session_id"]),
+                        (metadata["source"], metadata["session_id"]),
                     )
                 self._prune(connection, now)
                 return int(cursor.lastrowid)
