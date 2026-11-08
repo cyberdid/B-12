@@ -575,4 +575,4 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 ## [2026-11-08] merge | TUI Companion Upgrade локально інтегровано
 
-Feature branch `feat/b12-cybercat-tui` локально злито в `main`. Конфлікти wiki вирішено зі збереженням свіжих записів аудиту 04.11 та додаванням TUI-оновлень 08.11; кодові зміни злилися автоматично. Ruff, Python/shell syntax, JSON і wiki/source metadata перевірені статично. Повні тести та запуск TUI/API/audio/hooks не виконувалися; push не робився.
+Feature branch `feat/b12-cybercat-tui` локально злито в `main` merge commit `72a06d6`. Конфлікти wiki вирішено зі збереженням свіжих записів аудиту 04.11 та додаванням TUI-оновлень 08.11; кодові зміни злилися автоматично. Ruff, Python/shell syntax, JSON і wiki/source metadata перевірені статично. Повні тести та запуск TUI/API/audio/hooks не виконувалися; push не робився.
