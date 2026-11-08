@@ -637,3 +637,7 @@ Offscreen screenshot показав системно-білий порожній
 Wiki audit: 44 сторінки, 358 локальних Markdown-посилань, 0 битих якорів, 0 неіндексованих сторінок. Залишились 11 відомих відсутніх historical benchmark artifact links та одна відсутня source snapshot reference; нових битих посилань цей fix не додав. SHA-256 master brief лишився `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a` і збігається з manifest.
 
 **Межі:** X11 smoke перевірив лише map/ARGB metadata та Qt tray availability. Чату не надсилали prompt; live B-12 API/model, мікрофон/audio playback, GPU, tray click, mouse drag і screenshot композитора не перевіряли. Інтерактивний host acceptance та Wayland лишаються відкритими.
+
+## [2026-11-08] correction | Stacked desktop branch
+
+Перевірка `git log --graph --all` уточнила попередню примітку про ancestry: merge-base з `main` — `5f6ba90`, але прямий parent `feat/b12-desktop-companion` — runtime PR head `3e7fb07`. Desktop гілка містить зміни PR #1 разом із трьома власними desktop commits. Це навмисна залежність від runtime API/context роботи; desktop PR слід відкрити поверх `feat/b12-runtime`, щоб не дублювати runtime diff відносно `main`.
