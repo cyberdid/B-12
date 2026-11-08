@@ -549,3 +549,11 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-04] lint | Corpus v4 та locked environments
 
 38 wiki-сторінок, 318 локальних посилань/якорів, frontmatter sources та index coverage пройшли перевірку; broken links і неіндексовані сторінки — 0. Поточний статус містить нові functional results, historical model/voice metrics збережено окремо. Raw originals та source manifest незмінні.
+
+## [2026-11-08] ingest | Capri GitHub hero та social preview
+
+За погодженням власника додано оригінальну ілюстрацію Capri для головного README та окремий 1280×640 social-preview asset. Вона не використовує приватний Capri sprite pack. Prompt, походження й межі ліцензування зафіксовані в [source card](sources/capri-original-hero-2026-11-08.md). Capri — видима назва компаньйона; внутрішні `b12` package/API identifiers збережено.
+
+## [2026-11-08] lint | Capri GitHub branding
+
+README hero веде на `docs/images/capri-hero.jpg`; social preview — 1280×640 PNG (904 827 bytes). У main README прямо зазначено, що Capri desktop зміни лишаються у відкритому PR #2. GraphQL підтверджує `usesCustomOpenGraphImage=false`; GitHub не має публічного API для запису цього налаштування, а UI браузера в сесії недоступний. Тому preview asset підготовлений у репозиторії, але settings-level upload потребує ручної дії власника. Повний test suite для цієї візуальної зміни не запускався.

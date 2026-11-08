@@ -60,6 +60,7 @@ tags: [navigation]
 | [archive-index-public](sources/archive-index-public.md) | Pinned source review, 17 core tests і локальна інсталяція |
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
+| [Оригінальна обкладинка Capri](sources/capri-original-hero-2026-11-08.md) | Походження hero/social preview, prompt і межі використання локального art pack |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
 Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 116 URL](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).
