@@ -735,3 +735,9 @@ Ollama/model, голос/audio та GPU не перезапускалися. А�
 ## [2026-11-08] ingest | Публічний візуал Capri для GitHub
 
 За погодженням власника створено окрему оригінальну cyberpunk-ілюстрацію Capri для README та GitHub social preview. Вона не використовує приватний Capri sprite pack. Hero збережено як 1600×800 JPG; preview з типографікою підготовлено як 1280×640 PNG. Prompt, походження та межі ліцензування записані у [source card](sources/capri-original-hero-2026-11-08.md).
+
+## [2026-11-08] lint | GitHub-подача Capri
+
+Перевірено 88 локальних Markdown-посилань у README, desktop guide, індексі й новій source card: відсутніх цілей 0. Hero — 1600×800 JPG, social preview — 1280×640 PNG, 904 827 байтів (<1 MB); обидва зображення відкрито для візуальної перевірки. Поточний README більше не посилається на B-12 hero; його старий шлях лишається тільки в датованому історичному записі журналу. У Git tree не потрапили файли приватного Capri sprite pack.
+
+Commit `03f5a4b` запушений у `feat/b12-desktop-companion`; PR #2 має оновлені title/body, а repository About description і topics перевірено через GitHub CLI. PR лишається open і stacked на PR #1. Social-preview PNG готовий у гілці, але GitHub Settings preview не завантажений: у сеансі немає доступного браузера; README гілки стане README репозиторію після злиття PR залежностей. Розширений link scan із журналом має одну відсутню ціль `artifacts/task15-soak-2026-10-26-run2/events.jsonl`, давній artifact gap, зафіксований у попередніх lint-записах; нові та інструктивні посилання цілі. Автоматизовані тести не запускалися.
