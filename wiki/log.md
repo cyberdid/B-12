@@ -657,3 +657,7 @@ Desktop X11 smoke був ізольований через тимчасові st
 ## [2026-11-08] review | Approval reconnect follow-up
 
 Незалежний reviewer підтвердив, що offline notification більше не стирає approval pose; той самий pending operation ID лишає кота в approval state після reconnect, а порожня черга повертає його до idle. Regression безпосередньо перевіряє offline→reconnect із тим самим ID. Follow-up review: Critical — 0, Important — 0; verdict — ready to merge. Review зауважив лише застарілий рядок про pending review у plan; він оновлений цим записом.
+
+## [2026-11-08] publish | Desktop companion PR #2
+
+За дорученням власника гілку `feat/b12-desktop-companion` опубліковано в `cyberdid/B-12`; відкрито [PR #2](https://github.com/cyberdid/B-12/pull/2) із базою `feat/b12-runtime`, який stacked на [PR #1](https://github.com/cyberdid/B-12/pull/1). GitHub metadata підтвердила `open`, `mergeable=true`, `draft=false`; PR не злито. Коли PR #1 буде merged, PR #2 треба retarget на `main`.
