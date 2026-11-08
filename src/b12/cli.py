@@ -712,9 +712,42 @@ async def cmd_tui(args, settings) -> int:
     client = ApiClient(args.url, token_file.read_text().strip())
     try:
         # Already inside asyncio.run(main): the app must run on this loop (run_async).
-        await B12App(client, persist_default=args.persist).run_async()
+        await B12App(
+            client, persist_default=args.persist, state_dir=settings.state_dir
+        ).run_async()
     finally:
         await client.close()
+    return 0
+
+
+async def cmd_tui_hook(args, settings) -> int:
+    """Best-effort metadata only: silent success must never change a provider decision."""
+    import select
+    import time
+
+    from b12.tui.activity import ActivityStore
+    from b12.tui.hook import MAX_INPUT_BYTES
+
+    try:
+        # One bounded JSON object on a pipe; do not wait indefinitely for a broken hook.
+        deadline = time.monotonic() + 0.5
+        fd = sys.stdin.fileno()
+        data = bytearray()
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not select.select([fd], [], [], remaining)[0]:
+                return 0
+            chunk = os.read(fd, min(8192, MAX_INPUT_BYTES + 1 - len(data)))
+            if not chunk:
+                break
+            data.extend(chunk)
+            if len(data) > MAX_INPUT_BYTES:
+                return 0
+        payload = json.loads(data)
+        if isinstance(payload, dict):
+            ActivityStore(settings.state_dir).append(args.source, payload)
+    except (OSError, ValueError, TypeError, RecursionError):
+        pass
     return 0
 
 
@@ -792,6 +825,8 @@ def parser() -> argparse.ArgumentParser:
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
+    hook = sub.add_parser("tui-hook", help="локальні metadata lifecycle hooks без provider decisions")
+    hook.add_argument("--source", required=True, choices=("claude-code", "codex", "antigravity"))
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)
@@ -833,9 +868,9 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
-# Commands that run without the CLI taking the state lock: `serve` takes it itself, and `tui`
-# only talks to the API.
-SERVER_OWNED = frozenset({"serve", "tui"})
+# Commands without the runtime lock: serve takes it itself; tui uses the API;
+# tui-hook writes only the independent local UI metadata spool.
+SERVER_OWNED = frozenset({"serve", "tui", "tui-hook"})
 EXIT_SERVER_UNAVAILABLE = 4
 EXIT_REQUIRES_STOPPED_SERVER = 5
 
@@ -983,6 +1018,8 @@ def main(argv=None) -> int:
     try:
         settings = load_settings(args.config)
     except (ValueError, OSError, tomllib.TOMLDecodeError) as exc:
+        if args.command == "tui-hook":
+            return 0
         emit_json({"error": "invalid_settings", "detail": type(exc).__name__})
         return 1
     handlers = {
@@ -999,6 +1036,7 @@ def main(argv=None) -> int:
         "tools": cmd_tools,
         "serve": cmd_serve,
         "tui": cmd_tui,
+        "tui-hook": cmd_tui_hook,
         "goals": cmd_goals,
         "quiet": cmd_flag,
         "stop": cmd_flag,
