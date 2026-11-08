@@ -653,3 +653,7 @@ Wiki audit: 44 сторінки, 358 локальних Markdown-посилан�
 Wiki audit: 44 сторінки, 358 локальних посилань, 0 битих якорів, 0 сторінок поза index. Лишилися 11 історичних links на відсутні benchmark artifacts та одна відсутня source snapshot path; нові сторінки/зміни не створили цих gaps. Master brief SHA-256 незмінний: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, збігається з manifest.
 
 Desktop X11 smoke був ізольований через тимчасові state/config і dummy token, без API listener. B-12 server/model, microphone, audio playback і GPU не запускались. Поточна desktop гілка стоїть поверх runtime PR #1 (`feat/b12-runtime` на `3e7fb07`); окремий desktop PR має target цього branch до злиття PR #1.
+
+## [2026-11-08] review | Approval reconnect follow-up
+
+Незалежний reviewer підтвердив, що offline notification більше не стирає approval pose; той самий pending operation ID лишає кота в approval state після reconnect, а порожня черга повертає його до idle. Regression безпосередньо перевіряє offline→reconnect із тим самим ID. Follow-up review: Critical — 0, Important — 0; verdict — ready to merge. Review зауважив лише застарілий рядок про pending review у plan; він оновлений цим записом.
