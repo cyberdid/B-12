@@ -51,9 +51,10 @@ Textual `run_test` з **справжнім** `ApiClient` до живого се�
 
 ## Desktop-компаньйон
 - Qt offscreen: фази кіберкота, pointer/drag, safe transcript, session/history guards, approvals і API I/O поза GUI thread.
+- Порожня approval viewport: відрендерений центр має темний `#0a1020` колір, не системний `#efefef`.
 - Загублений NDJSON після `turn_started`: запит status не стартує до успішного cancel acknowledgement; саме acknowledgement не розблоковує composer. Authenticated `GET /api/turns/{id}/status` має підтвердити `active=false`, а свіжий history response — успішно завантажитися.
 - Конкурентність: застарілі stream, history, approval, cancel і turn-status callbacks не змінюють новіший turn/session.
-- Живий X11 compositor/tray і Wayland лишаються окремим host acceptance, не доведеним offscreen-тестами.
+- X11 host smoke: Qt window viewable 244×272, depth 32, tray API доступний; app запускався з offline dummy API і автоматично зупинений. Візуальний screenshot compositor/tray, клік/drag host acceptance і Wayland лишаються відкритими.
 
 ## Рівень 5. Реальна модель (перед відповіддю «готово» і після змін агента)
 Фіксований набір із 6 задач, запуск з `B12_REAL_MODEL=1`. Кожна задача має критерій успіху, який перевіряє код, а не ми на око:

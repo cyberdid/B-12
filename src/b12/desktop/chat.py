@@ -45,6 +45,9 @@ QLineEdit, QPlainTextEdit, QComboBox, QListWidget, QTextBrowser {
   selection-background-color: #255b70;
 }
 QTextBrowser { border: none; background: transparent; padding: 6px 10px; }
+QScrollArea#approvalScroll { background-color: #0a1020; border: none; }
+QScrollArea#approvalScroll QWidget#qt_scrollarea_viewport,
+QWidget#approvalHost { background-color: #0a1020; }
 QPushButton { background: #132338; color: #b6c5de; border: 1px solid #38516f;
   border-radius: 5px; padding: 8px 13px; font-weight: 700; }
 QPushButton:hover { background: #1a334d; border-color: #69f4df; color: #69f4df; }
@@ -198,10 +201,12 @@ class ChatWindow(QWidget):
         self.approvals_title.setObjectName("sectionTitle")
         layout.addWidget(self.approvals_title)
         approval_scroll = QScrollArea()
+        approval_scroll.setObjectName("approvalScroll")
         approval_scroll.setWidgetResizable(True)
         approval_scroll.setMaximumHeight(112)
         approval_scroll.setFrameShape(QFrame.Shape.NoFrame)
         self.approval_host = QWidget()
+        self.approval_host.setObjectName("approvalHost")
         self.approval_layout = QVBoxLayout(self.approval_host)
         self.approval_layout.setContentsMargins(0, 0, 0, 0)
         self.approval_layout.setSpacing(6)

@@ -619,3 +619,21 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 Wiki audit: 44 сторінки, 358 локальних посилань, 0 битих anchors і 0 сторінок поза index. Залишаються 11 історичних посилань на відсутні benchmark artifacts і одна source reference до відсутнього snapshot; відсутні докази не відновлювалися. SHA-256 незміненого `raw/B-12_Master_Project_2026-10-24.md` — `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, збігається з manifest.
 
 Для цієї реалізації не запускали B-12 server, desktop app, модель, microphone capture, audio playback або GPU workload; pytest використовував API fixtures/fakes. Фізичні X11/Wayland, tray та живий model stream залишаються неперевіреними. Робоча гілка `feat/b12-desktop-companion` базується на `main` через merge-base `5f6ba905`; код ще не опубліковано.
+
+## [2026-11-08] host-validation | Qt desktop на X11
+
+На реальному `DISPLAY=:1` (`XDG_SESSION_TYPE=x11`, X.Org 21.1.11, `eDP-1` 2560×1600) окремо запущено лише `b12 desktop` із тимчасовими `B12_STATE_DIR`/`XDG_CONFIG_HOME`, фіктивним owner token і test URL `127.0.0.1:18712`, де listener не було. `xwininfo` підтвердив viewable overlay 244×272, depth 32, TrueColor; Qt повернув tray availability `true`. Процес автоматично завершився через 55 секунд (timeout exit 124); після завершення вікна/процесу немає. Перевірка не відкривала діалог чату й не передавала аудіо. Звичайний `$HOME/.config/B-12/NeonCompanion.conf` відсутній; усе тестове зберігалось під `/tmp/b12-desktop-host-review`. Живий server/model/mic/audio/GPU не запускали, наявний Ollama не чіпали.
+
+**Межа host evidence:** CUA повернув порожній native app inventory (`apps: []`), тому screenshot compositor, реальну видимість tray icon, click/drag та stacking над іншими вікнами не підтверджено. `QSystemTrayIcon.isSystemTrayAvailable()` — лише API availability, не доказ успішного користувацького tray UX.
+
+## [2026-11-08] fix | Темний Qt approval viewport
+
+Offscreen screenshot показав системно-білий порожній блок approvals. Діагностика Qt підтвердила причину: `QScrollArea.viewport()` і його `approval_host` мали `autoFillBackground=true` та системний `#efefef`; глобальний stylesheet не охоплював ці об’єкти. Новий pixel-level regression спочатку впав із `#efefef != #0a1020`, потім пройшов після явної темної теми для viewport/host. Повторний контрольний рендер має темну поверхню без білого блока; cybercat atlas і компонування збережені.
+
+## [2026-11-08] lint | Desktop-компаньйон після візуального fix
+
+Повний locked suite після pixel regression: **741 passed / 4 skipped за 152,62 с**. `ruff check src tests`, `uv lock --check`, `git diff --check`, `uv build` пройшли; wheel містить `b12/desktop/chat.py`, `b12/desktop/cat.py` і B-12 cybercat atlas. `B12_REAL_MODEL` не вмикався.
+
+Wiki audit: 44 сторінки, 358 локальних Markdown-посилань, 0 битих якорів, 0 неіндексованих сторінок. Залишились 11 відомих відсутніх historical benchmark artifact links та одна відсутня source snapshot reference; нових битих посилань цей fix не додав. SHA-256 master brief лишився `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a` і збігається з manifest.
+
+**Межі:** X11 smoke перевірив лише map/ARGB metadata та Qt tray availability. Чату не надсилали prompt; live B-12 API/model, мікрофон/audio playback, GPU, tray click, mouse drag і screenshot композитора не перевіряли. Інтерактивний host acceptance та Wayland лишаються відкритими.

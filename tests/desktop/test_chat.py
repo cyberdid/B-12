@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip("PySide6")
 
-from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtWidgets import QApplication, QPushButton, QScrollArea
 
 from b12.desktop.chat import ChatWindow
 
@@ -19,6 +19,23 @@ class NoNetworkClient:
 @pytest.fixture(scope="module")
 def qapp():
     return QApplication.instance() or QApplication([])
+
+
+def test_empty_approval_area_uses_dark_theme(qapp):
+    window = ChatWindow(NoNetworkClient(), auto_load=False, auto_poll=False)
+    window.resize(1024, 800)
+    window.show()
+    qapp.processEvents()
+    try:
+        approval_scroll = window.findChild(QScrollArea)
+        assert approval_scroll is not None
+        center = approval_scroll.viewport().mapTo(
+            window, approval_scroll.viewport().rect().center()
+        )
+        pixel = window.grab().toImage().pixelColor(center)
+        assert pixel.name() == "#0a1020"
+    finally:
+        window.close()
 
 
 def test_turn_events_update_cat_phase_and_safe_transcript(qapp):
