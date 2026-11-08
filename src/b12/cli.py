@@ -1035,9 +1035,9 @@ def main(argv=None) -> int:
         # argparse normally prints and exits before reaching the hook handler.
         # A misconfigured telemetry hook must also remain silent and successful.
         import io
-        from contextlib import redirect_stderr, redirect_stdout
+        from contextlib import redirect_stderr
 
-        with redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+        with redirect_stderr(io.StringIO()):
             try:
                 args = parser().parse_args(argv)
             except SystemExit:
@@ -1052,6 +1052,12 @@ def main(argv=None) -> int:
             return 0
         emit_json({"error": "invalid_settings", "detail": type(exc).__name__})
         return 1
+    except Exception:
+        # Telemetry must not fail a provider action if settings loading breaks.
+        # Other commands keep their existing unexpected-exception behavior.
+        if args.command == "tui-hook":
+            return 0
+        raise
     handlers = {
         "doctor": cmd_doctor,
         "init": cmd_init,
