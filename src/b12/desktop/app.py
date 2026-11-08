@@ -2,17 +2,27 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QPoint, QRect, QSettings, QSize, Qt, QTimer, QUrl
-from PySide6.QtGui import QCursor, QDesktopServices, QIcon, QPixmap
+from PySide6.QtGui import QActionGroup, QCursor, QDesktopServices, QIcon, QPixmap
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
-from b12.desktop.cat import CatAtlas, CyberCatOverlay
+from b12.desktop.cat import CatAtlas, CompanionOverlay, QtPackAtlas
 from b12.desktop.chat import ChatWindow
 from b12.desktop.client import DesktopApiClient, DesktopApiError
 from b12.desktop.workers import ApiJob
+from b12.skins import SkinManifest, SkinOption, available_skins
+
+
+def skin_directory() -> Path:
+    """Resolve the optional desktop pack without triggering a download."""
+    configured = os.environ.get("B12_CAPRI_DIR") or os.environ.get("B12_TUI_CAPRI_DIR")
+    if configured:
+        return Path(configured).expanduser()
+    return Path.home() / ".local" / "share" / "b12" / "skins" / "capri"
 
 
 def load_owner_token(state_dir: Path) -> str:
@@ -62,7 +72,22 @@ class DesktopShell(QObject):
         self.app = app
         self.client = client
         self.settings = QSettings("B-12", "NeonCompanion")
-        self.overlay = CyberCatOverlay()
+        self.skin_options = available_skins(skin_directory())
+        self.skin_by_id = {option.id: option for option in self.skin_options}
+        saved_appearance = str(self.settings.value("appearance", ""))
+        initial_appearance = saved_appearance if saved_appearance in self.skin_by_id else ""
+        if not initial_appearance:
+            initial_appearance = "capri" if "capri" in self.skin_by_id else "cybercat"
+        try:
+            atlas, appearance_name = self._load_appearance(initial_appearance)
+        except Exception:
+            initial_appearance = "cybercat"
+            atlas, appearance_name = CatAtlas(), "КІБЕРКІТ"
+        self.overlay = CompanionOverlay(
+            atlas=atlas,
+            appearance_id=initial_appearance,
+            appearance_name=appearance_name,
+        )
         self.chat = ChatWindow(client, persist_default=persist_default)
         self.chat.phase_changed.connect(self.overlay.set_phase)
         self.chat.phase_changed.connect(self._remember_phase)
@@ -75,7 +100,7 @@ class DesktopShell(QObject):
         self._tray: QSystemTrayIcon | None = None
         if QSystemTrayIcon.isSystemTrayAvailable():
             self._tray = QSystemTrayIcon(self._icon(), self)
-            self._tray.setToolTip("B-12 · Кіберкіт")
+            self._tray.setToolTip(f"B-12 · {self.overlay.appearance_name}")
             self._tray.setContextMenu(self._menu)
             self._tray.activated.connect(self._tray_activated)
             self._tray.show()
@@ -88,14 +113,39 @@ class DesktopShell(QObject):
         self._poll_notifications()
 
     def _icon(self) -> QIcon:
-        atlas = CatAtlas()
-        frame = atlas.frame(phase="idle", frame=0, motion=False)
+        frame = self.overlay.atlas.frame(phase="idle", frame=0, motion=False)
         pixmap = QPixmap.fromImage(frame).scaled(
             QSize(48, 48),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         )
         return QIcon(pixmap)
+
+    def _load_appearance(self, appearance_id: str):
+        if appearance_id == "cybercat":
+            return CatAtlas(), "КІБЕРКІТ"
+        option: SkinOption | None = self.skin_by_id.get(appearance_id)
+        if option is None or option.manifest_path is None:
+            raise ValueError("skin_unavailable")
+        manifest = SkinManifest.load(option.manifest_path)
+        if manifest.id != appearance_id:
+            raise ValueError("skin_manifest_changed")
+        return QtPackAtlas(manifest), manifest.display_name
+
+    def set_appearance(self, appearance_id: str) -> None:
+        try:
+            atlas, appearance_name = self._load_appearance(appearance_id)
+        except Exception:
+            # Optional pack changes must never prevent the built-in appearance from working.
+            appearance_id = "cybercat"
+            atlas, appearance_name = CatAtlas(), "КІБЕРКІТ"
+        self.overlay.set_appearance(appearance_id, appearance_name, atlas)
+        self.settings.setValue("appearance", appearance_id)
+        for skin_id, action in self.appearance_actions.items():
+            action.setChecked(skin_id == appearance_id)
+        if self._tray is not None:
+            self._tray.setToolTip(f"B-12 · {appearance_name}")
+            self._tray.setIcon(self._icon())
 
     def _place_overlay(self) -> None:
         size = self.overlay.size()
@@ -128,6 +178,25 @@ class DesktopShell(QObject):
         self.open_chat_action.triggered.connect(self.show_chat)
         self.new_chat_action = menu.addAction("＋ НОВА РОЗМОВА")
         self.new_chat_action.triggered.connect(self._new_chat)
+        menu.addSeparator()
+        appearance_menu = menu.addMenu("ВИГЛЯД COMPANION")
+        self.appearance_actions = {}
+        self.appearance_group = QActionGroup(self)
+        self.appearance_group.setExclusive(True)
+        for option in self.skin_options:
+            action = appearance_menu.addAction(option.display_name)
+            action.setCheckable(True)
+            action.setChecked(option.id == self.overlay.appearance_id)
+            self.appearance_group.addAction(action)
+            action.triggered.connect(
+                lambda checked=False, skin_id=option.id: (
+                    self.set_appearance(skin_id) if checked else None
+                )
+            )
+            self.appearance_actions[option.id] = action
+        if "capri" not in self.skin_by_id:
+            unavailable = appearance_menu.addAction("Capri: локальний пак не встановлено")
+            unavailable.setEnabled(False)
         menu.addSeparator()
         self.pet_action = menu.addAction("ЗАСНУТИ / ПРОКИНУТИСЯ")
         self.pet_action.triggered.connect(self.toggle_pet)

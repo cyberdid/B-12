@@ -661,3 +661,15 @@ Desktop X11 smoke був ізольований через тимчасові st
 ## [2026-11-08] publish | Desktop companion PR #2
 
 За дорученням власника гілку `feat/b12-desktop-companion` опубліковано в `cyberdid/B-12`; відкрито [PR #2](https://github.com/cyberdid/B-12/pull/2) із базою `feat/b12-runtime`, який stacked на [PR #1](https://github.com/cyberdid/B-12/pull/1). GitHub metadata підтвердила `open`, `mergeable=true`, `draft=false`; PR не злито. Коли PR #1 буде merged, PR #2 треба retarget на `main`.
+
+## [2026-11-08] correction | Capri — основний вигляд desktop-компаньйона
+
+Власник уточнив, що йдеться про окрему графічну Qt-програму, а не TUI; Capri має бути основним виглядом, Кіберкіт — опційним. У desktop shell це забезпечує вибір Capri для нового профілю, коли локальний артпак валідний, із збереженням явного вибору користувача через `QSettings`; на цій машині Capri вже активна. Кіберкіт доступний у меню вигляду. Джерело арту — pinned Linux fork, pack лишається поза Git через виключення Capri/Cyberpunk IP з upstream LICENSE; див. [тему](topics/desktop-companion.md), [план](project/desktop-companion-plan.md) та [Q20](project/open-questions.md).
+
+Робота виконана поверх desktop commit `c4a93a3`; злиття локального `main`, яке занесло б нецільові TUI зміни, скасовано. `src/b12/tui/` не входить до цього diff. Qt-вікно `B-12 · CAPRI` 300×410 зараз відображається на X11; попередня ручна перевірка підтвердила перемикання Capri ↔ Кіберкіт і збереження Capri після перезапуску. B-12 model, microphone, speaker та GPU не запускалися. Ці локальні зміни ще не опубліковані.
+
+## [2026-11-08] lint | Capri-first Qt desktop
+
+Статичні перевірки desktop-змін пройшли: `ruff check`, `ruff format --check`, `uv lock --check`, `py_compile`, JSON parse для `raw/source-manifest.json` та `git diff --check`. Import smoke з `--extra desktop` виявив лише manifest-вигляди `['capri', 'cybercat']` у такому порядку й не імпортував `b12.tui` або Textual. На X11 після перезапуску тільки Qt-клієнта лишилося видиме вікно `B-12 · CAPRI` 300×410; loopback API health — HTTP 200. Автоматизовані тести не запускалися.
+
+Wiki перевірка: усі 43 сторінки індексовані; десять змінених Markdown-сторінок мають 0 нових битих локальних шляхів і `sources`. Виявлено одне давнє посилання журналу на відсутній `artifacts/task15-soak-2026-10-26-run2/events.jsonl`; воно вже є в базовому `HEAD` і не стосується Capri-змін.

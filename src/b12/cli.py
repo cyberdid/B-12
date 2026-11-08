@@ -724,7 +724,7 @@ async def cmd_desktop(args, settings) -> int:
         from b12.desktop.app import run_desktop
         from b12.desktop.client import DesktopApiError
     except ModuleNotFoundError as exc:
-        if exc.name and exc.name.startswith("PySide6"):
+        if exc.name and (exc.name.startswith("PySide6") or exc.name == "PIL"):
             emit_json({"error": "desktop_extra_missing", "hint": "uv sync --extra desktop"})
             return 1
         raise
@@ -820,7 +820,9 @@ def parser() -> argparse.ArgumentParser:
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
-    desktop = sub.add_parser("desktop", help="кіберкіт і desktop-компаньйон (optional Qt extra)")
+    desktop = sub.add_parser(
+        "desktop", help="графічний Capri / Кіберкіт компаньйон (optional Qt extra)"
+    )
     desktop.add_argument("--url", default=os.environ.get("B12_API_URL", "http://127.0.0.1:8712"))
     desktop.add_argument("--persist", action="store_true", help="початково ввімкнути довгий хід")
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")

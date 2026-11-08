@@ -22,13 +22,21 @@ tags: [progress, next]
 
 ## Поточний стан (2026-11-08)
 
-- **Перевірений факт:** desktop-функцію реалізовано у `feat/b12-desktop-companion`, що наразі стоїть поверх `feat/b12-runtime` на `3e7fb07`; merge-base обох із `main` — `5f6ba90`. Runtime зміни вже входять у відкритий PR #1, тому desktop PR потрібно базувати на `feat/b12-runtime` до злиття PR #1. README, desktop guide і план описують optional Qt оболонку, B-12 atlas, tray, sessions/chat/history, streamed turns, exact approval, memory/consent і voice mute/status.
+- **Перевірений факт:** desktop-функцію реалізовано у `feat/b12-desktop-companion`, що наразі стоїть поверх `feat/b12-runtime` на `3e7fb07`; merge-base обох із `main` — `5f6ba90`. Runtime зміни вже входять у відкритий PR #1, тому desktop PR потрібно базувати на `feat/b12-runtime` до злиття PR #1. README, desktop guide і план описують окрему optional Qt оболонку: Capri як початковий вигляд за наявності локального паку, а вбудований Кіберкіт — як опційний вигляд; також tray, sessions/chat/history, streamed turns, exact approval, memory/consent і voice mute/status.
 - **Перевірений факт:** [Desktop PR #2](https://github.com/cyberdid/B-12/pull/2) відкритий, mergeable і базується на `feat/b12-runtime`; після злиття PR #1 його слід retarget на `main`. PR #2 не злитий.
 - **Перевірений факт:** після втрати потоку відомого turn клієнт зберігає lock, пропонує cancel і звіряє точний стан через owner-scoped `GET /api/turns/{id}/status`. Запит має перевірку власника; тільки `active=false` розблоковує composer і запускає reload історії. Подробиці — у [темі](../topics/desktop-companion.md) та [архітектурному огляді API](../topics/cli-server-mode.md).
 - **Перевірений факт:** після recovery/visual regression fixes повний locked suite — 742 passed / 4 skipped за 151,69 с. Фінальні Ruff, lock check, `git diff --check`, sdist/wheel build і склад wheel наведені у фінальному записі [журналу](../log.md).
 - **Перевірений факт:** окремий host smoke запустив лише desktop-клієнт на X11 з ізольованими `XDG_CONFIG_HOME`/`B12_STATE_DIR`, фіктивним токеном і тестовою адресою без API listener. X.Org 21.1.11 відобразив вікно 244×272 у 32-bit TrueColor visual; Qt повернув `QSystemTrayIcon.isSystemTrayAvailable() == true`. Клієнт зупинився за timeout; звичайний user config лишився відсутнім/незмінним. Живі server, model, microphone, audio playback і GPU workload не запускались; уже наявний Ollama не змінювався.
 - **Перевірений факт:** offscreen Qt preview виявив і відтворив білий порожній approval surface (`#efefef`); stylesheet fix має pixel-level regression test на темний `#0a1020` фон. CUA native app inventory у цій сесії порожній, тому screenshot фактичного compositor/tray і mouse interaction не підтверджені.
 - **Потребує перевірки:** взаємодія з tray і window manager на реальному desktop, Wayland, чисте системне пакування та тривалий живий model stream. Сам факт X11 window map і доступності tray API не підтверджує повний native UX.
+
+### Capri appearance update (2026-11-08)
+
+- **Вимога власника:** окреме графічне Qt-вікно має починатися з Capri, а Кіберкіт є опційною альтернативою. Це не доручення змінювати або запускати TUI.
+- **Перевірений факт:** додано validated local atlas renderer, збереження вигляду в `QSettings`, перемикач у контекстному меню і tray; desktop завантажує `b12.skins` без Textual/TUI modules. `scripts/import-capri-skin.py` зібрав 60 анімаційних кадрів і три пози з pinned `nic0dvornikov/capricorn-linux` у приватний pack `~/.local/share/b12/skins/capri`. RGBA atlas: 8×8 клітинок, 249×380 кожна, 676,721 bytes; art поза Git.
+- **Перевірений факт:** X11 на `DISPLAY=:1` (2560×1600) показав viewable вікно `B-12 · CAPRI` 300×410. Context menu вручну перемкнув Capri → Кіберкіт → Capri; після перезапуску клієнта Capri лишилася вибраною. Loopback API health — HTTP 200.
+- **Перевірений факт:** уточнення власника стосується тільки графічного Qt-компаньйона; TUI не є цільовим інтерфейсом цієї зміни. Відгалуження лишається на desktop commit `c4a93a3` без злиття локального `main`; нові Capri-зміни поки локальні й не опубліковані. `src/b12/tui/` у цьому diff не змінювався.
+- **Межі:** upstream assistant code не запускався; чат, model inference, microphone capture, speaker playback і GPU не використовувалися. LICENSE виключає Capri/Cyberpunk artwork, тому локальне доручення не є правом на поширення; див. [Q20](open-questions.md). Automated tests не запускалися; статичні перевірки зафіксовані в [журналі](../log.md).
 
 ## Поточний стан (2026-11-07)
 

@@ -69,6 +69,7 @@ dependencies = [
 
 [package.optional-dependencies]
 desktop = [
+    { name = "pillow" },
     { name = "pyside6-essentials" },
 ]
 dev = [
@@ -96,6 +97,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6,<4" },
     { name = "numpy", specifier = ">=1.26,<3" },
     { name = "onnxruntime", marker = "extra == 'voice'", specifier = ">=1.19,<2" },
+    { name = "pillow", marker = "extra == 'desktop'", specifier = ">=13,<14" },
     { name = "pillow", marker = "extra == 'tui'", specifier = ">=13,<14" },
     { name = "piper-tts", marker = "extra == 'voice'", specifier = ">=1.2,<2" },
     { name = "pydantic", specifier = ">=2.10,<3" },

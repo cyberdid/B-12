@@ -1,7 +1,7 @@
 # B-12 Desktop Capri Skin — Design
 
 **Date:** 2026-11-08  
-**Status:** owner-authorized implementation  
+**Status:** implemented locally; native visual acceptance pending
 **Owner request:** use the original Capri visual in the separate desktop companion, while keeping the cybercat available as an optional choice.
 
 ## Goal
@@ -14,6 +14,7 @@ The native desktop companion can display Capri or the B-12 cybercat. When a vali
 - `B12_CAPRI_DIR` selects the local pack. For compatibility, the existing `B12_TUI_CAPRI_DIR` is also recognized. The pack stays under user data and outside Git.
 - The saved `QSettings` choice is used when available. A fresh install selects Capri if the pack validates; if it is missing or invalid, the app remains usable with the cybercat and reports the fallback in the menu.
 - A local import helper may assemble an atlas from the pinned Capricorn Linux image frames. It copies only image data and provenance metadata to the external user-data directory. It never runs the source project's setup, assistant, voice, or computer-control code.
+- The imported atlas uses the 60 `assets/anim/capri` RGBA frames and three selected poses. The separate eye animation is not composited because the reviewed slice does not provide a validated registration/mapping between those frames and the Capri body.
 - The upstream repo's MIT license covers its code but explicitly excludes Capri character art. The visual pack is therefore excluded from B-12 source control and distribution; the local use is recorded with the exact source revision and license boundary.
 
 ## Scope and safety

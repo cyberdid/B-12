@@ -1,4 +1,4 @@
-"""Transparent desktop cybercat using the approved B-12 sprite atlas."""
+"""Transparent desktop companion with the built-in cat and optional local skins."""
 
 from __future__ import annotations
 
@@ -7,8 +7,10 @@ from collections import OrderedDict
 from pathlib import Path
 
 from PySide6.QtCore import QPoint, QRect, QRectF, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QImage, QPainter, QPen
+from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPen
 from PySide6.QtWidgets import QApplication, QWidget
+
+from b12.skins import SkinManifest
 
 PHASES = {
     "idle": ("ПОРУЧ ІЗ ТОБОЮ", "Я тут. Я слухаю.", "#69f4df"),
@@ -124,28 +126,94 @@ class CatAtlas:
         return image
 
 
-class CyberCatOverlay(QWidget):
-    """Small non-activating, topmost pet overlay; all reactions stay presentation-only."""
+class QtPackAtlas:
+    """Render a validated shared manifest atlas without TUI's opaque background."""
+
+    def __init__(self, manifest: SkinManifest):
+        self.manifest = manifest
+        source = QImage(str(manifest.atlas_path))
+        if source.isNull():
+            raise ValueError("skin_atlas_unreadable")
+        self.sheet = source.convertToFormat(QImage.Format.Format_RGBA8888)
+        expected = (
+            manifest.frame_width * manifest.columns,
+            manifest.frame_height * manifest.rows,
+        )
+        if (self.sheet.width(), self.sheet.height()) != expected:
+            raise ValueError("skin_atlas_dimensions_changed")
+        self._cache: OrderedDict[int, QImage] = OrderedDict()
+
+    def frame(
+        self,
+        *,
+        phase: str,
+        frame: int,
+        look_x=0,
+        look_y=0,
+        purring=False,
+        motion=True,
+    ) -> QImage:
+        phases = self.manifest.phases
+        reaction = ""
+        if purring and "purr" in phases:
+            reaction = "purr"
+        elif phase in ("idle", "typing"):
+            if look_x:
+                reaction = "look_left" if look_x < 0 else "look_right"
+            elif look_y:
+                reaction = "look_up" if look_y < 0 else "look_down"
+        sequence = phases.get(reaction) or phases.get(phase) or phases["idle"]
+        offset = frame * 120 // self.manifest.frame_duration_ms if motion else 0
+        index = sequence[offset % len(sequence)]
+        cached = self._cache.get(index)
+        if cached is not None:
+            self._cache.move_to_end(index)
+            return cached
+        manifest = self.manifest
+        cell = QRect(
+            index % manifest.columns * manifest.frame_width,
+            index // manifest.columns * manifest.frame_height,
+            manifest.frame_width,
+            manifest.frame_height,
+        )
+        image = self.sheet.copy(cell)
+        if len(self._cache) >= 48:
+            self._cache.popitem(last=False)
+        self._cache[index] = image
+        return image
+
+
+class CompanionOverlay(QWidget):
+    """Small non-activating, topmost pet overlay; reactions stay presentation-only."""
 
     open_chat = Signal()
     menu_requested = Signal(QPoint)
     position_changed = Signal(QPoint)
     phase_changed = Signal(str)
 
-    def __init__(self, *, atlas: CatAtlas | None = None, parent=None):
+    def __init__(
+        self,
+        *,
+        atlas: CatAtlas | QtPackAtlas | None = None,
+        appearance_id: str = "cybercat",
+        appearance_name: str = "КІБЕРКІТ",
+        parent=None,
+    ):
         flags = (
             Qt.WindowType.Tool
             | Qt.WindowType.FramelessWindowHint
             | Qt.WindowType.WindowStaysOnTopHint
         )
         super().__init__(parent, flags)
-        self.setObjectName("b12CyberCatOverlay")
-        self.setWindowTitle("B-12 · Кіберкіт")
-        self.setAccessibleName("B-12, кіберкіт")
+        self.setObjectName("b12CompanionOverlay")
+        self.appearance_id = appearance_id
+        self.appearance_name = appearance_name
+        self.setWindowTitle(f"B-12 · {appearance_name}")
+        self.setAccessibleName(f"B-12, {appearance_name}")
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
         self.setMouseTracking(True)
-        self.setFixedSize(244, 272)
+        self.setFixedSize(300, 410)
         self.atlas = atlas or CatAtlas()
         self.phase = "idle"
         self.detail = ""
@@ -176,6 +244,19 @@ class CyberCatOverlay(QWidget):
 
     def toggle_motion(self) -> None:
         self.motion = not self.motion
+        self.update()
+
+    def set_appearance(
+        self,
+        appearance_id: str,
+        appearance_name: str,
+        atlas: CatAtlas | QtPackAtlas,
+    ) -> None:
+        self.appearance_id = appearance_id
+        self.appearance_name = appearance_name
+        self.atlas = atlas
+        self.setWindowTitle(f"B-12 · {appearance_name}")
+        self.setAccessibleName(f"B-12, {appearance_name}")
         self.update()
 
     def _tick(self) -> None:
@@ -209,15 +290,54 @@ class CyberCatOverlay(QWidget):
             purring=time.monotonic() < self._reaction_until,
             motion=self.motion,
         )
-        painter.drawImage(QRectF(12, 0, 220, 220), image)
-        card = QRectF(17, 220, 210, 45)
-        painter.setPen(QPen(QColor(accent), 1.2))
-        painter.setBrush(QColor(8, 13, 27, 218))
-        painter.drawRoundedRect(card, 9, 9)
-        painter.setPen(QColor(accent))
-        painter.drawText(QRectF(25, 224, 194, 17), Qt.AlignmentFlag.AlignCenter, title)
-        painter.setPen(QColor("#c4cce0"))
-        painter.drawText(QRectF(25, 241, 194, 18), Qt.AlignmentFlag.AlignCenter, caption[:30])
+        image_area = QRectF(14, 2, 272, 334)
+        scale = min(image_area.width() / image.width(), image_area.height() / image.height())
+        draw_width = image.width() * scale
+        draw_height = image.height() * scale
+        image_rect = QRectF(
+            image_area.center().x() - draw_width / 2,
+            image_area.center().y() - draw_height / 2,
+            draw_width,
+            draw_height,
+        )
+        if isinstance(self.atlas, QtPackAtlas) and not any(
+            direction in self.atlas.manifest.phases
+            for direction in ("look_left", "look_right", "look_up", "look_down")
+        ):
+            # Keep cursor feedback for packs without registered eye/gaze frames.
+            image_rect.translate(self.look_x * 3, self.look_y * 2)
+        if self.phase == "sleeping":
+            painter.setOpacity(0.58)
+        painter.drawImage(image_rect, image)
+        painter.setOpacity(1.0)
+        card = QRectF(20, 344, 260, 52)
+        if self.appearance_id == "capri":
+            path = QPainterPath()
+            path.moveTo(card.left() + 13, card.top())
+            path.lineTo(card.right(), card.top())
+            path.lineTo(card.right(), card.bottom() - 12)
+            path.lineTo(card.right() - 12, card.bottom())
+            path.lineTo(card.left(), card.bottom())
+            path.lineTo(card.left(), card.top() + 13)
+            path.closeSubpath()
+            painter.setPen(QPen(QColor("#ff0054"), 1.6))
+            painter.setBrush(QColor(8, 5, 16, 230))
+            painter.drawPath(path)
+            title_color = QColor("#00ef83")
+            caption_color = QColor("#f1e8f2")
+            painter.setPen(QPen(QColor("#00ef83"), 2))
+            painter.drawLine(232, 352, 249, 352)
+            painter.drawLine(254, 352, 261, 352)
+        else:
+            painter.setPen(QPen(QColor(accent), 1.2))
+            painter.setBrush(QColor(8, 13, 27, 218))
+            painter.drawRoundedRect(card, 9, 9)
+            title_color = QColor(accent)
+            caption_color = QColor("#c4cce0")
+        painter.setPen(title_color)
+        painter.drawText(QRectF(30, 347, 220, 18), Qt.AlignmentFlag.AlignLeft, title)
+        painter.setPen(caption_color)
+        painter.drawText(QRectF(30, 366, 232, 22), Qt.AlignmentFlag.AlignLeft, caption[:36])
         painter.end()
 
     def mousePressEvent(self, event) -> None:  # noqa: N802 - Qt virtual
@@ -255,3 +375,7 @@ class CyberCatOverlay(QWidget):
             event.accept()
             return
         super().mouseReleaseEvent(event)
+
+
+# Compatibility for callers which used the original class name.
+CyberCatOverlay = CompanionOverlay

@@ -1,8 +1,8 @@
 ---
 type: source-review
-updated: 2026-11-07
+updated: 2026-11-08
 status: reviewed
-sources: [raw/source-manifest.json, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md]
+sources: [raw/source-manifest.json, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, docs/superpowers/specs/2026-11-08-b12-desktop-capri-skin-design.md]
 tags: [desktop, companion, cybercat, github, licensing]
 ---
 # Capri / Capricorn desktop-компаньйони — огляд 07.11.2026
@@ -28,3 +28,11 @@ tags: [desktop, companion, cybercat, github, licensing]
 - **Пропозиція:** desktop shell огортає ці API можливості, не створює другий agent. Анімація інформує користувача, не створює model/tool calls.
 - **Вимога з brief/AGENTS:** local-first; permission/consent на контрольному шляху; один runtime-owner; mic/audio не запускається без явної дії; art має provenance.
 - **Потребує перевірки:** X11 compositing/topmost/tray на цільовому хості; Wayland; desktop packaging; довгі streaming/error cycles. Огляд не підтверджує Windows/macOS сумісність.
+
+## Додаткове джерело Capri image assets — 08.11.2026
+
+**Перевірений факт:** для окремої вимоги власника щодо desktop-вигляду відкрито [nic0dvornikov/capricorn-linux](https://github.com/nic0dvornikov/capricorn-linux) на pinned commit [`7752959e7a708bac5b540d5380321c33694f6fb6`](https://github.com/nic0dvornikov/capricorn-linux/tree/7752959e7a708bac5b540d5380321c33694f6fb6). Перевірено README, LICENSE, назви/розміри/режим PNG у `assets/poses`, `assets/anim/capri` та `assets/anim/eyes`; локально переглянуто кадри для вибору sequence. Перевірка обмежена цими матеріалами: повний repo не аудитувався, code/setup/assistant/voice/control не запускалися, upstream archive у `raw/` не зберігався.
+
+У pinned зрізі `assets/anim/capri` має 60 прозорих RGBA кадрів 249×380; `assets/poses` має три PNG, серед них `capri.png` 1692×1440 і `capri_roam.png` 683×700. B-12 локальний імпортер збирає їх у manifest atlas поза репозиторієм. Eye sequence не композититься, оскільки у переглянутому зрізі немає перевіреної body registration map. Це окрема desktop-інтеграція; TUI не отримує цей pack автоматично.
+
+**Межа ліцензії:** upstream [LICENSE](https://github.com/nic0dvornikov/capricorn-linux/blob/7752959e7a708bac5b540d5380321c33694f6fb6/LICENSE) поширює MIT на код, але прямо виключає Capri character/Cyberpunk IP. Власник доручив локальний приватний preview; це не підтверджує авторські права чи ліцензію на арт і не дозволяє його повторне поширення. Pack, atlas і PNG не комітяться та не входять у release; зовнішній web snapshot не зберігався.

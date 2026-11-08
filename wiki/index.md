@@ -39,7 +39,7 @@ tags: [navigation]
 | [Порівняння з NVIDIA Reachy Jetson](topics/reachy-jetson-comparison.md) | Їхній голос і зір, наш контроль дій і пам'ять; ризики й розбіжності у джерелах |
 | [CLI і запущений сервер](topics/cli-server-mode.md) | Один власник runtime: API при запущеному сервері, лок без нього; зіставлення команд і ендпоінтів |
 | [Кіберпанковий TUI та кіберкіт](topics/cyberpunk-tui.md) | Анімований pet, mouse/keyboard reactions, адаптивний layout і offline preview |
-| [Desktop-компаньйон](topics/desktop-companion.md) | Qt кіберкіт, tray, authenticated API клієнт, дозволи й межі платформи |
+| [Desktop-компаньйон](topics/desktop-companion.md) | Окреме Qt-вікно Capri/Кіберкіт, tray, authenticated API і дозволи |
 | [Модель доказів (A-10)](topics/evidence-model.md) | Спогади з посиланням на документи, міграція v1→v2 з резервною копією, застарілість і життєвий цикл |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
@@ -63,7 +63,7 @@ tags: [navigation]
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
 | [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
-| [Capri / Capricorn desktop-компаньйони](sources/capri-desktop-companions-2026-11-07.md) | Чотири pinned repositories, ліцензії, Qt reference та рішення для B-12 |
+| [Capri / Capricorn desktop-компаньйони](sources/capri-desktop-companions-2026-11-07.md) | Чотири задані repositories й окремий Linux art fork, Qt UX та межі ліцензії |
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 

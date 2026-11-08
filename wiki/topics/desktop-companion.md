@@ -2,14 +2,14 @@
 type: topic
 updated: 2026-11-08
 status: compiled
-sources: [wiki/sources/capri-desktop-companions-2026-11-07.md, docs/desktop-companion.md, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, src/b12/api.py]
-tags: [desktop, companion, Qt, cybercat]
+sources: [wiki/sources/capri-desktop-companions-2026-11-07.md, docs/desktop-companion.md, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, docs/superpowers/specs/2026-11-08-b12-desktop-capri-skin-design.md, src/b12/skins.py, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, src/b12/api.py]
+tags: [desktop, companion, Qt, Capri, cybercat]
 ---
 # Desktop-компаньйон B-12
 
 ## Висновок
 
-**Пропозиція, реалізована у feature worktree:** нативна Qt оболонка поверх чинного B-12 API дає плаваючого кіберкота, чат, tray і owner control без другого agent/runtime. Порівняння чотирьох референсів і ліцензійні межі наведені у [source review](../sources/capri-desktop-companions-2026-11-07.md); налаштування описані у [desktop guide](../../docs/desktop-companion.md).
+**Вимога власника:** у графічному desktop-компаньйоні основним виглядом має бути оригінальна Capri, а Кіберкіт — доступною опцією. **Перевірений факт у коді:** Qt shell тепер підтримує обидва варіанти, перемикач у tray/context menu та збереження вибору; за наявності валідного локального pack новий профіль починає з Capri. Це окрема графічна програма, не TUI. Порівняння референсів і межі прав наведені у [source review](../sources/capri-desktop-companions-2026-11-07.md); спосіб встановлення — у [desktop guide](../../docs/desktop-companion.md).
 
 ## Межі архітектури
 
@@ -22,7 +22,9 @@ tags: [desktop, companion, Qt, cybercat]
 
 ## UX
 
-Cybercat використовує власний B-12 atlas із TUI. Прозорий topmost overlay підтримує кліки, перетягування й обмежений погляд за поточною позицією pointer; він опитує координату через Qt кожні 120 мс, без глобального input hook. Чат має вкладки розмови, пам’яті та стану системи. Всі API I/O та streaming винесені у worker pool.
+Capri відображається з локального manifest atlas із прозорими RGBA кадрами; арт-пак зберігається поза Git у `~/.local/share/b12/skins/capri`. Вбудований Кіберкіт лишається в меню вибору. Для Capri додано вузьку неоново-рожеву/зелену плашку візуального статусу, а кадри малюються зі збереженням пропорцій. Прозорий topmost overlay підтримує кліки, перетягування й обмежений погляд за поточною позицією pointer; координату він опитує через Qt кожні 120 мс, без глобального input hook. Чат має вкладки розмови, пам’яті та стану системи. Всі API I/O та streaming винесені у worker pool.
+
+Імпортер створює приватний локальний pack лише з pinned `nic0dvornikov/capricorn-linux` revision `7752959e7a708bac5b540d5380321c33694f6fb6`; він не запускає upstream-програму. Її LICENSE явно виключає Capri character/Cyberpunk IP, тому цей локальний preview не означає наявності прав на поширення. Арт не входить до репозиторію, wheel або release; питання подальшого розповсюдження лишається відкритим у [Q20](../project/open-questions.md).
 
 Черга approvals навмисно не отримує аргументи через `/api/approvals`. Якщо tool args були отримані в поточному стрімі, transcript їх показує. Для черги, відновленої після перезапуску, UI явно попереджає про недоступність параметрів, не вигадуючи їх і не змінюючи API контракт.
 
@@ -36,6 +38,10 @@ Cybercat використовує власний B-12 atlas із TUI. Прозо
 
 **Перевірений факт:** X11 smoke на X.Org 21.1.11 створив видиме вікно 244×272 з 32-bit TrueColor visual; `QSystemTrayIcon.isSystemTrayAvailable()` повернув `true`. Запуск був із тимчасовим state/config, фіктивним токеном і порожнім локальним API endpoint; B-12 service/model/audio/GPU не запускався. Offscreen pixel regression виявив білий approval viewport системної палітри `#efefef`; після fix він має колір панелі `#0a1020`.
 
-**Потребує перевірки:** screenshot і pointer/tray interaction на реальному X11 compositor/window manager, Wayland behavior, чистий системний package install і довготривалий streaming із живим B-12 API. CUA native app inventory у цій сесії недоступний, тому X11 map metadata не замінює візуальний acceptance. Qt зазначає ARGB visual/compositing вимоги для translucent X11 top-level widgets; topmost — hint, залежний від window manager. Див. [Qt QWidget](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html), [Qt flags](https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html), [QSystemTrayIcon](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSystemTrayIcon.html).
+**Перевірений факт (2026-11-08):** Capri pack зібрано поза Git. На X11 `DISPLAY=:1` зафіксовано viewable Qt-вікно `B-12 · CAPRI` 300×410 на 2560×1600; збережено тимчасовий crop вікна, не повний desktop screenshot. Контекстне меню показало Capri і Кіберкіт; обидві зміни вигляду перевірено вручну, а після перезапуску persisted appearance лишився Capri. Клієнт був зібраний з `--extra desktop`, без імпорту TUI modules; API health повернув HTTP 200.
+
+**Потребує перевірки:** tray icon/menu interaction, Wayland behavior, topmost/drag acceptance на різних X11 window managers, чистий системний package install і довготривалий streaming із живим API. Qt зазначає ARGB visual/compositing вимоги для translucent X11 top-level widgets; topmost — hint, залежний від window manager. Див. [Qt QWidget](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QWidget.html), [Qt flags](https://doc.qt.io/qtforpython-6/PySide6/QtCore/Qt.html), [QSystemTrayIcon](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSystemTrayIcon.html).
+
+**Межа прав:** upstream LICENSE виключає персонажа Capri й Cyberpunk IP. Користувач попросив локальний приватний preview, але це не є правом на розповсюдження; pack не комітиться і не включається до release. Деталі походження — у [source card](../sources/capri-desktop-companions-2026-11-07.md), відкрите питання — [Q20](../project/open-questions.md).
 
 Детальний status і implementation checklist — у [project plan](../project/desktop-companion-plan.md); встановлення — у [guide](../../docs/desktop-companion.md).
