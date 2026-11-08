@@ -28,7 +28,8 @@ _EVENTS = {
     "antigravity": {
         "SessionStart": ("session_started", "started"),
         "PostToolUse": ("tool_completed", "completed"),
-        "PostInvocation": ("turn_completed", "completed"),
+        # One model invocation can be followed by more model/tool steps.
+        "PostInvocation": ("model_completed", "running"),
     },
 }
 

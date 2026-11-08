@@ -135,6 +135,21 @@ class ActivityStore:
         except (OSError, sqlite3.Error, ValueError, TypeError, OverflowError):
             return []
 
+    def recent(self, limit: int = 100) -> list[dict]:
+        """Newest retained events in ascending sequence order for initial UI history."""
+        try:
+            limit = min(1000, max(0, int(limit)))
+            if not limit:
+                return []
+            with self._connect() as connection, connection:
+                self._prune(connection, time.time())
+                rows = connection.execute(
+                    "SELECT * FROM events ORDER BY seq DESC LIMIT ?", (limit,)
+                ).fetchall()
+                return [dict(row) for row in reversed(rows)]
+        except (OSError, sqlite3.Error, ValueError, TypeError, OverflowError):
+            return []
+
     def clear(self) -> None:
         """Delete UI activity only; keep sequence monotonic for existing polling cursors."""
         with self._connect() as connection:
