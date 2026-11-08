@@ -1008,12 +1008,42 @@ def run_remote(args, settings) -> int:
         client.close()
 
 
+def _is_tui_hook(argv: list[str]) -> bool:
+    """Identify the command, without confusing config paths or chat text with it."""
+    skip_config_value = False
+    for value in argv:
+        if skip_config_value:
+            skip_config_value = False
+            continue
+        option = value.split("=", 1)[0]
+        # Match argparse's existing long-option abbreviation support as well.
+        if option.startswith("--") and "--config".startswith(option):
+            skip_config_value = "=" not in value
+            continue
+        if value.startswith("-"):
+            continue
+        return value == "tui-hook"
+    return False
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     # `b12 mcp add NAME --capability C -- server argv...`: everything after -- is the argv.
     server_argv = argv[argv.index("--") + 1 :] if "--" in argv else []
     argv = argv[: argv.index("--")] if "--" in argv else argv
-    args = parser().parse_args(argv)
+    if _is_tui_hook(argv):
+        # argparse normally prints and exits before reaching the hook handler.
+        # A misconfigured telemetry hook must also remain silent and successful.
+        import io
+        from contextlib import redirect_stderr, redirect_stdout
+
+        with redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+            try:
+                args = parser().parse_args(argv)
+            except SystemExit:
+                return 0
+    else:
+        args = parser().parse_args(argv)
     args.server_argv = server_argv
     try:
         settings = load_settings(args.config)
