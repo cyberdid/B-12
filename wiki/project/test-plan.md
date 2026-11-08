@@ -55,6 +55,7 @@ Textual `run_test` з **справжнім** `ApiClient` до живого се�
 - Загублений NDJSON після `turn_started`: запит status не стартує до успішного cancel acknowledgement; саме acknowledgement не розблоковує composer. Authenticated `GET /api/turns/{id}/status` має підтвердити `active=false`, а свіжий history response — успішно завантажитися.
 - Конкурентність: застарілі stream, history, approval, cancel і turn-status callbacks не змінюють новіший turn/session.
 - X11 host smoke: Qt window viewable 244×272, depth 32, tray API доступний; app запускався з offline dummy API і автоматично зупинений. Візуальний screenshot compositor/tray, клік/drag host acceptance і Wayland лишаються відкритими.
+- Pending approval: offline poll не стирає approval pose; reconnect із тим самим operation ID продовжує показувати очікування рішення.
 
 ## Рівень 5. Реальна модель (перед відповіддю «готово» і після змін агента)
 Фіксований набір із 6 задач, запуск з `B12_REAL_MODEL=1`. Кожна задача має критерій успіху, який перевіряє код, а не ми на око:

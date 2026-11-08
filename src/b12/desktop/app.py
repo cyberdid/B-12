@@ -202,7 +202,7 @@ class DesktopShell(QObject):
 
     def _notifications_ready(self, tag: str, result: dict) -> None:
         if not result.get("connected"):
-            if self.overlay.phase != "error":
+            if self.overlay.phase not in {"error", "approval"}:
                 self.overlay.set_phase("error", "API B-12 офлайн")
             return
         if self.overlay.phase == "error":

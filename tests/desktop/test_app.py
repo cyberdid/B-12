@@ -87,6 +87,38 @@ def test_shell_starts_pet_without_opening_chat_or_starting_voice(qapp):
     assert client.closed
 
 
+def test_pending_approval_pose_survives_offline_reconnect(qapp):
+    class OfflineClient:
+        base_url = "http://127.0.0.1:8712"
+
+        def health(self):
+            return False
+
+        def close(self):
+            pass
+
+    shell = DesktopShell(qapp, OfflineClient(), persist_default=False)
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline and shell._notification_job is not None:
+        qapp.processEvents()
+        time.sleep(0.01)
+    shell._last_approval_ids = {"op-pending"}
+    shell.overlay.set_phase("approval", "file_write")
+
+    shell._notifications_ready("notifications", {"connected": False, "approvals": []})
+    assert shell.overlay.phase == "approval"
+
+    shell._notifications_ready(
+        "notifications",
+        {
+            "connected": True,
+            "approvals": [{"operation_id": "op-pending", "name": "file_write"}],
+        },
+    )
+    assert shell.overlay.phase == "approval"
+    shell.shutdown()
+
+
 def test_sleep_and_wake_remain_available_without_a_system_tray(qapp):
     class OfflineClient:
         base_url = "http://127.0.0.1:8712"

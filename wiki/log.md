@@ -641,3 +641,15 @@ Wiki audit: 44 сторінки, 358 локальних Markdown-посилан�
 ## [2026-11-08] correction | Stacked desktop branch
 
 Перевірка `git log --graph --all` уточнила попередню примітку про ancestry: merge-base з `main` — `5f6ba90`, але прямий parent `feat/b12-desktop-companion` — runtime PR head `3e7fb07`. Desktop гілка містить зміни PR #1 разом із трьома власними desktop commits. Це навмисна залежність від runtime API/context роботи; desktop PR слід відкрити поверх `feat/b12-runtime`, щоб не дублювати runtime diff відносно `main`.
+
+## [2026-11-08] review-fix | Approval pose під час offline/reconnect
+
+Незалежний rereview виявив: offline notification змінював `approval` на `error`, але зберігав `_last_approval_ids`; після reconnect незмінний pending ID тому не повертав коту approval pose. Regression спершу впав саме на `error != approval`; fix зберігає approval phase поки API недоступний. Після reconnect із тим самим operation ID pose лишається approval, а після очищення server queue normal poll повертає кота до idle. Цільові app tests: 6 passed; повний suite треба оновити.
+
+## [2026-11-08] lint | Desktop companion final verification
+
+Повний locked suite після обох follow-up fixes: **742 passed / 4 skipped за 151,69 с**. `ruff check src tests`, `uv lock --check`, `git diff --check`, `uv build` пройшли. Wheel містить desktop chat/cat modules і B-12 cybercat atlas. Чотири skipped потребують явного `B12_REAL_MODEL=1`.
+
+Wiki audit: 44 сторінки, 358 локальних посилань, 0 битих якорів, 0 сторінок поза index. Лишилися 11 історичних links на відсутні benchmark artifacts та одна відсутня source snapshot path; нові сторінки/зміни не створили цих gaps. Master brief SHA-256 незмінний: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, збігається з manifest.
+
+Desktop X11 smoke був ізольований через тимчасові state/config і dummy token, без API listener. B-12 server/model, microphone, audio playback і GPU не запускались. Поточна desktop гілка стоїть поверх runtime PR #1 (`feat/b12-runtime` на `3e7fb07`); окремий desktop PR має target цього branch до злиття PR #1.
