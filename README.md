@@ -1,18 +1,28 @@
-# B-12
+# Capri
 
 <p align="center">
-  <img src="docs/images/b12-hero.jpg" alt="B-12 — автономний локальний ШІ-компаньйон" width="900">
+  <img src="docs/images/capri-hero.jpg" alt="Оригінальна ілюстрація Capri — локального AI-компаньйона B-12" width="100%">
 </p>
 
-Локальний ШІ-компаньйон з автобіографічною пам’яттю, реальними інструментами комп’ютера, доречною ініціативою та українською й англійською мовами. Надалі — фізична присутність через Reachy Mini.
+<p align="center"><sub>Оригінальна ілюстрація для B-12; приватний Capri sprite pack не використовується.</sub></p>
 
-Працює повністю локально: Ollama з моделлю NVIDIA **Nemotron Bolt E4B** (кандидат, модель змінна) на RTX 4060 Laptop 8 GB. Дані — у приватних SQLite-сховищах під контролем власника.
+[![Python 3.12–3.13](https://img.shields.io/badge/Python-3.12%E2%80%933.13-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-2ea44f.svg)](LICENSE)
+[![Platform: Linux](https://img.shields.io/badge/platform-Linux-59636e?logo=linux&logoColor=white)](docs/desktop-companion.md)
+
+**Capri** — локальний AI-компаньйон із пам’яттю, яку можна перевіряти й видаляти, реальними інструментами комп’ютера, доречною ініціативою та українською й англійською мовами. `b12` залишається внутрішньою назвою Python-пакета, CLI та runtime API заради сумісності. Наступний апаратний напрям — Reachy Mini.
+
+Модель змінна. Перевірений локальний шлях використовує Ollama; **Nemotron Bolt E4B — кандидат**, а не зафіксований остаточний вибір. Сховища й налаштування приватності керуються власником. Хмарний provider, якщо його окремо налаштувати, отримує текст запиту та переданий йому контекст.
+
+**Можливості:** пам’ять із джерелами та глобальним забуттям · інструменти з owner approval · пошук в інтернеті · голосовий стек · компактний Linux desktop · CLI, Web UI та TUI.
+
+<p align="center"><a href="#стан-реалізації">Стан</a> · <a href="#архітектура">Архітектура</a> · <a href="#результати-вимірювань">Вимірювання</a> · <a href="#термінальний-інтерфейс-b12-tui">TUI</a> · <a href="#desktop-компаньйон-b12-desktop">Desktop</a> · <a href="#швидкий-старт">Швидкий старт</a> · <a href="#документація">Документація</a></p>
 
 <p align="center">
-  <img src="docs/images/web-dark.png" alt="Web UI B-12: tool-виклики, підтвердження і скасування" width="900">
+  <img src="docs/images/web-dark.png" alt="Web UI Capri: tool-виклики, підтвердження і скасування" width="900">
 </p>
 
-> **Стан на 06.11.2026:** desktop runtime працює end-to-end із реальною моделлю. Реалізовано пам’ять зі згодою та глобальним забуттям, host tools і MCP (зокрема пошук в інтернеті через `web_search`), agent loop із режимом «Не зупинятися», CLI/API/Web/TUI, автономність, backup/restore та локальний голосовий шар (PTT, Silero VAD/endpoint, faster-whisper UA/EN, Piper TTS UA/EN, NLMS AEC, barge-in, speaker verification). Context admission повідомляє моделі про вилучену історію короткими позначеними уривками; обов’язковий контекст усе ще fail-closed при overflow. Модельний пошук пройшов один live smoke test; повний multi-file review на Bolt завершився `incomplete_coverage`, тож це обмеження зафіксоване. Фізичний Reachy/Jetson, 8-годинний акустичний soak і 30-денні докази ще попереду. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
+> **Стан на 08.11.2026:** B-12 runtime має CLI, owner-authenticated loopback API, Web UI, Textual TUI, пам’ять зі згодою та глобальним забуттям, host tools із контрольним каналом дозволів, MCP, автономність, backup/restore й програмний голосовий стек. Гілка Capri desktop додає компактну розмову, стильовий профіль, reminders, локальні системні панелі, launchers і activity hooks. Для нових desktop-змін пройшли статичні перевірки; повний test suite, живий модельний turn і host acceptance після цих змін ще не виконувалися. Попередній baseline — 742 passed / 4 skipped на попередній ревізії. Bolt E4B пройшов один окремий model-search smoke test; повний multi-file review позначений `incomplete_coverage`. Фізичний Reachy/Jetson, акустичний soak і 30-денні докази лишаються відкритими. Деталі — у [таблиці реалізації](#стан-реалізації) та [поточному статусі](wiki/project/status.md).
 
 ## Архітектура
 
@@ -169,7 +179,7 @@ Web UI обслуговується тим самим API зі строгим CS
 
 ### Термінальний інтерфейс (`b12 tui`)
 
-Кіберпанкова консоль на Textual: темний індиго, cyan/magenta акценти, окремі панелі розмов, чату та анімованого **кіберкота B-12**. Кіт стежить очима за мишкою, муркоче від кліку й реагує на набір повідомлення, очікування, відповідь, інструменти та підтвердження. Збережено локальний API, streaming, картки tools, пам’ять і перемикачі «Пам’ять» / «Не зупинятися».
+Кіберпанкова консоль на Textual: темний індиго, cyan/magenta акценти, окремі панелі розмов, чату та опційного анімованого кіберкота. Кіберкіт стежить очима за мишкою, муркоче від кліку й реагує на набір повідомлення, очікування, відповідь, інструменти та підтвердження; співрозмовник називається Capri. Збережено локальний API, streaming, картки tools, пам’ять і перемикачі «Пам’ять» / «Не зупинятися».
 
 ![TUI з растровим кіберкотом — Kitty, офлайн-демо](docs/images/tui-cybercat-raster.png)
 
@@ -192,11 +202,11 @@ uv run --no-sync python -m b12.tui.preview
 
 Клавіші: `Ctrl+N` нова розмова, `Ctrl+P` пам’ять/підтвердження, `Ctrl+K` погладити кота, `F2` навігація, `F8` пауза анімацій, `Esc` зупинити хід, `Ctrl+Q` вийти. Рекомендовано truecolor terminal від 120×36; компонування перевірено також на 80×24. NO_COLOR поважається. [Поведінка й межі](wiki/topics/cyberpunk-tui.md).
 
-Перевірено 2026-11-08: `uv run --locked --extra dev --extra tui --extra desktop --extra voice pytest -q` — 742 passed, 4 skipped за 151,69 с. Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
+На попередній ревізії 2026-11-08 повний suite дав 742 passed / 4 skipped за 151,69 с. Цей результат **не охоплює** пізніші Capri desktop additions. Пропущені сценарії потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`); нові desktop-зміни ще очікують окремого test run.
 
 ### Desktop-компаньйон (`b12 desktop`)
 
-Необов’язковий Linux desktop-клієнт показує прозорого кіберкота поверх вікон і відкриває окремий чат B-12. Є tray/menu, перетягування, погляд за курсором, реакції на стан ходу, історія сесій, потокові відповіді, скасування, точні approval/deny, керування пам’яттю та її згодою. Клієнт працює через наявний owner-authenticated loopback API — інструменти й дозволи лишаються під контролем runtime B-12.
+Необов’язковий Linux desktop-клієнт показує Capri або опційний Кіберкіт і відкриває компактну розмову біля персонажа. Є tray/menu, drag, погляд за курсором, реакції та незалежні від LLM анімації, історія сесій, streaming, cancel, exact approvals, reminders, локальні системні панелі, opt-in coding-agent activity hooks, профіль стилю, швидкі фрази й owner-managed launchers. Команди йдуть через звичайний `b12` chat та його grants/approval; клієнт не видає моделі нових прав. Профіль передається обраному model provider; з локальною моделлю він лишається на машині, з хмарною — надсилається provider. Повний перелік і межі — у [посібнику desktop](docs/desktop-companion.md).
 
 Для обірваного потоку composer лишається заблокованим до підтвердження cancel, завершення точного turn і успішного оновлення історії.
 
@@ -206,9 +216,9 @@ b12 serve --port 8712          # запусти окремо, якщо серв�
 b12 desktop --url http://127.0.0.1:8712
 ```
 
-Qt є optional extra; CLI/TUI не імпортують його у звичайному режимі. Desktop не запускає сервер або модель, не має автозапуску і не записує/відтворює аудіо. Перший цільовий сеанс — Linux/X11 із compositor; Wayland і фактична поведінка різних window managers потребують окремої перевірки. Деталі запуску й меж API — у [посібнику](docs/desktop-companion.md); стан реалізації та дослідження чотирьох референсів — у [wiki](wiki/project/desktop-companion-plan.md).
+Qt є optional extra; CLI/TUI не імпортують його у звичайному режимі. Desktop не запускає сервер чи модель і не записує/відтворює аудіо. Є preview-керування user-level autostart; воно вимкнене за замовчуванням і вимагає явного підтвердження. Перший цільовий сеанс — Linux/X11 із compositor; Wayland і різні window managers ще потребують окремої перевірки. Деталі запуску й меж API — у [посібнику](docs/desktop-companion.md); стан реалізації та дослідження референсів — у [wiki](wiki/project/desktop-companion-plan.md).
 
-X11 smoke підтвердив видиме 32-bit overlay-вікно й доступність Qt tray API; screenshot/drag/tray взаємодія на реальному compositor ще не прийняті.
+Попередній X11 smoke підтвердив видиме 32-bit overlay-вікно й доступність Qt tray API. Для останніх Capri additions реальні drag/tray/approval/system-action сценарії та Wayland не прийняті; повний suite не запускався.
 
 ## Швидкий старт
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 import json
+from collections.abc import Callable
 from functools import partial
 from urllib.parse import quote, unquote
 
@@ -78,6 +79,11 @@ class ChatWindow(QWidget):
 
     phase_changed = Signal(str, str)
     approval_requested = Signal(str, bool)
+    compact_close_requested = Signal()
+    expand_requested = Signal()
+    compact_actions_requested = Signal()
+    interaction_recorded = Signal(str)
+    reminder_candidate = Signal(str)
 
     def __init__(
         self,
@@ -91,10 +97,11 @@ class ChatWindow(QWidget):
         super().__init__(parent)
         self.client = client
         self.setObjectName("desktopChat")
-        self.setWindowTitle("B-12 · Neon Companion")
+        self.setWindowTitle("Capri · Neon Companion")
         self.setMinimumSize(620, 620)
         self.resize(760, 820)
         self.setStyleSheet(STYLE)
+        self._full_stylesheet = STYLE
         self._jobs: set[ApiJob] = set()
         self._entries: list[tuple[str, str]] = []
         self._tool_entries: dict[str, int] = {}
@@ -131,6 +138,11 @@ class ChatWindow(QWidget):
         self._auto_load = auto_load
         self._auto_poll = auto_poll
         self._persist_default = persist_default
+        self._companion_profile_provider: Callable[[], dict[str, object]] | None = None
+        self._compact_mode = False
+        self._compact_character_name = "CAPRI"
+        self._full_window_flags = self.windowFlags()
+        self._full_size = self.size()
         self._build_ui()
         self._poll_timer = QTimer(self)
         self._poll_timer.setInterval(5000)
@@ -150,6 +162,10 @@ class ChatWindow(QWidget):
         self.composer.textChanged.connect(self._composer_changed)
         self._send_shortcut = QShortcut(QKeySequence("Ctrl+Return"), self)
         self._send_shortcut.activated.connect(self.send_prompt)
+        self._compact_send_shortcut = QShortcut(QKeySequence("Return"), self.composer)
+        self._compact_send_shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+        self._compact_send_shortcut.activated.connect(self.send_prompt)
+        self._compact_send_shortcut.setEnabled(False)
         self.cancel_button.clicked.connect(self.cancel_turn)
         self.consent_toggle.toggled.connect(self.set_consent)
         self.memory_add_button.clicked.connect(self.add_memory)
@@ -157,31 +173,56 @@ class ChatWindow(QWidget):
         self.voice_mute_button.clicked.connect(self.toggle_voice_mute)
         self.phase_changed.connect(self._set_cat_phase)
 
+    def set_companion_profile_provider(
+        self, provider: Callable[[], dict[str, object]] | None
+    ) -> None:
+        """Set a local profile source; its values are sent only with the active chat request."""
+        self._companion_profile_provider = provider
+
     def _build_ui(self) -> None:
-        root = QVBoxLayout(self)
-        root.setContentsMargins(16, 14, 16, 14)
-        root.setSpacing(10)
+        self.root_layout = QVBoxLayout(self)
+        self.root_layout.setContentsMargins(16, 14, 16, 14)
+        self.root_layout.setSpacing(10)
         header = QHBoxLayout()
-        brand = QLabel("B-12  /  NEON COMPANION")
-        brand.setObjectName("brand")
-        header.addWidget(brand)
+        self.brand = QLabel("CAPRI  /  NEON COMPANION")
+        self.brand.setObjectName("brand")
+        header.addWidget(self.brand)
         header.addStretch(1)
         self.status_label = QLabel("◌  ПІДКЛЮЧЕННЯ…")
         self.status_label.setObjectName("status")
         self.status_label.setProperty("online", "false")
         header.addWidget(self.status_label)
-        root.addLayout(header)
+        self.compact_actions_button = QPushButton("⋯")
+        self.compact_actions_button.setToolTip("Нагадування, застосунки й швидкі фрази")
+        self.compact_actions_button.clicked.connect(self.compact_actions_requested.emit)
+        header.addWidget(self.compact_actions_button)
+        self.expand_button = QPushButton("⤢")
+        self.expand_button.setToolTip("Відкрити повний чат")
+        self.expand_button.clicked.connect(self.expand_requested.emit)
+        header.addWidget(self.expand_button)
+        self.compact_close_button = QPushButton("×")
+        self.compact_close_button.setToolTip("Згорнути розмову")
+        self.compact_close_button.clicked.connect(self.compact_close_requested.emit)
+        header.addWidget(self.compact_close_button)
+        for button in (
+            self.compact_actions_button,
+            self.expand_button,
+            self.compact_close_button,
+        ):
+            button.hide()
+        self.root_layout.addLayout(header)
 
         self.tabs = QTabWidget()
-        root.addWidget(self.tabs, 1)
+        self.root_layout.addWidget(self.tabs, 1)
         self._build_chat_tab()
         self._build_memory_tab()
         self._build_status_tab()
 
     def _build_chat_tab(self) -> None:
         page = QWidget()
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(12, 12, 12, 12)
+        self.chat_layout = QVBoxLayout(page)
+        self.chat_layout.setContentsMargins(12, 12, 12, 12)
+        layout = self.chat_layout
         sessions = QHBoxLayout()
         self.session_box = QComboBox()
         self.session_box.setMinimumWidth(240)
@@ -193,28 +234,28 @@ class ChatWindow(QWidget):
         self.transcript = QTextBrowser()
         self.transcript.setOpenLinks(False)
         self.transcript.setOpenExternalLinks(False)
-        self.transcript.setPlaceholderText("Тут з’явиться розмова з B-12.")
+        self.transcript.setPlaceholderText("Тут з’явиться розмова з Capri.")
         self.transcript.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         layout.addWidget(self.transcript, 1)
 
         self.approvals_title = QLabel("ПІДТВЕРДЖЕННЯ  ·  0")
         self.approvals_title.setObjectName("sectionTitle")
         layout.addWidget(self.approvals_title)
-        approval_scroll = QScrollArea()
-        approval_scroll.setObjectName("approvalScroll")
-        approval_scroll.setWidgetResizable(True)
-        approval_scroll.setMaximumHeight(112)
-        approval_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.approval_scroll = QScrollArea()
+        self.approval_scroll.setObjectName("approvalScroll")
+        self.approval_scroll.setWidgetResizable(True)
+        self.approval_scroll.setMaximumHeight(112)
+        self.approval_scroll.setFrameShape(QFrame.Shape.NoFrame)
         self.approval_host = QWidget()
         self.approval_host.setObjectName("approvalHost")
         self.approval_layout = QVBoxLayout(self.approval_host)
         self.approval_layout.setContentsMargins(0, 0, 0, 0)
         self.approval_layout.setSpacing(6)
-        approval_scroll.setWidget(self.approval_host)
-        layout.addWidget(approval_scroll)
+        self.approval_scroll.setWidget(self.approval_host)
+        layout.addWidget(self.approval_scroll)
 
         self.composer = QPlainTextEdit()
-        self.composer.setPlaceholderText("Напиши B-12…  ·  Ctrl+Enter надсилає")
+        self.composer.setPlaceholderText("Напиши Capri…  ·  Ctrl+Enter надсилає")
         self.composer.setMaximumHeight(96)
         layout.addWidget(self.composer)
         controls = QHBoxLayout()
@@ -233,10 +274,123 @@ class ChatWindow(QWidget):
         layout.addLayout(controls)
         self.tabs.addTab(page, "РОЗМОВА")
 
+    def set_compact_mode(self, compact: bool) -> None:
+        """Switch this same chat controller between full and pet-attached views."""
+        if self._compact_mode == compact:
+            return
+        was_visible = self.isVisible()
+        self._compact_mode = compact
+        if compact:
+            self._full_size = self.size()
+            self.setWindowFlags(
+                Qt.WindowType.Tool
+                | Qt.WindowType.FramelessWindowHint
+                | Qt.WindowType.WindowStaysOnTopHint
+            )
+            self.setWindowTitle("Capri · COMPANION")
+            self.setStyleSheet(
+                self._full_stylesheet
+                + "\nQWidget#desktopChat { border:2px solid #ff0054; border-radius:10px; }"
+                + "\nQLabel#brand { font-size:13px; letter-spacing:0; }"
+                + "\nQLabel#status { font-size:9px; padding:2px; }"
+                + "\nQPushButton { padding:5px 8px; }"
+            )
+            self.root_layout.setContentsMargins(10, 8, 10, 8)
+            self.root_layout.setSpacing(6)
+            self.chat_layout.setContentsMargins(8, 8, 8, 8)
+            self.setMinimumSize(330, 320)
+            self.resize(400, 400)
+            self.brand.setText(f"{self._compact_character_name} · CAPRI")
+            self.status_label.setMaximumWidth(98)
+            self.tabs.tabBar().hide()
+            for index in range(1, self.tabs.count()):
+                self.tabs.setTabVisible(index, False)
+            self.tabs.setCurrentIndex(0)
+            self.session_box.setMinimumWidth(90)
+            self.new_session_button.setText("＋")
+            self.new_session_button.setToolTip("Нова розмова")
+            self.composer.setMinimumHeight(44)
+            self.composer.setMaximumHeight(54)
+            self.composer.setPlaceholderText("Напиши Capri…  ·  Enter надсилає")
+            self.consent_toggle.setText("ПАМ’ЯТЬ")
+            self.persist_toggle.hide()
+            self.cancel_button.setText("СТОП")
+            self.send_button.setText("↗")
+            self.compact_actions_button.show()
+            self.expand_button.show()
+            self.compact_close_button.show()
+            self._compact_send_shortcut.setEnabled(True)
+            self._sync_compact_approval_visibility()
+        else:
+            self.setWindowFlags(self._full_window_flags)
+            self.setWindowTitle("Capri · Neon Companion")
+            self.setStyleSheet(self._full_stylesheet)
+            self.root_layout.setContentsMargins(16, 14, 16, 14)
+            self.root_layout.setSpacing(10)
+            self.chat_layout.setContentsMargins(12, 12, 12, 12)
+            self.setMinimumSize(620, 620)
+            self.resize(self._full_size.expandedTo(self.minimumSize()))
+            self.brand.setText("CAPRI  /  NEON COMPANION")
+            self.status_label.setMaximumWidth(16777215)
+            self.tabs.tabBar().show()
+            for index in range(1, self.tabs.count()):
+                self.tabs.setTabVisible(index, True)
+            self.session_box.setMinimumWidth(240)
+            self.new_session_button.setText("＋ НОВА")
+            self.new_session_button.setToolTip("")
+            self.composer.setMinimumHeight(0)
+            self.composer.setMaximumHeight(96)
+            self.composer.setPlaceholderText("Напиши Capri…  ·  Ctrl+Enter надсилає")
+            self.consent_toggle.setText("ПАМ’ЯТЬ")
+            self.persist_toggle.show()
+            self.cancel_button.setText("ЗУПИНИТИ")
+            self.send_button.setText("НАДІСЛАТИ  ↗")
+            self.compact_actions_button.hide()
+            self.expand_button.hide()
+            self.compact_close_button.hide()
+            self._compact_send_shortcut.setEnabled(False)
+            self.approval_title_visible(True)
+        if was_visible:
+            self.show()
+
+    def is_compact_mode(self) -> bool:
+        return self._compact_mode
+
+    def set_compact_character(self, name: str) -> None:
+        self._compact_character_name = name.strip().upper()[:18] or "COMPANION"
+        if self._compact_mode:
+            self.brand.setText(f"{self._compact_character_name} · CAPRI")
+
+    def is_user_busy(self) -> bool:
+        """Avoid showing a reminder toast while the owner is composing, reading, or waiting."""
+        if not self.isVisible():
+            return False
+        scrollbar = self.transcript.verticalScrollBar()
+        return bool(
+            self.composer.toPlainText().strip()
+            or scrollbar.value() < scrollbar.maximum() - 4
+            or self._active_turn_id
+            or self.pending_turn_id
+        )
+
+    def _sync_compact_approval_visibility(self) -> None:
+        self.approval_title_visible(not self._compact_mode or bool(self._approval_cards))
+
+    def approval_title_visible(self, visible: bool) -> None:
+        self.approvals_title.setVisible(visible)
+        self.approval_scroll.setVisible(visible)
+
+    def keyPressEvent(self, event) -> None:  # noqa: N802 - Qt virtual
+        if self._compact_mode and event.key() == Qt.Key.Key_Escape:
+            self.compact_close_requested.emit()
+            event.accept()
+            return
+        super().keyPressEvent(event)
+
     def _build_memory_tab(self) -> None:
         page = QWidget()
         layout = QVBoxLayout(page)
-        title = QLabel("ПАМ’ЯТЬ B-12")
+        title = QLabel("ПАМ’ЯТЬ CAPRI")
         title.setObjectName("sectionTitle")
         layout.addWidget(title)
         self.memory_search = QLineEdit()
@@ -251,7 +405,7 @@ class ChatWindow(QWidget):
         layout.addLayout(add_row)
         self.memory_list = QListWidget()
         layout.addWidget(self.memory_list, 1)
-        note = QLabel("Джерело та керування пам’яттю лишаються на стороні B-12.")
+        note = QLabel("Джерело та керування пам’яттю контролює локальне ядро Capri.")
         note.setObjectName("mutedNote")
         layout.addWidget(note)
         self.tabs.addTab(page, "ПАМ’ЯТЬ")
@@ -262,7 +416,7 @@ class ChatWindow(QWidget):
         title = QLabel("СТАН СИСТЕМИ")
         title.setObjectName("sectionTitle")
         layout.addWidget(title)
-        self.runtime_summary = QLabel("Очікую на локальний API B-12…")
+        self.runtime_summary = QLabel("Очікую на локальний API Capri…")
         self.runtime_summary.setWordWrap(True)
         self.runtime_summary.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         layout.addWidget(self.runtime_summary)
@@ -455,7 +609,7 @@ class ChatWindow(QWidget):
             if not result.get("connected"):
                 self._set_connected(False)
                 self.runtime_summary.setText(
-                    "Локальний API недоступний. Переконайся, що сервер B-12 запущений."
+                    "Локальний API недоступний. Переконайся, що ядро Capri запущене."
                 )
             else:
                 self._set_connected(True)
@@ -465,7 +619,7 @@ class ChatWindow(QWidget):
                     self.bootstrap()
                 status = result.get("status", {})
                 self.runtime_summary.setText(
-                    "B-12 працює · "
+                    "CAPRI ONLINE · "
                     f"активні ходи: {status.get('active_turns', 0)} · "
                     f"підтвердження: {status.get('pending_approvals', 0)} · "
                     f"збережені snapshots: {status.get('snapshots', 0)}"
@@ -501,6 +655,7 @@ class ChatWindow(QWidget):
         elif tag == "voice_mute":
             self._voice_muted = bool(result.get("muted"))
             self.request_voice_status()
+
     @Slot(str, str)
     def _on_job_error(self, tag: str, code: str) -> None:
         if tag == "poll" or tag.startswith("poll:"):
@@ -602,7 +757,7 @@ class ChatWindow(QWidget):
             self._apply_deferred_context_refresh()
 
     def _set_connected(self, connected: bool) -> None:
-        self.status_label.setText("●  API B-12 ONLINE" if connected else "○  API B-12 OFFLINE")
+        self.status_label.setText("●  CAPRI CORE ONLINE" if connected else "○  CAPRI CORE OFFLINE")
         self.status_label.setProperty("online", "true" if connected else "false")
         self.status_label.setProperty("error", "false")
         self.status_label.style().unpolish(self.status_label)
@@ -769,7 +924,7 @@ class ChatWindow(QWidget):
             if role == "user":
                 self._append_entry("ТИ", item.get("content", ""))
             elif role == "assistant" and item.get("content"):
-                self._append_entry("B-12", item["content"])
+                self._append_entry("Capri", item["content"])
             elif role == "tool":
                 self._append_entry(
                     f"ІНСТРУМЕНТ · {item.get('tool_name', 'tool')}", item.get("content", "")
@@ -782,10 +937,7 @@ class ChatWindow(QWidget):
             or self.pending_turn_id
             or self._session_change_inflight
             or self._bootstrap_inflight
-            or (
-                self._current_session
-                and self._history_loading_session == self._current_session
-            )
+            or (self._current_session and self._history_loading_session == self._current_session)
         ):
             return
         self._session_before_change = self._current_session
@@ -823,6 +975,8 @@ class ChatWindow(QWidget):
         if self.pending_turn_id:
             self.status_label.setText("◈  СПЕРШУ ВИРІШИ ПОТОЧНЕ ПІДТВЕРДЖЕННЯ")
             return
+        self.reminder_candidate.emit(text)
+        self.interaction_recorded.emit("chat")
         self._append_entry("ТИ", text)
         self.composer.clear()
         self._assistant_index = None
@@ -833,10 +987,20 @@ class ChatWindow(QWidget):
         self.phase_changed.emit("thinking", "")
         session_id = self._current_session
         persist = self.persist_toggle.isChecked()
+        companion_profile = (
+            self._companion_profile_provider() if self._companion_profile_provider else None
+        )
         stream_tag = self._next_stream_tag("chat")
+
+        def stream(emit):
+            options = {"persist": persist, "on_event": emit}
+            if companion_profile is not None:
+                options["companion_profile"] = companion_profile
+            return self.client.stream_turn(session_id, text, **options)
+
         self._start_job(
             stream_tag,
-            lambda emit: self.client.stream_turn(session_id, text, persist=persist, on_event=emit),
+            stream,
             streaming=True,
         )
 
@@ -856,11 +1020,7 @@ class ChatWindow(QWidget):
 
     def _request_lost_turn_status(self) -> None:
         turn_id = self._stream_lost_turn_id
-        if (
-            not turn_id
-            or self._active_turn_id != turn_id
-            or self._turn_status_inflight
-        ):
+        if not turn_id or self._active_turn_id != turn_id or self._turn_status_inflight:
             return
         self._turn_status_sequence += 1
         sequence = self._turn_status_sequence
@@ -911,7 +1071,7 @@ class ChatWindow(QWidget):
         elif kind == "text_delta":
             self.phase_changed.emit("speaking", "")
             if self._assistant_index is None:
-                self._assistant_index = self._append_entry("B-12", "")
+                self._assistant_index = self._append_entry("Capri", "")
             role, current = self._entries[self._assistant_index]
             self._entries[self._assistant_index] = (role, current + str(event.get("text", "")))
             self._render_transcript()
@@ -983,7 +1143,7 @@ class ChatWindow(QWidget):
         turn_id = result.get("turn_id") or self._active_turn_id
         self._clear_cancel_requests(turn_id)
         if result.get("content") and self._assistant_index is None:
-            self._append_entry("B-12", str(result["content"]))
+            self._append_entry("Capri", str(result["content"]))
         if state == "awaiting_approval":
             self._approval_state_revision += 1
             self.pending_turn_id = turn_id
@@ -1019,14 +1179,19 @@ class ChatWindow(QWidget):
         return len(self._entries) - 1
 
     def _render_transcript(self) -> None:
+        scrollbar = self.transcript.verticalScrollBar()
+        follow_tail = scrollbar.value() >= scrollbar.maximum() - 4
+        previous_value = scrollbar.value()
         blocks = []
         for role, text in self._entries:
             safe = html.escape(text, quote=False) if text else "…"
             safe = safe.replace("![", r"!\[")
             blocks.append(f"### {html.escape(role)}\n\n{safe}")
         self.transcript.setMarkdown("\n\n---\n\n".join(blocks))
-        scrollbar = self.transcript.verticalScrollBar()
-        scrollbar.setValue(scrollbar.maximum())
+        if follow_tail:
+            scrollbar.setValue(scrollbar.maximum())
+        else:
+            scrollbar.setValue(min(previous_value, scrollbar.maximum()))
 
     def _upsert_approval(self, approval: dict) -> None:
         operation_id = str(approval.get("operation_id", ""))
@@ -1068,9 +1233,10 @@ class ChatWindow(QWidget):
             context_note = "API не надає параметри цього запиту. Перевір контекст перед рішенням."
         info.setText(
             f"{approval.get('name', 'дія')}  ·  {operation_id[-8:]}\n"
-            f"B-12 очікує на точне рішення власника.\n{context_note}"
+            f"Capri очікує на точне рішення власника.\n{context_note}"
         )
         self.approvals_title.setText(f"ПІДТВЕРДЖЕННЯ  ·  {len(self._approval_cards)}")
+        self._sync_compact_approval_visibility()
 
     def _render_approvals(self, approvals: list[dict]) -> None:
         active = {str(item.get("operation_id")): item for item in approvals}
@@ -1078,8 +1244,7 @@ class ChatWindow(QWidget):
             pending_present = any(
                 item.get("turn_id") == self.pending_turn_id for item in active.values()
             ) or any(
-                operation_id in self._decision_inflight
-                and turn_id == self.pending_turn_id
+                operation_id in self._decision_inflight and turn_id == self.pending_turn_id
                 for operation_id, turn_id in self._approval_turns.items()
             )
             if not pending_present:
@@ -1095,6 +1260,7 @@ class ChatWindow(QWidget):
             self._approval_sessions[operation_id] = item.get("session_id")
             self._upsert_approval(item)
         self.approvals_title.setText(f"ПІДТВЕРДЖЕННЯ  ·  {len(self._approval_cards)}")
+        self._sync_compact_approval_visibility()
         self._sync_send_state()
         self._sync_session_selector()
         self._sync_approval_actions()
@@ -1108,6 +1274,7 @@ class ChatWindow(QWidget):
         self._approval_sessions.pop(operation_id, None)
         self._approval_turns.pop(operation_id, None)
         self.approvals_title.setText(f"ПІДТВЕРДЖЕННЯ  ·  {len(self._approval_cards)}")
+        self._sync_compact_approval_visibility()
         self._sync_send_state()
         self._sync_approval_actions()
 
@@ -1184,6 +1351,21 @@ class ChatWindow(QWidget):
     def _set_cat_phase(self, phase: str, detail: str) -> None:
         self.setProperty("petPhase", phase)
         self.setProperty("petDetail", detail)
+        if self._compact_mode:
+            labels = {
+                "idle": "ПОРУЧ",
+                "typing": "СЛУХАЮ",
+                "thinking": "ДУМАЮ",
+                "speaking": "ВІДПОВІДАЮ",
+                "working": "ПРАЦЮЮ",
+                "approval": "ПІДТВЕРДИ",
+                "success": "ГОТОВО",
+                "error": "ОФЛАЙН",
+                "cancelled": "СТОП",
+                "sleeping": "ТИША",
+            }
+            self.status_label.setText(labels.get(phase, "ПОРУЧ"))
+            self.status_label.setToolTip(detail[:120] if detail else labels.get(phase, "ПОРУЧ"))
 
     def refresh_memory(self) -> None:
         query = self.memory_search.text().strip()

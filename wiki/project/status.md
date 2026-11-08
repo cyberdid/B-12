@@ -2,12 +2,25 @@
 type: status
 updated: 2026-11-08
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/persona.py, src/b12/api.py, src/b12/reflection.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/project/decisions.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/local_features.py, src/b12/desktop/profile.py, src/b12/desktop/presentation.py, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py]
 tags: [progress, next]
 ---
 # Стан проєкту
 
 На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef`. На початок аудиту 04.11 `main`, `feat/b12-runtime` та обидва remote refs збігалися на `fbe9e223`; `feat/b12-access` був предком на 8 комітів позаду. Подальший локальний fix `baed10d` виправляє pytest entrypoint. Датовані зрізи внизу сторінки зберігають історію.
+
+## Поточний запит власника (2026-11-08) — повна Capri-функціональність
+
+- **Перевірений факт:** актуальний `mochiiwuff/capri-desktop` main лишається на `cb33e87dfaee79cec8b4b0f737ca89e07b87ba4b`; повний README/code audit показав, що попередня B-12 зміна реалізувала лише компактний чат, ручні нагадування, prompt/site shortcuts, launchers і chat handoff. Детальна capability matrix — у [джерельній картці](../sources/capri-desktop-companions-2026-11-07.md).
+- **Вимога власника:** «з цього репозиторію все забрати». За [ADR-012](decisions.md#adr-012--функціональна-сумісність-capri-desktop) треба пройти весь feature inventory і впровадити сумісні можливості у native Qt B-12, а не називати попередній subset повним портом.
+- **Поточний стан:** у worktree `feat/b12-desktop-companion` додано opt-in hooks/activity journal для трьох coding agents, звіти, profile/interaction settings, UA/EN нагадування з підтвердженням, local file/system/media panel, guide/autostart, auto-sleep і необов’язкове слідування між дисплеями. Це незалежна реалізація частини сумісних можливостей, не весь Capri Desktop. Ruff, format, compileall, JSON і whitespace static checks пройшли; automated tests та Qt smoke не запускали.
+- **Не виконували:** не встановлювали hooks у реальні конфіги, не запускали host-команди/програми, Qt-клієнт, API/model, voice/audio або GPU; функції, що потребують цих дій, іще не мають host acceptance.
+- **Межі:** переноситься поведінка власним кодом, не upstream files/art. На Linux/X11 немає Windows-only window APIs; B-12 текстовий chat поки не має image input. Hooks, PC telemetry і capture мають бути opt-in; capture вимагає vision-capable transport; системні команди лишаються за B-12 grants/approval. Feature без коду або host evidence не позначати реалізованою.
+- **Вимога власника:** перейменувати видимого компаньйона на Capri та додати придатні стильові/поведінкові складники з досліджених проєктів. **Код додано локально:** базова оригінальна persona підключена до спільного Agent; локальний desktop profile іде як обмежений style-only context через `/api/chat`; desktop/TUI/Web/CLI/API title узгоджені. Reflection prompt також називає Capri.
+- **Сумісність:** назви Python package, `b12` CLI/API path, env/state paths, hook markers і `QSettings("B-12", "NeonCompanion")` лишилися внутрішніми контрактами; це зафіксовано в [ADR-013](decisions.md#adr-013--ідентичність-capri-та-сумісність-runtime). Upstream prompt/діалоги не копіювалися.
+- **Приватність і перевірка:** desktop profile поля передаються вибраному model provider у prompt; із локальною моделлю лишаються локально, із хмарною — надсилаються provider. Не потрапляють у transcript/long-term memory/activity log. Код і docs оновлено; далі виконуються лише статичні перевірки, persona human eval та host acceptance не проводились.
+- **Запуск після змін:** старий API із основної теки замінений сервером з цього feature worktree; health відповідає, active turns та pending approvals — 0. GUI відкритий як `Capri · CAPRI`, 300×410. Модель, голос та GPU окремо не запускали.
+- **Уточнення власника за скриншотом (2026-11-08):** compact chat повертав `HTTP 422`, бо desktop передавав локальне `history_opt_in` у строгий API `companion_profile`. Клієнт тепер відправляє тільки дозволені поля стилю. Capri animations переведені з повторення одного atlas loop/статичних поз на окремий presentation controller з chat reactions, ручним меню жестів і процедурними Qt FX. Перевірено статично, відрендерено representative actions і перезапущено лише Qt-клієнт; X11 показує overlay 300×410, API health — `true`. Живий model turn для повторної перевірки 422 не надсилали.
 
 ## Поточний стан (2026-11-04)
 
@@ -37,6 +50,14 @@ tags: [progress, next]
 - **Перевірений факт:** X11 на `DISPLAY=:1` (2560×1600) показав viewable вікно `B-12 · CAPRI` 300×410. Context menu вручну перемкнув Capri → Кіберкіт → Capri; після перезапуску клієнта Capri лишилася вибраною. Loopback API health — HTTP 200.
 - **Перевірений факт:** уточнення власника стосується тільки графічного Qt-компаньйона; TUI не є цільовим інтерфейсом цієї зміни. Відгалуження лишається на desktop commit `c4a93a3` без злиття локального `main`; нові Capri-зміни поки локальні й не опубліковані. `src/b12/tui/` у цьому diff не змінювався.
 - **Межі:** upstream assistant code не запускався; чат, model inference, microphone capture, speaker playback і GPU не використовувалися. LICENSE виключає Capri/Cyberpunk artwork, тому локальне доручення не є правом на поширення; див. [Q20](open-questions.md). Automated tests не запускалися; статичні перевірки зафіксовані в [журналі](../log.md).
+
+### Compact chat та додаткові функції (2026-11-08)
+
+- **Вимога власника:** чат з Capri має відкриватися компактно біля персонажа; відсутні корисні функції з наданих репозиторіїв додавати. Уточнення: програми й системні команди також потрібні в компаньйоні.
+- **Перевірений факт у локальному коді:** click відкриває компактний frameless chat, ×/Escape його ховають, ⤢ повертає повне вікно. Bubble прив’язаний до pet і перебудовує позицію після drag. Він використовує той самий ChatWindow state/control для поточної session, history, streaming, cancel та approval.
+- **Перевірений факт у локальному коді:** додано QSettings reminders із date/time, due notice, snooze/dismiss; prompt shortcuts only-prefill; HTTP(S) site shortcuts із перевіркою URL; app launchers з absolute executable+argv і confirmation; shell command composer передає текст у B-12 chat/tool flow. ADR-011 документує запит і межі.
+- **Перевірка:** Ruff, `py_compile`, JSON та `git diff --check` проходять. Offscreen Qt smoke створив `DesktopShell`, перемкнув compact/full, побудував dialogs; API endpoint був навмисно не запущений. Жодних automated tests, server/model/audio/GPU чи реальних програм не запускали.
+- **Потребує перевірки:** видимий X11 компоновочний smoke з реальним Capri pack, drag/resize geometry, live model stream/approval через bubble, persistence через restart, reminder notification backend і Wayland. Поточна локальна зміна в worktree `feat/b12-desktop-companion` ще не опублікована.
 
 ## Поточний стан (2026-11-07)
 

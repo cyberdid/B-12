@@ -59,7 +59,7 @@ class RuntimeLock:
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             os.close(self.fd)
-            raise RuntimeError("state directory is in use by a running B-12") from None
+            raise RuntimeError("state directory is in use by the running Capri runtime") from None
 
     def release(self):
         if self.fd is not None:

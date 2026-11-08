@@ -14,7 +14,7 @@ class PreviewClient:
         self.cancelled = False
         self.histories = {
             "preview-01": [
-                {"role": "user", "content": "Привіт, B-12. Створімо щось неймовірне."},
+                {"role": "user", "content": "Привіт, Capri. Створімо щось неймовірне."},
                 {
                     "role": "assistant",
                     "content": (
@@ -87,7 +87,7 @@ class PreviewClient:
 
 
 class PreviewApp(B12App):
-    TITLE = "B-12 · Cybercat preview"
+    TITLE = "Capri · Cybercat preview"
 
     async def on_mount(self):
         self.query_one(NeonHeader).preview = True

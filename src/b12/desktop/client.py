@@ -159,6 +159,7 @@ class DesktopApiClient:
         *,
         persist: bool,
         on_event: Callable[[dict], None],
+        companion_profile: dict[str, object] | None = None,
     ) -> dict:
         body = {
             "session_id": session_id,
@@ -166,6 +167,14 @@ class DesktopApiClient:
             "persist": persist,
             "timeout_s": 1800.0 if persist else 600.0,
         }
+        if companion_profile is not None:
+            # The desktop keeps local-only fields (for example history_opt_in) next to
+            # the style preferences. The strict chat API accepts only these prompt fields.
+            body["companion_profile"] = {
+                key: companion_profile[key]
+                for key in ("name", "style_note", "catchphrases")
+                if key in companion_profile
+            }
         return self._stream("POST", "/api/chat", body, on_event)
 
     def _stream(

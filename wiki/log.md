@@ -673,3 +673,65 @@ Desktop X11 smoke був ізольований через тимчасові st
 Статичні перевірки desktop-змін пройшли: `ruff check`, `ruff format --check`, `uv lock --check`, `py_compile`, JSON parse для `raw/source-manifest.json` та `git diff --check`. Import smoke з `--extra desktop` виявив лише manifest-вигляди `['capri', 'cybercat']` у такому порядку й не імпортував `b12.tui` або Textual. На X11 після перезапуску тільки Qt-клієнта лишилося видиме вікно `B-12 · CAPRI` 300×410; loopback API health — HTTP 200. Автоматизовані тести не запускалися.
 
 Wiki перевірка: усі 43 сторінки індексовані; десять змінених Markdown-сторінок мають 0 нових битих локальних шляхів і `sources`. Виявлено одне давнє посилання журналу на відсутній `artifacts/task15-soak-2026-10-26-run2/events.jsonl`; воно вже є в базовому `HEAD` і не стосується Capri-змін.
+
+## [2026-11-08] ingest | Повторний функціональний аудит Capri-компаньйонів
+
+Для чотирьох наданих репозиторіїв повторно перевірено pinned code paths щодо compact chat anchoring, tray/actions, reminders, progress/status і launcher UX. Зафіксовано, що `CHNFTQ/Capricorn` — сторонній genomics-проєкт; інші три дали окремі UX-ідеї, але мають обмеження ліцензій/переносимості. Межі прочитаного, commit pins і відсутність raw snapshots уточнені в [source card](sources/capri-desktop-companions-2026-11-07.md) та [manifest](../raw/source-manifest.json); непрочитані частини не позначалися перевіреними.
+
+## [2026-11-08] implementation | Компактний Capri chat та дії у Qt-компаньйоні
+
+У `feat/b12-desktop-companion` додано компактну панель біля персонажа з повторним використанням того самого chat/session state, меню локальних нагадувань, saved prompt/site shortcuts, підтверджуваних application launchers та системний command composer. Launcher стартує тільки після кліку й підтвердження, з absolute executable та argv без shell parsing. Команда передається з composer у звичайний B-12 chat; її запуск лишається за runtime tools і чинними grants/exact approvals. ADR-011 і direct-user-request scope описані у [рішенні](project/decisions.md#adr-011--desktop-launchers--system-commands); TUI/API/voice не змінювалися.
+
+## [2026-11-08] lint | Compact chat та companion actions
+
+`ruff check` для трьох Qt-модулів, `ruff format --check` для нових/відформатованих модулів, `py_compile`, JSON parse для source manifest і `git diff --check` пройшли. Offscreen Qt smoke створив `DesktopShell`, перемкнув compact/full та побудував reminder/launcher/prompt/site/command dialogs із тестовими налаштуваннями. Markdown audit перевірив 148 локальних посилань у шести змінених wiki-сторінках: 0 відсутніх цілей; усі 43 змістові wiki-сторінки включені в index (index не індексує сам себе). Master brief лишився byte-identical, SHA-256 `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a` відповідає manifest.
+
+Automated test suite, B-12 API/server, model, microphone/audio, GPU та реальні програми не запускали. Реальне X11/Wayland розташування bubble, live tool approval/command і launcher запуск лишаються host-acceptance питаннями; offscreen widget smoke цього не доводить. Зміни залишаються локальними у worktree, не опубліковані.
+
+## [2026-11-08] implementation | Capri Desktop parity additions у Qt companion
+
+За прямою вимогою власника додано незалежні B-12 модулі для локального профілю й opt-in interaction metadata, розбору явних UA/EN нагадувань, bounded filename search і необов’язкового UTF-8 text-content search у вибраній теці, read-only host snapshot, Linux/X11 media/volume/power/theme/display controls, guide, безпечного XDG autostart manager, зовнішніх агентських hooks та денного mission report із копіюванням візуальної картки в clipboard. Меню отримало авто-сон через 10 хв без взаємодії та opt-in слідування за курсором між дисплеями; reduced motion вимикає рух. Antigravity output скориговано за офіційною hook схемою: `PreToolUse` делегує через `allow`, `Stop` не примушує продовження. Конфіги агентів не змінювалися; зовнішній код/арт не копіювалися.
+
+## [2026-11-08] lint | Capri Desktop parity additions
+
+Пройшли `ruff check src/b12/desktop/`, `ruff format --check src/b12/desktop/` (13 modules), `python -m compileall -q src/b12/desktop`, JSON parse `raw/source-manifest.json` і `git diff --check`. Wiki scan охопив 44 сторінки та 388 локальних посилань; виявив 11 історичних відсутніх artifact targets і одне давнє відсутнє source-directory посилання. Вони не додані цим implementation entry; нові локальні шляхи перевірені. Master brief зберігає SHA-256 `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
+
+Automated tests та Qt widget smoke не запускалися. Не встановлювали hooks, не запускали робочий Qt клієнт, B-12 server/model, audio/microphone/GPU, host actions або програми. Screen vision, window possession/management, USB/game/window sensing, content indexing, provider/model setup, локалізації та Capri-specific motion лишаються непокритими; X11/Wayland і реальні конфіги очікують host acceptance. Зміни залишаються у локальному worktree й не були commit/push.
+
+## [2026-11-08] review | Файли персони та діалогового стилю Capri
+
+На питання власника точково перевірено `Modelfile` у Desktop Construct, `chat.js`/`lines.js`/`custom.js`/`bond.js`/`brain.js` у `mochiiwuff/capri-desktop`, а також `persona.py`/`local_ai.py` і конфіг `replies` у `kystt29/capricorn`. Підтверджено наявність system prompts, стильових правил, scripted-реплік та логіки емоційної/подієвої поведінки у цих трьох проєктах; `CHNFTQ/Capricorn` лишається не пов’язаним із desktop-персоною. Точні ролі файлів і pinned посилання додано до [source card](sources/capri-desktop-companions-2026-11-07.md); межі перевірки оновлено у [manifest](../raw/source-manifest.json). Це fan-made реалізації, не підтверджені офіційні діалоги Capri; B-12 використовує лише незалежну реалізацію.
+
+## [2026-11-08] implementation | Capri persona та видиме перейменування
+
+За прямою вимогою власника додано самостійно написаний базовий голос Capri у спільний `Agent`, profile dialog із локальними ім’ям/style note/catchphrases та bounded formatter. Desktop надсилає ці поля з `/api/chat`; `Agent` зберігає лише відформатований стильовий context у пам’яті активного turn і додає його до кожного model reasoning round. Він обмежений формулюванням і не змінює tools/grants/consent/approvals; transcript, довга пам’ять та interaction journal не отримують профіль. При cloud provider profile передається тому provider як частина prompt.
+
+Видимі назви desktop, TUI, Web, CLI, API title та reflection prompt узгоджено на Capri. Внутрішні package/CLI/API/state/env/hook identifiers і `QSettings("B-12", "NeonCompanion")` збережені для сумісності; це зафіксовано в [ADR-013](project/decisions.md#adr-013--ідентичність-capri-та-сумісність-runtime). Upstream prompts і authored lines не копіювалися; поточна політика і evidence — у [desktop topic](topics/desktop-companion.md) та [implementation plan](project/desktop-companion-plan.md).
+
+## [2026-11-08] lint | Capri persona та product labels
+
+`uv run --no-sync ruff check src/b12`, `ruff format --check` для 20 змінених Python-модулів, `python -m compileall -q src/b12`, JSON parse `raw/source-manifest.json`, `git diff --check` і перевірка 13 нових локальних wiki targets пройшли. Повна `ruff format --check src/b12` лишає одне відхилення у незміненому `src/b12/tools/network.py`; цей файл не входить до поточного diff. Перевірені `sources` у п’яти wiki сторінках усі існують. Master brief SHA-256 лишився `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
+
+Автоматизовані тести, desktop UI, API/server, модель, аудіо й GPU не запускалися. Тому style quality на вибраній моделі та host acceptance не підтверджені. Зміни лишилися локально у worktree, без commit/push.
+
+## [2026-11-08] run | Повний перезапуск Capri з оновленого worktree
+
+Старий API працював із `/home/cyberdid/Projects/B-12`, а desktop-вікно було закрите. Перед зупинкою API owner status показав 0 active turns і 0 pending approvals. Старий процес завершено; сервер запущено з `/home/cyberdid/.codex/worktrees/cb2c/B-12` на `127.0.0.1:8712` з попереднім режимом `--no-autonomy`, потім запущено Qt desktop-клієнт із того самого worktree. Імпорт обох процесів вказує на оновлений `src/b12/cli.py`; `/api/health` повернув `true`, після старту active turns/pending approvals — 0, X11 показав вікно `Capri · CAPRI` 300×410.
+
+Ollama/model, голос/audio та GPU не перезапускалися. Автоматизовані тести не запускалися. API і GUI лишаються активними з локального feature worktree; systemd user service не змінювали й не запускали.
+
+## [2026-11-08] implementation | Capri gestures/FX і compact-chat HTTP 422
+
+За скриншотом власника відтворено причину `HTTP 422`: `load_companion_profile()` повертав локальний `history_opt_in`, але `ChatBody.companion_profile` суворо забороняє зайві поля. `DesktopApiClient.stream_turn()` тепер надсилає лише `name`, `style_note` та `catchphrases`; локальний прапорець згоди не виходить із клієнта.
+
+У `CompanionOverlay` додано bounded timer-driven actions, procedural Qt-перетворення й намальовані motion FX поверх приватного Capri pack. Мишка/drag та chat phases запускають реакції; menu розкладає ручні preview по реакціях, руху й ефектах. Реалізовані intro, curious/talk, sit/lounge, peek, leap/fall/throw/held/tumble/KO, teleport, satellite/beam, lightning, shards, shockwave, speed, celebration, reconnect glitch, cut-in та sleep. Reduced motion вимикає action timeline; рухи й ефекти не чекають LLM. Upstream code/art/sounds не копіювалися; window possession лишається поза scope.
+
+## [2026-11-08] lint | Capri animations і payload fix
+
+`ruff check src/b12/desktop/`, форматування, `compileall -q src/b12/desktop` і `git diff --check` пройшли. Markdown lint шести змінених інструктивних сторінок знайшов 0 битих локальних посилань і 0 відсутніх `sources`; усі згадані проєктні сторінки вже індексуються. Qt offscreen render із локальним pack візуально перевірив вибрані дії; після цього запущено тільки клієнт із feature worktree, X11 підтвердив вікно `Capri · CAPRI` 300×410, а loopback `/api/health` повернув `{"ok":true}`.
+
+Живе повідомлення не надсилалося, щоб не запустити inference на зайнятому GPU; тому успішний модельний chat після 422-fix ще не підтверджено через реальний turn. Модель, voice/audio, GPU, system actions, hooks і сервер не перезапускались у цій перевірці. Automated test suite не запускали. Upstream артефакти та local art pack лишилися поза Git.
+
+## [2026-11-08] ingest | Публічний візуал Capri для GitHub
+
+За погодженням власника створено окрему оригінальну cyberpunk-ілюстрацію Capri для README та GitHub social preview. Вона не використовує приватний Capri sprite pack. Hero збережено як 1600×800 JPG; preview з типографікою підготовлено як 1280×640 PNG. Prompt, походження та межі ліцензування записані у [source card](sources/capri-original-hero-2026-11-08.md).

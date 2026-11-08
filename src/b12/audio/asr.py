@@ -223,9 +223,10 @@ class WhisperAsr:
             temperatures=[0.0],
             initial_prompt=(
                 "Українська мова. Привіт, Олександре! Перевір, будь ласка, стан локальної пам'яті, "
-                "температуру процесора та відеокарти. Система працює стабільно, B-12, local runtime"
+                "температуру процесора та відеокарти. Система працює стабільно, "
+                "Capri, local runtime."
                 if chosen_lang == "uk"
-                else "Hello friend, B-12 local voice pipeline, system status."
+                else "Hello friend, Capri local voice pipeline, system status."
             ),
             prefix=None,
             suppress_blank=True,
@@ -239,9 +240,9 @@ class WhisperAsr:
             max_new_tokens=None,
             clip_timestamps="0",
             hallucination_silence_threshold=None,
-            hotwords="Олександре, будь ласка, пам'яті, працює, local runtime, B-12"
+            hotwords="Олександре, будь ласка, пам'яті, працює, local runtime, Capri"
             if chosen_lang == "uk"
-            else "B-12, pipeline, status",
+            else "Capri, pipeline, status",
         )
         seg_iter = m.generate_segments(
             features,

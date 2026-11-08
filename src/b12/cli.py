@@ -263,7 +263,7 @@ async def _converse(args, runtime, owner) -> int:
         if not line.strip():
             continue
         grant, task = owner.grant(timeout)
-        print("B-12> ", end="", flush=True)
+        print("Capri> ", end="", flush=True)
         result = await run_with_interrupt(
             runtime.agent.turn,
             owner.session_id,
@@ -781,7 +781,7 @@ async def cmd_serve(args, settings) -> int:
 
 
 def parser() -> argparse.ArgumentParser:
-    root = argparse.ArgumentParser(prog="b12", description="Локальний компаньйон B-12")
+    root = argparse.ArgumentParser(prog="b12", description="Локальний компаньйон Capri")
     root.add_argument("--config", help="TOML settings file (B12_* env overrides it)")
     sub = root.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="стан моделі, профілю й сховищ").add_argument(

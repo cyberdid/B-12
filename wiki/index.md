@@ -5,7 +5,7 @@ status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
 ---
-# Індекс знань B-12
+# Індекс знань Capri / B-12 runtime
 
 Спочатку [стан робіт](project/status.md), далі [аналіз](project/analysis.md) і потрібна тема. Позначки достовірності визначені в [AGENTS.md](../AGENTS.md). `compiled` означає опрацьовану документацію.
 
@@ -14,7 +14,9 @@ tags: [navigation]
 | Сторінка | Призначення |
 |---|---|
 | [Поточний статус](project/status.md) | Що є локально, чого ще немає, наступна дія |
-| [План desktop-компаньйона](project/desktop-companion-plan.md) | Дизайн, етапи, scope та стан реалізації |
+| [План desktop-компаньйона](project/desktop-companion-plan.md) | Загальний стан Qt companion, його scope і host acceptance |
+| [Capri feature parity](../docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md) | Повний capability audit Capri Desktop і план незалежної реалізації у B-12 |
+| [Capri persona та brand](../docs/superpowers/plans/2026-11-08-capri-persona-brand.md) | Базовий характер Capri, desktop profile context і межа сумісності `b12` |
 | [Реалізація повної системи](project/implementation.md) | Авторизований scope, повний plan/spec, worktree та execution ledger |
 | [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
@@ -24,7 +26,7 @@ tags: [navigation]
 | [Аудит вимог R01–R17](project/requirements-audit.md) | Статус кожної вимоги з доказами й межами; відкриті рішення |
 | [Подібні проєкти та моделі, 28.10.2026](sources/ai-assistant-projects-2026-10-28.md) | Перевірений огляд коду й UI конкурентів, що переносимо, і даних про Nemotron Bolt E4B |
 | [Самоогляд меж безпеки](project/security-self-review.md) | Знахідки F1–F5 за читанням API, control, purge; не незалежний |
-| [Реєстр рішень](project/decisions.md) | ADR-001–010 з оригінального brief та їхній статус |
+| [Реєстр рішень](project/decisions.md) | ADR-001–010 з оригінального brief, ADR-011/012 для desktop companion |
 | [Відкриті питання](project/open-questions.md) | Невідоме та спосіб отримати відповідь |
 
 ## Теми
@@ -39,7 +41,7 @@ tags: [navigation]
 | [Порівняння з NVIDIA Reachy Jetson](topics/reachy-jetson-comparison.md) | Їхній голос і зір, наш контроль дій і пам'ять; ризики й розбіжності у джерелах |
 | [CLI і запущений сервер](topics/cli-server-mode.md) | Один власник runtime: API при запущеному сервері, лок без нього; зіставлення команд і ендпоінтів |
 | [Кіберпанковий TUI та кіберкіт](topics/cyberpunk-tui.md) | Анімований pet, mouse/keyboard reactions, адаптивний layout і offline preview |
-| [Desktop-компаньйон](topics/desktop-companion.md) | Окреме Qt-вікно Capri/Кіберкіт, tray, authenticated API і дозволи |
+| [Desktop-компаньйон](topics/desktop-companion.md) | Qt Capri/Кіберкіт, компактний чат, інтеграції агентів, локальні дії й функціональні межі |
 | [Модель доказів (A-10)](topics/evidence-model.md) | Спогади з посиланням на документи, міграція v1→v2 з резервною копією, застарілість і життєвий цикл |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
@@ -64,6 +66,7 @@ tags: [navigation]
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
 | [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
 | [Capri / Capricorn desktop-компаньйони](sources/capri-desktop-companions-2026-11-07.md) | Чотири задані repositories й окремий Linux art fork, Qt UX та межі ліцензії |
+| [Оригінальна обкладинка Capri](sources/capri-original-hero-2026-11-08.md) | Походження hero/social preview, prompt і межі використання локального art pack |
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 

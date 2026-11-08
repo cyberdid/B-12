@@ -34,7 +34,7 @@ class Turn:
 
 class B12App(App):
     CSS = CSS
-    TITLE = "B-12"
+    TITLE = "Capri"
     ENABLE_COMMAND_PALETTE = False
     BINDINGS = [
         Binding("ctrl+n", "new_session", "Нова розмова"),
@@ -67,13 +67,13 @@ class B12App(App):
                 yield Static("F2  навігація\nТвій простір. Твої історії.", id="nav-note")
             with Vertical(id="conversation"):
                 with Horizontal(id="chat-heading"):
-                    yield Static("ЗВ’ЯЗОК ІЗ B-12", id="chat-title")
+                    yield Static("ЗВ’ЯЗОК ІЗ CAPRI", id="chat-title")
                     yield Static("// CHAT", id="channel-tag")
                 yield VerticalScroll(id="chat")
                 with Vertical(id="bar"):
                     yield Static("ТВОЯ ДУМКА  /  Enter — надіслати", id="compose-label")
                     with Horizontal(id="compose-line"):
-                        yield Input(placeholder="Напиши B-12…", id="prompt")
+                        yield Input(placeholder="Напиши Capri…", id="prompt")
                         yield Button("НАДІСЛАТИ", id="send")
                     with Horizontal(id="compose-options"):
                         yield Checkbox("ПАМ'ЯТЬ", value=True, id="consent")
@@ -81,7 +81,7 @@ class B12App(App):
             with Vertical(id="right-rail"):
                 with Vertical(id="companion"):
                     yield Static("COMPANION  /  01", id="companion-title")
-                    yield Static("B-12  ·  КІБЕРКІТ", id="companion-name")
+                    yield Static("CAPRI  ·  КІБЕРКІТ", id="companion-name")
                     yield CyberCat(id="pet")
                     yield Static("мишка · клік · Ctrl+K", id="pet-hint")
                 with VerticalScroll(id="panel"):
@@ -385,7 +385,7 @@ class B12App(App):
 
     async def add_assistant(self, text: str) -> Markdown:
         chat = self.query_one("#chat", VerticalScroll)
-        await chat.mount(Static("◆ B-12   /   відповідь", classes="msg-tag", markup=False))
+        await chat.mount(Static("◆ CAPRI   /   відповідь", classes="msg-tag", markup=False))
         md = Markdown(text)
         await chat.mount(md)
         if self.turn:
