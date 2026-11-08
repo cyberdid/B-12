@@ -741,3 +741,12 @@ Ollama/model, голос/audio та GPU не перезапускалися. А�
 Перевірено 88 локальних Markdown-посилань у README, desktop guide, індексі й новій source card: відсутніх цілей 0. Hero — 1600×800 JPG, social preview — 1280×640 PNG, 904 827 байтів (<1 MB); обидва зображення відкрито для візуальної перевірки. Поточний README більше не посилається на B-12 hero; його старий шлях лишається тільки в датованому історичному записі журналу. У Git tree не потрапили файли приватного Capri sprite pack.
 
 Commit `03f5a4b` запушений у `feat/b12-desktop-companion`; PR #2 має оновлені title/body, а repository About description і topics перевірено через GitHub CLI. PR лишається open і stacked на PR #1. Social-preview PNG готовий у гілці, але GitHub Settings preview не завантажений: у сеансі немає доступного браузера; README гілки стане README репозиторію після злиття PR залежностей. Розширений link scan із журналом має одну відсутню ціль `artifacts/task15-soak-2026-10-26-run2/events.jsonl`, давній artifact gap, зафіксований у попередніх lint-записах; нові та інструктивні посилання цілі. Автоматизовані тести не запускалися.
+
+
+## [2026-11-08] publish | Capri landing у main
+
+Документаційний commit `2b30b59` опубліковано безпосередньо в `main`: README hero тепер Capri, оновлено `social-preview.png` і source provenance. Це не зливає Capri desktop-код. Через зміни README PR #1 з `feat/b12-runtime` синхронізовано з `main` merge commit `023c9a1`; локальне незакомічене дерево окремого runtime worktree не змінювалося. У PR #2 включено цей новий base; PR лишається відкритим, а повний test/host acceptance для desktop additions не виконаний.
+
+## [2026-11-08] lint | Публічний landing і stacked гілки
+
+На `main`, runtime PR-гілці та desktop PR-гілці README посилається на Capri hero, social preview лишається 1280×640 (904 827 bytes), а private art pack відсутній у Git. Налаштування GitHub Social Preview досі `usesCustomOpenGraphImage=false`; без браузера і без публічного API його неможливо завантажити автоматично. Потрібен ручний Settings upload. Desktop PR #2 базується на оновленій runtime-гілці; його відкритий стан збережено.
