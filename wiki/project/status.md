@@ -1,13 +1,23 @@
 ---
 type: status
-updated: 2026-11-04
+updated: 2026-11-08
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
 tags: [progress, next]
 ---
 # Стан проєкту
 
-На початку імпорту 24.10.2026 `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`; реалізація йде у worktree `.worktrees/runtime`, branch `feat/b12-runtime`. Офіційний Bolt E4B встановлено поза Git як тестовий Ollama alias. Реалізовані foundations, canonical memory, lexical retrieval, pinned-profile model/context adapter, reviewed server-owned tool control, 13 реальних host tools, agent loop із sessions і global purge; owner CLI, автентифікований loopback API, Web UI і обмежена автономність (цілі/ініціатива/рефлексія); сервіс, голос і фізичні acceptance ще попереду.
+**Історичний baseline на 24.10.2026:** на початку імпорту `/home/cyberdid/Projects/B-12` була порожньою текою без Git. Дослідницький baseline збережено commit `78daaef` на `main`, а system implementation почалася в окремій гілці. Пізніший стан і перевірені межі відображені в датованих checkpoint нижче та тематичних сторінках; цю початкову оцінку не слід читати як поточний статус.
+
+## Оновлення 08.11.2026 — TUI Companion Upgrade
+
+**Вимога власника:** реалізовувати ідеї Capri-подібних компаньйонів у наявному TUI; лишити Кіберкота стандартним і зробити зовнішній Capri skin опційним. Інша desktop UI не входить у scope.
+
+**Поточна робота:** окрема worktree `/home/cyberdid/.codex/worktrees/bac0/B-12`, branch `feat/b12-cybercat-tui`. Є local activity SQLite і provider hook adapter, TUI timeline/reports, явні PTT/mute/TTS контроли та зовнішній manifest skin loader. Hook приклади — лише project-local templates; вони не внесені в жодні налаштування, не активовані. Три знайдені static review defects (Escape у paused approval, скасування mute preflight, fallback зі зниклого skin) виправлено в локальному diff.
+
+**Межі доказу:** зміни не злиті в основну гілку і не опубліковані. У цій сесії не запускаються tests, TUI/server, мікрофон, гучномовець або модель. Проводиться статична перевірка конфігів, Python/shell синтаксису, diff та wiki-посилань. Доступні локальні `uv` і audio executables, тому залежності не встановлювалися. Оригінальний Capri artwork не додається: огляд джерел не підтвердив права на ці зображення; потрібен власний/ліцензований pack, див. [Q19](open-questions.md) і [формат skin](../../src/b12/tui/assets/skins/README.md).
+
+Детальний scope, інтерфейси та межі приймання: [специфікація](../../docs/superpowers/specs/2026-11-08-b12-tui-companion-upgrade-design.md), [план](../../docs/superpowers/plans/2026-11-08-b12-tui-companion-upgrade.md), [тема TUI](../topics/cyberpunk-tui.md).
 
 ## Наявне
 
@@ -20,17 +30,19 @@ tags: [progress, next]
 - [Review archive-index-public](../sources/archive-index-public.md): 16 source files за pinned commit, 17 core tests passed; synthetic lexical/provenance і cache-refresh probe виконані без production DB/embedding load. Pinned lexical modules тепер інтегровані через actor-scoped derived index; приватний production archive не імпортовано.
 - [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
 - [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
-- [Tool control](../topics/tool-control.md): Task 5 reviewed у `bc07196`; Task 6 host tools — `7d7809e` після двох fix rounds. Filesystem/process/HTTP/memory handlers перевірені на temp/local fixtures. API authentication і глобальний purge ще не реалізовано.
+- [Tool control](../topics/tool-control.md): Task 5 reviewed у `bc07196`; Task 6 host tools — `7d7809e` після двох fix rounds. Task 9 додає loopback API authentication; `PurgeCoordinator` і cross-store purge evidence описані в [agent loop](../topics/agent-loop.md) та [operations](../topics/operations.md). Цей пункт замінює застаріле твердження про відсутність API auth/purge.
 
 ## Не підтверджено
 
 Старий SQLite kernel і його попередні latency results не знайдені; це не стосується нового Task 2 MemoryStore. Не перевірено купівлю Reachy/особистого Jetson, full-duplex, загальну українську якість моделей, simultaneous residency Bolt/Cosmos/voice та тривалу автономну роботу. Окремі дослідження voice згадані в brief, але їхніх оригіналів у `raw/` немає.
 
-## Активний етап
+## Історичний runtime checkpoint на 26.10.2026
+
+Наступний блок зберігає status snapshot того дня для походження рішень; актуальний напрям цієї сесії — TUI Companion Upgrade вище, а новіші зміни записуються в [журнал](../log.md).
 
 **Доручення власника:** реалізувати повноцінну систему з великим планом, звичайними/великими тестами, tools і повним host access. [Implementation/spec/ledger](implementation.md) задають поточний execution path; повторний дозвіл на старт не потрібний. **Перевірений факт:** Tasks 1–7 реалізовані; Task 7 `740629a`, full suite 350 passed / 2 skipped, Ruff clean; реальний Bolt виконує file write/read, system_info і memory recall після restart (3/3 у run2/run3). Task 8 owner CLI `964709b` (361 passed / 2 skipped; живий запуск із реальним Bolt). Task 9 API/auth `9632cdc` (382 passed / 2 skipped). Task 10 Web UI `6610f85` (headless Chrome acceptance 20/20, реальний Bolt). Task 11 автономність `6032a15`. **Пауза 26.10.2026 ~15:35 UTC за рішенням власника.** Tasks 12 (MCP і semantic через archive-index власника) і 13 (snapshots, deletion replay, restore, user unit — встановлює власник) завершено. Task 14: ctx4096 541 прогін, 81%, 0 протокольних помилок (до виправлень мови й морфології); ctx8192 частковий. Task 15: soak лише 1 год 19 хв (НЕ 8 год); виправлено дві лінійні деградації; ріст RSS ще відкритий. Tasks 16–17 відкладено власником. Task 18 — лише протокол на симуляторі; Task 19 — лише драйвер. Порядок продовження й деталі — у [звіті паузи](../../docs/superpowers/sdd/task-12-15-18-19-report.md). Full suite 450 passed / 3 skipped. Global purge hooks, API authentication, voice, robotics і тривалі acceptance також попереду. Власник відновив роботу 25.10 після явної паузи. Ціль active і не обмежена попередніми smoke tests. Наступні абзаци зберігають дослідницький baseline.
 
-**M0 — частково:** versioned contracts, canonical memory/revocation primitives, server-owned owner/guest control та grant/approval lifecycle є. System heartbeat і retention/global-purge coordinators ще потрібні. Для M1 є memory, lexical retrieval, pinned Bolt transport і strict tool policy/registry, реальні host handlers; agent/session loop, idle reflection та A/B ще немає. M2–M6 не початі.
+**Початкова оцінка M0–M6 на 24.10.2026 (історична):** versioned contracts, canonical memory/revocation primitives, server-owned owner/guest control та grant/approval lifecycle були на різних стадіях. Твердження про відсутні coordinators та наступні milestone відображали тодішній план і замінені пізнішими task records у [implementation](implementation.md), [agent loop](../topics/agent-loop.md) та [autonomy](../topics/autonomy.md).
 
 **Початковий Bolt smoke test:** зберігається як історичний baseline у [своєму звіті](bolt-first-test.md); його truncation на 2048 був підставою створити явний admission adapter. Новий run4 вимірює інший pinned renderer і чітко вказаний context 4096. Модель іще кандидат: Ukrainian quality corpus, tool performance, A/B і голосовий SLO залишаються відкритими.
 

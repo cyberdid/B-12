@@ -85,6 +85,7 @@ class B12App(App):
         self.paused_turn: Turn | None = None
         self._stream_active = False
         self._resume_requested: str | None = None
+        self._cancel_requested_turns: set[str] = set()
         self.persist_default = persist_default
         self.preview_mode = preview_mode
         self._closing = False
@@ -99,6 +100,7 @@ class B12App(App):
         self._player: VoicePlayer | None = None
         self._capture_lock = asyncio.Lock()
         self._ptt_task: asyncio.Task | None = None
+        self._voice_status_task: asyncio.Task | None = None
         self._asr_task: asyncio.Task | None = None
         self._mute_task: asyncio.Task | None = None
         self._speech_task: asyncio.Task | None = None
@@ -247,6 +249,16 @@ class B12App(App):
         pet = self.query_one(CyberCat)
         options = await asyncio.to_thread(pet.available_skins)
         if len(options) < 2:
+            if pet.skin_id != "cybercat":
+                had_error = bool(pet.skin_error)
+                pet.set_skin("cybercat")
+                self.query_one("#companion-name", Static).update(f"B-12  ·  {pet.skin_name}")
+                self.query_one("#pet-hint", Static).update(
+                    "Pack пошкоджений · повернувся кіберкіт"
+                    if had_error
+                    else "Pack недоступний · повернувся кіберкіт"
+                )
+                return
             message = (
                 "Pack пошкоджений · перевір manifest"
                 if pet.skin_error
@@ -282,7 +294,13 @@ class B12App(App):
             self._activity_task = asyncio.create_task(self._poll_activity())
         self._render_activity()
         if self.turn is not None:
-            label = "очікує дозволу" if self.waiting_turn else "працює"
+            label = (
+                "скасовується"
+                if self.turn.turn_id in self._cancel_requested_turns
+                else "очікує дозволу"
+                if self.waiting_turn
+                else "працює"
+            )
             self.query_one("#turn-report", Static).update(self.turn.report(label))
         elif self.paused_turn is not None and self.waiting_turn is not None:
             self.query_one("#turn-report", Static).update(self.paused_turn.report("очікує дозволу"))
@@ -420,9 +438,11 @@ class B12App(App):
         for button in self.query("#ptt"):
             button.label = "■ F7" if recording else ("🎙" if self.size.width < 90 else "🎙 F7")
             button.set_class(recording, "recording")
-            button.disabled = self.preview_mode or bool(
-                self._ptt_task is not None and not self._ptt_task.done() and not recording
-            ) or bool(self._mute_task is not None and not self._mute_task.done())
+            button.disabled = (
+                self.preview_mode
+                or bool(self._ptt_task is not None and not self._ptt_task.done() and not recording)
+                or bool(self._mute_task is not None and not self._mute_task.done())
+            )
         label = (
             "СТАН МІКР."
             if self._mic_muted is None
@@ -455,25 +475,36 @@ class B12App(App):
         generation = self._ptt_generation
         pcm = b""
         try:
-            async with self._capture_lock:
-                if generation != self._ptt_generation or self._closing:
-                    return
-                if self._recorder is not None and self._recorder.has_recording:
+            if generation != self._ptt_generation or self._closing:
+                return
+            if self._recorder is not None and self._recorder.has_recording:
+                async with self._capture_lock:
+                    if generation != self._ptt_generation or self._closing:
+                        return
                     self._stop_record_timer()
                     self._record_started = None
                     pcm = await self._recorder.stop()
                     self._sync_audio_controls()
-                else:
-                    _, stop_error = await self._stop_speech()
-                    if stop_error is not None:
-                        raise stop_error
-                    self._set_voice_status("Перевіряю стан мікрофона…")
-                    status = await self.client.voice_status()
-                    self._mic_muted = bool(status.get("muted", True))
+            else:
+                _, stop_error = await self._stop_speech()
+                if stop_error is not None:
+                    raise stop_error
+                self._set_voice_status("Перевіряю стан мікрофона…")
+                status_task = asyncio.create_task(self.client.voice_status())
+                self._voice_status_task = status_task
+                try:
+                    status = await status_task
+                finally:
+                    if self._voice_status_task is status_task:
+                        self._voice_status_task = None
+                if generation != self._ptt_generation or self._closing:
+                    return
+                self._mic_muted = bool(status.get("muted", True))
+                if self._mic_muted:
+                    raise VoiceError("microphone_muted")
+                async with self._capture_lock:
                     if generation != self._ptt_generation or self._closing:
                         return
-                    if self._mic_muted:
-                        raise VoiceError("microphone_muted")
                     self._recorder = self._recorder or PttRecorder()
                     await self._recorder.start()
                     if generation != self._ptt_generation or self._closing:
@@ -519,6 +550,8 @@ class B12App(App):
         self._ptt_generation += 1
         self._stop_record_timer()
         failure = None
+        if self._voice_status_task is not None:
+            self._voice_status_task.cancel()
         if self._asr_task is not None:
             self._asr_task.cancel()
         async with self._capture_lock:
@@ -555,9 +588,7 @@ class B12App(App):
             else:
                 result = await self.client.voice_mute(target)
                 self._mic_muted = bool(result.get("muted", target))
-            message = (
-                "Мікрофон вимкнено" if self._mic_muted else "Мікрофон увімкнено · F7 — запис"
-            )
+            message = "Мікрофон вимкнено" if self._mic_muted else "Мікрофон увімкнено · F7 — запис"
             if failure is not None:
                 message += " · " + _voice_message(failure)
             self._set_voice_status(message)
@@ -842,8 +873,21 @@ class B12App(App):
             await self._stream_finished()
 
     async def _stream_finished(self):
-        if self.turn is not None and self.turn.state == "awaiting_approval":
-            self.paused_turn = self.turn
+        if self.turn is not None:
+            turn_id = self.turn.turn_id
+            cancel_requested = turn_id in self._cancel_requested_turns
+            if self.turn.state == "awaiting_approval" and not cancel_requested:
+                self.paused_turn = self.turn
+            elif cancel_requested:
+                if self.turn.state == "awaiting_approval":
+                    self.turn.state = "cancelled"
+                    report = self.turn.report("скасовано")
+                    self.query_one("#turn-report", Static).update(report)
+                    await self.add_turn_report(report)
+                    await self.add_state("ХІД СКАСОВАНО")
+                if self.waiting_turn == turn_id:
+                    self.waiting_turn = None
+                self._cancel_requested_turns.discard(turn_id)
         self.turn = None
         self._stream_active = False
         resume, self._resume_requested = self._resume_requested, None
@@ -896,18 +940,34 @@ class B12App(App):
                 self.turn.approval_ids.add(
                     str(event.get("operation_id") or event.get("call_id") or self.turn.event_count)
                 )
-                self._pet_phase("approval")
-                self.waiting_turn = self.turn.turn_id
-                await self.add_state(f"ОЧІКУЄ ПІДТВЕРДЖЕННЯ: {event.get('name')}")
-                await self.refresh_approvals()
+                if self.turn.turn_id in self._cancel_requested_turns:
+                    self._pet_phase("cancelled")
+                else:
+                    self._pet_phase("approval")
+                    self.waiting_turn = self.turn.turn_id
+                    await self.add_state(f"ОЧІКУЄ ПІДТВЕРДЖЕННЯ: {event.get('name')}")
+                    await self.refresh_approvals()
             elif kind == "result":
+                if (
+                    self.turn.turn_id in self._cancel_requested_turns
+                    and event.get("state") == "awaiting_approval"
+                ):
+                    event = {**event, "state": "cancelled"}
+                    if self.waiting_turn == self.turn.turn_id:
+                        self.waiting_turn = None
                 await self.finish(event)
             elif kind == "error":
                 self.turn.failure_events += 1
                 self._pet_phase("error")
                 await self.add_state(f"ПОМИЛКА: {event.get('error')}")
             if kind != "result":
-                label = "очікує дозволу" if self.waiting_turn else "працює"
+                label = (
+                    "скасовується"
+                    if self.turn.turn_id in self._cancel_requested_turns
+                    else "очікує дозволу"
+                    if self.waiting_turn
+                    else "працює"
+                )
                 self.query_one("#turn-report", Static).update(self.turn.report(label))
             chat.scroll_end(animate=False)
 
@@ -941,9 +1001,34 @@ class B12App(App):
     async def action_cancel(self) -> None:
         await self._cancel_capture()
         await self._stop_speech()
-        if self.turn and self.turn.turn_id:
+        turn_id = self.turn.turn_id if self.turn is not None else None
+        if turn_id is None:
+            turn_id = (
+                (self.paused_turn.turn_id or self.waiting_turn)
+                if self.paused_turn is not None
+                else self.waiting_turn
+            )
+        if turn_id:
             self._pet_phase("cancelled")
-            await self.client.cancel(self.turn.turn_id)
+            await self.client.cancel(turn_id)
+            active_turn = self.turn is not None and self.turn.turn_id == turn_id
+            if self.turn is None and (
+                self.paused_turn is not None or self.waiting_turn is not None
+            ):
+                paused = self.paused_turn
+                self.waiting_turn = None
+                self.paused_turn = None
+                if paused is not None:
+                    paused.state = "cancelled"
+                    report = paused.report("скасовано")
+                    self.query_one("#turn-report", Static).update(report)
+                    await self.add_turn_report(report)
+                await self.add_state("ХІД СКАСОВАНО")
+                await self.refresh_approvals()
+            elif active_turn:
+                self._cancel_requested_turns.add(turn_id)
+                if self.waiting_turn == turn_id:
+                    self.waiting_turn = None
 
     # ---- widgets ------------------------------------------------------------
     async def add_user(self, text: str) -> None:

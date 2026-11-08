@@ -1,0 +1,31 @@
+{
+  "b12-local-activity": {
+    "enabled": true,
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source antigravity --event SessionStart",
+        "timeout": 2
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source antigravity --event PostToolUse",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PostInvocation": [
+      {
+        "type": "command",
+        "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source antigravity --event PostInvocation",
+        "timeout": 2
+      }
+    ]
+  }
+}
