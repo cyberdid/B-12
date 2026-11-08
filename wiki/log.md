@@ -1,6 +1,6 @@
 ---
 type: log
-updated: 2026-11-06
+updated: 2026-11-08
 status: append-only
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [history]
@@ -599,3 +599,12 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-06] publish | PR з runtime, пошуком і документацією
 
 За дорученням власника три коміти гілки `feat/b12-runtime` опубліковано в публічному `cyberdid/B-12`; відкрито [PR #1 у `main`](https://github.com/cyberdid/B-12/pull/1). PR містить детальний опис змін, перевірок, benchmark меж і негативного live code-review результату. На момент запису PR має стан OPEN і не злитий; `main` не змінювався.
+
+
+## [2026-11-08] ingest | Capri GitHub hero та social preview
+
+За погодженням власника додано оригінальну ілюстрацію Capri для головного README та окремий 1280×640 social-preview asset. Вона не використовує приватний Capri sprite pack. Prompt, походження й межі ліцензування зафіксовані в [source card](sources/capri-original-hero-2026-11-08.md). Capri — видима назва компаньйона; внутрішні `b12` package/API identifiers збережено.
+
+## [2026-11-08] lint | Capri GitHub branding
+
+README hero веде на `docs/images/capri-hero.jpg`; social preview — 1280×640 PNG (904 827 bytes). У main README прямо зазначено, що Capri desktop зміни лишаються у відкритому PR #2. GraphQL підтверджує `usesCustomOpenGraphImage=false`; GitHub не має публічного API для запису цього налаштування, а UI браузера в сесії недоступний. Тому preview asset підготовлений у репозиторії, але settings-level upload потребує ручної дії власника. Повний test suite для цієї візуальної зміни не запускався.

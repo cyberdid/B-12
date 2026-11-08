@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-06
+updated: 2026-11-08
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -60,6 +60,7 @@ tags: [navigation]
 | [archive-index-public](sources/archive-index-public.md) | Pinned source review, 17 core tests і локальна інсталяція |
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
+| [Оригінальна обкладинка Capri](sources/capri-original-hero-2026-11-08.md) | Походження hero/social preview, prompt і межі використання локального art pack |
 | [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
