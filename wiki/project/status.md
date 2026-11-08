@@ -1,8 +1,8 @@
 ---
 type: status
-updated: 2026-11-04
+updated: 2026-11-08
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -19,6 +19,18 @@ tags: [progress, next]
 - **Відкрито:** власник окремо відклав security findings A-01, A-07, A-08, A-18, A-19, A-22 та F-03; їх не слід трактувати як виправлені. Також лишаються безперервний 8-hour soak із перевіркою RSS, людська UA/EN оцінка, фізичний R15 soak і R16 hardware acceptance.
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 - **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
+
+
+## Оновлення 08.11.2026 — TUI Companion Upgrade
+
+**Вимога власника:** реалізовувати ідеї Capri-подібних компаньйонів у наявному TUI; лишити Кіберкота стандартним і зробити зовнішній Capri skin опційним. Інша desktop UI не входить у scope.
+
+**Поточна робота:** реалізацію зафіксовано у commits `0947f2e` та `cb5db3c` на branch `feat/b12-cybercat-tui` і локально інтегровано в `main`; remote не оновлювався. Є local activity SQLite і provider hook adapter, TUI timeline/reports, явні PTT/mute/TTS контроли та зовнішній manifest skin loader. Hook приклади — лише project-local templates; вони не внесені в жодні налаштування, не активовані. Static review defects (Escape у paused approval, скасування mute preflight, fallback зі зниклого skin та гонка скасування approval) виправлено.
+
+**Межі доказу:** зміни локально злиті в основну гілку, але не опубліковані. У цій сесії не запускаються tests, TUI/server, мікрофон, гучномовець або модель. Проводиться статична перевірка конфігів, Python/shell синтаксису, diff та wiki-посилань. Доступні локальні `uv` і audio executables, тому залежності не встановлювалися. Оригінальний Capri artwork не додається: огляд джерел не підтвердив права на ці зображення; потрібен власний/ліцензований pack, див. [Q19](open-questions.md) і [формат skin](../../src/b12/tui/assets/skins/README.md).
+
+Детальний scope, інтерфейси та межі приймання: [специфікація](../../docs/superpowers/specs/2026-11-08-b12-tui-companion-upgrade-design.md), [план](../../docs/superpowers/plans/2026-11-08-b12-tui-companion-upgrade.md), [тема TUI](../topics/cyberpunk-tui.md).
+
 
 ## Наявне
 

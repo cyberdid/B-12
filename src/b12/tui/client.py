@@ -1,9 +1,12 @@
 """HTTP client for the loopback B-12 API. Only the owner token is needed; no model code here."""
 
+import base64
 import json
 from collections.abc import AsyncIterator, Iterable
 
 import httpx
+
+from b12.tui.voice import MAX_RECORD_SECONDS, MAX_WAV_BYTES, VoiceError
 
 
 def parse_ndjson(lines: Iterable[str]) -> list[dict]:
@@ -73,6 +76,59 @@ class ApiClient:
 
     async def cancel(self, turn_id: str) -> None:
         await self._json("POST", f"/api/turns/{turn_id}/cancel", json={})
+
+    async def voice_status(self) -> dict:
+        return await self._json("GET", "/api/voice/status", timeout=10.0)
+
+    async def voice_mute(self, muted: bool) -> dict:
+        if not isinstance(muted, bool):
+            raise VoiceError("invalid_mute_state")
+        return await self._json("POST", "/api/voice/mute", json={"muted": muted}, timeout=10.0)
+
+    async def voice_asr(self, pcm: bytes, sample_rate: int = 16000, language: str = "auto") -> dict:
+        if (
+            not isinstance(pcm, bytes)
+            or not isinstance(sample_rate, int)
+            or isinstance(sample_rate, bool)
+            or not 8000 <= sample_rate <= 48000
+            or not 2 <= len(pcm) <= min(675_000, sample_rate * 2 * MAX_RECORD_SECONDS)
+            or len(pcm) % 2
+        ):
+            raise VoiceError("invalid_voice_audio")
+        if language not in ("auto", "uk", "en"):
+            raise VoiceError("invalid_voice_language")
+        return await self._json(
+            "POST",
+            "/api/voice/asr",
+            json={
+                "audio_b64": base64.b64encode(pcm).decode("ascii"),
+                "sample_rate": sample_rate,
+                "language": language,
+            },
+            timeout=httpx.Timeout(120.0, connect=5.0),
+        )
+
+    async def voice_tts(self, text: str, lang: str = "auto") -> bytes:
+        if not isinstance(text, str) or not text.strip() or len(text) > 4000:
+            raise VoiceError("invalid_speech_text")
+        if lang not in ("auto", "uk", "en"):
+            raise VoiceError("invalid_voice_language")
+        async with self.http.stream(
+            "POST",
+            "/api/voice/tts",
+            json={"text": text, "lang": lang},
+            timeout=httpx.Timeout(180.0, connect=5.0),
+        ) as response:
+            response.raise_for_status()
+            wav = bytearray()
+            try:
+                async for chunk in response.aiter_bytes():
+                    if len(wav) + len(chunk) > MAX_WAV_BYTES:
+                        raise VoiceError("voice_response_too_large")
+                    wav.extend(chunk)
+                return bytes(wav)
+            finally:
+                wav.clear()
 
     async def chat(
         self, session_id: str, text: str, *, persist: bool, timeout_s: float = 600

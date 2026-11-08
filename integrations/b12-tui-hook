@@ -1,0 +1,64 @@
+#!/bin/sh
+# Best-effort, project-local lifecycle telemetry; never return a provider decision.
+set -u
+
+source_name=
+event_name=
+
+emit_antigravity_noop() {
+    [ "$source_name" = antigravity ] || return 0
+    case "$event_name" in
+        SessionStart|PostToolUse) printf '{}\n' ;;
+        PostInvocation) printf '{"injectSteps":[],"terminationBehavior":""}\n' ;;
+    esac
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --source)
+            if [ "$#" -lt 2 ]; then
+                emit_antigravity_noop
+                exit 0
+            fi
+            source_name=${2-}
+            shift 2
+            ;;
+        --event)
+            if [ "$#" -lt 2 ]; then
+                emit_antigravity_noop
+                exit 0
+            fi
+            event_name=${2-}
+            shift 2
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$source_name" ] || ! command -v uv >/dev/null 2>&1; then
+    emit_antigravity_noop
+    exit 0
+fi
+
+project_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd) || {
+    emit_antigravity_noop
+    exit 0
+}
+
+set -- --source "$source_name"
+if [ -n "$event_name" ]; then
+    set -- "$@" --event "$event_name"
+fi
+
+# Offline flags prevent hook events from syncing dependencies, contacting registries,
+# or downloading a Python interpreter. The B-12 environment must be prepared beforehand.
+output=$(uv run --offline --no-python-downloads --no-sync --project "$project_root" b12 tui-hook "$@" 2>/dev/null)
+status=$?
+if [ "$status" -eq 0 ]; then
+    [ -n "$output" ] && printf '%s\n' "$output"
+else
+    emit_antigravity_noop
+fi
+exit 0

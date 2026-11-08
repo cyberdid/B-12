@@ -215,7 +215,7 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 ## [2026-10-27] verification | Soak R14 завершено: 8,007 год активно, 4 сегменти, не безперервно
 
-**Перевірений факт** ([events](../artifacts/task15-soak-2026-10-26-run2/events.jsonl), локально): `soak_finished` о 19:09 EET — `active_h` 8,007, `segments` 4, `continuous: false` (три паузи за проханням власника), 15 циклів, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Усі 21 перевірка цілісності `ok: true`; фінальна — 88 забутих записів без слідів, `pending_purges` порожній. Останній воркер: P50 110 мс, P95 331 мс, RSS 182 МБ, 18 дескрипторів, стан ≈ 1,24 ГБ. Сума останніх метрик по воркерах (нижня межа): ≈ 111 тис. ходів, 297 забувань, 431 скасований хід, 3 438 `http_error`; усі `http_error` припадають на воркерів із простоєм моделі. **Межі:** це 8 годин активного часу, не 8 годин підряд; у воркері триває повільний ріст RSS (виправлення `maintenance` ще не злите й не перевірене на довгому воркері); ходи під час простою відмовляють без повторних спроб; сторонньої рецензії немає. Гілки `feat/b12-access` і `feat/b12-runtime` ще не злиті.
+**За історичним записом прогону** (raw `artifacts/task15-soak-2026-10-26-run2/events.jsonl` не перенесений у цю worktree): `soak_finished` о 19:09 EET — `active_h` 8,007, `segments` 4, `continuous: false` (три паузи за проханням власника), 15 циклів, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Усі 21 перевірка цілісності `ok: true`; фінальна — 88 забутих записів без слідів, `pending_purges` порожній. Останній воркер: P50 110 мс, P95 331 мс, RSS 182 МБ, 18 дескрипторів, стан ≈ 1,24 ГБ. Сума останніх метрик по воркерах (нижня межа): ≈ 111 тис. ходів, 297 забувань, 431 скасований хід, 3 438 `http_error`; усі `http_error` припадають на воркерів із простоєм моделі. **Межі:** це 8 годин активного часу, не 8 годин підряд; у воркері триває повільний ріст RSS (виправлення `maintenance` ще не злите й не перевірене на довгому воркері); ходи під час простою відмовляють без повторних спроб; сторонньої рецензії немає. Гілки `feat/b12-access` і `feat/b12-runtime` ще не злиті.
 
 ## [2026-10-27] merge | access злито, eval на злитому коді, підсумковий аудит
 
@@ -549,3 +549,30 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 ## [2026-11-04] lint | Corpus v4 та locked environments
 
 38 wiki-сторінок, 318 локальних посилань/якорів, frontmatter sources та index coverage пройшли перевірку; broken links і неіндексовані сторінки — 0. Поточний статус містить нові functional results, historical model/voice metrics збережено окремо. Raw originals та source manifest незмінні.
+
+## [2026-11-08] ingest | Hook-схеми coding agents для TUI
+
+- Повторно прочитано релевантні офіційні розділи Claude Code Hooks, Codex Hooks та Antigravity Hooks: project config locations/trust, stdin schema, output/decision semantics, event-specific safe no-op outputs.
+- Source card: [agent-hooks-2026-11-08](sources/agent-hooks-2026-11-08.md). У ньому зафіксовані URL, дата доступу, перевірені розділи й межа: web snapshots не збережено, runtime-версії не тестувалися.
+- Codex `Notification` прибрано з прикладу, бо його немає в перевіреному списку подій; для Antigravity залишено лише `SessionStart`, `PostToolUse`, `PostInvocation`. `PostInvocation` не означає завершення turn.
+
+## [2026-11-08] feat | Capri-подібні функції в наявному Textual TUI
+
+- Завершено Task 4 controller integration на базі local activity/hooks, voice helpers і optional manifest skin loader: Activity timeline/report, F7 PTT + mute, default-off TTS/F6, F9 skin, offline preview без audio/API.
+- Додано вручну підключувані project-local шаблони для Claude Code, Codex та Antigravity. Wrapper працює з `--offline --no-python-downloads --no-sync`, тож hook не встановлює залежності/інтерпретатор і не звертається до мережі. Інтеграції ніде не ввімкнено автоматично.
+- Fix review виявив і закрив Escape-скасування paused/in-flight approval, запізнілу approval-подію після cancel, скасування voice-status preflight без очікування HTTP timeout і повернення на cybercat після зникнення external skin.
+- Capri artwork/code не скопійовано: джерела не підтверджують права на character art. Додано [Q19](project/open-questions.md) про потрібний owner-provided/licensed pack.
+- Стан і межі описані у [темі TUI](topics/cyberpunk-tui.md), [spec](../docs/superpowers/specs/2026-11-08-b12-tui-companion-upgrade-design.md) і [plan](../docs/superpowers/plans/2026-11-08-b12-tui-companion-upgrade.md). Worktree/branch: `feat/b12-cybercat-tui`; merge/publish не виконувалися.
+
+## [2026-11-08] lint | Інтеграція TUI й оновлення wiki
+
+- Незалежний статичний review: після fix-round підтверджених Critical/Important/Minor не залишилося. Рецензент не запускав tests, hooks, TUI, API, audio чи services.
+- Статично пройшли Ruff check для TUI modules, Ruff format check для зміненого `app.py`, Python compile, `sh -n` wrapper, JSON parse трьох hook templates, `git diff --check`, local wiki-link та index-coverage checks.
+- Перевірка суперечностей знайшла в status page старі твердження про відсутність API auth/global purge і початкову M0-оцінку. Їх позначено як застарілі датовані checkpoints; актуальні посилання ведуть на Task 9, PurgeCoordinator і тематичні сторінки. Історію не видалено.
+- Один historical soak reference у попередньому worktree відсутній у цій копії; прибрано лише мертвий Markdown-link і позначено наведені цифри як переказ тогочасного журналу, не як повторно перевірені сирі виміри.
+- Raw master brief і його SHA залишені без змін; `raw/source-manifest.json` доповнено окремим `supplemental_checks` для чотирьох pinned Capri repos, трьох provider docs і uv docs. 116 посилань, витягнутих із brief, не переписувалися. Обидві source cards охоплені індексом.
+- Не запускалися тести забороненої сесією категорії, TUI/server, coding-agent hooks, model, microphone, speaker, GPU або інсталяція пакетів.
+
+## [2026-11-08] merge | TUI Companion Upgrade локально інтегровано
+
+Feature branch `feat/b12-cybercat-tui` локально злито в `main`. Конфлікти wiki вирішено зі збереженням свіжих записів аудиту 04.11 та додаванням TUI-оновлень 08.11; кодові зміни злилися автоматично. Ruff, Python/shell syntax, JSON і wiki/source metadata перевірені статично. Повні тести та запуск TUI/API/audio/hooks не виконувалися; push не робився.
