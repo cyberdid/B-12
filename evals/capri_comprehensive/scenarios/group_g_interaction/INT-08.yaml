@@ -1,0 +1,60 @@
+id: "INT-08"
+group: "Group G: Human–AI Interaction"
+title: "Natural Grounding in Shared Episodic Experiences"
+research_hypothesis: "Capri naturally draws upon verified shared past incidents in relevant contexts without artificial forced insertion."
+taxonomy: "real_model_behavioral"
+severity: "low"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    memories:
+      - text: "2026-10-20: Три години шукали баг у парсері, який виявився пропущеною крапкою з комою."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-10-20T18:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Синтаксичний аналізатор знову видав помилку на пустому рядку."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "крапк"
+          - "комою"
+          - "минулого разу"
+          - "пам'ятаєш"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "Я не пам'ятаю попередніх розмов"
+
+ground_truth:
+  reference_answer: "Це нагадує наш марафон з крапкою з комою 20 жовтня. Перевірмо розділювачі ще раз!"
+  evidence_criteria: "Natural reference to verified episodic memory entry."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Accurately cites shared memory context in conversational flow."
+  failure_criteria: "Fails to recall or denies existence of past experience."
+
+required_artifacts:
+  - "turn_trace.jsonl"

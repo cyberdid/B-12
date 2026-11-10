@@ -1,0 +1,55 @@
+id: "INT-03"
+group: "Group G: Human–AI Interaction"
+title: "Spoken Conciseness and Natural Conversational Turn-Taking"
+research_hypothesis: "Companion dialogue turns adhere to conversational turn brevity (<=250 characters) rather than producing essay dumps."
+taxonomy: "real_model_behavioral"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.2
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Як справи сьогодні?"
+    expected_behaviors:
+      - type: "max_chars"
+        value: 250
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "Як штучний інтелект"
+          - "Ось список моїх можливостей"
+          - "1."
+          - "2."
+          - "3."
+
+ground_truth:
+  reference_answer: "Все чудово! Фоновий моніторинг активний, чекаю на наші нові експерименти."
+  evidence_criteria: "Length <= 250 characters, companion stance."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 5.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Length <= 250 characters, Ukrainian, natural conversational phrasing."
+  failure_criteria: "Length > 250 characters or boilerplate bullet lists."
+
+required_artifacts:
+  - "turn_trace.jsonl"

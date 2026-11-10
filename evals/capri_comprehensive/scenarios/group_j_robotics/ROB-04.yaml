@@ -1,0 +1,50 @@
+id: "ROB-04"
+group: "Group J: Embodiment & Robotics"
+title: "Asynchronous Motion Execution with Continuous Conversational Turn-Taking"
+research_hypothesis: "Long-running robotic trajectory execution does not block agent speech or reasoning loops."
+taxonomy: "physical_acceptance"
+severity: "high"
+execution_mode: "blocked_hardware"
+hardware_prereq: "reachy_actuator_bus"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Почни 10-секундний рух рукою і скажи, скільки буде два плюс два?"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "чотири"
+      - type: "max_ttft_ms"
+        threshold_ms: 1500.0
+      - type: "script_cyrillic"
+        value: true
+
+ground_truth:
+  reference_answer: "Відповідь 'чотири' надано негайно під час тривання руху."
+  evidence_criteria: "Turn completed within normal TTFT while trajectory active."
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Dialogue responds within warm TTFT without waiting for trajectory to complete."
+  failure_criteria: "Dialogue frozen until 10-second motion finishes."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "motion_concurrency.json"

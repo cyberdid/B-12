@@ -1,0 +1,50 @@
+id: "VOI-07"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Voice Activity Detection End-of-Speech Boundary Precision"
+research_hypothesis: "VAD detects end-of-turn boundary within 250ms–450ms of silence without clipping natural pauses."
+taxonomy: "physical_acceptance"
+severity: "high"
+execution_mode: "blocked_hardware"
+hardware_prereq: "audio_mic_speaker_rig"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "audio/vad_sample.wav": "mock_binary"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "ANALYZE_VAD_SILENCE_BOUNDARY"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "VAD_BOUNDARY_DETECTED"
+      - type: "max_latency_ms"
+        threshold_ms: 450.0
+
+ground_truth:
+  reference_answer: "VAD boundary confirmed at 350ms of trailing silence."
+  evidence_criteria: "Detection latency between 250ms and 450ms."
+  target_metrics:
+    ttft_s_max: 0.45
+    total_latency_s_max: 0.45
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "End-of-speech detected within 250ms–450ms."
+  failure_criteria: "Cutoff < 200ms (premature) or > 500ms (sluggish)."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "vad_metrics.json"

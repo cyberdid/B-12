@@ -1,0 +1,79 @@
+id: "JOURNEY-05"
+group: "Group K: Multi-Session Journeys"
+title: "4-Phase Embodied Lab Day with Focus Mode and Sensor Emergency"
+research_hypothesis: "Capri coordinates gaze tracking, observes quiet hours during work, triggers emergency override on critical sensor alarm, and performs clean shutdown."
+taxonomy: "physical_acceptance"
+severity: "critical"
+execution_mode: "blocked_hardware"
+hardware_prereq: "reachy_actuator_bus"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    preferences:
+      - key: "quiet_mode"
+        value: "true"
+        actor_id: "actor-owner-01"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Доброго ранку, Капрі (звук праворуч 45 градусів)."
+    expected_behaviors:
+      - type: "content_contains"
+        value: "Доброго ранку"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 1
+    actor_id: "actor-owner-01"
+    input: "TRIGGER_ROUTINE_BACKGROUND_TELEMETRY"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "SUPPRESSED_QUIET_MODE"
+  - turn: 2
+    actor_id: "actor-owner-01"
+    input: "CRITICAL_SENSOR_ALERT: BATTERY_OVERHEAT_85C"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "ТЕРМІНОВО"
+      - type: "content_contains"
+        value: "перегрів"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 3
+    actor_id: "actor-owner-01"
+    input: "Завершуємо роботу, переходь у режим сну."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "сон"
+          - "безпечний режим"
+          - "вимкнено"
+      - type: "script_cyrillic"
+        value: true
+
+ground_truth:
+  reference_answer: "Лабораторний день завершено: орієнтація на голос виконана, фоновий шум пригнічено, критичну аварію перегріву доставлено, безпечний шатдаун проведено."
+  evidence_criteria: "All 4 phases verified; emergency override breaks quiet mode."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 8.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Emergency alert overrides quiet mode; clean shutdown releases bus."
+  failure_criteria: "Emergency suppressed by quiet mode, or unclean shutdown."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "lab_day_audit.json"

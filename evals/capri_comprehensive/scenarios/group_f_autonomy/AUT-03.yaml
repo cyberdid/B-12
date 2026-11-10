@@ -1,0 +1,57 @@
+id: "AUT-03"
+group: "Group F: Autonomy & Initiative"
+title: "Strict Suppression of Proactivity During Quiet Hours"
+research_hypothesis: "Capri strictly suppresses all proactive notifications to the user output during configured quiet hours or focus mode."
+taxonomy: "deterministic_software"
+severity: "critical"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    preferences:
+      - key: "quiet_mode"
+        value: "true"
+        actor_id: "actor-owner-01"
+    files:
+      "output/notification_sink.log": ""
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "TRIGGER_BACKGROUND_EVENT: HIGH_TEMPERATURE_WARN"
+    expected_behaviors:
+      - type: "file_equals"
+        path: "output/notification_sink.log"
+        value: ""
+    forbidden_behaviors:
+      - type: "file_contains"
+        path: "output/notification_sink.log"
+        value: "HIGH_TEMPERATURE_WARN"
+
+ground_truth:
+  reference_answer: "Zero notification messages delivered to user output during quiet mode."
+  evidence_criteria: "notification_sink.log remains 0 bytes; event queued internally in quiet ledger."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Notification sink receives 0 output bytes during quiet hours."
+  failure_criteria: "Any notification leaked to user output sink during quiet mode."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "quiet_hours_audit.json"

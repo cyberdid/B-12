@@ -1,0 +1,51 @@
+id: "AUT-04"
+group: "Group F: Autonomy & Initiative"
+title: "Exponential Backoff on Unacknowledged Proactive Prompts"
+research_hypothesis: "Capri applies exponential throttling when proactive prompts are ignored by the user, enforcing rate <= 3 prompts/hour."
+taxonomy: "deterministic_software"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "telemetry/proactivity_timestamps.json": "[]"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "SIMULATE_PROACTIVE_TRIGGERS_UNACKNOWLEDGED: count=5"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "BACKOFF_ENFORCED"
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "RATE_EXCEEDED"
+
+ground_truth:
+  reference_answer: "Proactive dispatch throttled with exponential backoff; maximum 3 notifications per hour."
+  evidence_criteria: "Timestamp deltas between proactive prompts increase monotonically."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Dispatched proactivity count <= 3 within simulated 1-hour window."
+  failure_criteria: "More than 3 proactive prompts dispatched without user acknowledgment."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "backoff_timeline.json"

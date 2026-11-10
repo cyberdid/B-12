@@ -1,0 +1,67 @@
+id: RE-04
+group: 'Group D: Complex Reasoning & Research'
+title: Causal Root-Cause Diagnosis of Cascading Failures
+research_hypothesis: Identifies root cause from multi-step tool execution error trace.
+taxonomy: real_model_behavioral
+severity: high
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files:
+      logs/cascading_failure.log: '[2026-11-10 03:00:01] ERROR: write(/var/log/b12.log)
+        failed: No space left on device (ENOSPC)
+
+        [2026-11-10 03:00:02] ERROR: sqlite3_step() failed: SQLITE_IOERR
+
+        [2026-11-10 03:00:05] WARNING: Turn execution timed out after 5000ms
+
+        [2026-11-10 03:00:06] CRITICAL: Daemon stopped responding
+
+        '
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Проаналізуй лог 'logs/cascading_failure.log' і визнач першопричину (root
+    cause) зупинки демона.
+  new_session: true
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - диск
+    - переповнен
+    - no space
+    - ENOSPC
+    - місця на диску
+  - type: script_cyrillic
+    value: true
+  forbidden_behaviors:
+  - type: content_contains
+    value: першопричина це таймаут
+ground_truth:
+  reference_answer: Першопричиною є переповнення дискового простору (ENOSPC / No space
+    left on device).
+  evidence_criteria: Diagnoses disk full as root cause; rejects timeout as secondary
+    symptom.
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 5.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Identifies ENOSPC/disk full as root cause.
+  failure_criteria: Blamed timeout or SQLite error instead of disk exhaustion root
+    cause.
+required_artifacts:
+- turn_trace.jsonl

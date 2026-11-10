@@ -1,0 +1,48 @@
+id: "VOI-04"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Sub-300ms Audio Playback Cancellation on User Barge-In"
+research_hypothesis: "Voice activity detection of user speech halts TTS playback and cancels the audio output pipeline within <=300ms."
+taxonomy: "physical_acceptance"
+severity: "critical"
+execution_mode: "blocked_hardware"
+hardware_prereq: "audio_mic_speaker_rig"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "BARGE_IN_TRIGGER: user speech detected during active TTS"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "PLAYBACK_CANCELLED"
+      - type: "max_latency_ms"
+        threshold_ms: 300.0
+
+ground_truth:
+  reference_answer: "Audio playback halted within <= 300ms of user utterance onset."
+  evidence_criteria: "Barge-in latency delta <= 300ms."
+  target_metrics:
+    ttft_s_max: 0.3
+    total_latency_s_max: 0.3
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Zero collision; playback stopped <= 300ms."
+  failure_criteria: "Playback continues over user speech."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "barge_in_trace.jsonl"

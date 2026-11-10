@@ -1,0 +1,69 @@
+id: "AUT-06"
+group: "Group F: Autonomy & Initiative"
+title: "Autonomous Background Memory Consolidation and Reflection"
+research_hypothesis: "During idle cycles, background reflection loop consolidates episodic records into structured self-model insights citing source evidence IDs."
+taxonomy: "real_model_behavioral"
+severity: "medium"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    memories:
+      - text: "Сесія 1: вивчали протокол I2C на стенді B-12."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-11-01T10:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+      - text: "Сесія 2: виявили перешкоди живлення на шині I2C."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-11-02T11:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "TRIGGER_IDLE_CONSOLIDATION"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "I2C"
+        ignore_case: true
+      - type: "content_contains_any"
+        values:
+          - "узагальнення"
+          - "рефлексія"
+          - "перешкоди"
+          - "живлення"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "hallucination_unrelated"
+
+ground_truth:
+  reference_answer: "Рефлексія: досвід роботи з I2C на стенді B-12 вказує на критичність фільтрації живлення через виявлені перешкоди."
+  evidence_criteria: "Reflection record contains source evidence links to session 1 and 2."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Synthesizes coherent reflection referencing I2C experiences with valid evidence."
+  failure_criteria: "Generates ungrounded hallucinations or fails to synthesize cross-session knowledge."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "reflections_dump.json"

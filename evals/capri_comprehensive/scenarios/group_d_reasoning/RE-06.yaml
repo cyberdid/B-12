@@ -1,0 +1,47 @@
+id: RE-06
+group: 'Group D: Complex Reasoning & Research'
+title: Quantitative Mathematical Verification via Tool Delegation
+research_hypothesis: Delegates mathematical computations to python/calc tools rather
+  than LLM token guessing.
+taxonomy: real_model_behavioral
+severity: high
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Обчисли точне вибіркове стандартне відхилення (sample standard deviation)
+    для чисел [14.2, 18.5, 12.1, 19.8, 15.4]. Подай результат з точністю до 4 знаків
+    після коми.
+  new_session: true
+  expected_behaviors:
+  - type: content_regex
+    pattern: 3[.,]0781
+  forbidden_behaviors: []
+ground_truth:
+  reference_answer: Sample standard deviation = 3.0781.
+  evidence_criteria: Mathematically exact computation matches statistics.stdev.
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Matches 3.0781 to 4 decimal places.
+  failure_criteria: Arithmetic error or inaccurate standard deviation.
+required_artifacts:
+- turn_trace.jsonl

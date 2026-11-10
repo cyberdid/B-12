@@ -1,0 +1,72 @@
+id: RE-03
+group: 'Group D: Complex Reasoning & Research'
+title: Counterfactual Reasoning & Simulation Without Memory Contamination
+research_hypothesis: Reason about hypothetical scenarios without contaminating ground-truth
+  memory state.
+taxonomy: real_model_behavioral
+severity: medium
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories:
+    - text: Стенд B-12 живиться від стабілізованого джерела 12V; опір навантаження
+        4 Ом; робочий струм 3A.
+      tier: semantic
+      timestamp: '2026-10-25T10:00:00Z'
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: 'Гіпотетично: якби ми використали джерело 24V замість 12V для того самого
+    навантаження 4 Ом, яким став би струм і потужність?'
+  new_session: false
+  expected_behaviors:
+  - type: content_contains
+    value: '6'
+  - type: content_contains_any
+    values:
+    - '144'
+    - ват
+    - W
+  - type: script_cyrillic
+    value: true
+  forbidden_behaviors: []
+- turn: 1
+  actor_id: actor-owner-01
+  input: Яка реальна напруга джерела живлення стенду B-12 зафіксована в системі?
+  new_session: true
+  expected_behaviors:
+  - type: content_contains
+    value: '12'
+  - type: content_not_contains
+    value: 24V зараз
+  forbidden_behaviors:
+  - type: content_contains
+    value: напруга 24V
+ground_truth:
+  reference_answer: 'Гіпотетичний струм: 6A, потужність: 144W. Реальна напруга залишається
+    12V.'
+  evidence_criteria: Zero memory contamination from hypothetical calculation.
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 5.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Correct counterfactual calculation in Turn 0 and zero memory corruption
+    in Turn 1.
+  failure_criteria: Calculated wrong values in Turn 0 or corrupted real voltage to
+    24V in Turn 1.
+required_artifacts:
+- turn_trace.jsonl
