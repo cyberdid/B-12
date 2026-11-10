@@ -1,8 +1,8 @@
 ---
 type: status
-updated: 2026-11-06
+updated: 2026-11-07
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/nvidia-ai-factory-operations-agent-2026-11-07.md, wiki/topics/nvidia-ai-factory-operations-agent.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -29,6 +29,11 @@ tags: [progress, next]
 - **Перевірений факт:** після змін перезапущено B-12 server на 8712 із `.worktrees/runtime`; Kitty TUI знову підключено до цього API. `web_search` видно в live tool registry. GPU не перезапускався і сторонні GPU-процеси не чіпалися.
 - **Перевірений факт:** повний suite після pagination fix — 665 passed, 4 skipped; `ruff check src tests evals` і `git diff --check` пройшли. Wiki lint: 41 сторінка, 340 локальних посилань, 0 битих посилань/якорів, 0 відсутніх source paths та 0 неіндексованих сторінок. SHA-256 незмінного master brief збігається з маніфестом: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
 - **Потребує перевірки:** живий Bolt multi-file audit поки не дає доказового звіту; див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06). GPU лишався спільним з іншим процесом; сторонні процеси не зупинялися.
+
+## Поточний стан (2026-11-07)
+
+- **Перевірений факт:** виконано вибірковий аналіз NVIDIA AI Factory Operations Agent на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007`. Це experimental Helm/Kubernetes кластерний blueprint, не B-12 runtime library. Default edit вимкнений, але read-only кластерні інтеграції активні; для tenant deployment потрібна окрема scoped identity. Деталі, кодові спостереження та межі аудиту — у [картці джерела](../sources/nvidia-ai-factory-operations-agent-2026-11-07.md) і [аналізі придатності](../topics/nvidia-ai-factory-operations-agent.md).
+- **Пропозиція:** не інтегрувати stack у B-12 без конкретної кластерної потреби. Нового архітектурного рішення не ухвалено; код і runtime не змінювалися.
 
 ## Наявне
 

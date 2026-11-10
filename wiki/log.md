@@ -599,3 +599,13 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-06] publish | PR з runtime, пошуком і документацією
 
 За дорученням власника три коміти гілки `feat/b12-runtime` опубліковано в публічному `cyberdid/B-12`; відкрито [PR #1 у `main`](https://github.com/cyberdid/B-12/pull/1). PR містить детальний опис змін, перевірок, benchmark меж і негативного live code-review результату. На момент запису PR має стан OPEN і не злитий; `main` не змінювався.
+
+## [2026-11-07] ingest | NVIDIA AI Factory Operations Agent
+
+За URL власника прочитано README, security/multitenancy/installation docs та вибрані chart, RBAC, secrets і tool policy файли на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007` (commit 2026-11-05). AFOA — експериментальний Helm/Kubernetes blueprint для кластерних операцій; приватні NGC artifacts вимагають early-access запрошення. Default Edit вимкнений, але кластерний read-only доступ активний; tenant deployment потребує окремої scoped identity. Перевірений кодом lifecycle mutation має стани `running/completed/failed`; його здатність чесно представляти частковий ефект потребує перевірки.
+
+Рекомендація для B-12 — не переносити stack без конкретної задачі роботи із зовнішнім кластером. Патерни поділу tool/credential та server-side policy можна враховувати, але B-12 вже має власні grants і `unknown` outcome. Runtime не змінювався, Helm не встановлювався, тести не запускалися; snapshot у `raw/` не збережено. Картка джерела: [NVIDIA AFOA](sources/nvidia-ai-factory-operations-agent-2026-11-07.md); зіставлення: [придатність для B-12](topics/nvidia-ai-factory-operations-agent.md).
+
+## [2026-11-07] lint | Аналіз NVIDIA AI Factory Operations Agent
+
+Перевірено 43 wiki-сторінки, 352 локальні Markdown-посилання/якорі, frontmatter `type/updated/status/sources/tags`, усі source paths і охоплення індексом: помилок немає, сторінок поза індексом — 0. `raw/source-manifest.json` валідний, URL має `verified_selected_claims` із датою та обсягом читання. SHA-256 незміненого master brief збігається з маніфестом; `git diff --check` пройшов. Runtime-код і тести не змінювалися/не запускалися.
