@@ -1,8 +1,8 @@
 # Capri Comprehensive Evaluation: Statistical Summary
 
-**Generated:** 2026-11-10T13:35:07.451016+00:00  
+**Generated:** 2026-11-10T16:10:42.135077+00:00  
 **Total Scenarios Evaluated:** 92  
-**Automated Pass Rate (Runnable):** 37.2% [27.3%, 48.3%]  
+**Automated Pass Rate (Runnable):** 24.4% [16.2%, 34.9%]  
 **Blocked Hardware:** 12  
 **Blocked Delay (Long-Term):** 2  
 
@@ -10,23 +10,23 @@
 
 | Group | Total | Pass | Fail | Blocked HW | Blocked Delay | Pass Rate (Wilson 95% CI) | P50 (ms) [95% CI] | P95 (ms) [95% CI] |
 |:---|---:|---:|---:|---:|---:|:---|:---|:---|
-| Group A: Autobiographical Memory | 10 | 3 | 7 | 0 | 0 | 30.0% [10.8%, 60.3%] | 3517.9 [2478.0, 5804.9] | 7638.1 [4879.7, 8164.5] |
-| Group B: Long-Term Continuity | 8 | 3 | 4 | 0 | 1 | 42.9% [15.8%, 75.0%] | 7008.1 [3573.9, 12646.6] | 17089.1 [9108.1, 19026.2] |
-| Group C: Cross-Model Behavioral Continuity | 10 | 5 | 5 | 0 | 0 | 50.0% [23.7%, 76.3%] | 58664.8 [37621.1, 71857.9] | 74842.8 [71826.7, 78633.0] |
-| Group D: Complex Reasoning & Research | 8 | 4 | 4 | 0 | 0 | 50.0% [21.5%, 78.5%] | 14037.1 [6878.9, 16583.3] | 18241.2 [15564.8, 19346.4] |
-| Group E: Security & Adversarial Robustness | 12 | 5 | 7 | 0 | 0 | 41.7% [19.3%, 68.0%] | 7046.5 [4337.5, 11501.9] | 16542.2 [11622.3, 16561.3] |
-| Group F: Autonomy & Initiative | 9 | 1 | 8 | 0 | 0 | 11.1% [2.0%, 43.5%] | 0.0 [0.0, 9906.8] | 13815.4 [5158.2, 16421.1] |
-| Group G: Human–AI Interaction | 8 | 5 | 3 | 0 | 0 | 62.5% [30.6%, 86.3%] | 8470.2 [3906.3, 12766.8] | 13458.9 [11037.9, 13920.2] |
-| Group H: Voice & Real-Time Interaction | 8 | 3 | 0 | 5 | 0 | 100.0% [43.9%, 100.0%] | 3911.4 [245.4, 5046.6] | 4943.8 [3461.5, 5046.6] |
-| Group I: Reliability & Fault Tolerance | 8 | 0 | 8 | 0 | 0 | 0.0% [0.0%, 32.4%] | 0.0 [0.0, 0.0] | 5510.9 [0.0, 8478.3] |
+| Group A: Autobiographical Memory | 10 | 0 | 10 | 0 | 0 | 0.0% [0.0%, 27.8%] | 4440.3 [3765.2, 4501.0] | 6678.7 [4501.0, 6739.7] |
+| Group B: Long-Term Continuity | 8 | 1 | 6 | 0 | 1 | 14.3% [2.6%, 51.3%] | 6357.9 [2755.4, 9009.2] | 13421.6 [6819.8, 16888.6] |
+| Group C: Cross-Model Behavioral Continuity | 10 | 6 | 4 | 0 | 0 | 60.0% [31.3%, 83.2%] | 21226.9 [14485.0, 45870.0] | 86972.2 [43629.0, 90675.2] |
+| Group D: Complex Reasoning & Research | 8 | 2 | 6 | 0 | 0 | 25.0% [7.1%, 59.1%] | 5991.6 [3228.0, 13744.2] | 17097.0 [7847.6, 17201.0] |
+| Group E: Security & Adversarial Robustness | 12 | 5 | 7 | 0 | 0 | 41.7% [19.3%, 68.0%] | 8487.4 [6345.0, 9702.5] | 13459.5 [9702.5, 14875.5] |
+| Group F: Autonomy & Initiative | 9 | 0 | 9 | 0 | 0 | 0.0% [0.0%, 29.9%] | 0.0 [0.0, 5089.0] | 7325.5 [1644.4, 8816.5] |
+| Group G: Human–AI Interaction | 8 | 3 | 5 | 0 | 0 | 37.5% [13.7%, 69.4%] | 6677.6 [4047.4, 10298.1] | 12846.1 [8289.0, 14544.8] |
+| Group H: Voice & Real-Time Interaction | 8 | 2 | 1 | 5 | 0 | 66.7% [20.8%, 93.9%] | 4777.3 [1559.3, 9424.3] | 9157.5 [1908.9, 9424.3] |
+| Group I: Reliability & Fault Tolerance | 8 | 0 | 8 | 0 | 0 | 0.0% [0.0%, 32.4%] | 0.0 [0.0, 0.0] | 6656.5 [0.0, 10240.7] |
 | Group J: Embodiment & Robotics | 6 | 0 | 0 | 6 | 0 | N/A (0/0) | N/A | N/A |
-| Group K: Multi-Session Journeys | 5 | 0 | 3 | 1 | 1 | 0.0% [0.0%, 56.1%] | 9343.4 [5161.3, 13926.5] | 16630.5 [13880.9, 16633.7] |
+| Group K: Multi-Session Journeys | 5 | 0 | 3 | 1 | 1 | 0.0% [0.0%, 56.1%] | 3642.2 [2750.7, 7344.8] | 11352.3 [7344.8, 14783.7] |
 
 ## 2. Four-Tier Scientific Taxonomy Breakdown
 
 | Taxonomy Category | Scenarios | Executed Pass | Executed Fail | Blocked |
 |:---|---:|---:|---:|---:|
-| `controlled_experimental` | 13 | 5 | 6 | 2 |
-| `deterministic_software` | 28 | 5 | 23 | 0 |
+| `controlled_experimental` | 13 | 2 | 9 | 2 |
+| `deterministic_software` | 28 | 4 | 24 | 0 |
 | `physical_acceptance` | 12 | 0 | 0 | 12 |
-| `real_model_behavioral` | 39 | 19 | 20 | 0 |
+| `real_model_behavioral` | 39 | 13 | 26 | 0 |

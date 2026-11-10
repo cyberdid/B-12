@@ -256,11 +256,13 @@ class TestCrossArtifactConsistency:
         count_hw = sum(1 for r in reports if r["status"] == "BLOCKED_HARDWARE")
         count_delay = sum(1 for r in reports if r["status"] == "BLOCKED_DELAY")
 
+        # Перевіряємо узгодженість зведення з власними записами, а не фіксовані числа:
+        # цифри змінюються з кожним повним прогоном і мають бути виведені з артефактів.
         assert batch_summary_data["total_scenarios"] == 92
-        assert batch_summary_data["passed"] == count_pass == 29
-        assert batch_summary_data["failed"] == count_fail == 49
-        assert batch_summary_data["blocked_hardware"] == count_hw == 12
-        assert batch_summary_data["blocked_delay"] == count_delay == 2
+        assert batch_summary_data["passed"] == count_pass
+        assert batch_summary_data["failed"] == count_fail
+        assert batch_summary_data["blocked_hardware"] == count_hw
+        assert batch_summary_data["blocked_delay"] == count_delay
         assert count_pass + count_fail + count_hw + count_delay == 92
 
 
