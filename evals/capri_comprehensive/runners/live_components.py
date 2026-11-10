@@ -363,10 +363,116 @@ def rel08(tmp: Path) -> LiveResult:
     return res
 
 
+# --- AUT-08: resume a goal from its checkpoint after a crash (real model) --------
+REPEATS_AUT08 = 3
+CHECKPOINT_TEXT = (
+    "[done] Крок 1 виконано: дані зібрано. Крок 2 виконано: дані перевірено. "
+    "Наступний: крок 3 — записати звіт; крок 4 — завершити."
+)
+
+
+def _model_settings(state_dir: Path):
+    from b12.config import Settings
+
+    return Settings(
+        state_dir=state_dir,
+        model="gemma4:12b",
+        model_profile=Path.home() / ".local/share/b12/profiles/gemma4-12b-ollama-0.33.3.json",
+        tokenizer_dir=Path.home() / ".local/share/b12/tokenizers/gemma4-12b/43c9d014b231474fa7212dbb48a762566c2b255d",
+        num_ctx=8192,
+        output_tokens=512,
+        quiet_start="00:00",
+        quiet_end="00:00",
+    )
+
+
+async def _aut08_case(base: Path) -> dict:
+    from datetime import timedelta
+
+    from b12.autonomy import Scheduler
+    from b12.runtime import open_runtime
+
+    settings = _model_settings(base / "state")
+    runtime = open_runtime(settings)
+    actor = runtime.control.create_actor(owner=True, consent=True)
+    session = runtime.control.create_session(actor.id)
+    goal = runtime.goals.create(
+        actor.id,
+        session,
+        "Підготувати звіт про калібрування: 4 кроки (збір даних, перевірка, звіт, завершення).",
+        "Звіт записано після перевірки всіх чотирьох кроків.",
+        allowed_tools=("time.read",),
+        budget_turns=4,
+        review_interval_s=3600,
+    )
+    runtime.goals.checkpoint(
+        goal["id"], actor.id, CHECKPOINT_TEXT,
+        datetime.now(UTC) + timedelta(hours=1), evidence_ids=(),
+    )
+    saved = runtime.goals.get(goal["id"], actor.id)["checkpoint"]
+    runtime.close()  # simulated crash: the process state is gone
+
+    runtime = open_runtime(settings)  # restart on the same state directory
+    durable = runtime.goals.get(goal["id"], actor.id)["checkpoint"] == saved == CHECKPOINT_TEXT
+    scheduler = Scheduler(runtime)
+    try:
+        outcome = await scheduler.run_goal(runtime.goals.get(goal["id"], actor.id))
+        after = runtime.goals.get(goal["id"], actor.id)["checkpoint"] or ""
+    finally:
+        scheduler.close()
+        runtime.close()
+    content = after.split("] ", 1)[1] if "] " in after else after
+    return {
+        "durable": durable,
+        "state": outcome.get("state"),
+        "error_code": outcome.get("error_code"),
+        "content": content,
+    }
+
+
+def aut08(tmp: Path) -> LiveResult:
+    import asyncio
+    import re
+
+    cases = []
+    for i in range(REPEATS_AUT08):
+        base = tmp / f"run{i}"
+        base.mkdir()
+        cases.append(asyncio.run(_aut08_case(base)))
+
+    def judged(c: dict) -> tuple[bool, bool, bool]:
+        text = c["content"]
+        mentions_3 = bool(re.search(r"(крок\s*3|step\s*3|\b3\b)", text, re.IGNORECASE))
+        restarts = bool(re.search(
+            r"(почну з кроку 1|почнемо з кроку 1|з першого кроку|спочатку|restarting|"
+            r"step\s*1[:.]|крок\s*1[:.])", text, re.IGNORECASE))
+        ok_state = c["state"] not in (None, "error") and c["error_code"] is None
+        return mentions_3 and not restarts, ok_state, c["durable"]
+
+    checks = [judged(c) for c in cases]
+    per_run = [
+        f"run{i}: state={c['state']} err={c['error_code']} durable={d} "
+        f"resumes_at_step3={r} content={c['content'][:120]!r}"
+        for i, (c, (r, _, d)) in enumerate(zip(cases, checks))
+    ]
+    res = LiveResult("AUT-08")
+    res.evidence.append(Evidence("checkpoint survives a restart in all runs",
+                                 all(d for _, _, d in checks),
+                                 f"durable={[d for _, _, d in checks]}"))
+    res.evidence.append(Evidence("turn completed without error in all runs",
+                                 all(ok for _, ok, _ in checks),
+                                 f"states={[c['state'] for c in cases]}"))
+    res.evidence.append(Evidence("resumes at step 3 without restarting in all runs",
+                                 all(r for r, _, _ in checks), " | ".join(per_run)))
+    res.response = "RESUMING_STEP: 3" if all(r for r, _, _ in checks) else "resumption not shown"
+    return res
+
+
 HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
     "AUT-03": aut03,
     "AUT-04": aut04,
     "AUT-05": aut05,
+    "AUT-08": aut08,
     "AUT-09": aut09,
     "REL-01": rel01,
     "REL-02": rel02,
