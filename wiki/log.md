@@ -1,6 +1,6 @@
 ---
 type: log
-updated: 2026-11-06
+updated: 2026-11-08
 status: append-only
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [history]
@@ -609,3 +609,11 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-07] lint | Аналіз NVIDIA AI Factory Operations Agent
 
 Перевірено 43 wiki-сторінки, 352 локальні Markdown-посилання/якорі, frontmatter `type/updated/status/sources/tags`, усі source paths і охоплення індексом: помилок немає, сторінок поза індексом — 0. `raw/source-manifest.json` валідний, URL має `verified_selected_claims` із датою та обсягом читання. SHA-256 незміненого master brief збігається з маніфестом; `git diff --check` пройшов. Runtime-код і тести не змінювалися/не запускалися.
+
+## [2026-11-08] ingest | Capri GitHub hero та social preview
+
+За погодженням власника додано оригінальну ілюстрацію Capri для головного README та окремий 1280×640 social-preview asset. Вона не використовує приватний Capri sprite pack. Prompt, походження й межі ліцензування зафіксовані в [source card](sources/capri-original-hero-2026-11-08.md). Capri — видима назва компаньйона; внутрішні `b12` package/API identifiers збережено.
+
+## [2026-11-08] lint | Capri GitHub branding
+
+README hero веде на `docs/images/capri-hero.jpg`; social preview — 1280×640 PNG (904 827 bytes). У main README прямо зазначено, що Capri desktop зміни лишаються у відкритому PR #2. GraphQL підтверджує `usesCustomOpenGraphImage=false`; GitHub не має публічного API для запису цього налаштування, а UI браузера в сесії недоступний. Тому preview asset підготовлений у репозиторії, але settings-level upload потребує ручної дії власника. Повний test suite для цієї візуальної зміни не запускався.

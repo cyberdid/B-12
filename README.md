@@ -1,18 +1,26 @@
-# B-12
+# Capri
 
 <p align="center">
-  <img src="docs/images/b12-hero.jpg" alt="B-12 — автономний локальний ШІ-компаньйон" width="900">
+  <img src="docs/images/capri-hero.jpg" alt="Оригінальна ілюстрація Capri — локального AI-компаньйона B-12" width="100%">
 </p>
 
-Локальний ШІ-компаньйон з автобіографічною пам’яттю, реальними інструментами комп’ютера, доречною ініціативою та українською й англійською мовами. Надалі — фізична присутність через Reachy Mini.
+<p align="center"><sub>Оригінальна ілюстрація для B-12; приватний Capri sprite pack не використовується.</sub></p>
 
-Працює повністю локально: Ollama з моделлю NVIDIA **Nemotron Bolt E4B** (кандидат, модель змінна) на RTX 4060 Laptop 8 GB. Дані — у приватних SQLite-сховищах під контролем власника.
+[![Python 3.12–3.13](https://img.shields.io/badge/Python-3.12%E2%80%933.13-3776AB?logo=python&logoColor=white)](pyproject.toml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-2ea44f.svg)](LICENSE)
+![Platform: Linux](https://img.shields.io/badge/platform-Linux-59636e?logo=linux&logoColor=white)
+
+**Capri** — локальний AI-компаньйон із пам’яттю, яку можна перевіряти й видаляти, інструментами з підтвердженням власника, доречною ініціативою та українською й англійською мовами. `b12` залишається внутрішньою назвою Python-пакета, CLI та runtime API для сумісності. Наступний апаратний напрям — Reachy Mini.
+
+Модель змінна. Перевірений локальний шлях використовує Ollama; **Nemotron Bolt E4B — кандидат**, а не остаточний вибір. Дані зберігаються у локальних сховищах. Якщо власник окремо вибере хмарну модель, запит і наданий моделі контекст передаються цьому provider.
+
+**Базові можливості:** пам’ять зі згодою та глобальним забуттям · owner-approved host tools · CLI, API, Web UI та TUI · автономність · backup/restore · програмний голосовий стек.
 
 <p align="center">
-  <img src="docs/images/web-dark.png" alt="Web UI B-12: tool-виклики, підтвердження і скасування" width="900">
+  <img src="docs/images/web-dark.png" alt="Web UI Capri: tool-виклики, підтвердження і скасування" width="900">
 </p>
 
-> **Стан на 06.11.2026:** desktop runtime працює end-to-end із реальною моделлю. Реалізовано пам’ять зі згодою та глобальним забуттям, host tools і MCP (зокрема пошук в інтернеті через `web_search`), agent loop із режимом «Не зупинятися», CLI/API/Web/TUI, автономність, backup/restore та локальний голосовий шар (PTT, Silero VAD/endpoint, faster-whisper UA/EN, Piper TTS UA/EN, NLMS AEC, barge-in, speaker verification). Context admission повідомляє моделі про вилучену історію короткими позначеними уривками; обов’язковий контекст усе ще fail-closed при overflow. Модельний пошук пройшов один live smoke test; повний multi-file review на Bolt завершився `incomplete_coverage`, тож це обмеження зафіксоване. Фізичний Reachy/Jetson, 8-годинний акустичний soak і 30-денні докази ще попереду. Деталі — у таблиці [нижче](#стан-реалізації) та у [поточному стані](wiki/project/status.md).
+> **Стан на 08.11.2026:** B-12 runtime охоплює CLI/API/Web/TUI, пам’ять зі згодою та глобальним забуттям, host tools із контрольним каналом дозволів, MCP, автономність, backup/restore і програмний голосовий стек. [PR #1](https://github.com/cyberdid/B-12/pull/1) додає `web_search`, повніше покриття read-only огляду й уривки вилученої історії; його точний head пройшов 665 тестів, 4 пропущені потребують реальної моделі. [PR #2](https://github.com/cyberdid/B-12/pull/2) веде окрему роботу над Capri desktop; нові additions ще не пройшли повний suite та host acceptance. Фізичний Reachy/Jetson, акустичний soak і 30-денні докази лишаються відкритими. Деталі — у [поточному статусі](wiki/project/status.md) та описах PR.
 
 ## Архітектура
 
