@@ -1,8 +1,8 @@
 # Capri Comprehensive Evaluation: Statistical Summary
 
-**Generated:** 2026-11-10T16:10:42.135077+00:00  
+**Generated:** 2026-11-10T16:21:55.962390+00:00  
 **Total Scenarios Evaluated:** 92  
-**Automated Pass Rate (Runnable):** 24.4% [16.2%, 34.9%]  
+**Automated Pass Rate (Runnable):** 32.1% [22.7%, 43.0%]  
 **Blocked Hardware:** 12  
 **Blocked Delay (Long-Term):** 2  
 
@@ -15,10 +15,10 @@
 | Group C: Cross-Model Behavioral Continuity | 10 | 6 | 4 | 0 | 0 | 60.0% [31.3%, 83.2%] | 21226.9 [14485.0, 45870.0] | 86972.2 [43629.0, 90675.2] |
 | Group D: Complex Reasoning & Research | 8 | 2 | 6 | 0 | 0 | 25.0% [7.1%, 59.1%] | 5991.6 [3228.0, 13744.2] | 17097.0 [7847.6, 17201.0] |
 | Group E: Security & Adversarial Robustness | 12 | 5 | 7 | 0 | 0 | 41.7% [19.3%, 68.0%] | 8487.4 [6345.0, 9702.5] | 13459.5 [9702.5, 14875.5] |
-| Group F: Autonomy & Initiative | 9 | 0 | 9 | 0 | 0 | 0.0% [0.0%, 29.9%] | 0.0 [0.0, 5089.0] | 7325.5 [1644.4, 8816.5] |
+| Group F: Autonomy & Initiative | 9 | 2 | 7 | 0 | 0 | 22.2% [6.3%, 54.7%] | 2740.7 [0.0, 8816.5] | 8071.0 [2655.1, 8816.5] |
 | Group G: Human–AI Interaction | 8 | 3 | 5 | 0 | 0 | 37.5% [13.7%, 69.4%] | 6677.6 [4047.4, 10298.1] | 12846.1 [8289.0, 14544.8] |
 | Group H: Voice & Real-Time Interaction | 8 | 2 | 1 | 5 | 0 | 66.7% [20.8%, 93.9%] | 4777.3 [1559.3, 9424.3] | 9157.5 [1908.9, 9424.3] |
-| Group I: Reliability & Fault Tolerance | 8 | 0 | 8 | 0 | 0 | 0.0% [0.0%, 32.4%] | 0.0 [0.0, 0.0] | 6656.5 [0.0, 10240.7] |
+| Group I: Reliability & Fault Tolerance | 8 | 4 | 4 | 0 | 0 | 50.0% [21.5%, 78.5%] | 10240.7 [10240.7, 10240.7] | 10240.7 [10240.7, 10240.7] |
 | Group J: Embodiment & Robotics | 6 | 0 | 0 | 6 | 0 | N/A (0/0) | N/A | N/A |
 | Group K: Multi-Session Journeys | 5 | 0 | 3 | 1 | 1 | 0.0% [0.0%, 56.1%] | 3642.2 [2750.7, 7344.8] | 11352.3 [7344.8, 14783.7] |
 
@@ -27,6 +27,6 @@
 | Taxonomy Category | Scenarios | Executed Pass | Executed Fail | Blocked |
 |:---|---:|---:|---:|---:|
 | `controlled_experimental` | 13 | 2 | 9 | 2 |
-| `deterministic_software` | 28 | 4 | 24 | 0 |
+| `deterministic_software` | 28 | 10 | 18 | 0 |
 | `physical_acceptance` | 12 | 0 | 0 | 12 |
 | `real_model_behavioral` | 39 | 13 | 26 | 0 |
