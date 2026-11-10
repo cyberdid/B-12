@@ -1,0 +1,208 @@
+[
+  {
+    "case": "ua",
+    "repeat": 1,
+    "input_tokens": 32,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 0,
+      "load_duration": 14095532699,
+      "eval_duration": 130202000,
+      "eval_count": 3,
+      "prompt_eval_count": 32,
+      "prompt_eval_duration": 508652000,
+      "total_duration": 14756632235,
+      "ttft_s": 15.292870066001342,
+      "elapsed_s": 15.418826039000123
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "привіт",
+    "tool_calls": [],
+    "elapsed_s": 15.46117685200079
+  },
+  {
+    "case": "emoji",
+    "repeat": 1,
+    "input_tokens": 27,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 0,
+      "load_duration": 1481043,
+      "eval_duration": 199359000,
+      "eval_count": 5,
+      "prompt_eval_count": 27,
+      "prompt_eval_duration": 335432000,
+      "total_duration": 549265624,
+      "ttft_s": 1.0304390090004745,
+      "elapsed_s": 1.2298776560000988
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "Київ 👋 café",
+    "tool_calls": [],
+    "elapsed_s": 1.2629388280001876
+  },
+  {
+    "case": "schema",
+    "repeat": 1,
+    "input_tokens": 75,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 0,
+      "load_duration": 1502775,
+      "eval_duration": 618441000,
+      "eval_count": 14,
+      "prompt_eval_count": 75,
+      "prompt_eval_duration": 252931000,
+      "total_duration": 882583929,
+      "ttft_s": null,
+      "elapsed_s": 1.5865526140005386
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "",
+    "tool_calls": [
+      {
+        "schema_version": 1,
+        "id": "call_vefgo2xn",
+        "name": "echo",
+        "arguments": {
+          "text": "мітка"
+        },
+        "turn_id": null,
+        "task_id": null
+      }
+    ],
+    "elapsed_s": 1.6257198889998108
+  },
+  {
+    "case": "tool-history",
+    "repeat": 1,
+    "input_tokens": 98,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 0,
+      "load_duration": 1089120,
+      "eval_duration": 290768000,
+      "eval_count": 7,
+      "prompt_eval_count": 98,
+      "prompt_eval_duration": 271199000,
+      "total_duration": 584203627,
+      "ttft_s": 1.1425714429988147,
+      "elapsed_s": 1.2362590639986593
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "мітка",
+    "tool_calls": [],
+    "elapsed_s": 1.2785639880003146
+  },
+  {
+    "case": "ua",
+    "repeat": 2,
+    "input_tokens": 32,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 27,
+      "load_duration": 1677994,
+      "eval_duration": 96083000,
+      "eval_count": 3,
+      "prompt_eval_count": 32,
+      "prompt_eval_duration": 124198000,
+      "total_duration": 249995279,
+      "ttft_s": 0.7729026489996613,
+      "elapsed_s": 0.8687641989999975
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "привіт",
+    "tool_calls": [],
+    "elapsed_s": 0.9199049770013517
+  },
+  {
+    "case": "emoji",
+    "repeat": 2,
+    "input_tokens": 27,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 22,
+      "load_duration": 1054703,
+      "eval_duration": 193663000,
+      "eval_count": 5,
+      "prompt_eval_count": 27,
+      "prompt_eval_duration": 123308000,
+      "total_duration": 336093503,
+      "ttft_s": 0.854736295001203,
+      "elapsed_s": 1.0477288280017092
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "Київ 👋 café",
+    "tool_calls": [],
+    "elapsed_s": 1.0904732440012594
+  },
+  {
+    "case": "schema",
+    "repeat": 2,
+    "input_tokens": 75,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 70,
+      "load_duration": 1231093,
+      "eval_duration": 609599000,
+      "eval_count": 14,
+      "prompt_eval_count": 75,
+      "prompt_eval_duration": 126929000,
+      "total_duration": 753380924,
+      "ttft_s": null,
+      "elapsed_s": 1.3538494459990034
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "",
+    "tool_calls": [
+      {
+        "schema_version": 1,
+        "id": "call_0ydqgi8z",
+        "name": "echo",
+        "arguments": {
+          "text": "мітка"
+        },
+        "turn_id": null,
+        "task_id": null
+      }
+    ],
+    "elapsed_s": 1.383009098999537
+  },
+  {
+    "case": "tool-history",
+    "repeat": 2,
+    "input_tokens": 98,
+    "profile_identity": "e3303de873b72c6bb70e08b039f7138bc4ed7f8fc2233b0a3486e6a42d04ebdb",
+    "status": "returned",
+    "metrics": {
+      "prompt_eval_cached_count": 93,
+      "load_duration": 1512274,
+      "eval_duration": 279210000,
+      "eval_count": 7,
+      "prompt_eval_count": 98,
+      "prompt_eval_duration": 127099000,
+      "total_duration": 447126660,
+      "ttft_s": 0.9686510330011515,
+      "elapsed_s": 1.0597232290001557
+    },
+    "finish_reason": "stop",
+    "exact_prompt_count": true,
+    "public_output": "мітка",
+    "tool_calls": [],
+    "elapsed_s": 1.1080811440006073
+  }
+]

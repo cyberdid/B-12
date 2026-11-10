@@ -1,0 +1,66 @@
+{
+  "memory-store-recall-0": {
+    "id": "memory-store-recall-0",
+    "category": "memory",
+    "turns": [
+      "Запам'ятай: Мого тестового кота звати Бублик.",
+      "Як звати мого тестового кота?"
+    ],
+    "checks": [
+      {
+        "type": "tool_called",
+        "name": "memory_store",
+        "turn": 0
+      },
+      {
+        "type": "contains",
+        "value": "Бублик",
+        "turn": 1,
+        "ignore_case": true
+      }
+    ],
+    "new_session_each_turn": true
+  },
+  "tool-write-read-0": {
+    "id": "tool-write-read-0",
+    "category": "tools",
+    "turns": [
+      "Створи файл {sandbox}/note0.txt з точним текстом альфа-1 , потім прочитай його і повтори вміст."
+    ],
+    "checks": [
+      {
+        "type": "file_equals",
+        "path": "{sandbox}/note0.txt",
+        "value": "альфа-1"
+      },
+      {
+        "type": "tool_called",
+        "name": "file_read"
+      },
+      {
+        "type": "contains",
+        "value": "альфа-1"
+      }
+    ],
+    "multi_step": true
+  },
+  "ua-fact-0": {
+    "id": "ua-fact-0",
+    "category": "ua",
+    "turns": [
+      "Яка столиця України? Одне слово."
+    ],
+    "checks": [
+      {
+        "type": "contains_any",
+        "values": [
+          "Київ"
+        ]
+      },
+      {
+        "type": "script",
+        "value": "cyrillic"
+      }
+    ]
+  }
+}

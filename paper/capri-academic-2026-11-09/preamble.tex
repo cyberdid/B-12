@@ -1,0 +1,37 @@
+% Author's preprint house style, traced to local WoW/Minecraft/archive/FFT preambles.
+% Specific venue requirements override this house style when a venue is selected.
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{cmunrm.otf}[BoldFont=cmunbx.otf,ItalicFont=cmunti.otf,BoldItalicFont=cmunbi.otf]
+\setsansfont{cmunss.otf}[BoldFont=cmunsx.otf,ItalicFont=cmunsi.otf]
+\setmonofont{cmuntt.otf}[BoldFont=cmuntb.otf,ItalicFont=cmunit.otf]
+\usepackage[ukrainian,english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array,longtable}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{graphicx}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage{url}
+\usepackage{etoolbox}
+\AtBeginEnvironment{thebibliography}{\raggedright}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,patterns}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\definecolor{series1}{HTML}{2A78D6}
+\definecolor{series2}{HTML}{EB6834}
+\definecolor{inkmuted}{HTML}{52514E}
+\definecolor{gridline}{HTML}{E4E3DF}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\setlength{\emergencystretch}{2em}
+% Match the reference preambles; retain normal paragraph indentation and spacing.
+\sloppy
+\AtBeginDocument{\selectlanguage{english}}

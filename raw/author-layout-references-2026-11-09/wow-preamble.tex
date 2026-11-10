@@ -1,0 +1,75 @@
+% Shared preamble for paper/tex/en/main.tex and paper/tex/uk/main.tex (XeLaTeX via Tectonic).
+% The including file defines \tablelang (en|uk) before \input{../preamble}.
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{cmunrm.otf}[BoldFont=cmunbx.otf,ItalicFont=cmunti.otf,BoldItalicFont=cmunbi.otf]
+\setsansfont{cmunss.otf}[BoldFont=cmunsx.otf,ItalicFont=cmunsi.otf]
+\setmonofont{cmuntt.otf}[BoldFont=cmuntb.otf,ItalicFont=cmunit.otf]
+\usepackage[ukrainian,english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array,multirow,longtable}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{subcaption}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usepackage[most]{tcolorbox}
+
+% palette (validated: categorical slots 1-2, light surface)
+\definecolor{series1}{HTML}{2A78D6}  % Claude / accepted
+\definecolor{series2}{HTML}{EB6834}  % Codex / rejected
+\definecolor{inkmuted}{HTML}{52514E}
+\definecolor{gridline}{HTML}{E4E3DF}
+\definecolor{panel}{HTML}{F6F5F2}
+\definecolor{trustred}{HTML}{B23A3A}
+\definecolor{trustgreen}{HTML}{2F7D4F}
+
+% primitive input: LaTeX's \input is not expandable and breaks inside tabular after \midrule
+\makeatletter\newcommand{\gentable}[1]{\@@input ../tables/\tablelang/T#1.tex }\makeatother
+\input{../generated/numbers.tex}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\ev}[1]{\textsuperscript{\textsf{\footnotesize[E#1]}}}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}r}
+
+\pgfplotsset{
+  wwbase/.style={
+    axis line style={inkmuted!70}, tick style={inkmuted!70},
+    tick label style={font=\footnotesize, color=inkmuted},
+    label style={font=\footnotesize, color=inkmuted},
+    title style={font=\small\bfseries},
+    major grid style={gridline}, ymajorgrids,
+    legend style={font=\footnotesize, draw=none, fill=none},
+    every axis plot/.append style={line join=round},
+  }
+}
+
+\tcbset{
+  quotebox/.style={enhanced, colback=panel, colframe=panel, boxrule=0pt, arc=2pt,
+    left=8pt, right=8pt, top=5pt, bottom=5pt, borderline west={2.5pt}{0pt}{series1!70}},
+  findingbox/.style={enhanced, colback=white, colframe=inkmuted!40, boxrule=0.4pt, arc=2pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt, fonttitle=\small\bfseries, coltitle=black,
+    colbacktitle=panel, attach boxed title to top left={xshift=6pt,yshift=-2mm},
+    boxed title style={boxrule=0pt, colframe=panel, arc=1pt}},
+}
+
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.12}
+\setlist{itemsep=1pt,topsep=3pt}
+\setlength{\emergencystretch}{2em}
+\sloppy

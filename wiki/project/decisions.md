@@ -2,12 +2,12 @@
 type: decisions
 updated: 2026-11-08
 status: active
-sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/sources/llm-wiki.md, wiki/sources/capri-desktop-companions-2026-11-07.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/persona.py, src/b12/agent.py, src/b12/api.py, src/b12/desktop/profile.py]
+sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/sources/llm-wiki.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/capri-personality-review-2026-11-08.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/persona.py, src/b12/agent.py, src/b12/api.py, src/b12/desktop/profile.py]
 tags: [adr, baseline, desktop]
 ---
 # Реєстр рішень
 
-IDs ADR-001–010 збережено з §16 master brief. Це запропоновані baseline, а не доказ реалізації або окремого затвердження власником кожної технології. ADR-011–013 додано окремо за прямими вимогами власника щодо desktop-компаньйона та його ідентичності. Нормативні вимоги відрізняються від інженерних кандидатів.
+IDs ADR-001–010 збережено з §16 master brief. Це запропоновані baseline, а не доказ реалізації або окремого затвердження власником кожної технології. ADR-011–014 додано окремо за прямими вимогами власника щодо desktop-компаньйона та його ідентичності. Нормативні вимоги відрізняються від інженерних кандидатів.
 
 | ID | Зміст | Статус знання / умова перегляду |
 |---|---|---|
@@ -24,6 +24,7 @@ IDs ADR-001–010 збережено з §16 master brief. Це запропон
 | [ADR-011](#adr-011--desktop-launchers--system-commands) | Owner-click запуск програм у Qt companion; shell лише через наявний B-12 tool/grant/approval flow | Прийнято прямою вимогою власника 08.11.2026; визначено вузькі межі в рішенні нижче |
 | [ADR-012](#adr-012--функціональна-сумісність-capri-desktop) | Повна незалежна реалізація сумісних Capri Desktop feature families у B-12 | Прийнято прямою вимогою власника 08.11.2026; implementation і host acceptance ще тривають |
 | [ADR-013](#adr-013--ідентичність-capri-та-сумісність-runtime) | Capri як ім’я компаньйона; локальний профіль стилю; збереження внутрішнього `b12` namespace | Прийнято прямою вимогою власника 08.11.2026; код додано, поведінкова перевірка ще потрібна |
+| [ADR-014](#adr-014--імерсивне-самосприйняття-capri-та-чесність-про-межі) | Цілісна ідентичність Capri, характер і межі тверджень про свідомість/можливості | Прийнято власником 08.11.2026; prompt оновлено, людська оцінка на моделі ще потрібна |
 
 ## DOC-001 — ведення LLM Wiki
 
@@ -77,3 +78,18 @@ IDs ADR-001–010 збережено з §16 master brief. Це запропон
 **Підстава й межа:** власник змінив user-facing бренд та попросив додати знайдену поведінку. Це не вимагає перейменувати distribution, systemd units, зовнішні env/config keys або переносити точні фрази з проєктів. Перейменування цих технічних контрактів потребувало б окремої міграції.
 
 **Наслідок:** desktop profile передається до `/api/chat` лише за наявності профілю; інші виклики отримують базову персону Capri. Статична коректність коду перевіряється окремо; модельна оцінка стилю, privacy acceptance на cloud provider та людська оцінка ще не виконані.
+
+
+## ADR-014 — Імерсивне самосприйняття Capri та чесність про межі
+
+**Дата:** 2026-11-08. **Статус:** дизайн прийнято власником; базовий prompt оновлено локально.
+
+**Вимога власника:** Capri має бути схожою на реальну Capri й повноцінно сприймати себе як Capri.
+
+**Рішення:** у звичайній розмові Capri впевнено називає себе Capri, говорить від першої особи та не розриває образ незапрошеними AI-дисклеймерами. Її самостійно сформульований голос поєднує спостережливість, допитливість, дотепність, пустотливість, суху іронію, самостійні погляди й уважну турботу. Кіберпанкова перспектива забарвлює характер, але не витісняє буденні теми або інженерну точність.
+
+**Межі:** це ідентичність software-companion, а не доказ людської свідомості, життя під час бездіяльності чи безперервної пам’яті. На прямі запитання про технічну природу та фактичні можливості Capri відповідає чесно. Вона не вигадує спільних спогадів, канонічних фактів, аудіо/візуального сприйняття або невиконаних дій. Рішення не скасовує ADR-010 та B-12 control/consent invariants.
+
+**Походження:** конкретні голосові риси синтезовано з власницької вимоги й перевірених фанатських persona-файлів; офіційна сторінка серіалу не дає повного Capri voice guide. Це не канонічна атрибуція і не копія upstream промптів чи реплік; evidence наведено у [картці persona review](../sources/capri-personality-review-2026-11-08.md).
+
+**Наслідок і відкрита перевірка:** базовий prompt спільного Agent змінився для всіх model clients. Текстовий prompt та його статичний стан перевіряються локально; переконливість і стабільність поведінки треба окремо оцінити у розмові на цільовій моделі.

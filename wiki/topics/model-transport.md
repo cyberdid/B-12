@@ -7,6 +7,16 @@ tags: [model, context, streaming, cancellation]
 ---
 # Admission і model transport
 
+## Змінна модель і майбутній ModelManager (08.11.2026)
+
+**Вимога власника:** модель є змінним компонентом Capri; пам’ять, історія, цілі та особистість мають зберігатися незалежно від вибраних ваг. Потрібні виявлення локальних моделей, реєстр перевірених профілів і ручний вибір через CLI та desktop. Автоматичний router, cloud adapter і порівняльний persona benchmark — подальші можливості, не підтверджені поточною реалізацією.
+
+**Перевірений факт у коді:** сховища створюються окремо від OllamaModel в application factory. Ім’я моделі, profile, tokenizer assets та бюджети задаються конфігурацією; перевірка ModelProfile і deployment лишається обов’язковою. Готовий profile у profiles наразі один — Bolt. Заміна імені без відповідного профілю не підтверджує сумісність і може дати profile_invalid або profile_mismatch. Наявність збережених даних не гарантує однакових відповідей чи того, що весь старий контекст поміститься у нову модель.
+
+**Інженерна вимога для реалізації:** перемикати як єдину версіоновану конфігурацію модель, tokenizer, template, profile та context/output budgets. Не дозволяти нові ходи під час переходу; враховувати ходи, які готуються, активні, очікують approval чи продовжуються після нього, а також reflection і purge. Поточний model_lock захищає виклик моделі, але admission відбувається до нього, тому заміни тільки model під цим lock недостатньо. Невдалу перевірку кандидата слід завершувати без втрати попередньої конфігурації. Сховища й дозволи лишаються під контролем runtime.
+
+**Потребує реалізації та перевірки:** реєстр і валідація профілів, атомарний lifecycle перемикання, owner API, CLI/desktop UX, відновлення після перезапуску й тести конкурентності. Порівняння моделей потребує окремого корпусу, умов та сирих результатів; надані ролі моделей є кандидатами, не результатами benchmark.
+
 **Перевірений факт:** Task 4 реалізує окремі context/transport primitives. Agent loop, tool execution, consent resolver та global purge сюди не входять. [Контракти майбутньої системи](../../docs/superpowers/specs/2026-10-24-b12-system-design.md), [стан реалізації](../project/implementation.md).
 
 `ContextBuilder(settings).build(system, messages, evidence=(), tools=())` повертає `AdmittedRequest`. Усі вкладені messages/tools immutable; caller-owned dict/list не зберігаються. Спільний structural validator перевіряє допустимі fields/roles, leading system, required user, повні tool groups і native function schemas як у builder, так і при кожному snapshot validation/send. Реконструйований DTO з перерахованим fingerprint не обходить ці перевірки. Snapshot містить context/output budgets, точний rendered token count із додатковим margin, model manifest/template/profile identity, fingerprint і dropped message IDs. `payload()` повертає окрему копію; зміни цієї копії не змінюють snapshot.

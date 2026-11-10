@@ -750,3 +750,79 @@ Commit `03f5a4b` запушений у `feat/b12-desktop-companion`; PR #2 ма�
 ## [2026-11-08] lint | Публічний landing і stacked гілки
 
 На `main`, runtime PR-гілці та desktop PR-гілці README посилається на Capri hero, social preview лишається 1280×640 (904 827 bytes), а private art pack відсутній у Git. Налаштування GitHub Social Preview досі `usesCustomOpenGraphImage=false`; без браузера і без публічного API його неможливо завантажити автоматично. Потрібен ручний Settings upload. Desktop PR #2 базується на оновленій runtime-гілці; його відкритий стан збережено.
+
+
+## [2026-11-08] implementation | Імерсивна особистість Capri
+
+За затвердженим дизайном власника розширено спільний базовий prompt у src/b12/persona.py: Capri має цілісне самоназвання від першої особи, власні погляди, допитливість, дотепність, пустотливість, іронію та уважну турботу. У звичайній розмові немає незапрошених фраз «я лише AI»; прямо запитані технічні межі, пам’ять і доступи описуються чесно. Канон не змішується з інтерпретацією, не вигадуються спільні спогади чи сприйняття екрана/мікрофона. Upstream промпти й репліки не копіювалися. Доказові межі записані у [картці persona review](sources/capri-personality-review-2026-11-08.md), рішення — в [ADR-014](project/decisions.md#adr-014--імерсивне-самосприйняття-capri-та-чесність-про-межі); оновлено index, status і desktop guide.
+
+## [2026-11-08] lint | Особистість Capri та джерела
+
+Ruff check/format для src/b12/persona.py, compileall для модуля, JSON parse source-manifest і git diff --check пройшли. Підсумковий scan охопив 193 локальні Markdown-посилання у семи сторінках: знайдено одну давню відсутню artifact-ціль у попередньому записі wiki/log.md (artifacts/task15-soak-2026-10-26-run2/events.jsonl), уже відому з історичних lint. Усі нові цілі, frontmatter sources та індексація wiki-сторінок коректні. Automated tests і живий model turn не запускалися; статичний prompt не підтверджує поведінкову якість цільової моделі. GPU та voice/audio не зачіпалися.
+
+## [2026-11-08] run | Перезапуск Capri з новою особистістю
+
+Після підтвердження 0 active turns і 0 pending approvals перезапущено тільки API із --no-autonomy та Qt desktop client із worktree /home/cyberdid/.codex/worktrees/cb2c/B-12. Після стабільного старту /api/health повернув ok=true; owner status показав active_turns=0 і pending_approvals=0. X11 підтвердив вікно Capri · CAPRI розміром 300×410. Процеси залишені у керованих тривалих сесіях. Ollama/model, voice/audio, GPU, scheduler та systemd units не запускалися й не перезапускалися.
+
+## [2026-11-08] analysis | Змінна модель Capri
+
+Вимогу власника про змінність моделі та спільні пам’ять, історію й особистість внесено до [model transport](topics/model-transport.md#змінна-модель-і-майбутній-modelmanager-08112026). Читання runtime, Agent, ModelProfile та OllamaModel підтвердило окремі stores і profile-bound admission. Admission зараз відбувається до model_lock; самого цього lock недостатньо для атомарного live switch, особливо з approval resume, reflection та підготовкою нових ходів. ModelManager, CLI/Desktop перемикач, routing, cloud adapter і persona benchmark цим записом не реалізовано. Моделі та GPU не запускалися.
+
+
+## [2026-11-08] ingest | Scribe і двомовний препринт Capri
+
+За дорученням власника переглянуто Scribe README/release, запущено Linux AppImage 1.2.3 та підготовлено англомовний і україномовний LaTeX/PDF у paper/capri-preprint. Джерела, provenance й межі наведені у [картці](sources/scribe-paper-2026-11-08.md). Історичні metadata та summary локального корпусу перевірено; новий inference, benchmark або публікація не виконувалися. PDF складено Tectonic; компіляцію з GUI Scribe не перевіряли. Сирі траси не скопійовані й не опубліковані.
+
+
+## [2026-11-08] lint | Двомовний препринт Capri
+
+Англійську й українську версії складено Tectonic, кожна має 5 сторінок; перевірено PDF text extraction, українські заголовки та рендер усіх сторінок. У кожному джерелі всі citation keys мають відповідні bibliography entries. Джерела й межі прочитаного зафіксовано в [картці](sources/preprint-related-work-2026-11-08.md); хеші переглянутих локальних metadata і summary — у paper/capri-preprint/evidence.md. Нових model runs або незалежної наукової рецензії немає. Локальні сирі траси не опубліковані. Scribe AppImage працює, але складання з його UI не перевірялося.
+
+
+## [2026-11-08] writing | Розширення двомовного препринту
+
+На прохання власника розширено обидва рукописи: життєвий цикл ходу та статуси результатів, admission і профілі, provenance та межі видалення, desktop і голос, інтерпретацію корпусу, механізми відмов, обмеження продуктивності та програму наступних експериментів. Обидва PDF складено Tectonic і візуально перевірено посторінково; кожен має 9 сторінок. Джерела й локальні історичні дані не перетворюють цю редакцію на новий benchmark або незалежну рецензію. Розширені копії розміщено у Статті в корені проєкту; модель, GPU та голос не запускалися.
+
+
+## [2026-11-09] ingest | Наукова редакція Capri
+
+Створено окремий англомовний рукопис, BibTeX, 4 відтворювані рисунки, 6 таблиць, 26-row evidence matrix, revision report і research gaps. Перевірено metadata Git та відкритих PR; історичні raw outcomes повторно агреговані. Нове CPU-тестування: 118 passed / 1 failed, окремий repeat відтворив збій. Причину не встановлювали зміною production-коду. Обсяг і межі аудиту описані у [картці](sources/capri-scientific-revision-2026-11-09.md). Оригінальні статті збережені за SHA-256.
+
+
+## [2026-11-09] lint | Перевірка наукової редакції
+
+Фінальний PDF: 19 сторінок, бібліографія починається на 17-й; 4 рисунки, 6 таблиць, 17 цитованих джерел і 26 тверджень у матриці. Tectonic завершився успішно; undefined references і overfull boxes відсутні. Всі рисунки/таблиці згадані, DOI/URL надруковані у бібліографії; всі фінальні сторінки відрендерено й переглянуто. Перевірено локальні посилання нової картки та включення до індексу, авторство/афіліацію й SHA-256 оригіналу. Перевірка source inventory підтвердила незмінність production/test/eval файлів протягом цієї ревізії; git diff --check пройшов. CPU suite лишається 118 passed / 1 failed з відтвореним збоєм, не позначений повністю успішним. Повного незалежного аудиту всієї історії не заявлено. Окремі PDF і ZIP джерел розміщено у Статті в корені основного проєкту.
+
+
+## [2026-11-09] ingest | Авторський академічний шаблон Capri
+
+За виправленням власника переглянуто локальні PDF WoW, Minecraft, archive-index і FFT та повністю прочитано їхні преамбули. Знайдено спільний A4/25 мм/CMU/11 pt/natbib стиль; незмінені оригінали й преамбули збережено в raw, provenance і SHA-256 — у manifest. Окремого журналу немає за відповіддю власника. Створено окрему редакцію й [прописані норми](../paper/capri-academic-2026-11-09/formatting-spec.md), native TikZ/PGFPlots і layout validator. Попередній Letter/DejaVu PDF лишається історичною редакцією; твердження про єдиний універсальний академічний шаблон не робиться. Наукові результати не імпортовано з інших проєктів і не змінено; нових експериментів немає.
+
+
+## [2026-11-09] lint | Приймання академічної верстки Capri
+
+Фінальний PDF має 15 сторінок A4, References починається на 14-й; 6 таблиць, 4 native рисунки, 17 джерел. Усі аркуші відрендерено й переглянуто; вбудовані CMU-шрифти, відсутні Type 3, overfull/undefined/missing-glyph помилки. Одне Underfull місце переглянуто й описано у звіті. Tectonic 0.17.0 використано з окремого кешу; системний compiler не замінено. Layout validator і inherited evidence перевірка пройшли; числа й доказові файли не змінені. SHA-256 чотирьох PDF/преамбул та їхніх raw-копій збігаються; нові wiki links/frontmatter/index і diff check пройшли. Оновлено зручні PDF/ZIP у Статті; попередні джерела лишилися у paper/capri-scientific-2026-11-09, оригінали EN/UA збережені. Ця перевірка стосується авторського шаблону, не правил неназваного журналу.
+
+
+## [2026-11-09] ingest | Gemma 12B: реальні пілоти та контрольована CPU-абляція
+
+Уточнення власника — модель Gemma 12B. Виявлено gemma4:12b Q4_K_M, pinned assets/profile залишені експериментальними. 8/8 exact input counts; 12/12 task executions над 3 вибраними сценаріями на ctx4096/8192, 16 turns. Окрема CPU-абляція 4 prefixes × 3 repeats: 11344/10598/9886/11344 символів; лише removed prefix проходить стару <10000 assertion. Non-system дані раундів ідентичні; HEAD також fail, тож останній persona edit не єдина причина. Це не Gemma behavior ablation. Деталі, передреєстрація, сирі метрики/перевірки й межі — у [картці](sources/gemma12b-followup-2026-11-09.md). Production/test/eval файли не змінювали, live config не перемикали. Обидва model unload підтверджено; initial GPU state відновлено. Окрема стаття має 17 сторінок, 18 джерел і 29 claims; попередні редакції збережено.
+
+
+## [2026-11-09] lint | Gemma follow-up та 17-сторінкова редакція
+
+Перевірено arithmetic сирих 12 CPU arms/repeats, 8 calibration calls і 12 model case executions; із корпусними 541 результатами їх не об'єднували. Копії нових experiment files у paper package збігаються з measurement originals. Runtime/test/eval source hashes незмінні. Tectonic 0.17.0 успішний; 17 A4 pages, References від 16-ї, 6 таблиць, 4 рисунки, 18 sources і 29 claims. Усі сторінки відрендерено й переглянуто, відсотки рисунка перевірені за історичними числами; overfull/undefined/missing-glyph помилок немає. Нові wiki links/frontmatter/index, Python compile, layout/follow-up/historical validators і diff check пройшли. GPU probes завершені, unload підтверджено. Публікацію/merge/live model switching не виконували; full benchmark лишається відкритим.
+
+
+## [2026-11-09] deploy | Capri Desktop на Gemma 4 12B
+
+За прямим запитом власника зроблено backup глобального config, встановлено persistent profile/assets і model=gemma4:12b. Context 8192 та state_dir збережено; default output reserve 1024. Doctor ok, API health і одна тестова відповідь completed; API/Qt units active, X11 Capri window присутнє. Ollama ps: 34% CPU / 66% GPU; utilization GPU зафіксовано до 100% під час відповіді. Metadata належать цьому запуску, а не попереднім пілотам. Докази й межі — у [картці](sources/gemma12b-desktop-launch-2026-11-09.md). Не запускали voice/TTS pipeline і не змінювали production code/persona. Секрети не записані.
+
+## [2026-11-09] lint | Перевірка запуску на Gemma
+
+Profile asset hashes і local deployment digest перевірено doctor; backup/config receipt збережені локально. API smoke зафіксував completed, active_turns/pending_purges/pending_approvals=0. Нові source-card links/frontmatter/index і diff check перевірені. Наявність вікна не позначена повним GUI acceptance; partial GPU offload не названо 100% GPU запуском.
+
+
+## [2026-11-09] stop | Capri вимкнено за командою власника
+
+Зупинено capri-desktop.service і capri-api.service; обидва inactive/dead, MainPID=0. Ollama /api/ps — порожній список, завантаженої Gemma немає. Конфігурацію, історію й пам’ять збережено. Автоматичного повторного запуску не виконували.

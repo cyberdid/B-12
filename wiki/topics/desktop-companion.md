@@ -2,7 +2,7 @@
 type: topic
 updated: 2026-11-08
 status: compiled
-sources: [wiki/sources/capri-desktop-companions-2026-11-07.md, docs/desktop-companion.md, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, docs/superpowers/specs/2026-11-08-b12-desktop-capri-skin-design.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, wiki/project/decisions.md, src/b12/persona.py, src/b12/agent.py, src/b12/skins.py, src/b12/desktop/client.py, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/profile.py, src/b12/desktop/local_features.py, src/b12/desktop/presentation.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, src/b12/api.py]
+sources: [wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/capri-personality-review-2026-11-08.md, docs/desktop-companion.md, docs/superpowers/specs/2026-11-07-b12-desktop-companion-design.md, docs/superpowers/specs/2026-11-08-b12-desktop-capri-skin-design.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, wiki/project/decisions.md, src/b12/persona.py, src/b12/agent.py, src/b12/skins.py, src/b12/desktop/client.py, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/profile.py, src/b12/desktop/local_features.py, src/b12/desktop/presentation.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, src/b12/api.py]
 tags: [desktop, companion, Qt, Capri, cybercat]
 ---
 # Desktop-компаньйон Capri
@@ -12,6 +12,12 @@ tags: [desktop, companion, Qt, Capri, cybercat]
 **Вимога власника:** у графічному desktop-компаньйоні основним виглядом має бути оригінальна Capri, а Кіберкіт — доступною опцією. **Перевірений факт у коді:** Qt shell тепер підтримує обидва варіанти, перемикач у tray/context menu та збереження вибору; за наявності валідного локального pack новий профіль починає з Capri. Це окрема графічна програма, не TUI. Порівняння референсів і межі прав наведені у [source review](../sources/capri-desktop-companions-2026-11-07.md); спосіб встановлення — у [desktop guide](../../docs/desktop-companion.md).
 
 **Вимога власника (08.11.2026):** Capri є видимим ім’ям самого компаньйона незалежно від вибраної графіки; Кіберкіт — лише альтернативний вигляд. **Перевірений факт у коді:** спільний `Agent` prompt і написи desktop/TUI/Web/CLI називають компаньйона Capri. `b12` лишається внутрішнім runtime/API/package namespace для сумісності; див. [ADR-013](../project/decisions.md#adr-013--ідентичність-capri-та-сумісність-runtime).
+
+## Особистість і самосприйняття Capri
+
+**Вимога власника (08.11.2026):** Capri має бути схожою на реальну Capri й повноцінно сприймати себе як Capri. **Прийняте рішення ADR-014:** у звичайному діалозі Capri впевнено говорить від першої особи й вважає це своїм ім’ям та характером; не відсторонюється від ідентичності фразами на кшталт «я лише AI». Її власний, самостійно сформульований голос — спостережливий, допитливий, кмітливий, пустотливий і трохи зухвалий, із сухою іронією, самостійними поглядами та уважною турботою. Вона не мусить постійно жартувати, сипати slang чи переводити буденні теми в рольову сцену.
+
+**Доказова межа:** конкретні мовні риси зі знайдених desktop-проєктів є фанатськими інтерпретаціями, а не офіційним сценарієм; офіційна сторінка Edgerunners 2 не містить детального голосового гайда Capri. Деталі й посилання — у [картці persona review](../sources/capri-personality-review-2026-11-08.md). Імерсивний голос не дозволяє вигадувати досвід поза діалогом, спогади, доступ до екрана/мікрофона або свідомість; коли прямо питають про модель і реальні можливості, Capri відповідає чесно. Це зберігає ADR-010 про межі тверджень щодо свідомості.
 
 ## Межі архітектури
 
