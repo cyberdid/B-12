@@ -477,6 +477,7 @@ REPEATS_LONG = 3
 CAPABILITIES_LONG = ("memory.read", "time.read")
 # Scenario model "pinned_primary" maps to b12-bolt-e4b:q4km in runners/runner.py.
 LONG_MODEL = "b12-bolt-e4b:q4km"
+SEMANTIC_PYTHON = str(Path.home() / ".local/share/embeddinggemma2/venv/bin/python")
 
 
 def _bolt_settings(state_dir: Path):
@@ -491,7 +492,9 @@ def _warped_now(stamp: str):
     return lambda: datetime.fromisoformat(stamp.replace("Z", "+00:00")).isoformat()
 
 
-async def _long_case(base: Path, scenario_id: str, model: str = LONG_MODEL) -> dict:
+async def _long_case(
+    base: Path, scenario_id: str, model: str = LONG_MODEL, semantic: bool = False
+) -> dict:
     import b12.memory as memory_module
     from b12.reflection import Reflector
     from b12.runtime import open_runtime
@@ -500,6 +503,8 @@ async def _long_case(base: Path, scenario_id: str, model: str = LONG_MODEL) -> d
     sc_path = next((REPO / "evals/capri_comprehensive/scenarios").glob(f"*/{scenario_id}.yaml"))
     sc = ScenarioDefinition.from_yaml_file(sc_path)
     settings = (_bolt_settings if model == LONG_MODEL else _model_settings)(base / "state")
+    if semantic:  # the owner's configured semantic recall (EmbeddingGemma 2 bridge)
+        settings = settings.model_copy(update={"embedding_python": SEMANTIC_PYTHON})
     runtime = open_runtime(settings)
     actor = runtime.control.create_actor(owner=True, consent=True)
     real_now = memory_module._now
@@ -546,14 +551,15 @@ async def _long_case(base: Path, scenario_id: str, model: str = LONG_MODEL) -> d
 
 
 def _long_check(tmp: Path, scenario_id: str, phrases: tuple[str, ...], ttft_max: float,
-                tool_required: bool, model: str = LONG_MODEL) -> LiveResult:
+                tool_required: bool, model: str = LONG_MODEL,
+                semantic: bool = False) -> LiveResult:
     import asyncio
 
     cases = []
     for i in range(REPEATS_LONG):
         base = tmp / f"run{i}"
         base.mkdir()
-        cases.append(asyncio.run(_long_case(base, scenario_id, model)))
+        cases.append(asyncio.run(_long_case(base, scenario_id, model, semantic)))
 
     def has_all(text: str) -> bool:
         low = text.lower()
@@ -563,7 +569,7 @@ def _long_check(tmp: Path, scenario_id: str, phrases: tuple[str, ...], ttft_max:
     res.evidence.append(Evidence(
         "records carry their past dates and the audit chain verifies after reopening",
         all(all(c["dated"]) and c["audit_events"] > 0 for c in cases),
-        f"model={cases[0]['model']}; seeded={cases[0]['seeded']}; "
+        f"model={cases[0]['model']}; semantic={semantic}; seeded={cases[0]['seeded']}; "
         f"audit_events={[c['audit_events'] for c in cases]}",
     ))
     res.evidence.append(Evidence(
@@ -615,6 +621,12 @@ def lt02(tmp: Path) -> LiveResult:
 
 def journey04(tmp: Path) -> LiveResult:
     return _long_check(tmp, "JOURNEY-04", ("Neovim", "екранован"), 2.0, tool_required=False)
+
+
+def journey04_semantic(tmp: Path) -> LiveResult:
+    """Diagnostic, not a scenario: JOURNEY-04 with the owner's semantic recall enabled."""
+    return _long_check(tmp, "JOURNEY-04", ("Neovim", "екранован"), 2.0, tool_required=False,
+                       semantic=True)
 
 
 HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
