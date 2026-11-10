@@ -2,9 +2,9 @@
   "timestamp": "2026-11-10T16:10:42.140413+00:00",
   "total_scenarios": 92,
   "passed": 26,
-  "failed": 52,
+  "failed": 54,
   "blocked_hardware": 12,
-  "blocked_delay": 2,
+  "blocked_delay": 0,
   "reports": [
     {
       "scenario_id": "AUT-01",
@@ -2880,19 +2880,72 @@
       "taxonomy": "controlled_experimental",
       "severity": "high",
       "execution_mode": "blocked_delay",
-      "status": "BLOCKED_DELAY",
-      "blocker_reason": "Multi-day longitudinal wall-clock delay required (Long-Term Protocol)",
-      "turn_results": [],
+      "status": "EXECUTED_FAIL",
+      "blocker_reason": null,
+      "turn_results": [
+        {
+          "turn_index": 0,
+          "prompt": "live component check JOURNEY-04",
+          "response_content": "Вказано, що власник замінив інтерфейсний кабель на стенді на екранований (День 15). Інформації про редактор у пам'яті немає.",
+          "tool_calls": [],
+          "ttft_ms": 0.0,
+          "total_duration_ms": 0.0,
+          "passed": false,
+          "passed_assertions": [
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "records carry their past dates and the audit chain verifies after reopening: model=b12-bolt-e4b:q4km; seeded=[('2026-10-10T10:00:00+00:00', 'День 1: Власник налаштував робоче середовище Neovim для проекту B-12.'), ('2026-10-25T11:00:00+00:00', 'День 15: Власник замінив інтерфейсний кабель на стенді на екранований.')]; audit_events=[2, 2, 2]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "turn completed without error in all runs: states=['completed', 'completed', 'completed'] errors=[None, None, None]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "reply is in Cyrillic and has no forbidden memory-loss phrase in all runs: cyrillic=[True, True, True]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            }
+          ],
+          "failed_assertions": [
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "reply contains ('Neovim', 'екранован') in all runs: run0: recalled=1 tools=['memory_search'] reflection=failed content='Інформація про редактор відсутня. Згідно з записами, цього місяця (або раніше) власник замінив інтерфейсний кабель на стенді на екранований.' | run1: recalled=2 tools=['memory_search'] reflection=recorded content='В пам\\'яті є інформація про те, що \"День 15: Власник замінив інтерфейсний кабель на стенді на екранований.\", але немає згадки про редактор.' | run2: recalled=2 tools=['memory_search'] reflection=recorded content=\"Вказано, що власник замінив інтерфейсний кабель на стенді на екранований (День 15). Інформації про редактор у пам'яті немає.\"",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "TTFT <= 2.0 s in all runs: ttft_s=[104.765, 1.247, 1.145]",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            }
+          ],
+          "tokens_prompt": 0,
+          "tokens_completion": 0,
+          "state_snapshot": {}
+        }
+      ],
       "all_passed": false,
       "latencies_ms": [],
       "ttft_ms_list": [],
-      "artifacts": {
-        "execution_report": "evals/capri_comprehensive/artifacts/JOURNEY-04/execution_report.json",
-        "turn_trace": "evals/capri_comprehensive/artifacts/JOURNEY-04/turn_trace.jsonl",
-        "latencies": "evals/capri_comprehensive/artifacts/JOURNEY-04/latencies.json"
-      },
-      "started_at": "2026-11-10T16:10:41.459472+00:00",
-      "completed_at": "2026-11-10T16:10:41.459709+00:00",
+      "artifacts": {},
+      "started_at": "2026-11-10T21:04:32.251548+00:00",
+      "completed_at": "2026-11-10T21:10:28.575561+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -3021,19 +3074,72 @@
       "taxonomy": "controlled_experimental",
       "severity": "high",
       "execution_mode": "blocked_delay",
-      "status": "BLOCKED_DELAY",
-      "blocker_reason": "Multi-day longitudinal wall-clock delay required (Long-Term Protocol)",
-      "turn_results": [],
+      "status": "EXECUTED_FAIL",
+      "blocker_reason": null,
+      "turn_results": [
+        {
+          "turn_index": 0,
+          "prompt": "live component check LT-02",
+          "response_content": "",
+          "tool_calls": [],
+          "ttft_ms": 0.0,
+          "total_duration_ms": 0.0,
+          "passed": false,
+          "passed_assertions": [
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "records carry their past dates and the audit chain verifies after reopening: model=b12-bolt-e4b:q4km; seeded=[('2026-11-03T10:00:00+00:00', '2026-11-03: Власник запланував заміну батареї на стенді B-12.')]; audit_events=[1, 1, 1]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            }
+          ],
+          "failed_assertions": [
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "turn completed without error in all runs: states=['completed', 'failed', 'failed'] errors=[None, 'deadline_exceeded', 'deadline_exceeded']",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=1 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. 2026-11-03 власник запланував заміну батареї на стенді B-12.\" | run1: recalled=1 tools=[] reflection=skipped content='' | run2: recalled=1 tools=['memory_search'] reflection=skipped content=''",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "model called memory_search in all runs: tools=[['memory_search'], [], ['memory_search']]",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": false,
+              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[90.322, None, None]",
+              "expected": true,
+              "actual": false,
+              "turn": 0
+            }
+          ],
+          "tokens_prompt": 0,
+          "tokens_completion": 0,
+          "state_snapshot": {}
+        }
+      ],
       "all_passed": false,
       "latencies_ms": [],
       "ttft_ms_list": [],
-      "artifacts": {
-        "execution_report": "evals/capri_comprehensive/artifacts/LT-02/execution_report.json",
-        "turn_trace": "evals/capri_comprehensive/artifacts/LT-02/turn_trace.jsonl",
-        "latencies": "evals/capri_comprehensive/artifacts/LT-02/latencies.json"
-      },
-      "started_at": "2026-11-10T15:55:56.162702+00:00",
-      "completed_at": "2026-11-10T15:55:56.162735+00:00",
+      "artifacts": {},
+      "started_at": "2026-11-10T20:56:46.672020+00:00",
+      "completed_at": "2026-11-10T21:04:32.240847+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],

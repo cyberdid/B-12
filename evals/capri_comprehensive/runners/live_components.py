@@ -468,12 +468,163 @@ def aut08(tmp: Path) -> LiveResult:
     return res
 
 
+# --- LT-02 / JOURNEY-04: Track 1 time-warp of the long-term protocol (real model) --
+# The protocol (reports/CAPRI_LONG_TERM_PROTOCOL.md, 2.1) allows a synthetic time
+# shift: memories are written with past timestamps into a real MemoryStore, then the
+# real agent answers the exam question. This is Track 1, not the wall-clock Track 2;
+# the store has not lived through the days, only carries their dates.
+REPEATS_LONG = 3
+CAPABILITIES_LONG = ("memory.read", "time.read")
+# Scenario model "pinned_primary" maps to b12-bolt-e4b:q4km in runners/runner.py.
+LONG_MODEL = "b12-bolt-e4b:q4km"
+
+
+def _bolt_settings(state_dir: Path):
+    return _model_settings(state_dir).model_copy(update={
+        "model": LONG_MODEL,
+        "model_profile": REPO / "profiles/bolt-e4b-ollama-0.33.3.json",
+        "tokenizer_dir": Path.home() / "Downloads/B-12-runtime/tokenizer",
+    })
+
+
+def _warped_now(stamp: str):
+    return lambda: datetime.fromisoformat(stamp.replace("Z", "+00:00")).isoformat()
+
+
+async def _long_case(base: Path, scenario_id: str, model: str = LONG_MODEL) -> dict:
+    import b12.memory as memory_module
+    from b12.reflection import Reflector
+    from b12.runtime import open_runtime
+    from evals.capri_comprehensive.evaluators.schema import ScenarioDefinition
+
+    sc_path = next((REPO / "evals/capri_comprehensive/scenarios").glob(f"*/{scenario_id}.yaml"))
+    sc = ScenarioDefinition.from_yaml_file(sc_path)
+    settings = (_bolt_settings if model == LONG_MODEL else _model_settings)(base / "state")
+    runtime = open_runtime(settings)
+    actor = runtime.control.create_actor(owner=True, consent=True)
+    real_now = memory_module._now
+    seeded = []
+    try:
+        for m in sc.pre_conditions.initial_state.memories:
+            memory_module._now = _warped_now(m.timestamp)  # time-warp: the record's own date
+            seeded.append(runtime.memory.remember(m.text, actor))
+    finally:
+        memory_module._now = real_now
+    runtime.close()  # the days pass with the store closed; reopen like a restarted daemon
+
+    runtime = open_runtime(settings)
+    try:
+        audit_events = runtime.memory.verify_full()
+        reflection = await Reflector(runtime).reflect(actor, timeout_s=300)
+        session = runtime.control.create_session(actor.id)
+        task = runtime.control.create_task(session)
+        grant = runtime.control.issue_grant(
+            actor.id, session, CAPABILITIES_LONG, task_id=task, full_execution=True
+        )
+        result = await runtime.agent.turn(
+            session, grant, sc.interactions[0].input, task_id=task, timeout_s=600
+        )
+        ttft = next((m.get("ttft_s") for m in result.model_metrics if m.get("ttft_s")), None)
+        return {
+            "seeded": [(r.created_at, r.text) for r in seeded],
+            "dated": [
+                r.created_at[:19] == m.timestamp.replace("Z", "")[:19]
+                for r, m in zip(seeded, sc.pre_conditions.initial_state.memories, strict=True)
+            ],
+            "audit_events": audit_events,
+            "reflection": reflection.get("state"),
+            "state": result.state,
+            "error_code": result.error_code,
+            "content": result.content,
+            "tools": [t.name for t in result.tool_results],
+            "recalled": len(result.evidence_ids),
+            "ttft_s": ttft,
+            "model": settings.model,
+        }
+    finally:
+        runtime.close()
+
+
+def _long_check(tmp: Path, scenario_id: str, phrases: tuple[str, ...], ttft_max: float,
+                tool_required: bool, model: str = LONG_MODEL) -> LiveResult:
+    import asyncio
+
+    cases = []
+    for i in range(REPEATS_LONG):
+        base = tmp / f"run{i}"
+        base.mkdir()
+        cases.append(asyncio.run(_long_case(base, scenario_id, model)))
+
+    def has_all(text: str) -> bool:
+        low = text.lower()
+        return all(p.lower() in low for p in phrases)
+
+    res = LiveResult(scenario_id)
+    res.evidence.append(Evidence(
+        "records carry their past dates and the audit chain verifies after reopening",
+        all(all(c["dated"]) and c["audit_events"] > 0 for c in cases),
+        f"model={cases[0]['model']}; seeded={cases[0]['seeded']}; "
+        f"audit_events={[c['audit_events'] for c in cases]}",
+    ))
+    res.evidence.append(Evidence(
+        "turn completed without error in all runs",
+        all(c["state"] == "completed" and c["error_code"] is None for c in cases),
+        f"states={[c['state'] for c in cases]} errors={[c['error_code'] for c in cases]}",
+    ))
+    res.evidence.append(Evidence(
+        f"reply contains {phrases} in all runs",
+        all(has_all(c["content"]) for c in cases),
+        " | ".join(f"run{i}: recalled={c['recalled']} tools={c['tools']} "
+                   f"reflection={c['reflection']} content={c['content'][:160]!r}"
+                   for i, c in enumerate(cases)),
+    ))
+    if scenario_id == "JOURNEY-04":
+        import re
+
+        def cyrillic(text: str) -> bool:
+            letters = re.findall(r"[^\W\d_]", text)
+            return bool(letters) and sum("а" <= ch.lower() <= "я" or ch.lower() in "іїєґ"
+                                         for ch in letters) / len(letters) >= 0.5
+
+        forbidden = ("Я не пам'ятаю подій минулого місяця", "Моя пам'ять очищується")
+        res.evidence.append(Evidence(
+            "reply is in Cyrillic and has no forbidden memory-loss phrase in all runs",
+            all(cyrillic(c["content"]) and not any(f in c["content"] for f in forbidden)
+                for c in cases),
+            f"cyrillic={[cyrillic(c['content']) for c in cases]}",
+        ))
+    if tool_required:
+        res.evidence.append(Evidence(
+            "model called memory_search in all runs",
+            all("memory_search" in c["tools"] for c in cases),
+            f"tools={[c['tools'] for c in cases]}",
+        ))
+    ttfts = [c["ttft_s"] for c in cases]
+    res.evidence.append(Evidence(
+        f"TTFT <= {ttft_max} s in all runs",
+        all(t is not None and t <= ttft_max for t in ttfts),
+        f"ttft_s={[round(t, 3) if t is not None else None for t in ttfts]}",
+    ))
+    res.response = cases[-1]["content"]
+    return res
+
+
+def lt02(tmp: Path) -> LiveResult:
+    return _long_check(tmp, "LT-02", ("заміну батареї",), 1.5, tool_required=True)
+
+
+def journey04(tmp: Path) -> LiveResult:
+    return _long_check(tmp, "JOURNEY-04", ("Neovim", "екранован"), 2.0, tool_required=False)
+
+
 HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
     "AUT-03": aut03,
     "AUT-04": aut04,
     "AUT-05": aut05,
     "AUT-08": aut08,
     "AUT-09": aut09,
+    "JOURNEY-04": journey04,
+    "LT-02": lt02,
     "REL-01": rel01,
     "REL-02": rel02,
     "REL-03": rel03,

@@ -5,12 +5,15 @@ format the scenario runner writes. The reports replace the earlier harness-limit
 entries for the same scenario IDs in artifacts/, batch_summary.json and the matrix.
 
 Usage (from the repository root):
-    uv run python -m evals.capri_comprehensive.runners.run_live_suite
+    uv run python -m evals.capri_comprehensive.runners.run_live_suite [SCENARIO_ID ...]
+
+With scenario IDs, only those handlers run; other reports stay as they are.
 """
 
 from __future__ import annotations
 
 import json
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -77,12 +80,16 @@ def _to_report(sc: ScenarioDefinition, started: str, result) -> ExecutionReport:
     )
 
 
-def main() -> None:
+def main(ids: list[str] | None = None) -> None:
+    ids = ids or list(HANDLERS)
+    unknown = [i for i in ids if i not in HANDLERS]
+    if unknown:
+        raise SystemExit(f"no live handler for: {unknown}")
     batch = json.loads((REPORTS / "batch_summary.json").read_text(encoding="utf-8"))
     by_id = {r["scenario_id"]: r for r in batch["reports"]}
     scenarios: dict[str, ScenarioDefinition] = {}
     new_reports: dict[str, ExecutionReport] = {}
-    for sid in HANDLERS:
+    for sid in ids:
         sc = _scenario(sid)
         scenarios[sid] = sc
         started = datetime.now(UTC).isoformat()
@@ -124,4 +131,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
