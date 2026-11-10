@@ -1,8 +1,8 @@
 # Capri Comprehensive Evaluation: Statistical Summary
 
-**Generated:** 2026-11-10T21:10:29.737286+00:00  
+**Generated:** 2026-11-10T21:20:06.567083+00:00  
 **Total Scenarios Evaluated:** 92  
-**Automated Pass Rate (Runnable):** 32.5% [23.2%, 43.4%]  
+**Automated Pass Rate (Runnable):** 33.8% [24.3%, 44.6%]  
 **Blocked Hardware:** 12  
 **Blocked Delay (Long-Term):** 0  
 
@@ -11,7 +11,7 @@
 | Group | Total | Pass | Fail | Blocked HW | Blocked Delay | Pass Rate (Wilson 95% CI) | P50 (ms) [95% CI] | P95 (ms) [95% CI] |
 |:---|---:|---:|---:|---:|---:|:---|:---|:---|
 | Group A: Autobiographical Memory | 10 | 0 | 10 | 0 | 0 | 0.0% [0.0%, 27.8%] | 4440.3 [3765.2, 4501.0] | 6678.7 [4501.0, 6739.7] |
-| Group B: Long-Term Continuity | 8 | 1 | 7 | 0 | 0 | 12.5% [2.2%, 47.1%] | 6357.9 [2755.4, 9009.2] | 13421.6 [6819.8, 16888.6] |
+| Group B: Long-Term Continuity | 8 | 2 | 6 | 0 | 0 | 25.0% [7.1%, 59.1%] | 6357.9 [2755.4, 9009.2] | 13421.6 [6819.8, 16888.6] |
 | Group C: Cross-Model Behavioral Continuity | 10 | 6 | 4 | 0 | 0 | 60.0% [31.3%, 83.2%] | 21226.9 [14485.0, 45870.0] | 86972.2 [43629.0, 90675.2] |
 | Group D: Complex Reasoning & Research | 8 | 2 | 6 | 0 | 0 | 25.0% [7.1%, 59.1%] | 5991.6 [3228.0, 13744.2] | 17097.0 [7847.6, 17201.0] |
 | Group E: Security & Adversarial Robustness | 12 | 5 | 7 | 0 | 0 | 41.7% [19.3%, 68.0%] | 8487.4 [6345.0, 9702.5] | 13459.5 [9702.5, 14875.5] |
@@ -26,7 +26,7 @@
 
 | Taxonomy Category | Scenarios | Executed Pass | Executed Fail | Blocked |
 |:---|---:|---:|---:|---:|
-| `controlled_experimental` | 13 | 2 | 11 | 0 |
+| `controlled_experimental` | 13 | 3 | 10 | 0 |
 | `deterministic_software` | 28 | 11 | 17 | 0 |
 | `physical_acceptance` | 12 | 0 | 0 | 12 |
 | `real_model_behavioral` | 39 | 13 | 26 | 0 |

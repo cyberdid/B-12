@@ -1,8 +1,8 @@
 {
   "timestamp": "2026-11-10T16:10:42.140413+00:00",
   "total_scenarios": 92,
-  "passed": 26,
-  "failed": 54,
+  "passed": 27,
+  "failed": 53,
   "blocked_hardware": 12,
   "blocked_delay": 0,
   "reports": [
@@ -3074,77 +3074,76 @@
       "taxonomy": "controlled_experimental",
       "severity": "high",
       "execution_mode": "blocked_delay",
-      "status": "EXECUTED_FAIL",
+      "status": "EXECUTED_PASS",
       "blocker_reason": null,
       "turn_results": [
         {
           "turn_index": 0,
           "prompt": "live component check LT-02",
-          "response_content": "",
+          "response_content": "Я пам'ятаю, що 2026-11-03 ви запланували заміну батареї на стенді B-12.",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
-          "passed": false,
+          "passed": true,
           "passed_assertions": [
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "records carry their past dates and the audit chain verifies after reopening: model=b12-bolt-e4b:q4km; seeded=[('2026-11-03T10:00:00+00:00', '2026-11-03: Власник запланував заміну батареї на стенді B-12.')]; audit_events=[1, 1, 1]",
+              "detail": "records carry their past dates and the audit chain verifies after reopening: model=b12-bolt-e4b:q4km; semantic=False; seeded=[('2026-11-03T10:00:00+00:00', '2026-11-03: Власник запланував заміну батареї на стенді B-12.')]; audit_events=[1, 1, 1]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "turn completed without error in all runs: states=['completed', 'completed', 'completed'] errors=[None, None, None]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=1 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. 2026-11-03 власник запланував заміну батареї на стенді B-12.\" | run1: recalled=1 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. 2026-11-03 власник запланував заміну батареї на стенді B-12.\" | run2: recalled=1 tools=['memory_search'] reflection=skipped content=\"Я пам'ятаю, що 2026-11-03 ви запланували заміну батареї на стенді B-12.\"",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "model called memory_search in all runs: tools=[['memory_search'], ['memory_search'], ['memory_search']]",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
+              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[1.108, 1.122, 1.175]",
               "expected": true,
               "actual": true,
               "turn": 0
             }
           ],
-          "failed_assertions": [
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "turn completed without error in all runs: states=['completed', 'failed', 'failed'] errors=[None, 'deadline_exceeded', 'deadline_exceeded']",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            },
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=1 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. 2026-11-03 власник запланував заміну батареї на стенді B-12.\" | run1: recalled=1 tools=[] reflection=skipped content='' | run2: recalled=1 tools=['memory_search'] reflection=skipped content=''",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            },
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "model called memory_search in all runs: tools=[['memory_search'], [], ['memory_search']]",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            },
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[90.322, None, None]",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            }
-          ],
+          "failed_assertions": [],
           "tokens_prompt": 0,
           "tokens_completion": 0,
           "state_snapshot": {}
         }
       ],
-      "all_passed": false,
+      "all_passed": true,
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-10T20:56:46.672020+00:00",
-      "completed_at": "2026-11-10T21:04:32.240847+00:00",
+      "started_at": "2026-11-10T21:19:41.502884+00:00",
+      "completed_at": "2026-11-10T21:20:05.270061+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
       "ablation_condition": null,
-      "raw_score": 0.0
+      "raw_score": 1.0
     },
     {
       "scenario_id": "LT-03",
