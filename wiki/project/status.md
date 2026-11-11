@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-11-08
+updated: 2026-11-11
 status: active
 sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
 tags: [progress, next]
@@ -80,3 +80,9 @@ tags: [progress, next]
 - **Відкрито:** голос і робот — `BLOCKED_HARDWARE`.
 - **Відкрито:** розбіжність RE-01 (базовий прогін PASS, A4 FULL FAIL) не пояснена.
 - **Перевірений факт:** `tests/test_m3_gate_challenger2.py` (28/28) включено в коміт `010beb5`.
+
+## Оновлення 11.11.2026 — звіт про роботу
+
+- **Перевірений факт:** таймер `b12-daily-check` після виправлення відпрацював сам: запуск 00:03 11.11 за Києвом, `ok=true`.
+- **Спростовано/замінено:** запис вище про непояснену розбіжність RE-01 застарів. Старий PASS не відтворився: п'ять повторних запусків дали FAIL, і його знято в повному перезапуску.
+- Підсумок робіт 10–11.11: [work-report-2026-11-11.md](work-report-2026-11-11.md).
