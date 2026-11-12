@@ -7,6 +7,7 @@ B12_* environment values taking precedence. Exit codes: 0 completed/ok,
 
 import argparse
 import asyncio
+import contextlib
 import json
 import os
 import signal
@@ -770,6 +771,38 @@ async def cmd_tui_hook(args, settings) -> int:
     return 0
 
 
+def _graceful_server_class():
+    import uvicorn
+
+    class GracefulServer(uvicorn.Server):
+        """SIGTERM is a normal stop request for a service: shut down and exit with code 0.
+
+        uvicorn re-raises a captured signal after the graceful shutdown, so the process
+        would die by SIGTERM (exit code -15) even though it stopped cleanly. SIGINT keeps
+        uvicorn's behaviour.
+        """
+
+        @contextlib.contextmanager
+        def capture_signals(self):
+            with super().capture_signals():
+                try:
+                    yield
+                finally:
+                    # Read by uvicorn's capture_signals right after this block exits.
+                    self._captured_signals = [
+                        s for s in self._captured_signals if s != signal.SIGTERM
+                    ]
+
+    return GracefulServer
+
+
+def __getattr__(name):
+    # uvicorn is imported lazily: only `serve` needs it.
+    if name == "GracefulServer":
+        return _graceful_server_class()
+    raise AttributeError(name)
+
+
 async def cmd_serve(args, settings) -> int:
     import ipaddress
 
@@ -781,7 +814,7 @@ async def cmd_serve(args, settings) -> int:
         emit_json({"error": "loopback_only"})
         return 1
     app = create_app(settings, port=args.port, autonomy=not args.no_autonomy)
-    server = uvicorn.Server(
+    server = _graceful_server_class()(
         uvicorn.Config(
             app,
             host=args.host,
