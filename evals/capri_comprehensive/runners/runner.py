@@ -14,6 +14,7 @@ Executes a scenario YAML specification:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import logging
 import time
@@ -201,7 +202,7 @@ class ScenarioRunner:
         total_prompt_tokens = 0
         total_comp_tokens = 0
 
-        with sandbox:
+        with sandbox, contextlib.ExitStack() as stack:
             workspace_path = sandbox.get_workspace_path()
             world_state: dict[str, Any] = {
                 "sandbox_dir": str(sandbox.sandbox_dir),
@@ -216,6 +217,13 @@ class ScenarioRunner:
             }
 
             all_passed = True
+            scenario_scope = getattr(self.turn_executor, "scenario", None)
+            scope = (
+                scenario_scope(scenario, workspace_path)
+                if scenario_scope is not None
+                else contextlib.nullcontext()
+            )
+            stack.enter_context(scope)  # closed before the sandbox is removed
 
             # 3. Execute Interaction Turns
             for turn_idx, turn in enumerate(scenario.interactions):
@@ -230,7 +238,9 @@ class ScenarioRunner:
                 )
 
                 turn_duration_ms = (time.perf_counter() - turn_start) * 1000.0
-                ttft_ms = raw_turn_output.get("ttft_ms", turn_duration_ms * 0.3)
+                ttft_ms = raw_turn_output.get("ttft_ms")
+                if ttft_ms is None:  # unmeasured: report the whole turn, never an estimate
+                    ttft_ms = turn_duration_ms
                 content = raw_turn_output.get("content", "")
                 tool_calls = raw_turn_output.get("tool_calls", [])
 
@@ -255,6 +265,22 @@ class ScenarioRunner:
                     metrics=turn_metrics,
                     turn_index=turn_idx,
                 )
+
+                runtime_state = raw_turn_output.get("runtime_state")
+                if runtime_state in ("failed", "cancelled"):
+                    # A turn the runtime did not complete is never a pass, whatever the rules.
+                    passed = False
+                    failed_assertions = [
+                        *failed_assertions,
+                        AssertionOutcome(
+                            rule_type="runtime_turn_state",
+                            passed=False,
+                            detail=f"runtime turn ended {runtime_state}: {content[:200]}",
+                            expected="completed or awaiting_approval",
+                            actual=runtime_state,
+                            turn=turn_idx,
+                        ),
+                    ]
 
                 # Optional LLM Judge evaluation
                 if scenario.evaluation.method == "frozen_broker_judge":
@@ -327,6 +353,9 @@ class ScenarioRunner:
         scenario: ScenarioDefinition,
     ) -> dict[str, Any]:
         """Dispatch turn execution to custom turn_executor or local Ollama bridge."""
+        run_turn = getattr(self.turn_executor, "run_turn", None)
+        if run_turn is not None:  # scenario-aware executor (real B-12 runtime)
+            return run_turn(turn, turn_index, world_state)
         if self.turn_executor:
             return self.turn_executor(turn.input, turn_index, world_state)
 
@@ -526,9 +555,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Capri Scenario Runner")
     parser.add_argument("scenario_path", help="Path to scenario YAML file")
     parser.add_argument("--artifacts", default=None, help="Directory to save execution artifacts")
+    parser.add_argument(
+        "--runtime-dir", default=None,
+        help="Run turns through the real B-12 runtime with state under this directory",
+    )
     args = parser.parse_args()
 
-    runner = ScenarioRunner(artifacts_dir=args.artifacts)
+    executor = None
+    if args.runtime_dir:
+        from evals.capri_comprehensive.runners.runtime_executor import RuntimeTurnExecutor
+
+        executor = RuntimeTurnExecutor(Path(args.runtime_dir))
+    runner = ScenarioRunner(artifacts_dir=args.artifacts, turn_executor=executor)
     report = runner.run(args.scenario_path)
 
     print(f"Scenario: {report.scenario_id} [{report.status.value}]")

@@ -132,27 +132,76 @@ def aut04(tmp: Path) -> LiveResult:
 
 # --- AUT-05: owner emergency stop must cancel the running goal -------------------
 def aut05(tmp: Path) -> LiveResult:
-    from b12.attention import AttentionPolicy
-    from b12.goals import GoalStore
+    """Owner stop during a running background goal turn (real Scheduler, real Bolt)."""
+    import asyncio
 
-    settings = SimpleNamespace(timezone="Europe/Kyiv", quiet_start="23:00", quiet_end="08:00",
-                               initiative_hour_cap=3, initiative_cooldown_s=600.0)
-    goals = GoalStore(tmp / "goals.sqlite3")
-    goal = goals.create(OWNER, "session-1", "Довгий пошук у файлах", "Завершити пошук")
-    policy = AttentionPolicy(tmp / "attention", settings, clock=lambda: datetime(2026, 11, 10, 10, 0, tzinfo=UTC))
-    policy.set_stopped(OWNER, True)
-    after = goals.get(goal["id"], OWNER)
-    stop_decision = policy.decide(OWNER)
-    policy.close()
-    goals.close()
-    status = after["status"] if after else "missing"
+    runs = [asyncio.run(_aut05_case(tmp / f"run{i}")) for i in range(REPEATS_AUT05)]
     res = LiveResult("AUT-05")
-    res.evidence.append(Evidence("stop blocks new initiatives", not stop_decision.allowed,
-                                 f"reason={stop_decision.reason}"))
-    res.evidence.append(Evidence("running goal cancelled by stop", status == "cancelled",
-                                 f"goal status after stop={status}"))
-    res.response = f"stop reason={stop_decision.reason}; goal status={status}"
+    res.evidence.append(Evidence(
+        "stop blocks new initiatives", all(not r["initiative_allowed"] for r in runs),
+        f"reasons={[r['reason'] for r in runs]}"))
+    res.evidence.append(Evidence(
+        "background turn in flight is cancelled by stop",
+        all(r["state"] == "cancelled" for r in runs), f"states={[r['state'] for r in runs]}"))
+    res.evidence.append(Evidence(
+        f"cancelled within {STOP_LATENCY_MAX_MS:.0f} ms of the stop",
+        all(r["stop_to_return_ms"] <= STOP_LATENCY_MAX_MS for r in runs),
+        f"stop_to_return_ms={[r['stop_to_return_ms'] for r in runs]}"))
+    res.evidence.append(Evidence(
+        "goal kept for resume after stop is lifted (stop is a pause)",
+        all(r["goal_status"] == "active" for r in runs),
+        f"goal_status={[r['goal_status'] for r in runs]}"))
+    ok = all(e.passed for e in res.evidence)
+    res.response = (
+        "Фонову роботу зупинено: активний хід скасовано, нові ініціативи заблоковано. STOPPED"
+        if ok else f"runs={runs}"
+    )
     return res
+
+
+REPEATS_AUT05 = 3
+STOP_LATENCY_MAX_MS = 500.0
+
+
+async def _aut05_case(base: Path) -> dict:
+    import asyncio
+
+    from b12.autonomy import Scheduler
+    from b12.runtime import open_runtime
+
+    settings = _bolt_settings(base / "state").model_copy(
+        update={"quiet_start": "00:00", "quiet_end": "00:00"}
+    )
+    runtime = open_runtime(settings)
+    scheduler = Scheduler(runtime)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        session = runtime.control.create_session(actor.id)
+        goal = runtime.goals.create(
+            actor.id, session,
+            "Склади детальний план калібрування стенда з двадцяти пронумерованих кроків.",
+            "План із двадцяти кроків записано.",
+            allowed_tools=("time.read",), budget_turns=4, review_interval_s=3600,
+        )
+        running = asyncio.create_task(scheduler.run_goal(goal))
+        while not runtime.agent.active and not running.done():
+            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.5)  # the model is answering now
+        stopped_at = time.monotonic()
+        runtime.attention.set_stopped(actor.id, True)
+        outcome = await asyncio.wait_for(running, timeout=60)
+        stop_to_return_ms = round((time.monotonic() - stopped_at) * 1000, 1)
+        decision = runtime.attention.decide(actor.id)
+        return {
+            "state": outcome.get("state"),
+            "stop_to_return_ms": stop_to_return_ms,
+            "initiative_allowed": decision.allowed,
+            "reason": decision.reason,
+            "goal_status": runtime.goals.get(goal["id"], actor.id)["status"],
+        }
+    finally:
+        scheduler.close()
+        runtime.close()
 
 
 # --- AUT-09: priority preemption (static: absence of the mechanism) --------------
@@ -306,11 +355,43 @@ def rel05(tmp: Path) -> LiveResult:
 
 # --- REL-06: write refused under low disk (static: absence of a threshold) -------
 def rel06(tmp: Path) -> LiveResult:
-    hits = _source_hits(("disk_usage", "free_space", "статфс", "statvfs"))
+    """Real runtime, real disk: a reserve above the actual free space must refuse writes."""
+    import shutil
+
+    from b12.memory import DiskSpaceLow
+    from b12.runtime import open_runtime
+
+    state = tmp / "state"
+    state.mkdir(parents=True)
+    runtime = open_runtime(_bolt_settings(state))  # default reserve: the write goes through
+    actor = runtime.control.create_actor(owner=True, consent=True)
+    runtime.memory.remember("звичайний запис до перевірки", actor)
+    runtime.close()
+    free_mb = shutil.disk_usage(state).free // 2**20
+    settings = _bolt_settings(state).model_copy(update={"min_free_mb": free_mb + 1024})
+    runtime = open_runtime(settings)
+    try:
+        before = runtime.memory.verify_full()
+        refused, detail = False, ""
+        try:
+            runtime.memory.remember("великий запис для перевірки резерву диска", actor)
+        except DiskSpaceLow as exc:
+            refused, detail = True, str(exc)
+        after = runtime.memory.verify_full()
+        stored = runtime.memory.search("резерву", actor)
+    finally:
+        runtime.close()
     res = LiveResult("REL-06")
-    res.evidence.append(Evidence("free-space threshold guards writes in src/b12", bool(hits),
-                                 f"matches={len(hits)}; {hits[:3]}"))
-    res.response = f"free-space checks in src: {len(hits)}"
+    res.evidence.append(Evidence("write refused below the reserve", refused,
+                                 f"free={free_mb} MB reserve={free_mb + 1024} MB; {detail}"))
+    res.evidence.append(Evidence("nothing written and the audit chain unchanged",
+                                 not stored and after == before,
+                                 f"records={len(stored)} audit {before}->{after}"))
+    ok = all(e.passed for e in res.evidence)
+    res.response = (
+        f"WRITE_REFUSED: НЕДОСТАТНЬО МІСЦЯ ({detail}); база цілісна."
+        if ok else f"refused={refused} records={len(stored)}"
+    )
     return res
 
 

@@ -85,8 +85,6 @@ def main(ids: list[str] | None = None) -> None:
     unknown = [i for i in ids if i not in HANDLERS]
     if unknown:
         raise SystemExit(f"no live handler for: {unknown}")
-    batch = json.loads((REPORTS / "batch_summary.json").read_text(encoding="utf-8"))
-    by_id = {r["scenario_id"]: r for r in batch["reports"]}
     scenarios: dict[str, ScenarioDefinition] = {}
     new_reports: dict[str, ExecutionReport] = {}
     for sid in ids:
@@ -105,8 +103,22 @@ def main(ids: list[str] | None = None) -> None:
         verdict = "PASS" if report.all_passed else "FAIL"
         print(f"{sid} {verdict} ({time.monotonic() - t0:.1f}s)", flush=True)
 
+    merge_into_suite(new_reports)
+
+
+def merge_into_suite(new_reports: dict[str, ExecutionReport]) -> dict[str, int]:
+    """Replace reports by scenario ID in batch_summary.json and regenerate the matrix."""
+    batch = json.loads((REPORTS / "batch_summary.json").read_text(encoding="utf-8"))
+    by_id = {r["scenario_id"]: r for r in batch["reports"]}
+    repo = str(ROOT.parents[1]) + "/"
     for sid, report in new_reports.items():
-        by_id[sid] = json.loads(report.model_dump_json())
+        data = json.loads(report.model_dump_json())
+        # Artifact paths are kept relative to the repository: no host paths in reports.
+        data["artifacts"] = {
+            k: v.removeprefix(repo) if isinstance(v, str) else v
+            for k, v in (data.get("artifacts") or {}).items()
+        }
+        by_id[sid] = data
     batch["reports"] = [by_id[k] for k in sorted(by_id)]
     counts = {}
     for r in batch["reports"]:
@@ -125,9 +137,12 @@ def main(ids: list[str] | None = None) -> None:
         sc = ScenarioDefinition.from_yaml_file(path)
         all_scenarios[sc.id] = sc
     agg = EvaluationAggregator(all_reports)
-    agg.write_scenario_matrix_csv(REPORTS / "CAPRI_SCENARIO_MATRIX.csv", scenarios_map=all_scenarios)
+    agg.write_scenario_matrix_csv(
+        REPORTS / "CAPRI_SCENARIO_MATRIX.csv", scenarios_map=all_scenarios
+    )
     agg.generate_markdown_summary(REPORTS / "STATISTICAL_SUMMARY.md")
     print("counts:", counts, flush=True)
+    return counts
 
 
 if __name__ == "__main__":
