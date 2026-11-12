@@ -9,6 +9,7 @@ output_tokens = 512
 max_rounds = 8
 max_tool_calls = 16
 tool_timeout_s = 30.0
+min_free_mb = 50  # memory writes are refused below this much free space on the state disk
 host_access = "full"
 # Admission requires an explicit calibrated profile and local pinned tokenizer assets.
 # Set absolute paths for your deployment (or B12_MODEL_PROFILE / B12_TOKENIZER_DIR).
