@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-11
+updated: 2026-11-12
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -18,7 +18,7 @@ tags: [navigation]
 | [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
-| [Комплексна оцінка Capri, 10.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії: 27 пройдено, 53 провалено, 12 заблоковано обладнанням; класифікація «гібридна модель-центрична система», не повний компаньйон |
+| [Комплексна оцінка Capri, 12.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії через рантайм: 39 пройдено, 41 провалено, 12 заблоковано обладнанням; класифікація «гібридна модель-центрична система», не повний компаньйон |
 | [Звіт про роботу, 10–11.11.2026](project/work-report-2026-11-11.md) | Що зроблено в оцінці Capri, довгостроковій пам'яті й git; відкриті питання; PDF-версія |
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |
 | [Дорожня карта](project/roadmap.md) | M0–M6, залежності й критерії завершення |
