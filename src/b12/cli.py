@@ -409,6 +409,7 @@ async def cmd_goals(args, settings) -> int:
                     budget_turns=args.budget,
                     review_interval_s=args.interval,
                     check=check,
+                    priority=args.priority,
                 )
             )
         elif args.action == "list":
@@ -896,6 +897,10 @@ def parser() -> argparse.ArgumentParser:
     goals.add_argument("--criteria", default="Короткий звіт про результат")
     goals.add_argument("--budget", type=int, default=5)
     goals.add_argument("--interval", type=float, default=3600)
+    goals.add_argument(
+        "--priority", type=int, default=0, choices=range(11), metavar="0-10",
+        help="вища ціль іде першою й витісняє нижчу",
+    )
     goals.add_argument("--tools", nargs="*")
     goals.add_argument("--check-file")
     goals.add_argument("--check-text", default="")
