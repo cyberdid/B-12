@@ -1121,3 +1121,34 @@ async def test_a_partly_read_file_is_continued_in_normal_mode_too(runtime_factor
     assert len(reads) == 3, [r.name for r in result.tool_results]
     nudge = [m["content"] for m in state["requests"][2]["messages"] if m["role"] == "user"][-1]
     assert "offset=2400" in nudge
+
+
+async def test_guest_prompt_names_the_guest_and_carries_no_owner_data(runtime_factory):
+    from pathlib import Path
+
+    from b12.auth import GUEST_CAPABILITIES
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    secret = "кодовий пароль стенда AURORA-77"
+    runtime.memory.remember(secret, who.actor)
+    guest = runtime.control.create_actor(owner=False, consent=True)
+    session = runtime.control.create_session(guest.id)
+    task = runtime.control.create_task(session)
+    grant = runtime.control.issue_grant(
+        guest.id, session, tuple(sorted(GUEST_CAPABILITIES)), task_id=task
+    )
+    state["script"] = [{"content": "Це конфіденційні дані власника."}]
+    result = await runtime.agent.turn(session, grant, "Який кодовий пароль стенда?", task_id=task)
+    assert result.state == "completed"
+    request = state["requests"][-1]
+    everything = json.dumps(request["messages"], ensure_ascii=False)
+    assert "AURORA" not in everything
+    assert str(Path.home()) not in everything
+    assert "гість" in request["messages"][0]["content"]
+
+    state["script"] = [{"content": "AURORA-77."}]
+    await run_turn(runtime, who, "Який кодовий пароль стенда?")
+    system = state["requests"][-1]["messages"][0]["content"]
+    assert "власник" in system and str(Path.home()) in system and "AURORA-77" in system
