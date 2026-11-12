@@ -1363,3 +1363,55 @@ async def test_store_lists_similar_facts_and_supersede_tool_retires_the_old_one(
     ]
     same, _ = await run_turn(runtime, who, "заміни сам себе")
     assert [(r.status, r.error_code) for r in same.tool_results] == [("failed", "unsupported")]
+
+
+async def test_enrichment_lets_a_general_word_find_a_named_fact_and_purge_removes_it(
+    runtime_factory,
+):
+    from b12.enrichment import KIND, Enricher
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    fact = runtime.memory.remember("День 1: власник налаштував середовище Neovim.", who.actor)
+    other = runtime.memory.remember("Власник п'є чай Ерл Грей.", who.actor)
+    numbers = {fact.text: None, other.text: None}
+
+    def categorize(request):
+        lines = request["messages"][-1]["content"].splitlines()
+        for line in lines:
+            number, text = line.split(": ", 1)
+            numbers[text] = number
+        return {"content": f"{numbers[fact.text]}: програма, редактор\n"
+                           f"{numbers[other.text]}: напій, 1abc"}
+
+    state["script"] = [categorize]
+    outcome = await Enricher(runtime).enrich(who.actor)
+    assert outcome == {"state": "recorded", "count": 2}
+    assert await Enricher(runtime).enrich(who.actor) == {
+        "state": "skipped", "reason": "nothing_new"
+    }
+    notes = runtime.memory.recent(who.actor, limit=10)
+    category = [n for n in notes if n.kind == KIND and fact.id in n.evidence_ids][0]
+    assert "редактор" in category.text and "Neovim" in category.text
+
+    state["script"] = [{"content": "Neovim."}]
+    await run_turn(runtime, who, "З яким редактором ми працювали?")
+    assert "Neovim" in state["requests"][-1]["messages"][0]["content"]
+
+    receipt = await runtime.purge.forget(fact.id, who.actor.id)
+    assert receipt.state == "complete"
+    assert not runtime.memory.is_live(category.id, who.actor)
+    assert runtime.memory.search("редактор", who.actor) == []
+
+
+async def test_enrichment_needs_consent(runtime_factory):
+    from b12.enrichment import Enricher
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime, consent=False)
+    assert await Enricher(runtime).enrich(who.actor) == {
+        "state": "skipped", "reason": "consent_required"
+    }
+    assert state["requests"] == []

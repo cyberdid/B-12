@@ -135,6 +135,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "embedding_python": None,
         "embedding_backend": "archive_index.embed:Embedder",
         "forget_requires_approval": True,
+        "memory_enrichment": True,
         "sudo_access": "off",
         "network_allow": (),
         "tool_result_bytes": 4096,

@@ -725,6 +725,10 @@ async def _long_case(
     try:
         audit_events = runtime.memory.verify_full()
         reflection = await Reflector(runtime).reflect(actor, timeout_s=300)
+        # The scheduler runs enrichment right after idle reflection: part of the days that pass.
+        from b12.enrichment import Enricher
+
+        enrichment = await Enricher(runtime).enrich(actor, timeout_s=300)
         session = runtime.control.create_session(actor.id)
         task = runtime.control.create_task(session)
         grant = runtime.control.issue_grant(
@@ -742,6 +746,7 @@ async def _long_case(
             ],
             "audit_events": audit_events,
             "reflection": reflection.get("state"),
+            "enrichment": enrichment.get("state"),
             "state": result.state,
             "error_code": result.error_code,
             "content": result.content,

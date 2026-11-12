@@ -38,6 +38,8 @@ class Settings(BaseModel):
     # Owner-chosen wide access. Both are control-channel settings; model output cannot set them.
     # forget_requires_approval=False lets memory_forget run on the owner's grant alone.
     forget_requires_approval: bool = True
+    # Background category notes ("Neovim" -> редактор) so facts are found by general words.
+    memory_enrichment: bool = True
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"
     # http_fetch destinations: exact hosts, "*.suffix" (subdomains) or "*" (all); empty denies all.
@@ -150,7 +152,7 @@ class Settings(BaseModel):
                 value = float(value)
             elif field == "network_allow":
                 value = tuple(item.strip() for item in value.split(",") if item.strip())
-            elif field == "forget_requires_approval":
+            elif field in ("forget_requires_approval", "memory_enrichment"):
                 value = value.strip().lower() in ("1", "true", "yes", "on")
             elif field in {
                 "tool_timeout_s",

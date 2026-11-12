@@ -204,6 +204,11 @@ class Scheduler:
             ):
                 continue
             outcomes.append({"actor_id": actor_id, **await Reflector(rt).reflect(actor)})
+            if getattr(rt.settings, "memory_enrichment", False):
+                from b12.enrichment import Enricher
+
+                enriched = await Enricher(rt).enrich(actor)
+                outcomes.append({"actor_id": actor_id, "enrichment": enriched})
             # Marked only once the reflection has finished, so an interrupted run is not counted.
             rt.control.set_meta(key, now.isoformat())
         return outcomes
