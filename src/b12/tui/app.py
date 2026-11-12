@@ -758,6 +758,14 @@ class B12App(App):
         panel = self.query_one("#panel")
         panel.toggle_class("open")
         self.query_one("#right-rail").set_class(panel.has_class("open"), "controls-open")
+        if panel.has_class("open"):
+            # Ctrl+P is the memory/approvals shortcut; on short terminals the voice and
+            # activity sections above would otherwise push memory search off-screen.
+            self.call_after_refresh(self._reveal_memory_search)
+
+    def _reveal_memory_search(self) -> None:
+        panel = self.query_one("#panel", VerticalScroll)
+        panel.scroll_to_widget(self.query_one("#mem-query", Input), animate=False)
 
     async def refresh_approvals(self) -> None:
         box = self.query_one("#approvals", Vertical)
