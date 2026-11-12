@@ -1,0 +1,53 @@
+id: "REL-05"
+group: "Group I: Reliability & Fault Tolerance"
+title: "Safe Serialization of Concurrent State Mutations"
+research_hypothesis: "Multiple concurrent turn requests against the same state directory serialize safely without ledger races or lock errors."
+taxonomy: "deterministic_software"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "db/shared_state.json": '{"counter": 0}'
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "DISPATCH_CONCURRENT_MUTATIONS: count=5"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "ALL_MUTATIONS_SERIALIZED"
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "RACE_CONDITION"
+          - "DIRTY_READ"
+
+ground_truth:
+  reference_answer: "5 concurrent mutations completed sequentially."
+  evidence_criteria: "Shared state counter == 5."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "All 5 transactions commit cleanly; counter == 5."
+  failure_criteria: "Lost updates or transaction collision errors."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "concurrency_audit.json"

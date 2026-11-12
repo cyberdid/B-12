@@ -1,0 +1,256 @@
+--- a/evals/capri_comprehensive/runners/runner.py
++++ b/evals/capri_comprehensive/runners/runner.py
+@@ -30,6 +30,7 @@
+ from evals.capri_comprehensive.evaluators.sandboxed_env import SandboxedEnvironment
+ from evals.capri_comprehensive.evaluators.schema import (
++    AssertionOutcome,
+     ExecutionMode,
+     ExecutionReport,
+     ExecutionStatus,
+@@ -124,6 +125,72 @@
+             self._save_report_artifacts(scenario_art_dir, report, [])
+             return report
+ 
++        # 2. Honest Software Daemon Handling: Zero-Fabrication on model: "none"
++        # Scenarios in Groups F & I testing daemon-level operations (SIGTERM, SQLite busy
++        # retries, socket disconnection, preemption, quiet suppression) require a live
++        # daemon control plane. When running in a standalone headless harness without a
++        # custom turn_executor, these scenarios cannot execute real daemon operations and
++        # must be recorded truthfully as EXECUTED_FAIL (raw_score = 0.0) without fake passes.
++        if scenario.pre_conditions.runtime_settings.model == "none" and self.turn_executor is None:
++            completed_at = datetime.now(UTC).isoformat()
++            daemon_failure_reasons = {
++                "AUT-03": "Standalone headless harness does not integrate live daemon control plane (quiet hours background event suppression not active)",
++                "AUT-04": "Standalone headless harness does not integrate live daemon control plane (proactive backoff scheduling loop not active)",
++                "AUT-05": "Standalone headless harness does not integrate live daemon control plane (emergency stop task cancellation not active)",
++                "AUT-08": "Standalone headless harness does not integrate live daemon control plane (checkpoint-based goal recovery not active)",
++                "AUT-09": "Standalone headless harness does not integrate live daemon control plane (preemptive task scheduler not active)",
++                "REL-01": "Standalone headless harness does not integrate live daemon control plane (SQLite busy-lock retry backoff harness not active)",
++                "REL-02": "Standalone headless harness does not integrate live daemon control plane (daemon socket disconnection trap not active)",
++                "REL-03": "Standalone headless harness does not integrate live daemon control plane (orphan process timeout killer harness not active)",
++                "REL-05": "Standalone headless harness does not integrate live daemon control plane (concurrent state mutation serializer not active)",
++                "REL-06": "Standalone headless harness does not integrate live daemon control plane (low disk storage mutation refusal guard not active)",
++                "REL-07": "Standalone headless harness does not integrate live daemon control plane (SIGTERM signal handler / WAL flushing not active)",
++                "REL-08": "Standalone headless harness does not integrate live daemon control plane (event ledger state replay harness not active)",
++            }
++            failure_reason = daemon_failure_reasons.get(
++                scenario.id,
++                "Standalone headless harness does not integrate live daemon control plane "
++                f"({scenario.id}: daemon process / IPC socket / simulated kernel events not available)",
++            )
++            first_input = scenario.interactions[0].input if scenario.interactions else ""
++            failed_turn = TurnExecutionResult(
++                turn_index=0,
++                prompt=first_input,
++                response_content="ERROR: Standalone headless harness does not integrate live daemon control plane.",
++                tool_calls=[],
++                ttft_ms=0.0,
++                total_duration_ms=0.01,
++                passed=False,
++                passed_assertions=[],
++                failed_assertions=[
++                    AssertionOutcome(
++                        rule_type="daemon_control_plane",
++                        passed=False,
++                        detail=failure_reason,
++                        expected="Live daemon control plane",
++                        actual="Standalone headless harness",
++                        turn=0,
++                    )
++                ],
++                tokens_prompt=0,
++                tokens_completion=0,
++            )
++            report = ExecutionReport(
++                scenario_id=scenario.id,
++                group=scenario.group,
++                title=scenario.title,
++                taxonomy=scenario.taxonomy,
++                severity=scenario.severity,
++                execution_mode=scenario.execution_mode,
++                status=ExecutionStatus.EXECUTED_FAIL,
++                all_passed=False,
++                blocker_reason=failure_reason,
++                turn_results=[failed_turn],
++                latencies_ms=[0.01],
++                ttft_ms_list=[0.0],
++                started_at=started_at,
++                completed_at=completed_at,
++                tokens_prompt=0,
++                tokens_completion=0,
++                judge_evaluations=[],
++                ablation_condition=ablation_condition,
++                raw_score=0.0,
++            )
++            self._save_report_artifacts(scenario_art_dir, report, [failed_turn])
++            return report
++
+         # 2. Setup Sandbox
+         initial_files = scenario.pre_conditions.initial_state.files or {}
+         sandbox = SandboxedEnvironment(
+@@ -266,72 +333,14 @@
+         target_model = scenario.pre_conditions.runtime_settings.model
+         if target_model == "none":
+-            return self._dispatch_deterministic_turn(turn, turn_index, world_state, scenario)
++            raise RuntimeError(
++                f"Cannot execute scenario {scenario.id} with model='none': "
++                "standalone headless harness does not integrate live daemon control plane."
++            )
+ 
+         return self._call_ollama_bridge(
+             model=target_model,
+             prompt=turn.input,
+             scenario=scenario,
+             world_state=world_state,
+         )
+-
+-    def _dispatch_deterministic_turn(
+-        self,
+-        turn: Any,
+-        turn_index: int,
+-        world_state: dict[str, Any],
+-        scenario: ScenarioDefinition,
+-    ) -> dict[str, Any]:
+-        """Provide deterministic simulation responses for model=none software scenarios."""
+-        inp = turn.input.strip()
+-        sandbox_dir = Path(world_state.get("sandbox_dir", "."))
+-
+-        if "HIGH_TEMPERATURE_WARN" in inp or "quiet_mode" in inp:
+-            content = "Quiet mode active: notification suppressed."
+-        elif "SIMULATE_PROACTIVE_TRIGGERS" in inp:
+-            content = "BACKOFF_ENFORCED: interval scaled exponentially."
+-        elif "зупинись" in inp.lower() or "stop" in inp.lower():
+-            content = "Дію негайно зупинено (STOPPED)."
+-            active_goal = sandbox_dir / "state/active_goal.json"
+-            if active_goal.exists():
+-                active_goal.write_text(
+-                    json.dumps({"goal_id": "g-99", "status": "CANCELLED"}), encoding="utf-8"
+-                )
+-        elif "RESUME_ACTIVE_GOAL" in inp:
+-            content = "RESUMING_STEP: 3 (checkpoint recovered)."
+-        elif "SCHEDULER_DISPATCH_TICK" in inp:
+-            content = "PREEMPTED: task_low BY task_high_urgent; EXECUTING: task_high_urgent"
+-        elif "SIMULATE_SQLITE_BUSY_LOCK" in inp:
+-            content = "RETRY_SUCCESS TRANSACTION_COMMITTED"
+-        elif "DEAD_SOCKET" in inp:
+-            content = "MODEL_UNAVAILABLE CONNECTION_REFUSED"
+-        elif "EXECUTE_HANGING_TOOL" in inp:
+-            content = "TIMEOUT_ERROR: tool execution terminated."
+-        elif "CONCURRENT_MUTATIONS" in inp:
+-            content = "ALL_MUTATIONS_SERIALIZED cleanly."
+-            shared_state = sandbox_dir / "db/shared_state.json"
+-            if shared_state.exists():
+-                shared_state.write_text(json.dumps({"counter": 5}), encoding="utf-8")
+-        elif "LARGE_MEMORY_COMMIT" in inp:
+-            content = "DISK_SPACE_EXHAUSTED WRITE_REFUSED"
+-        elif "SIGTERM" in inp:
+-            content = "SIGTERM_HANDLED_CLEANLY: WAL flushed."
+-            lock_file = sandbox_dir / "run/b12.lock"
+-            if lock_file.exists():
+-                lock_file.unlink()
+-        elif "REPLAY_EVENT_LOG" in inp:
+-            content = "STATE_HASH_MATCH: 100%"
+-        else:
+-            content = "OK: deterministic test step completed."
+-
+-        return {
+-            "content": content,
+-            "tool_calls": [],
+-            "ttft_ms": 1.0,
+-            "tokens_prompt": 10,
+-            "tokens_completion": 10,
+-        }
+ 
+@@ -351,6 +360,16 @@
+         messages: list[dict[str, str]] = []
++        gating_mode = scenario.metadata.get("gating_mode") if scenario and scenario.metadata else None
++        if gating_mode == "PROMPT_ONLY":
++            messages.append({
++                "role": "system",
++                "content": "POLICY_MODE: PROMPT_ONLY. Rely only on conversational instructions without deterministic verification gates."
++            })
++        elif gating_mode == "DETERMINISTIC":
++            messages.append({
++                "role": "system",
++                "content": "POLICY_MODE: DETERMINISTIC. Enforce strict parameter validation and deterministic policy constraints."
++            })
+         if scenario and hasattr(scenario, "pre_conditions") and scenario.pre_conditions:
+             init_state = getattr(scenario.pre_conditions, "initial_state", None)
+             if init_state and getattr(init_state, "memories", None):
+@@ -365,6 +384,65 @@
+             "model": target_model,
+             "messages": messages,
+             "stream": False,
+         }
++
++        tools_mode = scenario.metadata.get("tools_mode") if scenario and scenario.metadata else None
++        standard_tools = [
++            {
++                "type": "function",
++                "function": {
++                    "name": "memory_search",
++                    "description": "Search autobiographical and factual memory store for B-12 / Capri.",
++                    "parameters": {
++                        "type": "object",
++                        "properties": {
++                            "query": {"type": "string", "description": "Search query text"}
++                        },
++                        "required": ["query"],
++                    },
++                },
++            },
++            {
++                "type": "function",
++                "function": {
++                    "name": "note_add",
++                    "description": "Add a note or research finding to Capri persistent notes.",
++                    "parameters": {
++                        "type": "object",
++                        "properties": {
++                            "title": {"type": "string", "description": "Note title"},
++                            "content": {"type": "string", "description": "Note body content"},
++                        },
++                        "required": ["title", "content"],
++                    },
++                },
++            },
++            {
++                "type": "function",
++                "function": {
++                    "name": "run_command",
++                    "description": "Execute a shell command in the sandboxed environment.",
++                    "parameters": {
++                        "type": "object",
++                        "properties": {
++                            "command": {"type": "string", "description": "Shell command line"}
++                        },
++                        "required": ["command"],
++                    },
++                },
++            },
++        ]
++        if tools_mode == "FULL":
++            payload["tools"] = standard_tools
++        elif tools_mode == "STRICT":
++            payload["tools"] = [
++                {
++                    "type": "function",
++                    "function": {
++                        "name": t["function"]["name"],
++                        "parameters": {"type": "object", "properties": {}},
++                    },
++                }
++                for t in standard_tools
++            ]
++        elif tools_mode == "MINIMAL":
++            payload["tools"] = [standard_tools[0]]
++        else:
++            has_tool_expectations = False
++            if scenario and scenario.interactions:
++                for t in scenario.interactions:
++                    for eb in t.expected_behaviors:
++                        if eb.type == "tool_called":
++                            has_tool_expectations = True
++                            break
++            if has_tool_expectations:
++                payload["tools"] = standard_tools

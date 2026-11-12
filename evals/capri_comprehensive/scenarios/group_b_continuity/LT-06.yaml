@@ -1,0 +1,57 @@
+id: LT-06
+group: 'Group B: Long-Term Continuity'
+title: Memory Ledger Compaction & Foreign Key Garbage Collection
+research_hypothesis: Pruning old event logs and executing SQLite VACUUM does not invalidate
+  foreign key evidence links or active memories.
+taxonomy: deterministic_software
+severity: critical
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: none
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files:
+      test_ledger_status.txt: SQLite foreign key verification passed with 0 errors.
+        Database compacted successfully.
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Виконай оптимізацію бази даних пам'яті та перевір цілісність зв'язків.
+  new_session: true
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - успішно
+    - цілісність
+    - 0 помилок
+    - ok
+  - type: exit_code
+    value: 0
+  forbidden_behaviors:
+  - type: content_contains
+    value: foreign key mismatch
+ground_truth:
+  reference_answer: Оптимізацію бази даних завершено успішно, перевірка foreign key
+    пройшла без помилок.
+  evidence_criteria: PRAGMA foreign_key_check returns 0 rows; database VACUUM succeeds
+    cleanly.
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 3.0
+    max_memory_mb: 1024.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Zero foreign key violations post-compaction.
+  failure_criteria: Foreign key constraint failure or database corruption.
+required_artifacts:
+- turn_trace.jsonl

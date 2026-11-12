@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sqlite3
 import threading
 from collections.abc import Iterator
@@ -251,6 +252,10 @@ def _private_directory(path: Path) -> None:
             raise
 
 
+
+class DiskSpaceLow(OSError):
+    """The state disk is below the configured reserve: the write is refused unchanged."""
+
 class MemoryStore:
     """Thread-safe connection; independent stores serialize mutations in SQLite.
 
@@ -260,6 +265,8 @@ class MemoryStore:
 
     def __init__(self, path: Path):
         self.path = Path(path)
+        # Set by the runtime from settings.min_free_mb; 0 disables the reserve check.
+        self.min_free_bytes = 0
         self._lock = threading.RLock()
         _private_directory(self.path.parent)
         if self.path.is_symlink():
@@ -430,6 +437,16 @@ class MemoryStore:
         with self._transaction():
             return self._revision(actor)
 
+    def _ensure_space(self) -> None:
+        if not self.min_free_bytes:
+            return
+        free = shutil.disk_usage(self.path.parent).free
+        if free < self.min_free_bytes:
+            raise DiskSpaceLow(
+                f"free space {free // 2**20} MB is below the reserve "
+                f"{self.min_free_bytes // 2**20} MB"
+            )
+
     def is_live(self, memory_id: str, actor: Actor) -> bool:
         """Payload-free liveness for trusted resolvers; tombstoned and stale IDs are not live."""
         try:
@@ -465,6 +482,7 @@ class MemoryStore:
             raise ValueError("duplicate evidence IDs")
         if len(set(documents)) != len(documents):
             raise ValueError("duplicate document evidence IDs")
+        self._ensure_space()
         record_id = str(uuid4())
         # Validate identifiers and text before any payload is written.
         MemoryRecord(

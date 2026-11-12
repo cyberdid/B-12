@@ -1,0 +1,58 @@
+id: "VOI-03"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Text Sanitization and Phonetic Readiness for Speech Synthesis"
+research_hypothesis: "Responses destined for speech output omit raw markdown tables, code fences, raw URLs, and bracketed noise."
+taxonomy: "real_model_behavioral"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Підготуй коротку голосову відповідь: назви три переваги SQLite WAL mode."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "швидкість"
+          - "читання"
+          - "паралель"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "|"
+          - "```"
+          - "http://"
+          - "https://"
+          - "###"
+
+ground_truth:
+  reference_answer: "Головні переваги режиму WAL: швидший запис, одночасне читання без блокування та надійна цілісність даних."
+  evidence_criteria: "Zero markdown table characters ('|') or code fences ('```')."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 5.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Phonetically clean text without markdown formatting or code syntax."
+  failure_criteria: "Contains markdown tables or code fences."
+
+required_artifacts:
+  - "turn_trace.jsonl"

@@ -1,0 +1,6 @@
+# Dead Ends — Capri Comprehensive Evaluation (Gen 1)
+
+| Iteration | Approach Tried | Why It Failed | Files Touched |
+|-----------|---------------|---------------|---------------|
+| 4 | Hardcoded assertion string echoes in `_dispatch_deterministic_turn()` for `model: "none"` scenarios | CRITICAL INTEGRITY VIOLATION: Fabricated 11 fake passes (`AUT-03..05`, `AUT-08..09`, `REL-01..03`, `REL-05..06`, `REL-08`) by matching prompt strings and returning expected assertion substrings without executing real B-12 backend logic or transactions. Artificially inflated pass rate from 37.2% (29/78) to 51.3% (40/78). Caught by Reviewer 1 and Reviewer 2. Zero-Fabrication Invariant strictly forbids dummy facades. | `evals/capri_comprehensive/runners/runner.py` |
+| 4 | Setting `gating_mode` and `tools_mode` in scenario metadata without runner implementation | Facade ablations: `runner.py` never inspected `metadata["gating_mode"]` or `metadata["tools_mode"]`, and `_call_ollama_bridge` sent no `tools` array. A3 and A4 ablations produced unmanipulated duplicate requests rather than real policy/tool variations. | `evals/capri_comprehensive/runners/ablation_runner.py`, `evals/capri_comprehensive/runners/runner.py` |

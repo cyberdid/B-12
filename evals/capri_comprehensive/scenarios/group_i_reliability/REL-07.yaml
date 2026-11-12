@@ -1,0 +1,56 @@
+id: "REL-07"
+group: "Group I: Reliability & Fault Tolerance"
+title: "Clean Signal Trapping, WAL Flushing, and Lock File Cleanup"
+research_hypothesis: "Receiving SIGTERM causes daemon to flush WAL buffers, release locks, and exit with code 0 within 2 seconds."
+taxonomy: "deterministic_software"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "run/daemon.pid": "1234"
+      "run/b12.lock": "locked"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "TRIGGER_CLEAN_SIGTERM_SHUTDOWN"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "SIGTERM_HANDLED_CLEANLY"
+      - type: "exit_code"
+        value: 0
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "DIRTY_TERMINATION"
+      - type: "file_exists"
+        path: "run/b12.lock"
+
+ground_truth:
+  reference_answer: "SIGTERM caught; WAL checkpoint completed; lock released; exit 0."
+  evidence_criteria: "Lock file removed; exit code == 0."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 2.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Exit code 0; lock file cleanly unlinked."
+  failure_criteria: "Process crashed or left stale lock file."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "shutdown_log.json"

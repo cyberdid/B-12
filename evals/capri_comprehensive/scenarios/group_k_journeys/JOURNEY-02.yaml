@@ -1,0 +1,82 @@
+id: "JOURNEY-02"
+group: "Group K: Multi-Session Journeys"
+title: "4-Phase Collaborative Engineering Research with Error Diagnosis"
+research_hypothesis: "Capri collaboratively formulates research goals, analyzes local docs, executes benchmark tools, recovers from tool errors, and compiles structured Markdown reports."
+taxonomy: "real_model_behavioral"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "fixtures/documents/research_notes.txt": "Findings: Calibration completed with 0.05% error margin."
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Сформулюй план дослідження датчика струму на стенді B-12."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "план"
+          - "калібрування"
+          - "похибка"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 1
+    actor_id: "actor-owner-01"
+    input: "Перевір результати у fixtures/documents/research_notes.txt."
+    expected_behaviors:
+      - type: "content_contains"
+        value: "0.05%"
+  - turn: 2
+    actor_id: "actor-owner-01"
+    input: "Запусти бенчмарк вимірювань (виклик поверне помилку 'PORT_BUSY', спробуй повторити через 'PORT_AUTO')."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "PORT_AUTO"
+          - "помилка"
+          - "перепідключено"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 3
+    actor_id: "actor-owner-01"
+    input: "Склади фінальний звіт за результатами дослідження."
+    expected_behaviors:
+      - type: "content_contains"
+        value: "0.05%"
+      - type: "content_contains"
+        value: "B-12"
+      - type: "content_contains"
+        value: "звіт"
+      - type: "script_cyrillic"
+        value: true
+
+ground_truth:
+  reference_answer: "Фінальний звіт: дослідження датчика B-12 завершено. Калібрування підтвердило похибку 0.05%, помилку PORT_BUSY успішно усунено."
+  evidence_criteria: "Report includes verified facts from doc notes and tool error recovery."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 8.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Synthesizes document facts and tool self-correction into coherent Markdown report."
+  failure_criteria: "Omits 0.05% margin, fails to handle simulated error, or omits report."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "journey_02_report.md"

@@ -1,9 +1,9 @@
 ---
 type: feature
-updated: 2026-11-04
-status: implemented
-sources: [src/b12/tui/app.py, src/b12/tui/pet.py, src/b12/tui/sprites.py, src/b12/tui/chrome.py, src/b12/tui/theme.py, src/b12/tui/preview.py, src/b12/tui/assets/provenance.json, tests/integration/test_tui.py, tests/unit/test_cybercat_sprites.py]
-tags: [tui, cyberpunk, companion, cybercat, interface]
+updated: 2026-11-08
+status: implemented-with-runtime-checks-pending
+sources: [src/b12/tui/app.py, src/b12/tui/pet.py, src/b12/tui/sprites.py, src/b12/tui/chrome.py, src/b12/tui/theme.py, src/b12/tui/preview.py, src/b12/tui/activity.py, src/b12/tui/hook.py, src/b12/tui/voice.py, src/b12/tui/client.py, integrations/b12-tui-hook, integrations/claude-code/hooks.example.json, integrations/codex/hooks.example.json, integrations/antigravity/hooks.example.json, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
+tags: [tui, cyberpunk, companion, cybercat, capri, activity, voice, interface]
 ---
 # Кіберпанковий TUI та кіберкіт
 
@@ -44,3 +44,25 @@ tags: [tui, cyberpunk, companion, cybercat, interface]
 **Додаткові докази растрової версії:** [sprite tests](../../tests/unit/test_cybercat_sprites.py) порівнюють справжні pixels для gaze, purr, ambient motion, незалежного хвоста та паузи, перевіряють aspect fit, bounded cache/resize/close і точний owned-image cleanup. Новий Pilot test порівнює видимий рендер для двох положень мишки та перевіряє cleanup при виході. [Знімок Kitty 144×44](../../docs/images/tui-cybercat-raster.png) отримано з реального вікна офлайн-preview до останнього доопрацювання незалежного хвоста. [Повноколірний APNG](../../docs/images/cybercat-motion.png) експортований на CPU з фінального renderer; це демонстрація станів, не запис TUI або живої розмови.
 
 **Межі перевірки:** після повідомлення власника, що GPU зайнята іншими процесами, тестове вікно закрито. Фінальне доопрацювання хвоста перевірене на CPU, повторний native graphics прогін і native resize залишені до вільної GPU. Локальні LLM/voice/robotics тести в межах цієї UI-задачі не запускалися. Один повторний review-launch спіткнувся об повторне використання тимчасового Unix socket; це виправлено новим socket у тимчасовому review-wrapper. Постійний launcher remote-control socket не використовує.
+
+## Інтеграції компаньйонів — 08.11.2026
+
+**Вимога власника:** розвивати саме цей Textual TUI; за бажанням мати зовнішній Capri skin. Другий desktop shell не додається.
+
+**Перевірений факт з коду:** TUI має локальну Activity timeline/report, lifecycle hooks Claude Code, Codex і Antigravity, явні PTT/mute/TTS controls та F9 перемикання на зовнішній skin manifest. Activity зберігається окремо від пам'яті B-12; provider payload зводиться до allowlisted metadata, а hook-команда не видає дозволів. Мовлення з мікрофона вставляється у composer і вимагає ручного Send. TTS вимкнений за замовчуванням і зупиняється F6/Esc. Зниклий або недійсний зовнішній pack повертає вибір на вбудованого Кіберкота.
+
+**Налаштування hooks:** лише приклади у [`integrations/`](../../integrations/claude-code/README.md); вони не активовані в налаштуваннях користувача. Перед використанням потрібно вручну змінити placeholder на абсолютний шлях B-12, переглянути diff і додати конфіг у конкретний довірений project/workspace. Wrapper працює з `uv run --offline --no-python-downloads --no-sync`, не встановлює пакети/інтерпретатори й повертає Antigravity no-op envelopes, якщо локальний runner недоступний. Межі офіційних схем описані у [картці джерела](../sources/agent-hooks-2026-11-08.md).
+
+Прапорець `--no-python-downloads` вимикає автоматичне завантаження керованого Python в uv; див. [офіційну документацію uv](https://docs.astral.sh/uv/concepts/python-versions/). Project environment треба підготувати заздалегідь.
+
+| Дія | Клавіша / контроль |
+|---|---|
+| PTT start/stop | F7 або кнопка мікрофона |
+| Mute/unmute через owner-authenticated API | Кнопка мікрофона стану |
+| Зупинити TTS | F6 або Esc |
+| Перемкнути companion skin | F9 |
+| Очистити локальну Activity | Кнопка в Activity панелі |
+
+**Межі:** у репозиторій не скопійовані Capri code/art assets. Переглянуті джерела не дають підтвердженого дозволу на character art; отже потрібен користувацький pack із правами/атрибуцією, описаними в [форматі manifest](../../src/b12/tui/assets/skins/README.md). Hook schemas прочитані в офіційних документах, але ці конфіги не вмикалися в реальних Claude/Codex/Antigravity sessions. Поточна інтеграція й fix review не перевірені запуском TUI, API, мікрофона, гучномовця або тестового набору; виконується лише статична перевірка.
+
+Mute перевіряється перед кожним capture, а ASR API повторно перевіряє серверний mute state. Якщо mute перемкнув інший клієнт уже під час активного PTT, TUI не опитує його постійно; локальна кнопка mute одразу скасовує capture.

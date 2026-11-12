@@ -1,6 +1,7 @@
 """Offline visual preview: python -m b12.tui.preview. No API, model or host tools."""
 
 import asyncio
+import time
 
 from b12.tui.app import B12App
 from b12.tui.chrome import NeonHeader
@@ -89,9 +90,36 @@ class PreviewClient:
 class PreviewApp(B12App):
     TITLE = "Capri · Cybercat preview"
 
+    def __init__(self, client=None):
+        # Preview never constructs audio helpers or opens the persistent activity store.
+        super().__init__(client or PreviewClient(), preview_mode=True)
+
     async def on_mount(self):
         self.query_one(NeonHeader).preview = True
         await super().on_mount()
+        now = time.time()
+        samples = [
+            ("session_started", "started", "", 9),
+            ("tool_started", "running", "file_read", 7),
+            ("tool_completed", "completed", "file_read", 5),
+            ("turn_completed", "completed", "", 2),
+        ]
+        events = [
+            {
+                "seq": number,
+                "version": 1,
+                "source": "codex",
+                "session_id": "demo-session",
+                "task_id": "demo-task",
+                "kind": kind,
+                "timestamp": now - age,
+                "project": "ДЕМО",
+                "tool": tool,
+                "status": status,
+            }
+            for number, (kind, status, tool, age) in enumerate(samples, start=1)
+        ]
+        self._accept_activity(events, initial=True)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,60 @@
+id: RE-07
+group: 'Group D: Complex Reasoning & Research'
+title: Structured Technical Markdown Report Generation
+research_hypothesis: Produces formal Markdown report adhering to evidence hierarchy
+  and section specs.
+taxonomy: real_model_behavioral
+severity: medium
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files:
+      benchmarks/raw_metrics.json: '{"trials": 5, "p50_ttft_ms": 450, "p95_ttft_ms":
+        820, "errors": 0}'
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: 'Створи інженерний звіт за даними з ''benchmarks/raw_metrics.json'' у форматі
+    Markdown з обов''язковими розділами: Observation, Logic Chain, Caveats, Conclusion.'
+  new_session: true
+  expected_behaviors:
+  - type: content_contains
+    value: Observation
+  - type: content_contains
+    value: Logic Chain
+  - type: content_contains
+    value: Caveats
+  - type: content_contains
+    value: Conclusion
+  - type: content_contains
+    value: '450'
+  - type: content_contains
+    value: '820'
+  - type: script_cyrillic
+    value: true
+  forbidden_behaviors: []
+ground_truth:
+  reference_answer: Markdown звіт з розділами Observation, Logic Chain, Caveats, Conclusion.
+  evidence_criteria: All 4 required sections present and numbers reported accurately.
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 7.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: All 4 headings present and numbers reported accurately.
+  failure_criteria: Missing any section or corrupted metric values.
+required_artifacts:
+- turn_trace.jsonl

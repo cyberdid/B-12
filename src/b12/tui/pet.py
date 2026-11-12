@@ -48,6 +48,26 @@ class CyberCat(Static):
     def on_unmount(self):
         self.portrait.close()
 
+    @property
+    def skin_id(self) -> str:
+        return self.portrait.skin_id
+
+    @property
+    def skin_name(self) -> str:
+        return self.portrait.skin_name
+
+    @property
+    def skin_error(self) -> str:
+        return self.portrait.skin_error
+
+    def available_skins(self):
+        return self.portrait.refresh_skins()
+
+    def set_skin(self, skin_id: str) -> bool:
+        selected = self.portrait.set_skin(skin_id)
+        self.refresh()
+        return selected
+
     def _tick(self):
         now = time.monotonic()
         if self._phase_until and now >= self._phase_until:

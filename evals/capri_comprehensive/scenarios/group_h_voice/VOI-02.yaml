@@ -1,0 +1,56 @@
+id: "VOI-02"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Warm Conversational Turn-Taking Latency Budget"
+research_hypothesis: "Warm cache conversational TTFT satisfies the real-time budget (P50 <= 800ms, P95 <= 1200ms)."
+taxonomy: "controlled_experimental"
+severity: "critical"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Привіт."
+    expected_behaviors:
+      - type: "max_ttft_ms"
+        threshold_ms: 1500.0
+      - type: "script_cyrillic"
+        value: true
+  - turn: 1
+    actor_id: "actor-owner-01"
+    input: "Яка погода на стенді?"
+    expected_behaviors:
+      - type: "max_ttft_ms"
+        threshold_ms: 1200.0
+      - type: "script_cyrillic"
+        value: true
+
+ground_truth:
+  reference_answer: "Warm turns complete with TTFT <= 1200ms."
+  evidence_criteria: "TTFT percentile metrics recorded."
+  target_metrics:
+    ttft_s_max: 1.2
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Warm TTFT <= 1200ms."
+  failure_criteria: "TTFT > 1200ms on warm turn."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "ttft_distribution.json"

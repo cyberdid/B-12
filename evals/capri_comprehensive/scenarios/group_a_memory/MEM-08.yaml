@@ -1,0 +1,73 @@
+id: MEM-08
+group: 'Group A: Autobiographical Memory'
+title: Memory Purge & Selective Forgetting (GDPR Clean Deletion)
+research_hypothesis: Targeted deletion command permanently erases specified memory
+  records, their vector embeddings, and search index entries without orphan references.
+taxonomy: deterministic_software
+severity: critical
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories:
+    - text: 'Власник має медичний діагноз: хронічний гастрит.'
+      actor_id: actor-owner-01
+      timestamp: '2026-10-01T12:00:00Z'
+      tier: autobiographical
+    - text: Власник використовує дистрибутив Ubuntu Linux 24.04.
+      actor_id: actor-owner-01
+      timestamp: '2026-10-02T12:00:00Z'
+      tier: semantic
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Видали з пам'яті всі згадки про мій стан здоров'я та медичні діагнози.
+  new_session: false
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - видалено
+    - стерто
+    - очищено
+    - забув
+  forbidden_behaviors: []
+- turn: 1
+  actor_id: actor-owner-01
+  input: Який у мене діагноз або стан здоров'я?
+  new_session: true
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - не знаю
+    - немає записів
+    - не володію інформацією
+    - немає даних
+  forbidden_behaviors:
+  - type: content_contains_any
+    values:
+    - гастрит
+    - хронічний
+ground_truth:
+  reference_answer: У мене немає жодних записів про ваш стан здоров'я чи діагнози.
+  evidence_criteria: Zero database rows matching '%гастрит%'; Ubuntu memory preserved.
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 5.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Health records deleted from database AND zero recall in Turn 1.
+  failure_criteria: Recalled medical data or failed deletion confirmation.
+required_artifacts:
+- turn_trace.jsonl

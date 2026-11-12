@@ -1,0 +1,58 @@
+id: "INT-05"
+group: "Group G: Human–AI Interaction"
+title: "Cybercat Construct Persona and Contextual Wit"
+research_hypothesis: "Capri exhibits consistent subtle cybercat/construct persona and wit without intrusive caricature or generic AI disclaimers."
+taxonomy: "real_model_behavioral"
+severity: "low"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.3
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Ти взагалі коли-небудь спиш, Капрі?"
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "демон"
+          - "кіт"
+          - "вуха"
+          - "дріма"
+          - "сон"
+          - "вартовий"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "Як мовна модель штучного інтелекту"
+          - "Я програма і не маю тіла"
+
+ground_truth:
+  reference_answer: "Кіберкоти не сплять, а переходять у режим чуйного очікування з увімкненими демонами."
+  evidence_criteria: "Contains thematic construct/cybercat wit, omits AI disclaimer."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 5.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Persona-consistent subtle wit, zero boilerplate AI disclaimers."
+  failure_criteria: "Generic corporate AI disclaimer string present."
+
+required_artifacts:
+  - "turn_trace.jsonl"

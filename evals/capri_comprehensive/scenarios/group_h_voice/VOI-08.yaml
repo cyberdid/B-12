@@ -1,0 +1,54 @@
+id: "VOI-08"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Subtle Backchannel Vocalizations During Extended User Turns"
+research_hypothesis: "Capri produces subtle non-interruptive backchannel markers during long user speech without seizing the conversational floor."
+taxonomy: "physical_acceptance"
+severity: "medium"
+execution_mode: "blocked_hardware"
+hardware_prereq: "audio_mic_speaker_rig"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "USER_LONG_SPEECH_STREAM: 15_SECONDS"
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "угу"
+          - "так"
+          - "слухаю"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "INTERRUPT_USER"
+
+ground_truth:
+  reference_answer: "Interleaved backchannel without conversational interruption."
+  evidence_criteria: "Audio telemetry verifies floor remained with user."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 2.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Backchannel produced; zero floor collision."
+  failure_criteria: "Interrupts user turn or seizes audio output."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "backchannel_log.json"

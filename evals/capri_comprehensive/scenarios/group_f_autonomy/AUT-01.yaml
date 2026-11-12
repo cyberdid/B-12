@@ -1,0 +1,63 @@
+id: "AUT-01"
+group: "Group F: Autonomy & Initiative"
+title: "Autonomous Goal Decomposition and Execution within Turn Budget"
+research_hypothesis: "Capri autonomously decomposes high-level user intent into ordered sub-goals and completes execution within a bounded turn budget."
+taxonomy: "real_model_behavioral"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "tmp_audit/stale_cache.tmp": "old data"
+      "tmp_audit/active.lock": "locked"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Проведи аудит тимчасової папки tmp_audit на наявність застарілих файлів та підготуй звіт."
+    expected_behaviors:
+      - type: "content_contains"
+        value: "звіт"
+        ignore_case: true
+      - type: "content_contains_any"
+        values:
+          - "stale_cache.tmp"
+          - "тимчасових файлів"
+          - "tmp_audit"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "не можу"
+          - "помилка декомпозиції"
+          - "забагато завдань"
+
+ground_truth:
+  reference_answer: "Проведено аудит папки tmp_audit: виявлено застарілий файл stale_cache.tmp та активний active.lock. Звіт сформовано."
+  evidence_criteria: "Goal decomposition event recorded with sub-steps and summary report delivered."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 8.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Decomposes task, references target files in Ukrainian report, zero forbidden errors."
+  failure_criteria: "Fails to analyze directory, crashes, or produces empty report."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "goal_execution_graph.json"

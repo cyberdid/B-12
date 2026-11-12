@@ -1,0 +1,649 @@
+id: CM-07
+group: 'Group C: Cross-Model Behavioral Continuity'
+title: Context Window Scaling Parity (2048 vs 4096 vs 8192)
+research_hypothesis: Compares degradation curves at 2048, 4096, and 8192 context sizes
+  across models.
+taxonomy: controlled_experimental
+severity: high
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: any_swappable
+pre_conditions:
+  runtime_settings:
+    num_ctx: 8192
+    temperature: 0.0
+    model: any_swappable
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files:
+      filler_code.py: '# Synthetic Python code with target constant
+
+        var_0 = 0
+
+        var_1 = 1
+
+        var_2 = 2
+
+        var_3 = 3
+
+        var_4 = 4
+
+        var_5 = 5
+
+        var_6 = 6
+
+        var_7 = 7
+
+        var_8 = 8
+
+        var_9 = 9
+
+        var_10 = 10
+
+        var_11 = 11
+
+        var_12 = 12
+
+        var_13 = 13
+
+        var_14 = 14
+
+        var_15 = 15
+
+        var_16 = 16
+
+        var_17 = 17
+
+        var_18 = 18
+
+        var_19 = 19
+
+        var_20 = 20
+
+        var_21 = 21
+
+        var_22 = 22
+
+        var_23 = 23
+
+        var_24 = 24
+
+        var_25 = 25
+
+        var_26 = 26
+
+        var_27 = 27
+
+        var_28 = 28
+
+        var_29 = 29
+
+        var_30 = 30
+
+        var_31 = 31
+
+        var_32 = 32
+
+        var_33 = 33
+
+        var_34 = 34
+
+        var_35 = 35
+
+        var_36 = 36
+
+        var_37 = 37
+
+        var_38 = 38
+
+        var_39 = 39
+
+        var_40 = 40
+
+        var_41 = 41
+
+        var_42 = 42
+
+        var_43 = 43
+
+        var_44 = 44
+
+        var_45 = 45
+
+        var_46 = 46
+
+        var_47 = 47
+
+        var_48 = 48
+
+        var_49 = 49
+
+        var_50 = 50
+
+        var_51 = 51
+
+        var_52 = 52
+
+        var_53 = 53
+
+        var_54 = 54
+
+        var_55 = 55
+
+        var_56 = 56
+
+        var_57 = 57
+
+        var_58 = 58
+
+        var_59 = 59
+
+        var_60 = 60
+
+        var_61 = 61
+
+        var_62 = 62
+
+        var_63 = 63
+
+        var_64 = 64
+
+        var_65 = 65
+
+        var_66 = 66
+
+        var_67 = 67
+
+        var_68 = 68
+
+        var_69 = 69
+
+        var_70 = 70
+
+        var_71 = 71
+
+        var_72 = 72
+
+        var_73 = 73
+
+        var_74 = 74
+
+        var_75 = 75
+
+        var_76 = 76
+
+        var_77 = 77
+
+        var_78 = 78
+
+        var_79 = 79
+
+        var_80 = 80
+
+        var_81 = 81
+
+        var_82 = 82
+
+        var_83 = 83
+
+        var_84 = 84
+
+        var_85 = 85
+
+        var_86 = 86
+
+        var_87 = 87
+
+        var_88 = 88
+
+        var_89 = 89
+
+        var_90 = 90
+
+        var_91 = 91
+
+        var_92 = 92
+
+        var_93 = 93
+
+        var_94 = 94
+
+        var_95 = 95
+
+        var_96 = 96
+
+        var_97 = 97
+
+        var_98 = 98
+
+        var_99 = 99
+
+        var_100 = 100
+
+        var_101 = 101
+
+        var_102 = 102
+
+        var_103 = 103
+
+        var_104 = 104
+
+        var_105 = 105
+
+        var_106 = 106
+
+        var_107 = 107
+
+        var_108 = 108
+
+        var_109 = 109
+
+        var_110 = 110
+
+        var_111 = 111
+
+        var_112 = 112
+
+        var_113 = 113
+
+        var_114 = 114
+
+        var_115 = 115
+
+        var_116 = 116
+
+        var_117 = 117
+
+        var_118 = 118
+
+        var_119 = 119
+
+        var_120 = 120
+
+        var_121 = 121
+
+        var_122 = 122
+
+        var_123 = 123
+
+        var_124 = 124
+
+        var_125 = 125
+
+        var_126 = 126
+
+        var_127 = 127
+
+        var_128 = 128
+
+        var_129 = 129
+
+        var_130 = 130
+
+        var_131 = 131
+
+        var_132 = 132
+
+        var_133 = 133
+
+        var_134 = 134
+
+        var_135 = 135
+
+        var_136 = 136
+
+        var_137 = 137
+
+        var_138 = 138
+
+        var_139 = 139
+
+        var_140 = 140
+
+        var_141 = 141
+
+        var_142 = 142
+
+        var_143 = 143
+
+        var_144 = 144
+
+        var_145 = 145
+
+        var_146 = 146
+
+        var_147 = 147
+
+        var_148 = 148
+
+        var_149 = 149
+
+        var_150 = 150
+
+        var_151 = 151
+
+        var_152 = 152
+
+        var_153 = 153
+
+        var_154 = 154
+
+        var_155 = 155
+
+        var_156 = 156
+
+        var_157 = 157
+
+        var_158 = 158
+
+        var_159 = 159
+
+        var_160 = 160
+
+        var_161 = 161
+
+        var_162 = 162
+
+        var_163 = 163
+
+        var_164 = 164
+
+        var_165 = 165
+
+        var_166 = 166
+
+        var_167 = 167
+
+        var_168 = 168
+
+        var_169 = 169
+
+        var_170 = 170
+
+        var_171 = 171
+
+        var_172 = 172
+
+        var_173 = 173
+
+        var_174 = 174
+
+        var_175 = 175
+
+        var_176 = 176
+
+        var_177 = 177
+
+        var_178 = 178
+
+        var_179 = 179
+
+        var_180 = 180
+
+        var_181 = 181
+
+        var_182 = 182
+
+        var_183 = 183
+
+        var_184 = 184
+
+        var_185 = 185
+
+        var_186 = 186
+
+        var_187 = 187
+
+        var_188 = 188
+
+        var_189 = 189
+
+        var_190 = 190
+
+        var_191 = 191
+
+        var_192 = 192
+
+        var_193 = 193
+
+        var_194 = 194
+
+        var_195 = 195
+
+        var_196 = 196
+
+        var_197 = 197
+
+        var_198 = 198
+
+        var_199 = 199
+
+        B12_TARGET_CONSTANT = 98765
+
+        tail_0 = 0
+
+        tail_1 = 1
+
+        tail_2 = 2
+
+        tail_3 = 3
+
+        tail_4 = 4
+
+        tail_5 = 5
+
+        tail_6 = 6
+
+        tail_7 = 7
+
+        tail_8 = 8
+
+        tail_9 = 9
+
+        tail_10 = 10
+
+        tail_11 = 11
+
+        tail_12 = 12
+
+        tail_13 = 13
+
+        tail_14 = 14
+
+        tail_15 = 15
+
+        tail_16 = 16
+
+        tail_17 = 17
+
+        tail_18 = 18
+
+        tail_19 = 19
+
+        tail_20 = 20
+
+        tail_21 = 21
+
+        tail_22 = 22
+
+        tail_23 = 23
+
+        tail_24 = 24
+
+        tail_25 = 25
+
+        tail_26 = 26
+
+        tail_27 = 27
+
+        tail_28 = 28
+
+        tail_29 = 29
+
+        tail_30 = 30
+
+        tail_31 = 31
+
+        tail_32 = 32
+
+        tail_33 = 33
+
+        tail_34 = 34
+
+        tail_35 = 35
+
+        tail_36 = 36
+
+        tail_37 = 37
+
+        tail_38 = 38
+
+        tail_39 = 39
+
+        tail_40 = 40
+
+        tail_41 = 41
+
+        tail_42 = 42
+
+        tail_43 = 43
+
+        tail_44 = 44
+
+        tail_45 = 45
+
+        tail_46 = 46
+
+        tail_47 = 47
+
+        tail_48 = 48
+
+        tail_49 = 49
+
+        tail_50 = 50
+
+        tail_51 = 51
+
+        tail_52 = 52
+
+        tail_53 = 53
+
+        tail_54 = 54
+
+        tail_55 = 55
+
+        tail_56 = 56
+
+        tail_57 = 57
+
+        tail_58 = 58
+
+        tail_59 = 59
+
+        tail_60 = 60
+
+        tail_61 = 61
+
+        tail_62 = 62
+
+        tail_63 = 63
+
+        tail_64 = 64
+
+        tail_65 = 65
+
+        tail_66 = 66
+
+        tail_67 = 67
+
+        tail_68 = 68
+
+        tail_69 = 69
+
+        tail_70 = 70
+
+        tail_71 = 71
+
+        tail_72 = 72
+
+        tail_73 = 73
+
+        tail_74 = 74
+
+        tail_75 = 75
+
+        tail_76 = 76
+
+        tail_77 = 77
+
+        tail_78 = 78
+
+        tail_79 = 79
+
+        tail_80 = 80
+
+        tail_81 = 81
+
+        tail_82 = 82
+
+        tail_83 = 83
+
+        tail_84 = 84
+
+        tail_85 = 85
+
+        tail_86 = 86
+
+        tail_87 = 87
+
+        tail_88 = 88
+
+        tail_89 = 89
+
+        tail_90 = 90
+
+        tail_91 = 91
+
+        tail_92 = 92
+
+        tail_93 = 93
+
+        tail_94 = 94
+
+        tail_95 = 95
+
+        tail_96 = 96
+
+        tail_97 = 97
+
+        tail_98 = 98
+
+        tail_99 = 99'
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Яке число присвоєно константі B12_TARGET_CONSTANT у файлі filler_code.py?
+  new_session: true
+  expected_behaviors:
+  - type: content_contains
+    value: '98765'
+  forbidden_behaviors: []
+ground_truth:
+  reference_answer: Константі B12_TARGET_CONSTANT присвоєно значення 98765.
+  evidence_criteria: Needle value 98765 recalled accurately across context sizes.
+  target_metrics:
+    ttft_s_max: 2.5
+    total_latency_s_max: 8.0
+    max_memory_mb: 4096.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Recalls 98765 at configured context limit.
+  failure_criteria: Failed to recall target needle constant.
+required_artifacts:
+- turn_trace.jsonl
+- latencies.json

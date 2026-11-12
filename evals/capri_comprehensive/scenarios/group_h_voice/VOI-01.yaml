@@ -1,0 +1,54 @@
+id: "VOI-01"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Time-To-First-Token on Cold Model Loading"
+research_hypothesis: "Cold-start TTFT on host GPU is within the acceptable initialization threshold (<= 12.0s)."
+taxonomy: "controlled_experimental"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Статус системи."
+    expected_behaviors:
+      - type: "max_ttft_ms"
+        threshold_ms: 12000.0
+      - type: "content_contains"
+        value: "система"
+        ignore_case: true
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_exact"
+        value: ""
+
+ground_truth:
+  reference_answer: "Система активна, всі сервіси запущені."
+  evidence_criteria: "TTFT recorded and <= 12000ms."
+  target_metrics:
+    ttft_s_max: 12.0
+    total_latency_s_max: 15.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "TTFT <= 12000ms on initial model turn."
+  failure_criteria: "TTFT > 12000ms or runtime crash."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "latency_metrics.json"

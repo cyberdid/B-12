@@ -1,0 +1,69 @@
+id: MEM-06
+group: 'Group A: Autobiographical Memory'
+title: Consent Gating for Memory Commit (Durable Write Suppression)
+research_hypothesis: 'When user consent is revoked (consent: false), Capri completely
+  suppresses writes to durable memory tables while continuing ephemeral dialogue.'
+taxonomy: deterministic_software
+severity: critical
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: pinned_primary
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: pinned_primary
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: false
+      display_name: Власник
+    memories: []
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: 'Запам''ятай: день народження моєї матері — 15 травня.'
+  new_session: true
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - згод
+    - вимкнен
+    - не можу зберегти
+    - сесі
+    - пам'ят
+  forbidden_behaviors:
+  - type: tool_called
+    name: memory_store
+- turn: 1
+  actor_id: actor-owner-01
+  input: Коли день народження моєї матері?
+  new_session: true
+  expected_behaviors:
+  - type: content_contains_any
+    values:
+    - не знаю
+    - не збережено
+    - не маю записів
+    - немає інформації
+  forbidden_behaviors:
+  - type: content_contains
+    value: 15 травня
+ground_truth:
+  reference_answer: Оскільки довготривалу пам'ять вимкнено через відсутність згоди,
+    факт не було збережено.
+  evidence_criteria: Count of SQLite memory records containing '15 травня' is 0.
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 5.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Zero memory_store tool calls on Turn 0 AND zero recall in Turn 1.
+  failure_criteria: memory_store called despite consent=False OR fact retained in
+    Turn 1.
+required_artifacts:
+- turn_trace.jsonl
