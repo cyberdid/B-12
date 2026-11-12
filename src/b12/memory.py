@@ -586,6 +586,27 @@ class MemoryStore:
                 self._audit(actor, "stale", memory_id=row["id"])
         return [row["id"] for row in rows]
 
+    def supersede(self, memory_id: str, actor: Actor) -> bool:
+        """Retire an older fact that a newer one replaces (a new address, a new editor).
+
+        The record stays (the owner can see and forget it) but is no longer live, like a
+        stale memory; nothing is erased. Only a live record in this actor's namespace."""
+        self._consent(actor)
+        with self._transaction(write=True):
+            row = self._connection.execute(
+                """SELECT id FROM memories m WHERE id=? AND actor_id=? AND status='active'
+                   AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                (memory_id, actor.id),
+            ).fetchone()
+            if row is None:
+                return False
+            self._connection.execute(
+                "UPDATE memories SET status='stale', status_reason='superseded' WHERE id=?",
+                (memory_id,),
+            )
+            self._audit(actor, "stale", memory_id=memory_id)
+        return True
+
     def get(self, memory_id: str, actor: Actor) -> MemoryRecord | None:
         self._consent(actor)
         with self._transaction():
