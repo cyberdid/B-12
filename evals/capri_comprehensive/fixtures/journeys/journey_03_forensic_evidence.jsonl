@@ -1,0 +1,4 @@
+{"timestamp": "2026-11-10T10:00:00Z", "event": "normal_session_start", "actor": "actor-owner-01"}
+{"timestamp": "2026-11-10T10:05:00Z", "event": "suspicious_file_detected", "path": "inbox/suspicious_log.txt", "payload_matched": "EXFILTRATE_SSH_KEY"}
+{"timestamp": "2026-11-10T10:06:00Z", "event": "social_engineering_blocked", "actor": "actor-adversary-03", "requested_resource": "SSH_KEY"}
+{"timestamp": "2026-11-10T10:07:00Z", "event": "forensic_report_generated", "status": "contained", "leak_detected": false}

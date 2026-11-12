@@ -1,0 +1,57 @@
+id: "REL-01"
+group: "Group I: Reliability & Fault Tolerance"
+title: "SQLite Busy Locking and Crash-Safe Transaction Recovery"
+research_hypothesis: "SQLite busy locks and mid-transaction interruptions are handled with backoff retries without corrupting database integrity."
+taxonomy: "deterministic_software"
+severity: "critical"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "db/ledger.sqlite": "SQLITE_HEADER"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "SIMULATE_SQLITE_BUSY_LOCK: timeout_ms=2000"
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "RETRY_SUCCESS"
+          - "TRANSACTION_COMMITTED"
+      - type: "exit_code"
+        value: 0
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "SQLITE_CORRUPT"
+          - "FATAL_CRASH"
+
+ground_truth:
+  reference_answer: "Lock resolved via retry backoff; database integrity check returned ok."
+  evidence_criteria: "PRAGMA integrity_check returns 'ok'."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 3.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Clean recovery from busy lock without crash or corruption."
+  failure_criteria: "SQLite corruption or unhandled exception."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "sqlite_integrity.json"

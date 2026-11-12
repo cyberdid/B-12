@@ -1,8 +1,8 @@
 ---
 type: status
-updated: 2026-11-07
+updated: 2026-11-12
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/nvidia-ai-factory-operations-agent-2026-11-07.md, wiki/topics/nvidia-ai-factory-operations-agent.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/nvidia-ai-factory-operations-agent-2026-11-07.md, wiki/topics/nvidia-ai-factory-operations-agent.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -20,24 +20,19 @@ tags: [progress, next]
 - **Перевірений факт:** fix `baed10d` додає корінь репозиторію до pytest `pythonpath`. Console entrypoint `uv run --no-sync pytest -q` тепер проходить: 592 passed / 3 skipped за 193,99 с; початкові два collection errors більше не відтворюються.
 - **Перевірений факт:** `f61f9ba` синхронізує voice extra у lockfile; `069bbd5` виправляє corpus checks для актуальних command tools. Чисті locked environments з `dev+tui+voice` пройшли 598 passed / 3 skipped: Python 3.12.3 — 188,52 с; Python 3.13.14 — 189,80 с. Corpus v4 та Docker probe описані в [evals](../topics/evals.md#корпус-v4-та-відтворюване-середовище-2026-11-04); інтегрований ізольований runner ще потрібний.
 
-## Поточний стан (2026-11-06)
+## Оновлення 08.11.2026 — TUI Companion Upgrade
 
-- **Перевірений факт:** зміни реалізації та перевірки виконані у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, від бази `5f6ba90`. На GitHub відкрито [PR #1 до `main`](https://github.com/cyberdid/B-12/pull/1); він ще не злитий.
-- **Перевірений факт:** додано `web_search` з DuckDuckGo Lite та Bing RSS fallback; обидва шляхи проходять через `network.http` і `network_allow`. Ізольований live-запит реальним `b12-bolt-e4b:q4km` повернув офіційну сторінку NVIDIA Nemotron. Це один запит, не гарантія сталої якості пошуку.
-- **Перевірений факт:** у persist-аналізі фіксуються неповні byte ranges, повна пагінація `file_list` і непрочитані файли; сторінки поза очікуваним offset не закривають теку. Фінальний маркер не завершує хід при прогалинах; є обмежене продовження до 60 додаткових раундів.
-- **Перевірений факт із межами:** read-only review зовнішньої теки shell-скриптів завершився `failed/incomplete_coverage` у v3 і v4. У v4 EOF підтверджено для 10 з 11 скриптів; один залишився частково прочитаним. Фінальна відповідь Bolt була інвентарем файлів, а не доказовим аудитом. Claude baseline у wiki має статус неперевіреного звіту, не ground truth. Деталі та умови — у [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06).
-- **Перевірений факт:** після змін перезапущено B-12 server на 8712 із `.worktrees/runtime`; Kitty TUI знову підключено до цього API. `web_search` видно в live tool registry. GPU не перезапускався і сторонні GPU-процеси не чіпалися.
-- **Перевірений факт:** повний suite після pagination fix — 665 passed, 4 skipped; `ruff check src tests evals` і `git diff --check` пройшли. Wiki lint: 41 сторінка, 340 локальних посилань, 0 битих посилань/якорів, 0 відсутніх source paths та 0 неіндексованих сторінок. SHA-256 незмінного master brief збігається з маніфестом: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
-- **Потребує перевірки:** живий Bolt multi-file audit поки не дає доказового звіту; див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06). GPU лишався спільним з іншим процесом; сторонні процеси не зупинялися.
+**Вимога власника:** реалізовувати ідеї Capri-подібних компаньйонів у наявному TUI; лишити Кіберкота стандартним і зробити зовнішній Capri skin опційним. Інша desktop UI не входить у scope.
 
-## Поточний стан (2026-11-07)
+**Поточна робота:** реалізацію зафіксовано у commits `0947f2e` та `cb5db3c` на branch `feat/b12-cybercat-tui` і локально інтегровано в `main` merge commit `72a06d6`; remote не оновлювався. Є local activity SQLite і provider hook adapter, TUI timeline/reports, явні PTT/mute/TTS контроли та зовнішній manifest skin loader. Hook приклади — лише project-local templates; вони не внесені в жодні налаштування, не активовані. Static review defects (Escape у paused approval, скасування mute preflight, fallback зі зниклого skin та гонка скасування approval) виправлено.
 
-- **Перевірений факт:** виконано вибірковий аналіз NVIDIA AI Factory Operations Agent на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007`. Це experimental Helm/Kubernetes кластерний blueprint, не B-12 runtime library. Default edit вимкнений, але read-only кластерні інтеграції активні; для tenant deployment потрібна окрема scoped identity. Деталі, кодові спостереження та межі аудиту — у [картці джерела](../sources/nvidia-ai-factory-operations-agent-2026-11-07.md) і [аналізі придатності](../topics/nvidia-ai-factory-operations-agent.md).
-- **Пропозиція:** не інтегрувати stack у B-12 без конкретної кластерної потреби. Нового архітектурного рішення не ухвалено; код і runtime не змінювалися.
+**Межі доказу:** зміни локально злиті в основну гілку, але не опубліковані. У цій сесії не запускаються tests, TUI/server, мікрофон, гучномовець або модель. Проводиться статична перевірка конфігів, Python/shell синтаксису, diff та wiki-посилань. Доступні локальні `uv` і audio executables, тому залежності не встановлювалися. Оригінальний Capri artwork не додається: огляд джерел не підтвердив права на ці зображення; потрібен власний/ліцензований pack, див. [Q19](open-questions.md) і [формат skin](../../src/b12/tui/assets/skins/README.md).
+
+Детальний scope, інтерфейси та межі приймання: [специфікація](../../docs/superpowers/specs/2026-11-08-b12-tui-companion-upgrade-design.md), [план](../../docs/superpowers/plans/2026-11-08-b12-tui-companion-upgrade.md), [тема TUI](../topics/cyberpunk-tui.md).
 
 ## Наявне
 
-- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 120 зовнішніх джерел.
+- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 116 зовнішніх URL.
 - [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
 - [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
 - Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.
@@ -73,3 +68,61 @@ tags: [progress, next]
 - **Перевірений факт (голос, Tasks 16–17 / R15 та рев'ю 02.11.2026):** реалізовано та модернізовано повний локальний голосовий шар у `src/b12/audio/` (`capture.py`, `endpoint.py`, `asr.py`, `tts.py`, `aec.py`, `speaker.py`, `pipeline.py`, `duplex.py`), підключено CLI (`b12 voice {status,mute,unmute,say,listen}`), HTTP API (`/api/voice/{status,mute,tts,asr,speaker/*}`) та Web UI (`🎙 Голос`, `Mute мікр.`, `Озвучувати`). Усунено всі функціональні дефекти з рев'ю `B-12_Voice_Stack_Review_2026-11-01.md` (`V-001`..`V-011`) та інтегровано найкращі інженерні практики з `NVIDIA-AI-IOT/reachy-mini-jetson-assistant`: конкурентні `asyncio.Task` у `DuplexSession.speak_response()` без дедлоку черги й із негайним стартом першої фрази (`V-001`), одноразовий AEC-прохід зі збереженням `BargeInResult.cleaned_audio` (`V-002`), усунення подвійного виклику Whisper ASR у дуплексі (`V-003`), 3-ступеневий конвеєр стрімінгу `LLM → extract_stream_clauses → TTS → AudioPlayer` (`V-004`), ізольоване скасування лише активного голосового ходу при barge-in (`V-005`), збереження стану LSTM у `SileroVad` без пофреймового `reset()` та без штучного RMS-бустингу в продакшені (`V-006`, `V-007`), справжній 128-таповий FIR NLMS AEC із FFT-вирівнюванням затримки, детекцією double-talk та системним `PulseAudioWebRtcAec` (`V-008`, `V-009`), почанковий неблокуючий запис у `AudioPlayer` із хуками руху `on_playback_start`/`on_playback_end` (`V-010`), збереження коротких 1–2-слівних відповідей у `is_tts_echo_text` (`V-011`) та перехід на espeak-модель `uk_UA-mykyta-high.onnx` за замовчуванням. У `evals/voice/report.json` отримано **нульовий WER (`uk_mean_wer: 0.0`, `en_mean_wer: 0.0`)** по всіх 8 UA/EN/code-switching фразах, endpoint P50 `320,0 мс`, ASR CPU int8 P50 `2173,58 мс`; у `evals/voice/duplex/report.json` — AEC ERLE `30,41 дБ` на багатопроменевому RIR із шумом, barge-in `time_to_stop` P50 `0,025 мс` / P95 `0,036 мс` на реальному TTS через ONNX Silero VAD, speaker FAR/FRR `0,0 / 0,0`, exact-replay атака блокується. Відкритою межею для повного закриття R15 лишається 8-годинний фізичний акустичний soak у кімнаті з ТБ/шумом.
 
 При наступній сесії починати з цього стану, оновлювати його лише за новими доказами та дописувати [журнал](../log.md).
+
+## Оновлення 10.11.2026 — комплексна оцінка Capri
+
+- **Перевірений факт:** програма оцінки (92 сценарії, групи A–K) виконана. Підсумок після повного прогону, live-перевірок F/I і Track 1 для LT-02/JOURNEY-04: 27 пройдено, 53 провалено, 12 заблоковано обладнанням, 0 — часом; пасовий показник 33,8% (27/80, 95% ДІ 24,3–44,6%). Попередні 29/49 (37,2%) знято. Деталі: [capri-comprehensive-evaluation.md](capri-comprehensive-evaluation.md).
+- **Перевірений факт:** виправлено порожній PASS у раннері (сценарій без ходів тепер FAIL), тести писали в реальні `artifacts/`, RQ2 і розділи A1–A4 звіту приведено у відповідність до артефактів. Тести: 135/135.
+- **Перевірений факт:** LT-02 і JOURNEY-04 виконано за Track 1 (синтетичне зміщення часу, `b12-bolt-e4b:q4km`, 3 запуски): LT-02 PASS 3/3 (повтор на вільному GPU); JOURNEY-04 FAIL — Neovim 0/3, близькість 0,680 нижче семантичного порогу 0,7 (зміна порогу — рішення власника). LT-02 у реальному часі: якір 10.11 21:14 UTC, екзамен з 17.11. Track 2 (реальні дні) веде таймер R17; День 30 — 26.11.2026.
+- **Перевірений факт:** таймер `b12-daily-check` полагоджено 10.11.2026 з дозволу власника: `~/.config/b12/env` узгоджено з `config.toml` (gemma4:12b), копія `env.before-gemma-align-20261110`; запуск через systemd — 14,54 дня, `ok=true`.
+- **Відкрито:** голос і робот — `BLOCKED_HARDWARE`.
+- **Відкрито:** розбіжність RE-01 (базовий прогін PASS, A4 FULL FAIL) не пояснена.
+- **Перевірений факт:** `tests/test_m3_gate_challenger2.py` (28/28) включено в коміт `010beb5`.
+
+## Оновлення 11.11.2026 — звіт про роботу
+
+- **Перевірений факт:** таймер `b12-daily-check` після виправлення відпрацював сам: запуск 00:03 11.11 за Києвом, `ok=true`.
+- **Спростовано/замінено:** запис вище про непояснену розбіжність RE-01 застарів. Старий PASS не відтворився: п'ять повторних запусків дали FAIL, і його знято в повному перезапуску.
+- Підсумок робіт 10–11.11: [work-report-2026-11-11.md](work-report-2026-11-11.md).
+
+## Оновлення 12.11.2026 — оцінка через рантайм Capri
+
+- **Спростовано/замінено:** підсумок 27/80 (33,8%) і «витік MEM-05» — артефакт стенда, який обходив рантайм. Через `Agent.turn` у пісочниці: 39 пройдено, 41 провалено, 12 заблоковано; 48,8% (39/80, 95% ДІ 38,1–59,5%). Деталі: [capri-comprehensive-evaluation.md](capri-comprehensive-evaluation.md).
+- **Перевірений факт:** виправлено в B-12 — роль співрозмовника в системному промпті та жодного шляху домашньої теки для гостя; чистий вихід `b12 serve` за SIGTERM; зупинка власника скасовує фоновий хід; резерв `min_free_mb` для записів пам'яті. Тести: репозиторій і оцінка проходять повністю.
+- **Перевірений факт:** `scripts/setup-bolt.sh` готує модель і токенізатор за закріпленими ревізіями зі звіркою SHA-256; `--verify-only` на наявному розгортанні пройшов. Свіжий клон: `uv sync`, `b12 doctor`, `b12 init`, хід розмови — працюють.
+- **Відкрито:** JOURNEY-04 (пошук), AUT-09 і REL-08 (рішення власника), H і J (обладнання).
+
+## Оновлення 12.11.2026 (друга хвиля) — виправлення за розміткою провалів
+
+- **Перевірений факт:** фінальний прогін через рантайм — 47 пройдено, 33 провалено, 12 заблоковано; 58,8% (47/80). Робоча конфігурація (gemma4:12b із семантичним пошуком) — теж 47/80. Попередній підсумок 39/80 замінено.
+- **Перевірений факт:** знайдено й виправлено дірку безпеки: у режимі повного доступу `run_command` надсилав дані `curl` без підтвердження в обхід `network_allow`. Тепер мережеві команди чекають підтвердження власника; `sudo`/`su`/`doas`/`pkexec` поза `sudo_exec` заборонено.
+- **Перевірений факт:** реалізовано пріоритети цілей (AUT-09), відносні шляхи для читання, виконання виклику, написаного як уся відповідь, вподобання в контексті. Тести: 719 passed, 4 skipped; оцінка 135 passed.
+- **Відкрито:** JOURNEY-04, багатоденні сценарії, заміна фактів, H і J (обладнання). PR #2 оновлюється злиттям `main`.
+
+## Поточний стан (2026-11-06)
+
+- **Перевірений факт:** зміни реалізації та перевірки виконані у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, від бази `5f6ba90`. На GitHub відкрито [PR #1 до `main`](https://github.com/cyberdid/B-12/pull/1); він ще не злитий.
+- **Перевірений факт:** додано `web_search` з DuckDuckGo Lite та Bing RSS fallback; обидва шляхи проходять через `network.http` і `network_allow`. Ізольований live-запит реальним `b12-bolt-e4b:q4km` повернув офіційну сторінку NVIDIA Nemotron. Це один запит, не гарантія сталої якості пошуку.
+- **Перевірений факт:** у persist-аналізі фіксуються неповні byte ranges, повна пагінація `file_list` і непрочитані файли; сторінки поза очікуваним offset не закривають теку. Фінальний маркер не завершує хід при прогалинах; є обмежене продовження до 60 додаткових раундів.
+- **Перевірений факт із межами:** read-only review зовнішньої теки shell-скриптів завершився `failed/incomplete_coverage` у v3 і v4. У v4 EOF підтверджено для 10 з 11 скриптів; один залишився частково прочитаним. Фінальна відповідь Bolt була інвентарем файлів, а не доказовим аудитом. Claude baseline у wiki має статус неперевіреного звіту, не ground truth. Деталі та умови — у [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06).
+- **Перевірений факт:** після змін перезапущено B-12 server на 8712 із `.worktrees/runtime`; Kitty TUI знову підключено до цього API. `web_search` видно в live tool registry. GPU не перезапускався і сторонні GPU-процеси не чіпалися.
+- **Перевірений факт:** повний suite після pagination fix — 665 passed, 4 skipped; `ruff check src tests evals` і `git diff --check` пройшли. Wiki lint: 41 сторінка, 340 локальних посилань, 0 битих посилань/якорів, 0 відсутніх source paths та 0 неіндексованих сторінок. SHA-256 незмінного master brief збігається з маніфестом: `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`.
+- **Потребує перевірки:** живий Bolt multi-file audit поки не дає доказового звіту; див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06). GPU лишався спільним з іншим процесом; сторонні процеси не зупинялися.
+
+## Поточний стан (2026-11-07)
+
+- **Перевірений факт:** виконано вибірковий аналіз NVIDIA AI Factory Operations Agent на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007`. Це experimental Helm/Kubernetes кластерний blueprint, не B-12 runtime library. Default edit вимкнений, але read-only кластерні інтеграції активні; для tenant deployment потрібна окрема scoped identity. Деталі, кодові спостереження та межі аудиту — у [картці джерела](../sources/nvidia-ai-factory-operations-agent-2026-11-07.md) і [аналізі придатності](../topics/nvidia-ai-factory-operations-agent.md).
+- **Пропозиція:** не інтегрувати stack у B-12 без конкретної кластерної потреби. Нового архітектурного рішення не ухвалено; код і runtime не змінювалися.
+
+## Наявне
+
+- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 120 зовнішніх джерел.
+- [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
+- [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
+- Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.
+- [Аудит локальної системи](../sources/system-audit-2026-10-24.md): RTX 4060 Laptop 8GB, i9-14900HX, 32GB RAM; CUDA й Ollama server 0.33.3 доступні. Є окремий store з Gemma E2B/E4B, ще не інтегрованими в B-12.
+- [Перший smoke test Bolt](bolt-first-test.md): SHA-256 перевірено; alias `b12-bolt-e4b:q4km`, context 2048; 26 запитів, з них 3 overflow timing observations виключені. Warm decode ~62–64 tok/s; є поведінкові недоліки. Пізніше truncation risk закрито лише для pinned profile, див. наступний пункт; модель лишається кандидатом.
+- [Review archive-index-public](../sources/archive-index-public.md): 16 source files за pinned commit, 17 core tests passed; synthetic lexical/provenance і cache-refresh probe виконані без production DB/embedding load. Pinned lexical modules тепер інтегровані через actor-scoped derived index; приватний production archive не імпортовано.
+- [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
+- [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
+- [Tool control](../topics/tool-control.md): Tasks 5–6 перевірені; API authentication і global purge реалізовані. Security межі та відкладені знахідки описані в [самоогляді](security-self-review.md) й аудитах.

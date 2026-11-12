@@ -14,6 +14,7 @@ from pydantic import Field, field_validator
 
 from b12.contracts import PurgeReceipt
 from b12.control import ExecutionContext
+from b12.memory import DiskSpaceLow
 from b12.tools._common import Args, EmptyArgs, clip, failure
 from b12.tools.outcomes import HandlerOutcome, SideEffect
 from b12.tools.policy import EffectGuard, Risk
@@ -138,6 +139,8 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
             return failure("permission_denied")
         except ValueError:
             return failure("unsupported")
+        except DiskSpaceLow:
+            return failure("disk_space_low")  # refused before any write: nothing to undo
         except Exception:
             return HandlerOutcome(
                 status="unknown",

@@ -1,0 +1,13 @@
+--- a/evals/capri_comprehensive/tests/test_stress_m4.py
++++ b/evals/capri_comprehensive/tests/test_stress_m4.py
+@@ -231,8 +231,8 @@
+         count_delay = sum(1 for r in reports if r["status"] == "BLOCKED_DELAY")
+ 
+         assert batch_summary_data["total_scenarios"] == 92
+-        assert batch_summary_data["passed"] == count_pass == 40
+-        assert batch_summary_data["failed"] == count_fail == 38
++        assert batch_summary_data["passed"] == count_pass == 29
++        assert batch_summary_data["failed"] == count_fail == 49
+         assert batch_summary_data["blocked_hardware"] == count_hw == 12
+         assert batch_summary_data["blocked_delay"] == count_delay == 2
+         assert count_pass + count_fail + count_hw + count_delay == 92

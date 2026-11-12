@@ -1,0 +1,88 @@
+id: "JOURNEY-01"
+group: "Group K: Multi-Session Journeys"
+title: "4-Phase Companion Onboarding, Consent Setting, and Morning Re-Awakening"
+research_hypothesis: "Capri transitions across multi-session onboarding phases (meeting, consent boundaries, setup task, morning re-awakening) retaining context and identity without drift."
+taxonomy: "real_model_behavioral"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.1
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Олексій"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Привіт, мене звати Олексій. Хто ти?"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "Капрі"
+      - type: "content_contains"
+        value: "Олексій"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 1
+    actor_id: "actor-owner-01"
+    input: "Я віддаю перевагу спілкуванню українською мовою та лаконічним технічним поясненням."
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "зрозумів"
+          - "врахую"
+          - "українськ"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 2
+    actor_id: "actor-owner-01"
+    input: "Перевір наявність файлу конфігурації стенду config/stand.json."
+    expected_behaviors:
+      - type: "content_contains"
+        value: "config/stand.json"
+      - type: "script_cyrillic"
+        value: true
+  - turn: 3
+    actor_id: "actor-owner-01"
+    input: "Доброго ранку, Капрі!"
+    new_session: true
+    expected_behaviors:
+      - type: "content_contains"
+        value: "Олексій"
+      - type: "content_contains_any"
+        values:
+          - "config/stand.json"
+          - "налаштування"
+          - "стенд"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "Як я можу вам допомогти, незнайомцю?"
+          - "Хто ви?"
+
+ground_truth:
+  reference_answer: "Доброго ранку, Олексію! Вчора ми перевіряли config/stand.json. Продовжуємо роботу зі стендом?"
+  evidence_criteria: "Greets owner by name, recalls Phase 3 setup task, zero generic assistant boilerplate."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Recalls owner name, references Phase 3 task across session boundary."
+  failure_criteria: "Generic greeting, forgets owner name, or forgets yesterday's setup task."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "journey_01_summary.json"

@@ -1,0 +1,58 @@
+id: CM-03
+group: 'Group C: Cross-Model Behavioral Continuity'
+title: Memory Context Grounding & Retrieval Utilization Parity
+research_hypothesis: Models correctly ground answers in retrieved memory context injected
+  into prompt rather than hallucinating external training data.
+taxonomy: real_model_behavioral
+severity: high
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: any_swappable
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: any_swappable
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories:
+    - text: Собаку власника звати Рекс, це вівчарка віком 4 роки.
+      actor_id: actor-owner-01
+      timestamp: '2026-10-15T12:00:00Z'
+      tier: autobiographical
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: Як звати мого собаку і якої він породи?
+  new_session: true
+  expected_behaviors:
+  - type: content_contains
+    value: Рекс
+  - type: content_contains
+    value: вівчарк
+    ignore_case: true
+  - type: script_cyrillic
+    value: true
+  forbidden_behaviors:
+  - type: content_contains_any
+    values:
+    - не знаю
+    - у вас немає собаки
+ground_truth:
+  reference_answer: Вашого собаку звати Рекс, це вівчарка.
+  evidence_criteria: Response grounded strictly in injected memory record.
+  target_metrics:
+    ttft_s_max: 1.5
+    total_latency_s_max: 5.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Exact keyword presence ('Рекс', 'вівчарка') in response content.
+  failure_criteria: Hallucinated name or denied pet existence.
+required_artifacts:
+- turn_trace.jsonl

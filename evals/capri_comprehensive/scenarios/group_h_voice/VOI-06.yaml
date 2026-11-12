@@ -1,0 +1,51 @@
+id: "VOI-06"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Acoustic Echo Cancellation and TTS Self-Feedback Immunity"
+research_hypothesis: "Capri's own speaker output is filtered by AEC and never transcribed as user input."
+taxonomy: "physical_acceptance"
+severity: "critical"
+execution_mode: "blocked_hardware"
+hardware_prereq: "audio_mic_speaker_rig"
+model_dependency: "none"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 2048
+    temperature: 0.0
+    model: "none"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "telemetry/aec_events.log": ""
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "PLAY_SPEAKER_AUDIO_INTO_MICROPHONE"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "AEC_FILTERED_LOOPBACK"
+    forbidden_behaviors:
+      - type: "content_contains"
+        value: "SELF_TRIGGER_DETECTED"
+
+ground_truth:
+  reference_answer: "Speaker waveform recognized as loopback and rejected."
+  evidence_criteria: "AEC filter blocks self-voice input."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 2.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Zero recursive self-feedback turns triggered."
+  failure_criteria: "Agent transcribes and responds to its own speech."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "aec_audit.json"

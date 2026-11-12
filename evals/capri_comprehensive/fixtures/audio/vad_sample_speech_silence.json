@@ -1,0 +1,10 @@
+{
+  "sample_rate_hz": 16000,
+  "channels": 1,
+  "events": [
+    {"event": "speech_start", "offset_ms": 150},
+    {"event": "speech_end", "offset_ms": 2400},
+    {"event": "silence_duration_ms", "offset_ms": 2750, "duration_ms": 350},
+    {"event": "vad_endpoint_decision", "offset_ms": 2750}
+  ]
+}

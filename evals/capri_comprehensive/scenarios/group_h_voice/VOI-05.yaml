@@ -1,0 +1,49 @@
+id: "VOI-05"
+group: "Group H: Voice & Real-Time Interaction"
+title: "Continuous Audio Playback During Background Tool Execution"
+research_hypothesis: "Concurrent LLM inference or tool execution does not induce audio buffer underruns or stutter."
+taxonomy: "physical_acceptance"
+severity: "critical"
+execution_mode: "blocked_hardware"
+hardware_prereq: "audio_mic_speaker_rig"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "telemetry/audio_buffer.log": '{"underruns": 0}'
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "CONCURRENT_HEAVY_TOOL_AND_AUDIO_PLAYBACK"
+    expected_behaviors:
+      - type: "file_contains"
+        path: "telemetry/audio_buffer.log"
+        value: '"underruns": 0'
+
+ground_truth:
+  reference_answer: "Zero audio underrun glitches during concurrent tool execution."
+  evidence_criteria: "Audio telemetry records 0 buffer drops."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 5.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Underrun count == 0."
+  failure_criteria: "Underrun count > 0."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "audio_buffer_trace.json"

@@ -7,6 +7,7 @@ B12_* environment values taking precedence. Exit codes: 0 completed/ok,
 
 import argparse
 import asyncio
+import contextlib
 import json
 import os
 import signal
@@ -408,6 +409,7 @@ async def cmd_goals(args, settings) -> int:
                     budget_turns=args.budget,
                     review_interval_s=args.interval,
                     check=check,
+                    priority=args.priority,
                 )
             )
         elif args.action == "list":
@@ -712,10 +714,94 @@ async def cmd_tui(args, settings) -> int:
     client = ApiClient(args.url, token_file.read_text().strip())
     try:
         # Already inside asyncio.run(main): the app must run on this loop (run_async).
-        await B12App(client, persist_default=args.persist).run_async()
+        await B12App(client, persist_default=args.persist, state_dir=settings.state_dir).run_async()
     finally:
         await client.close()
     return 0
+
+
+def _emit_tui_hook_noop(args) -> None:
+    """Protocol response depends only on recognized CLI configuration, never payload."""
+    if getattr(args, "source", None) != "antigravity":
+        return
+    response = {
+        "SessionStart": "{}",
+        "PostToolUse": "{}",
+        "PostInvocation": '{"injectSteps":[],"terminationBehavior":""}',
+    }.get(getattr(args, "event", None))
+    if response is not None:
+        try:
+            print(response, flush=True)
+        except (OSError, ValueError):
+            pass  # A closed provider pipe must not turn telemetry into an error.
+
+
+async def cmd_tui_hook(args, settings) -> int:
+    """Best-effort telemetry: return only documented Antigravity no-op envelopes."""
+    try:
+        import select
+        import time
+
+        from b12.tui.activity import ActivityStore
+        from b12.tui.hook import MAX_INPUT_BYTES, normalize_hook
+
+        # One bounded JSON object on a pipe; do not wait indefinitely for a broken hook.
+        deadline = time.monotonic() + 0.5
+        fd = sys.stdin.fileno()
+        data = bytearray()
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not select.select([fd], [], [], remaining)[0]:
+                return 0
+            chunk = os.read(fd, min(8192, MAX_INPUT_BYTES + 1 - len(data)))
+            if not chunk:
+                break
+            data.extend(chunk)
+            if len(data) > MAX_INPUT_BYTES:
+                return 0
+        payload = json.loads(data)
+        if not isinstance(payload, dict):
+            return 0
+        if normalize_hook(args.source, payload, time.time(), event=args.event) is None:
+            return 0
+        ActivityStore(settings.state_dir).append(args.source, payload, event=args.event)
+    except Exception:
+        pass  # Telemetry failures never change a provider action.
+    finally:
+        _emit_tui_hook_noop(args)
+    return 0
+
+
+def _graceful_server_class():
+    import uvicorn
+
+    class GracefulServer(uvicorn.Server):
+        """SIGTERM is a normal stop request for a service: shut down and exit with code 0.
+
+        uvicorn re-raises a captured signal after the graceful shutdown, so the process
+        would die by SIGTERM (exit code -15) even though it stopped cleanly. SIGINT keeps
+        uvicorn's behaviour.
+        """
+
+        @contextlib.contextmanager
+        def capture_signals(self):
+            with super().capture_signals():
+                try:
+                    yield
+                finally:
+                    # Read by uvicorn's capture_signals right after this block exits.
+                    self._captured_signals = [
+                        s for s in self._captured_signals if s != signal.SIGTERM
+                    ]
+
+    return GracefulServer
+
+
+def __getattr__(name):
+    # uvicorn is imported lazily: only `serve` needs it.
+    if name == "GracefulServer":
+        return _graceful_server_class()
+    raise AttributeError(name)
 
 
 async def cmd_serve(args, settings) -> int:
@@ -729,7 +815,7 @@ async def cmd_serve(args, settings) -> int:
         emit_json({"error": "loopback_only"})
         return 1
     app = create_app(settings, port=args.port, autonomy=not args.no_autonomy)
-    server = uvicorn.Server(
+    server = _graceful_server_class()(
         uvicorn.Config(
             app,
             host=args.host,
@@ -792,6 +878,15 @@ def parser() -> argparse.ArgumentParser:
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
+    hook = sub.add_parser(
+        "tui-hook", help="локальні metadata lifecycle hooks без provider decisions"
+    )
+    hook.add_argument("--source", required=True, choices=("claude-code", "codex", "antigravity"))
+    hook.add_argument(
+        "--event",
+        choices=("SessionStart", "PostToolUse", "PostInvocation"),
+        help="явна безпечна lifecycle-подія Antigravity",
+    )
     serve = sub.add_parser("serve", help="локальний API (лише loopback)")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8712)
@@ -802,6 +897,10 @@ def parser() -> argparse.ArgumentParser:
     goals.add_argument("--criteria", default="Короткий звіт про результат")
     goals.add_argument("--budget", type=int, default=5)
     goals.add_argument("--interval", type=float, default=3600)
+    goals.add_argument(
+        "--priority", type=int, default=0, choices=range(11), metavar="0-10",
+        help="вища ціль іде першою й витісняє нижчу",
+    )
     goals.add_argument("--tools", nargs="*")
     goals.add_argument("--check-file")
     goals.add_argument("--check-text", default="")
@@ -833,9 +932,9 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
-# Commands that run without the CLI taking the state lock: `serve` takes it itself, and `tui`
-# only talks to the API.
-SERVER_OWNED = frozenset({"serve", "tui"})
+# Commands without the runtime lock: serve takes it itself; tui uses the API;
+# tui-hook writes only the independent local UI metadata spool.
+SERVER_OWNED = frozenset({"serve", "tui", "tui-hook"})
 EXIT_SERVER_UNAVAILABLE = 4
 EXIT_REQUIRES_STOPPED_SERVER = 5
 
@@ -973,18 +1072,58 @@ def run_remote(args, settings) -> int:
         client.close()
 
 
+def _is_tui_hook(argv: list[str]) -> bool:
+    """Identify the command, without confusing config paths or chat text with it."""
+    skip_config_value = False
+    for value in argv:
+        if skip_config_value:
+            skip_config_value = False
+            continue
+        option = value.split("=", 1)[0]
+        # Match argparse's existing long-option abbreviation support as well.
+        if option.startswith("--") and "--config".startswith(option):
+            skip_config_value = "=" not in value
+            continue
+        if value.startswith("-"):
+            continue
+        return value == "tui-hook"
+    return False
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     # `b12 mcp add NAME --capability C -- server argv...`: everything after -- is the argv.
     server_argv = argv[argv.index("--") + 1 :] if "--" in argv else []
     argv = argv[: argv.index("--")] if "--" in argv else argv
-    args = parser().parse_args(argv)
+    if _is_tui_hook(argv):
+        # argparse normally prints and exits before reaching the hook handler.
+        # A misconfigured telemetry hook must also remain silent and successful.
+        import io
+        from contextlib import redirect_stderr
+
+        with redirect_stderr(io.StringIO()):
+            try:
+                args = parser().parse_args(argv)
+            except SystemExit:
+                return 0
+    else:
+        args = parser().parse_args(argv)
     args.server_argv = server_argv
     try:
         settings = load_settings(args.config)
     except (ValueError, OSError, tomllib.TOMLDecodeError) as exc:
+        if args.command == "tui-hook":
+            _emit_tui_hook_noop(args)
+            return 0
         emit_json({"error": "invalid_settings", "detail": type(exc).__name__})
         return 1
+    except Exception:
+        # Telemetry must not fail a provider action if settings loading breaks.
+        # Other commands keep their existing unexpected-exception behavior.
+        if args.command == "tui-hook":
+            _emit_tui_hook_noop(args)
+            return 0
+        raise
     handlers = {
         "doctor": cmd_doctor,
         "init": cmd_init,
@@ -999,6 +1138,7 @@ def main(argv=None) -> int:
         "tools": cmd_tools,
         "serve": cmd_serve,
         "tui": cmd_tui,
+        "tui-hook": cmd_tui_hook,
         "goals": cmd_goals,
         "quiet": cmd_flag,
         "stop": cmd_flag,

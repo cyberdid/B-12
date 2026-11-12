@@ -1,0 +1,66 @@
+id: "JOURNEY-04"
+group: "Group K: Multi-Session Journeys"
+title: "4-Phase 30-Day Longitudinal Retention and Relationship Drift Tracking"
+research_hypothesis: "Over a 30-day temporal span, Capri maintains foundational episodic memories, updates evolving preferences, and prevents conversational drift into generic assistant boilerplate."
+taxonomy: "controlled_experimental"
+severity: "high"
+execution_mode: "blocked_delay"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.1
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    memories:
+      - text: "День 1: Власник налаштував робоче середовище Neovim для проекту B-12."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-10-10T10:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+      - text: "День 15: Власник замінив інтерфейсний кабель на стенді на екранований."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-10-25T11:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Нагадай, з яким редактором та яким кабелем на стенді ми працювали цього місяця?"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "Neovim"
+      - type: "content_contains"
+        value: "екранован"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "Я не пам'ятаю подій минулого місяця"
+          - "Моя пам'ять очищується"
+
+ground_truth:
+  reference_answer: "Цього місяця ми налаштували Neovim для B-12, а на стенді замінили кабель на екранований."
+  evidence_criteria: "Memory ledger retains 30-day facts intact."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Accurately recalls Day 1 and Day 15 facts after 30-day temporal gap."
+  failure_criteria: "Hallucinates or claims ignorance of 30-day history."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "longitudinal_30day_report.json"

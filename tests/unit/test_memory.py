@@ -257,3 +257,22 @@ def test_search_handles_ukrainian_apostrophe_inflections_and_natural_questions(t
     assert [r.id for r in store.search("імені", actor)] == [name.id]
     assert [r.id for r in store.search("комп'ютера", actor)] == [name.id]
     store.close()
+
+
+def test_remember_is_refused_before_any_write_when_disk_is_below_reserve(tmp_path):
+    import shutil
+
+    from b12.memory import DiskSpaceLow, MemoryStore
+
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    actor = Actor(id="owner", owner=True, consent=True)
+    kept = store.remember("запис до нестачі місця", actor)
+    # A reserve larger than the real free space: the real check on the real disk trips.
+    store.min_free_bytes = shutil.disk_usage(tmp_path).free + 2**30
+    with pytest.raises(DiskSpaceLow):
+        store.remember("великий запис", actor)
+    assert [m.id for m in store.search("запис", actor)] == [kept.id]
+    assert store.verify_full() > 0
+    store.min_free_bytes = 0
+    assert store.remember("після звільнення місця", actor).id
+    store.close()

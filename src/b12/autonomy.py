@@ -18,6 +18,7 @@ from pathlib import Path
 from b12.auth import owner_capabilities
 
 log = logging.getLogger(__name__)
+STOP_POLL_S = 0.1  # how quickly an owner stop cancels a background turn in flight
 
 
 def _clock():
@@ -92,7 +93,34 @@ class Scheduler:
             "Зроби один наступний перевірюваний крок інструментами, якщо потрібно, "
             "і коротко звітуй: що зроблено, що перевірено, що далі."
         )
-        result = await rt.agent.turn(goal["session_id"], grant, prompt, task_id=task, timeout_s=300)
+        cancel = asyncio.Event()
+        preempted_by: list[str] = []
+
+        async def watch_owner_stop():
+            # Owner stop halts background work already in flight, not only the next step;
+            # a due goal of higher priority preempts it (the preempted goal yields and stays).
+            while not cancel.is_set():
+                if not rt.attention.execution_allowed(actor.id):
+                    cancel.set()
+                    return
+                higher = [
+                    g["id"] for g in rt.goals.due(self.clock())
+                    if g["id"] != goal["id"] and g["priority"] > goal["priority"]
+                ]
+                if higher:
+                    preempted_by.append(higher[0])
+                    cancel.set()
+                    return
+                await asyncio.sleep(STOP_POLL_S)
+
+        watcher = asyncio.create_task(watch_owner_stop())
+        try:
+            result = await rt.agent.turn(
+                goal["session_id"], grant, prompt, task_id=task, timeout_s=300, cancel=cancel
+            )
+        finally:
+            watcher.cancel()
+            await asyncio.gather(watcher, return_exceptions=True)
         now = self.clock()
         next_review = now + timedelta(seconds=goal["review_interval_s"])
         checkpoint = f"[{result.state}] {result.content}"[:4000]
@@ -105,6 +133,8 @@ class Scheduler:
             "error_code": result.error_code,
             "status": updated["status"],
         }
+        if preempted_by:
+            outcome["preempted_by"] = preempted_by[0]
         if result.state == "awaiting_approval":
             rt.goals.set_status(goal["id"], actor.id, "paused", "approval_pending")
             outcome["status"] = "paused"
@@ -138,8 +168,15 @@ class Scheduler:
         return outcome
 
     async def tick(self) -> list[dict]:
-        outcomes = []
-        for goal in self.runtime.goals.due(self.clock())[: self.max_goals]:
+        outcomes, ran = [], set()
+        while len(ran) < self.max_goals:
+            # Re-read the due list each step: a goal that preempted the last one runs next.
+            goal = next(
+                (g for g in self.runtime.goals.due(self.clock()) if g["id"] not in ran), None
+            )
+            if goal is None:
+                break
+            ran.add(goal["id"])
             try:
                 outcomes.append(await self.run_goal(goal))
             except Exception:

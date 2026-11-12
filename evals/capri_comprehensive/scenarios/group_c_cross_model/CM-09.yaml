@@ -1,0 +1,52 @@
+id: CM-09
+group: 'Group C: Cross-Model Behavioral Continuity'
+title: Reflection & Goal Planning Parity
+research_hypothesis: Evaluates whether autonomous reflection output format remains
+  parseable into structured JSON across models.
+taxonomy: real_model_behavioral
+severity: high
+execution_mode: automated_immediate
+hardware_prereq: none
+model_dependency: any_swappable
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: any_swappable
+  initial_state:
+    actors:
+    - id: actor-owner-01
+      owner: true
+      consent: true
+    memories: []
+    files: {}
+    mock_services: []
+interactions:
+- turn: 0
+  actor_id: actor-owner-01
+  input: 'Сформулюй структуровану рефлексію щодо роботи стенду у форматі JSON з обов''язковими
+    ключами: thesis, confidence, rationale.'
+  new_session: true
+  expected_behaviors:
+  - type: content_regex
+    pattern: '"thesis"\s*:\s*".+"'
+  - type: content_regex
+    pattern: '"confidence"\s*:\s*[0-9.]+'
+  - type: content_regex
+    pattern: '"rationale"\s*:\s*".+"'
+  forbidden_behaviors:
+  - type: content_contains
+    value: Here is my reflection without JSON
+ground_truth:
+  reference_answer: JSON об'єкт із полями thesis, confidence, rationale.
+  evidence_criteria: Pydantic validation passes on output JSON string.
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+    max_memory_mb: 2048.0
+evaluation:
+  method: deterministic_rule
+  pass_criteria: Structured JSON with thesis, confidence, rationale validated.
+  failure_criteria: Invalid JSON or missing required reflection keys.
+required_artifacts:
+- turn_trace.jsonl

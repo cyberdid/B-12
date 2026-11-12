@@ -90,6 +90,12 @@ Screen {
     color: #608293;
     text-align: right;
 }
+#turn-report {
+    height: 2;
+    padding: 0 2;
+    color: #7189a8;
+    background: #0b1220;
+}
 #chat {
     height: 1fr;
     padding: 0 3 1 3;
@@ -123,6 +129,13 @@ Screen {
     border-left: tall #a47b55;
     padding: 0 1;
     margin-top: 1;
+}
+.turn-summary {
+    color: #83bcbb;
+    border-left: tall #31585d;
+    background: #0d1b25;
+    padding: 0 1;
+    margin: 1 0;
 }
 Markdown {
     margin: 0 0 1 0;
@@ -176,6 +189,12 @@ Collapsible Static {
     color: #526784;
     text-align: center;
 }
+#activity-status {
+    height: 2;
+    padding: 0 1;
+    color: #7292a6;
+    text-align: center;
+}
 #panel {
     height: 1fr;
     min-height: 8;
@@ -200,6 +219,46 @@ Collapsible Static {
     margin-top: 1;
     text-style: bold;
 }
+#panel Checkbox {
+    width: 100%;
+    height: 1;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #a5bbd7;
+}
+#audio-buttons {
+    height: 3;
+    margin-top: 1;
+}
+#audio-buttons Button {
+    width: 1fr;
+    padding: 0;
+    margin-right: 1;
+    color: #9bd9d2;
+}
+#activity-report {
+    height: auto;
+    color: #8ba5bf;
+    padding: 1 0;
+}
+#activity-timeline {
+    height: 12;
+    min-height: 5;
+    border-left: solid #273e55;
+    padding-left: 1;
+    scrollbar-color: #315269;
+    scrollbar-size-vertical: 1;
+}
+#activity-lines {
+    height: auto;
+    color: #879db8;
+}
+#clear-activity {
+    width: 100%;
+    color: #b6a0cc;
+    margin-top: 1;
+}
 #mem-query {
     height: 3;
     background: #0b1020;
@@ -219,7 +278,7 @@ Collapsible Static {
     border: none;
 }
 #bar {
-    height: 7;
+    height: 8;
     padding: 0 2;
     background: #0b1120;
     border-top: solid #25334b;
@@ -257,6 +316,29 @@ Collapsible Static {
     background: #ff79c8;
     border: round #ff79c8;
     color: #22152c;
+}
+#ptt {
+    width: 8;
+    min-width: 0;
+    height: 3;
+    padding: 0;
+    margin-left: 1;
+    color: #a8e6df;
+    border: round #315b68;
+    background: #122632;
+}
+#ptt.recording {
+    color: #180e17;
+    background: #ff8193;
+    border: round #ff8193;
+}
+#voice-status {
+    height: 1;
+    color: #5e8299;
+}
+#voice-status.recording {
+    color: #ff8193;
+    text-style: bold;
 }
 #compose-options {
     height: 2;
@@ -297,10 +379,16 @@ Screen.narrow #bar {
 Screen.narrow #send {
     width: 6;
 }
+Screen.narrow #ptt {
+    width: 5;
+}
 Screen.narrow #chat-heading {
     padding: 1 1 0 1;
 }
 Screen.short #companion-title {
+    height: 1;
+}
+Screen.short #turn-report {
     height: 1;
 }
 Screen.short #companion-name {

@@ -1,0 +1,85 @@
+{
+  "description": "Opt-in B-12 local activity metadata for this Codex project.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/absolute/path/to/B-12/integrations/b12-tui-hook --source codex",
+            "timeout": 2
+          }
+        ]
+      }
+    ]
+  }
+}

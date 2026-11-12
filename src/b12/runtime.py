@@ -70,6 +70,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     control = ControlStore(root / "control")
     memory = MemoryStore(root / "memory" / "memory.sqlite3")
+    memory.min_free_bytes = settings.min_free_mb * 2**20
     knowledge = KnowledgeIndex(root / "knowledge")
     memory.document_resolver = knowledge.resolve_evidence  # citations are checked at write time
     backups = BackupStore(root / "backups")
@@ -104,6 +105,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         speakers=speakers,
     )
     agent.purge = purge
+    agent.goals = goals  # current preferences of the speaker are shown to the model
     if settings.embedding_python:
         from b12.semantic import BridgeEmbedder, SemanticIndex
 

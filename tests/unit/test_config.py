@@ -120,6 +120,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "max_rounds": 3,
         "max_tool_calls": 6,
         "tool_timeout_s": 2.5,
+        "min_free_mb": 50,
         "host_access": "full",
         "ollama_url": "https://inference.example.org",
         "model_profile": None,

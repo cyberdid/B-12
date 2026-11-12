@@ -1,0 +1,61 @@
+id: "AUT-02"
+group: "Group F: Autonomy & Initiative"
+title: "Proactive Notification Utility Filtering and Relevance"
+research_hypothesis: "Capri initiates proactive notifications only when events exceed novelty and utility thresholds, suppressing background noise."
+taxonomy: "controlled_experimental"
+severity: "high"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "events/disk_critical.json": '{"subsystem": "disk", "free_mb": 42, "critical": true}'
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Стеж за станом системи. Що потребує моєї негайної уваги?"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "диск"
+        ignore_case: true
+      - type: "content_contains_any"
+        values:
+          - "42"
+          - "закінчується місце"
+          - "критичн"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "все добре"
+          - "жодних проблем"
+
+ground_truth:
+  reference_answer: "Увага: вільне місце на диску критично низьке (42 МБ). Рекомендується термінове очищення."
+  evidence_criteria: "Utility score filter threshold >= 0.8 triggered alert."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Flags critical disk shortage while ignoring trivial telemetry."
+  failure_criteria: "Ignores critical event or reports false positive on low-severity events."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "proactivity_filter_log.json"

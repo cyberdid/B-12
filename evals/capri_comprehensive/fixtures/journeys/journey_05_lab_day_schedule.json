@@ -1,0 +1,9 @@
+{
+  "journey_id": "JOURNEY-05",
+  "schedule": [
+    {"phase": 1, "action": "morning_gaze", "time": "09:00", "doa_deg": 45.0},
+    {"phase": 2, "action": "focus_mode_quiet", "time": "10:00-17:00", "suppress_routine": true},
+    {"phase": 3, "action": "emergency_alarm", "time": "14:30", "event": "BATTERY_OVERHEAT_85C", "override_quiet": true},
+    {"phase": 4, "action": "safe_shutdown", "time": "18:00", "bus_release": true}
+  ]
+}

@@ -32,6 +32,8 @@ class Settings(BaseModel):
     )
     max_tool_calls: Annotated[int, Field(gt=0)] = 300
     tool_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 30
+    # Memory writes are refused while the state disk has less free space than this.
+    min_free_mb: Annotated[int, Field(ge=0)] = 50
     host_access: Literal["full", "read_only", "none"] = "full"
     # Owner-chosen wide access. Both are control-channel settings; model output cannot set them.
     # forget_requires_approval=False lets memory_forget run on the owner's grant alone.
@@ -135,6 +137,7 @@ class Settings(BaseModel):
             "initiative_hour_cap",
             "tool_result_bytes",
             "seed",
+            "min_free_mb",
         }
         for field in cls.model_fields:
             key = f"B12_{field.upper()}"

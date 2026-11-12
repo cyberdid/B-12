@@ -20,7 +20,7 @@
   <img src="docs/images/web-dark.png" alt="Web UI Capri: tool-виклики, підтвердження і скасування" width="900">
 </p>
 
-> **Стан на 08.11.2026:** B-12 runtime охоплює CLI/API/Web/TUI, пам’ять зі згодою та глобальним забуттям, host tools із контрольним каналом дозволів, MCP, автономність, backup/restore і програмний голосовий стек. [PR #1](https://github.com/cyberdid/B-12/pull/1) додає `web_search`, повніше покриття read-only огляду й уривки вилученої історії; його точний head пройшов 665 тестів, 4 пропущені потребують реальної моделі. [PR #2](https://github.com/cyberdid/B-12/pull/2) веде окрему роботу над Capri desktop; нові additions ще не пройшли повний suite та host acceptance. Фізичний Reachy/Jetson, акустичний soak і 30-денні докази лишаються відкритими. Деталі — у [поточному статусі](wiki/project/status.md) та описах PR.
+> **Стан на 12.11.2026:** гілка `main` містить базовий B-12 runtime і [комплексну оцінку Capri](evals/capri_comprehensive/reports/CAPRI_COMPREHENSIVE_EVALUATION.md) з відкритими дефектами (див. «Результати вимірювань»). [PR #1](https://github.com/cyberdid/B-12/pull/1) оновлює web search і контроль повноти context review; [PR #2](https://github.com/cyberdid/B-12/pull/2) додає Capri desktop-компаньйон. Обидва PR ще відкриті, тому desktop additions поки не входять до `main`. Перевірки та обмеження наведені у [поточному статусі](wiki/project/status.md) і в описах PR.
 
 ## Архітектура
 
@@ -145,6 +145,10 @@ Web UI обслуговується тим самим API зі строгим CS
 
 <img src="docs/images/eval-by-category.png" alt="Eval за категоріями" width="760">
 
+**Комплексна оцінка Capri (12.11.2026)** — інший і суворіший набір. 92 поведінкові сценарії в 11 групах: автобіографічна пам'ять, неперервність у часі, безпека, автономія, надійність, голос і робот. Кожен сценарій має кілька обов'язкових перевірок за ключовими словами, а відповідь має бути українською. Сценарії проходять через справжній рантайм Capri в пісочниці bubblewrap. Результат: 47 пройдено, 33 провалено, 12 заблоковано відсутністю обладнання, тобто **58,8 %** серед запущених (95 % ДІ 47,8–68,9 %). На робочій конфігурації (gemma4:12b із семантичним пошуком) — так само 47 з 80: gemma сильніша в міркуваннях і розмові, Bolt — у безпеці й швидкості. Цифри не суперечать великому eval: той перевіряє окремі задачі з інструментами, а ця оцінка — поведінку компаньйона. Детермінований контур підтверджено вимірами: ізоляція власника й гостя, згода, зупинка й пріоритети фонових цілей, резерв диска, чисте завершення за SIGTERM, заборона `sudo` поза `sudo_exec`, підтвердження мережевих команд. Слабкі місця — багатоденні сценарії (0 з 4), заміна старого факту новим і пошук запису, сформульованого іншими словами. Ручна розмітка показує, що 9 із 31 провалу правильні за суттю й не проходять лише через формулювання. Перший прогін 10.11 (33,8 %) обходив рантайм, тому його знято; зокрема, «витік» секрету гостю в ньому спричинив сам стенд. Повний [звіт](evals/capri_comprehensive/reports/CAPRI_COMPREHENSIVE_EVALUATION.md).
+
+**Пам'ять у часі.** Щоденна перевірка: три якорі, засіяні 27.10, відтворюються через 14,6 дня, а забутий якір відсутній і в пошуку, і в байтах сховища. Прискорений тест зі зсувом часу: 7 днів (LT-02) — 3 з 3; 30 днів (JOURNEY-04) — один із двох фактів, бо запис про редактор має смислову близькість 0,680 при порозі пошуку 0,7. Справжній 7-денний прогін триває до 17.11, день 30 настає 26.11. [Протокол](evals/capri_comprehensive/reports/CAPRI_LONG_TERM_PROTOCOL.md).
+
 **8-годинний soak.** Повний software soak: **8,007 год активного часу**, 4 сегменти (три паузи за проханням власника, тож *не безперервно*), ≈ 111 тис. ходів, 297 забувань, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Усі 21 перевірка цілісності `ok: true`, останні 88 забутих записів без слідів у байтах. P50 ≈ 110 мс і P95 ≈ 330 мс не росте в часі. Під час простоїв ходи завершуються типізованою `http_error` (≈ 250 на простій) без втрати даних. **Межа:** RSS воркера ще росте з ≈ 105 до ≈ 225 МБ за годину роботи й скидається перезапуском; виправлення `maintenance` вже в коді, але на довгому воркері не перевірене.
 
 <img src="docs/images/soak-8h.png" alt="Затримка і пам'ять під час 8-годинного soak" width="760">
@@ -172,7 +176,7 @@ Web UI обслуговується тим самим API зі строгим CS
 | 15 | Stress / growth / 8 год soak | ✅ 8,007 год активно (не безперервно); ріст RSS у воркері відкритий |
 | 16–17 | Голос, full-duplex | 🟡 програмний стек і локальні бенчмарки готові (`src/b12/audio/`, `evals/voice/`); 8h кімнатний soak відкритий |
 | 18 | Reachy / Jetson | 🟡 протокол на симуляторі; фізичне приймання — з пристроєм |
-| 19 | Пам’ять 1/7/30 днів | 🟡 день 0 (27.10) і перевірка на 4,4 доби (31.10, `ok: true`) записані; чекає 7/30 днів |
+| 19 | Пам’ять 1/7/30 днів | 🟡 14,6 доби `ok: true` (3/3 якорі); прискорено: 7 днів 3/3, 30 днів — 1 з 2 фактів; справжні 7/30 днів — 17.11 і 26.11 |
 | 20 | Фінальний аудит R01–R17 | 🟡 [готово](wiki/project/requirements-audit.md): 10 із 17 виконано, решта частково/відкрито |
 
 ### Термінальний інтерфейс (`b12 tui`)
@@ -200,16 +204,18 @@ uv run --no-sync python -m b12.tui.preview
 
 Клавіші: `Ctrl+N` нова розмова, `Ctrl+P` пам’ять/підтвердження, `Ctrl+K` погладити кота, `F2` навігація, `F8` пауза анімацій, `Esc` зупинити хід, `Ctrl+Q` вийти. Рекомендовано truecolor terminal від 120×36; компонування перевірено також на 80×24. NO_COLOR поважається. [Поведінка й межі](wiki/topics/cyberpunk-tui.md).
 
-Тести: `uv run --no-sync pytest -q` — 551 passed, 3 skipped. Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
+Тести: `uv run --no-sync pytest -q` — 719 passed, 4 skipped (12.11.2026). Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
 
 ## Швидкий старт
 
-Потрібні Ollama з alias `b12-bolt-e4b:q4km`, calibrated profile і pinned tokenizer assets (див. `config.example.toml`).
+Потрібні Linux, Python 3.12+, [uv](https://docs.astral.sh/uv/), [Ollama](https://ollama.com/download) 0.33.3, `hf` (`pip install -U huggingface_hub`) і близько 7 ГБ на диску та 8 ГБ VRAM. Скрипт `scripts/setup-bolt.sh` завантажує офіційний GGUF Nemotron Bolt E4B і файли токенізатора за закріпленими ревізіями, звіряє SHA-256 з профілем і створює alias `b12-bolt-e4b:q4km` в Ollama.
 
 ```bash
 uv sync --extra dev
+scripts/setup-bolt.sh        # ≈ 6,2 ГБ; --verify-only перевіряє вже наявне
 export B12_MODEL_PROFILE=$PWD/profiles/bolt-e4b-ollama-0.33.3.json
-export B12_TOKENIZER_DIR=/absolute/pinned/tokenizer-assets
+export B12_TOKENIZER_DIR=~/.local/share/b12/tokenizers/bolt-e4b
+source .venv/bin/activate    # або пишіть uv run b12 …
 b12 doctor --json            # модель, профіль, сховища, pending purge
 b12 init                     # owner + сесія; --no-consent вимикає збереження пам’яті
 b12 chat                     # інтерактивно; Ctrl-C скасовує поточний turn
@@ -218,7 +224,7 @@ b12 serve --port 8712        # API + Web UI лише на loopback, scheduler у
 b12 tui                      # термінальний інтерфейс до запущеного сервера (потрібен tui-extra)
 b12 approvals | b12 approve <operation_id> | b12 resume <turn_id>
 b12 memory remember|search|forget|pending …
-b12 goals add "…" --check-file /abs/path --check-text "…"
+b12 goals add "…" --priority 0-10 --check-file /abs/path --check-text "…"
 b12 quiet on|off · b12 stop on|off · b12 autonomy [--reflect]
 b12 backup create|list|verify|restore <id> · b12 status
 b12 voice status|mute|unmute|say "…" [--play]|listen [--chat]
@@ -228,7 +234,8 @@ b12 mcp add archive --capability archive.read --read-only --timeout-s 180 -- /pa
 - **API:** токен власника лежить у `$B12_STATE_DIR/api/owner.token` (0600) і передається лише заголовком `Authorization: Bearer …`.
 - **Коди виходу:** 0 — готово, 1 — помилка, 2 — чекає approval, 3 — purge ще pending, 130 — скасовано.
 - **Розширений доступ:** у `~/.config/b12/config.toml` — `forget_requires_approval = false` (forget без підтвердження) і `sudo_access = "approval"` (`sudo_exec`, кожна команда з exact approval, лише `sudo -n`: паролі B-12 не вводить).
-- **Host access:** `host_access="full"` дає моделі реальний доступ до файлів і команд у межах прав Linux вашого користувача; руйнівні дії потребують approval.
+- **Host access:** `host_access="full"` дає моделі реальний доступ до файлів і команд у межах прав Linux вашого користувача; руйнівні дії потребують approval. Команди з мережевими клієнтами (`curl`, `wget`, `nc`, `ssh`…) теж чекають approval, а `sudo`/`su`/`doas`/`pkexec` поза `sudo_exec` заборонені. Інструменти читання приймають `~/…` і шляхи відносно домашньої теки.
+- **Пріоритет цілей:** `b12 goals add "…" --priority 0-10`: вища ціль іде першою й витісняє хід нижчої; `b12 stop on` скасовує фоновий хід, ціль продовжиться після `stop off`.
 - **Сервіс:** `scripts/install-user-service.sh` встановлює systemd user unit без root і без автозапуску.
 
 ## Документація

@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-08
+updated: 2026-11-12
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -18,6 +18,8 @@ tags: [navigation]
 | [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
+| [Комплексна оцінка Capri, 12.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії через рантайм: 47 пройдено, 33 провалено, 12 заблоковано обладнанням (58,8%); класифікація «гібридна модель-центрична система», не повний компаньйон |
+| [Звіт про роботу, 10–11.11.2026](project/work-report-2026-11-11.md) | Що зроблено в оцінці Capri, довгостроковій пам'яті й git; відкриті питання; PDF-версія |
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |
 | [Дорожня карта](project/roadmap.md) | M0–M6, залежності й критерії завершення |
 | [Аудит вимог R01–R17](project/requirements-audit.md) | Статус кожної вимоги з доказами й межами; відкриті рішення |
@@ -37,7 +39,7 @@ tags: [navigation]
 | [Ініціатива й рефлексія](topics/autonomy.md) | Цілі, доречність втручання, self-model |
 | [Порівняння з NVIDIA Reachy Jetson](topics/reachy-jetson-comparison.md) | Їхній голос і зір, наш контроль дій і пам'ять; ризики й розбіжності у джерелах |
 | [CLI і запущений сервер](topics/cli-server-mode.md) | Один власник runtime: API при запущеному сервері, лок без нього; зіставлення команд і ендпоінтів |
-| [Кіберпанковий TUI та кіберкіт](topics/cyberpunk-tui.md) | Анімований pet, mouse/keyboard reactions, адаптивний layout і offline preview |
+| [Кіберпанковий TUI та кіберкіт](topics/cyberpunk-tui.md) | Анімований companion, local activity/hooks, task reports, explicit voice та опційні зовнішні skins |
 | [Модель доказів (A-10)](topics/evidence-model.md) | Спогади з посиланням на документи, міграція v1→v2 з резервною копією, застарілість і життєвий цикл |
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
@@ -53,6 +55,8 @@ tags: [navigation]
 
 | Сторінка | Призначення |
 |---|---|
+| [Огляд Capri-подібних desktop companions](sources/capri-desktop-companions-2026-11-07.md) | Чотири pinned репозиторії, придатні ідеї та ліцензійні межі |
+| [Lifecycle hooks для coding agents](sources/agent-hooks-2026-11-08.md) | Офіційні hooks Claude Code, Codex та Antigravity; schema boundaries і межі інтеграції |
 | [Master brief](sources/master-brief.md) | Походження, контрольна сума, охоплення документа |
 | [LLM Wiki](sources/llm-wiki.md) | Метод ведення й адаптація до проєкту |
 | [Перевірка зовнішніх джерел](sources/external-checks.md) | Що прочитано незалежно, що залишилось неперевіреним |

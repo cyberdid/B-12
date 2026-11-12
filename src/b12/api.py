@@ -77,6 +77,7 @@ class GoalBody(_Body):
     review_interval_s: float = Field(default=3600, ge=30, le=7 * 86400)
     allowed_tools: list[str] = Field(default_factory=list, max_length=16)
     check: dict[str, str] | None = None
+    priority: int = Field(default=0, ge=0, le=10)
 
 
 class GoalStatusBody(_Body):
@@ -594,6 +595,7 @@ def create_app(
                 budget_turns=body.budget_turns,
                 review_interval_s=body.review_interval_s,
                 check=body.check,
+                priority=body.priority,
             )
         except ValueError as exc:
             raise HTTPException(422, "invalid_goal") from exc

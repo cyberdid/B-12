@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-10-26
+updated: 2026-11-12
 status: partially_implemented
-sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/memory.py, tests/integration/test_memory_restart.py, tests/security/test_memory_isolation.py]
+sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/memory.py, tests/integration/test_memory_restart.py, tests/security/test_memory_isolation.py, src/b12/semantic.py, evals/capri_comprehensive/runners/semantic_calibration.py, tests/unit/test_memory.py]
 tags: [memory, privacy, consent]
 ---
 # Пам’ять і приватність
@@ -28,3 +28,11 @@ Working, episodic, semantic, autobiographical, procedural, social, research і s
 ## Наявний кандидат для derived retrieval
 
 Власник надав [archive-index-public](../sources/archive-index-public.md). Review підтвердив готові SQLite FTS5/search/provenance компоненти; 17 базових тестів пройшли. Це дозволяє [повторно використати пошук](archive-retrieval.md), залишивши canonical events/consent окремим шаром. Mutable index не замінює append-only історію, а постійний VectorCache потребує invalidation після змін. Попередній B-12 kernel цим не знайдено.
+
+## Ізоляція акторів, згода і резерв диска (12.11.2026)
+
+- **Перевірений факт:** пам'ять відокремлена за `actor_id` на рівні SQL. Через рантайм гість не отримує ні записів власника, ні шляху до його домашньої теки; системний промпт називає роль співрозмовника з контрольного каналу. Попередній «витік» MEM-05 спричиняв стенд оцінки, що обходив рантайм.
+- **Перевірений факт:** без згоди промпт прямо каже моделі, що пам'ять вимкнена.
+- **Перевірений факт:** запис у пам'ять відхиляється з `disk_space_low` до будь-якої зміни, якщо вільного місця менше за `min_free_mb` (типово 50).
+- **Перевірений факт (калібрування семантичного порогу):** на 24 питаннях сценаріїв і 570 явно нерелевантних парах EmbeddingGemma 2 дає медіану близькості 0,64 і 90-й перцентиль 0,70 для нерелевантного. Поріг 0,65 пропустив би 39% шуму, 0,68 — 15%, 0,7 — 9%. Тому поріг `min_score = 0,7` залишено; запис про Neovim (0,68) у JOURNEY-04 від шуму не відділяється. Артефакт: `evals/capri_comprehensive/artifacts/semantic_calibration.json` (локально), скрипт `runners/semantic_calibration.py`.
+- **Перевірений факт:** актуальні вподобання співрозмовника (`GoalStore.current_preferences`, останнє не відкликане значення кожного ключа, до 16) додаються до системного повідомлення як дані, лише за згоди і лише його власні. Раніше модель їх не бачила зовсім. На Bolt це допомогло з одиницями температури (LT-07), але не з редактором.

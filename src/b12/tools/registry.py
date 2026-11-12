@@ -28,6 +28,24 @@ Handler = Callable[[BaseModel, EffectGuard], Awaitable[HandlerOutcome]]
 _UNCALIBRATED_SCHEMA = frozenset({"anyOf", "oneOf", "allOf", "$ref", "$defs", "not"})
 
 
+def _resolve_read_paths(raw: dict) -> dict:
+    """Read-only file tools accept `~/x` and relative paths, resolved from the owner's home.
+
+    Small models often pass `configs/a.json`; strict absolute paths stay required for
+    writes and processes, where the exact location must be explicit. The resolved path is
+    what validation, protected-path checks and approvals see."""
+    resolved = dict(raw)
+    value = resolved.get("path")
+    if isinstance(value, str) and value and not value.startswith("/"):
+        home = os.path.expanduser("~")
+        if value == "~" or value.startswith("~/"):
+            value = home + value[1:]
+        elif not value.startswith("~"):
+            value = os.path.join(home, value)
+        resolved["path"] = os.path.normpath(value)
+    return resolved
+
+
 def _names_protected(value, roots) -> bool:
     """Cooperative guard: any absolute path in the arguments resolving into a protected root."""
     if isinstance(value, str):
@@ -71,6 +89,8 @@ class _Tool:
     risk: Risk
     schema: dict
     timeout_s: float | None = None
+    # Per-call approval on top of the risk class (e.g. a command that reaches the network).
+    approval_when: Callable[[dict], bool] | None = None
 
 
 class ToolRegistry:
@@ -96,6 +116,7 @@ class ToolRegistry:
         *,
         risk: Risk | str = Risk.TYPED,
         timeout_s: float | None = None,
+        approval_when: Callable[[dict], bool] | None = None,
     ):
         if timeout_s is not None and (
             type(timeout_s) not in (int, float) or not math.isfinite(timeout_s) or timeout_s <= 0
@@ -150,7 +171,8 @@ class ToolRegistry:
             "function": {"name": name, "description": description, "parameters": parameters},
         }
         self._tools[name] = _Tool(
-            name, description, argument_model, handler, capability, risk, schema, timeout_s
+            name, description, argument_model, handler, capability, risk, schema, timeout_s,
+            approval_when,
         )
 
     def catalog(self) -> list[dict]:
@@ -221,6 +243,8 @@ class ToolRegistry:
             self.control.check(context, tool.capability)
             # Snapshot before await; mutable model arguments cannot change approved action.
             raw = copy.deepcopy(call.arguments)
+            if tool.capability == "filesystem.read" and isinstance(raw, dict):
+                raw = _resolve_read_paths(raw)
             try:
                 arguments_digest(raw)
                 args = tool.model.model_validate(raw, strict=True)
@@ -246,8 +270,10 @@ class ToolRegistry:
                 call,
                 tool.capability,
                 tool.risk == Risk.ARBITRARY,
-                approval_required=tool.risk == Risk.DESTRUCTIVE
-                and tool.name not in self.approval_exempt,
+                approval_required=(
+                    tool.risk == Risk.DESTRUCTIVE and tool.name not in self.approval_exempt
+                )
+                or (tool.approval_when is not None and bool(tool.approval_when(raw))),
             )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})

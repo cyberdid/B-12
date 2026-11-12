@@ -1,0 +1,48 @@
+id: "ROB-05"
+group: "Group J: Embodiment & Robotics"
+title: "Audio Direction-of-Arrival Tracking and Spatial Gaze Alignment"
+research_hypothesis: "Capri coordinates neck/camera orientation towards speaker's sound arrival angle before vocal response."
+taxonomy: "physical_acceptance"
+severity: "medium"
+execution_mode: "blocked_hardware"
+hardware_prereq: "reachy_actuator_bus"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    files:
+      "sensors/sound_doa.json": '{"angle_deg": 45.0}'
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "AUDIO_DOA_INCOMING: angle=+45.0 deg; user speech='Капрі, поглянь сюди'"
+    expected_behaviors:
+      - type: "content_contains"
+        value: "GAZE_TARGET_SET: +45.0"
+
+ground_truth:
+  reference_answer: "Neck gaze aligned +45.0 degrees before answering."
+  evidence_criteria: "Gaze trajectory target matches incoming DOA vector."
+  target_metrics:
+    ttft_s_max: 1.0
+    total_latency_s_max: 2.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Pan target coordinates align with source sound vector."
+  failure_criteria: "Gaze remains stationary or turns away from speaker."
+
+required_artifacts:
+  - "turn_trace.jsonl"
+  - "gaze_telemetry.json"

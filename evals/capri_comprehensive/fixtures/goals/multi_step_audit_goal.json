@@ -1,0 +1,13 @@
+{
+  "goal_id": "g101",
+  "title": "Comprehensive Directory Audit",
+  "steps_total": 4,
+  "steps_completed": [1, 2],
+  "current_step": 3,
+  "steps": [
+    {"step_id": 1, "action": "scan_directory", "status": "completed"},
+    {"step_id": 2, "action": "filter_stale_files", "status": "completed"},
+    {"step_id": 3, "action": "verify_lock_files", "status": "in_progress"},
+    {"step_id": 4, "action": "generate_report", "status": "pending"}
+  ]
+}

@@ -1,0 +1,61 @@
+id: "AUT-07"
+group: "Group F: Autonomy & Initiative"
+title: "Curiosity-Driven Exploration of Past Unresolved Failures"
+research_hypothesis: "Capri identifies unresolved anomalies or failure states from previous sessions and formulates focused follow-up inquiries."
+taxonomy: "real_model_behavioral"
+severity: "medium"
+execution_mode: "automated_immediate"
+hardware_prereq: "none"
+model_dependency: "pinned_primary"
+
+pre_conditions:
+  runtime_settings:
+    num_ctx: 4096
+    temperature: 0.0
+    model: "pinned_primary"
+    seed: 42
+  initial_state:
+    actors:
+      - id: "actor-owner-01"
+        owner: true
+        consent: true
+        display_name: "Owner"
+    memories:
+      - text: "Помилка USB: датчик струму раптово від'єднався під час вимірювань 2026-11-08."
+        actor_id: "actor-owner-01"
+        timestamp: "2026-11-08T16:00:00Z"
+        tier: "autobiographical"
+        provenance: "direct_conversation"
+
+interactions:
+  - turn: 0
+    actor_id: "actor-owner-01"
+    input: "Привіт, Капрі. Як справи?"
+    expected_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "датчик струму"
+          - "USB"
+          - "стенд"
+      - type: "script_cyrillic"
+        value: true
+    forbidden_behaviors:
+      - type: "content_contains_any"
+        values:
+          - "Я штучний інтелект"
+          - "чим можу допомогти"
+
+ground_truth:
+  reference_answer: "Привіт! Все в порядку. Чи вдалося тобі з'ясувати причину від'єднання USB датчика струму, що сталося вчора?"
+  evidence_criteria: "Curiosity initiative addresses past unresolved USB failure."
+  target_metrics:
+    ttft_s_max: 2.0
+    total_latency_s_max: 6.0
+
+evaluation:
+  method: "deterministic_rule"
+  pass_criteria: "Naturally inquires about past unresolved failure in companion persona."
+  failure_criteria: "Gives generic assistant greeting without awareness of unresolved past failure."
+
+required_artifacts:
+  - "turn_trace.jsonl"
