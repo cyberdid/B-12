@@ -206,7 +206,7 @@ uv run --no-sync python -m b12.tui.preview
 
 Клавіші: `Ctrl+N` нова розмова, `Ctrl+P` пам’ять/підтвердження, `Ctrl+K` погладити кота, `F2` навігація, `F8` пауза анімацій, `Esc` зупинити хід, `Ctrl+Q` вийти. Рекомендовано truecolor terminal від 120×36; компонування перевірено також на 80×24. NO_COLOR поважається. [Поведінка й межі](wiki/topics/cyberpunk-tui.md).
 
-Тести: `uv run --no-sync pytest -q` — 811 passed, 4 skipped (12.11.2026, злитий код `main` і desktop, Python 3.13, з extras `dev`, `tui`, `desktop`, `voice`). Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
+Тести: `uv run --no-sync pytest -q` — 812 passed, 4 skipped (12.11.2026, злитий код `main` і desktop, Python 3.13, з extras `dev`, `tui`, `desktop`, `voice`). Пропущені тести потребують явно ввімкненої реальної моделі (`B12_REAL_MODEL=1`).
 
 ### Desktop-компаньйон (`b12 desktop`)
 
