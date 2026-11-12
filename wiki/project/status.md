@@ -126,3 +126,9 @@ tags: [progress, next]
 - [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
 - [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
 - [Tool control](../topics/tool-control.md): Tasks 5–6 перевірені; API authentication і global purge реалізовані. Security межі та відкладені знахідки описані в [самоогляді](security-self-review.md) й аудитах.
+
+## Оновлення 12.11.2026 (фінал) — заміна фактів і остаточні числа
+
+- **Перевірений факт:** фінальний прогін — 46/34/12, 57,5% (46/80); робоча конфігурація gemma4:12b — 44/36/12, 55,0%. Проміжні 47/80 замінено; різниця — розкид формулювань.
+- **Перевірений факт:** реалізовано заміну фактів (`memory_store` з `supersedes`); тести 721 passed, 4 skipped. Моделі механізмом поки не користуються.
+- **Перевірений факт:** у власному venv гілки desktop з `--extra desktop` проходять обидва e2e-тести, що падали в спільному venv, і 74 тести desktop-клієнта.

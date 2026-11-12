@@ -276,3 +276,20 @@ def test_remember_is_refused_before_any_write_when_disk_is_below_reserve(tmp_pat
     store.min_free_bytes = 0
     assert store.remember("після звільнення місця", actor).id
     store.close()
+
+
+def test_supersede_retires_an_old_fact_without_erasing_it(tmp_path):
+    from b12.memory import MemoryStore
+
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    owner = Actor(id="owner", owner=True, consent=True)
+    guest = Actor(id="guest", owner=False, consent=True)
+    old = store.remember("Власник живе у Києві на Подолі.", owner)
+    assert not store.supersede(old.id, guest)  # another namespace: nothing happens
+    assert store.supersede(old.id, owner)
+    assert not store.is_live(old.id, owner)
+    kept = store.get(old.id, owner)
+    assert kept is not None and kept.status == "stale" and kept.status_reason == "superseded"
+    assert not store.supersede(old.id, owner)  # idempotent
+    assert store.verify_full() > 0
+    store.close()
