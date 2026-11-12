@@ -48,6 +48,7 @@ tags: [navigation]
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Контроль і результати інструментів](topics/tool-control.md) | Server-owned grants, exact approval, lifecycle, bounded effects і unknown outcomes |
+| [NVIDIA AI Factory Operations Agent](topics/nvidia-ai-factory-operations-agent.md) | Порівняння кластерного operations агента з local-first архітектурою B-12 |
 | [Agent loop і глобальне забуття](topics/agent-loop.md) | Model→tools→results, events, sessions/provenance, PurgeCoordinator, реальний Bolt |
 | [Експлуатація: snapshots, soak, ріст](topics/operations.md) | Backup/restore, deletion replay, сервіс, знайдені деградації, long-horizon драйвер |
 | [Eval: корпус і результати](topics/evals.md) | 109 сценаріїв, runner, результати Bolt і знайдені дефекти |
@@ -79,6 +80,7 @@ tags: [navigation]
 | [Наукова редакція Capri, 09.11](sources/capri-scientific-revision-2026-11-09.md) | RQ, матриця доказів, нові CPU-перевірки та межі відтворюваності |
 | [Суміжні джерела препринту](sources/preprint-related-work-2026-11-08.md) | Перевірені abstracts, DOI та межі використання результатів інших робіт |
 | [Оригінальна обкладинка Capri](sources/capri-original-hero-2026-11-08.md) | Походження hero/social preview, prompt і межі використання локального art pack |
+| [NVIDIA AI Factory Operations Agent](sources/nvidia-ai-factory-operations-agent-2026-11-07.md) | Вибірковий code/docs огляд кластерного operations blueprint і його меж для B-12 |
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 

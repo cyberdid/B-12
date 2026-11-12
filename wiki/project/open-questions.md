@@ -1,6 +1,6 @@
 ---
 type: questions
-updated: 2026-11-08
+updated: 2026-11-12
 status: open
 sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md, wiki/topics/evals.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
 tags: [unknowns, validation]

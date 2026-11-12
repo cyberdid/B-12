@@ -2,7 +2,7 @@
 type: status
 updated: 2026-11-12
 status: active
-sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md, wiki/sources/gemma12b-desktop-launch-2026-11-09.md, wiki/sources/gemma12b-followup-2026-11-09.md, wiki/sources/capri-academic-formatting-2026-11-09.md, wiki/sources/capri-scientific-revision-2026-11-09.md, src/b12/agent.py, src/b12/persona.py, src/b12/api.py, src/b12/reflection.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-personality-review-2026-11-08.md, wiki/sources/scribe-paper-2026-11-08.md, wiki/project/decisions.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/local_features.py, src/b12/desktop/profile.py, src/b12/desktop/presentation.py, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py]
+sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md, wiki/sources/gemma12b-desktop-launch-2026-11-09.md, wiki/sources/gemma12b-followup-2026-11-09.md, wiki/sources/capri-academic-formatting-2026-11-09.md, wiki/sources/capri-scientific-revision-2026-11-09.md, src/b12/agent.py, src/b12/persona.py, src/b12/api.py, src/b12/reflection.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-personality-review-2026-11-08.md, wiki/sources/scribe-paper-2026-11-08.md, wiki/project/decisions.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/local_features.py, src/b12/desktop/profile.py, src/b12/desktop/presentation.py, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, wiki/sources/nvidia-ai-factory-operations-agent-2026-11-07.md, wiki/topics/nvidia-ai-factory-operations-agent.md]
 tags: [progress, next]
 ---
 # Стан проєкту
@@ -157,6 +157,24 @@ tags: [progress, next]
 ## Наявне
 
 - Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 128 зовнішніх джерел.
+- [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
+- [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
+- Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.
+- [Аудит локальної системи](../sources/system-audit-2026-10-24.md): RTX 4060 Laptop 8GB, i9-14900HX, 32GB RAM; CUDA й Ollama server 0.33.3 доступні. Є окремий store з Gemma E2B/E4B, ще не інтегрованими в B-12.
+- [Перший smoke test Bolt](bolt-first-test.md): SHA-256 перевірено; alias `b12-bolt-e4b:q4km`, context 2048; 26 запитів, з них 3 overflow timing observations виключені. Warm decode ~62–64 tok/s; є поведінкові недоліки. Пізніше truncation risk закрито лише для pinned profile, див. наступний пункт; модель лишається кандидатом.
+- [Review archive-index-public](../sources/archive-index-public.md): 16 source files за pinned commit, 17 core tests passed; synthetic lexical/provenance і cache-refresh probe виконані без production DB/embedding load. Pinned lexical modules тепер інтегровані через actor-scoped derived index; приватний production archive не імпортовано.
+- [Model transport](../topics/model-transport.md): Task 4 reviewed; run4 — 15/15 реальних запитів до локального Bolt alias із exact prompt counts на сценаріях до 3928 токенів. Це перевірка pinned профілю, не універсального truncation proof чи голосового SLO. Model profile залишається explicit, alias default context — 2048.
+- [Agent loop](../topics/agent-loop.md): Task 7 model→tools→results, events, sessions/provenance, PurgeCoordinator; real Bolt run2/run3 без protocol failures.
+- [Tool control](../topics/tool-control.md): Tasks 5–6 перевірені; API authentication і global purge реалізовані. Security межі та відкладені знахідки описані в [самоогляді](security-self-review.md) й аудитах.
+
+## Поточний стан (2026-11-07)
+
+- **Перевірений факт:** виконано вибірковий аналіз NVIDIA AI Factory Operations Agent на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007`. Це experimental Helm/Kubernetes кластерний blueprint, не B-12 runtime library. Default edit вимкнений, але read-only кластерні інтеграції активні; для tenant deployment потрібна окрема scoped identity. Деталі, кодові спостереження та межі аудиту — у [картці джерела](../sources/nvidia-ai-factory-operations-agent-2026-11-07.md) і [аналізі придатності](../topics/nvidia-ai-factory-operations-agent.md).
+- **Пропозиція:** не інтегрувати stack у B-12 без конкретної кластерної потреби. Нового архітектурного рішення не ухвалено; код і runtime не змінювалися.
+
+## Наявне
+
+- Незмінений [master brief](../../raw/B-12_Master_Project_2026-10-24.md), SHA-256 і маніфест 120 зовнішніх джерел.
 - [Тематична wiki](../index.md), [аналіз](analysis.md), [кандидати рішень](decisions.md), [питання](open-questions.md), [дорожня карта](roadmap.md).
 - [Постійні правила агента](../../AGENTS.md) за запитаним LLM Wiki workflow.
 - Вибіркова [незалежна перевірка](../sources/external-checks.md) NVIDIA Research та README; решта матеріалів мають явну межу достовірності.

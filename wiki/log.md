@@ -1,6 +1,6 @@
 ---
 type: log
-updated: 2026-10-24
+updated: 2026-11-12
 status: append-only
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [history]
@@ -608,6 +608,16 @@ Read-only review виявив, що `Agent._track_files` раніше виста
 ## [2026-11-07] plan | Desktop-компаньйон B-12
 
 За прямим дорученням власника підготовлено архітектурний дизайн і поетапний implementation plan. Обрано окремий optional Qt shell, що використовує існуючий owner-authenticated loopback API та B-12 cybercat art. Нові host tools, скринкасти/віконний моніторинг, автозапуск і власний runtime не додаються; мікрофон/audio playback не стартують. Робота винесена в гілку `feat/b12-desktop-companion`; на базовому `3e7fb07` перевірений TUI baseline — 22 passed.
+
+## [2026-11-07] ingest | NVIDIA AI Factory Operations Agent
+
+За URL власника прочитано README, security/multitenancy/installation docs та вибрані chart, RBAC, secrets і tool policy файли на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007` (commit 2026-11-05). AFOA — експериментальний Helm/Kubernetes blueprint для кластерних операцій; приватні NGC artifacts вимагають early-access запрошення. Default Edit вимкнений, але кластерний read-only доступ активний; tenant deployment потребує окремої scoped identity. Перевірений кодом lifecycle mutation має стани `running/completed/failed`; його здатність чесно представляти частковий ефект потребує перевірки.
+
+Рекомендація для B-12 — не переносити stack без конкретної задачі роботи із зовнішнім кластером. Патерни поділу tool/credential та server-side policy можна враховувати, але B-12 вже має власні grants і `unknown` outcome. Runtime не змінювався, Helm не встановлювався, тести не запускалися; snapshot у `raw/` не збережено. Картка джерела: [NVIDIA AFOA](sources/nvidia-ai-factory-operations-agent-2026-11-07.md); зіставлення: [придатність для B-12](topics/nvidia-ai-factory-operations-agent.md).
+
+## [2026-11-07] lint | Аналіз NVIDIA AI Factory Operations Agent
+
+Перевірено 43 wiki-сторінки, 352 локальні Markdown-посилання/якорі, frontmatter `type/updated/status/sources/tags`, усі source paths і охоплення індексом: помилок немає, сторінок поза індексом — 0. `raw/source-manifest.json` валідний, URL має `verified_selected_claims` із датою та обсягом читання. SHA-256 незміненого master brief збігається з маніфестом; `git diff --check` пройшов. Runtime-код і тести не змінювалися/не запускалися.
 
 ## [2026-11-08] ingest | Hook-схеми coding agents для TUI
 
