@@ -18,6 +18,7 @@ from pathlib import Path
 from b12.auth import owner_capabilities
 
 log = logging.getLogger(__name__)
+STOP_POLL_S = 0.1  # how quickly an owner stop cancels a background turn in flight
 
 
 def _clock():
@@ -92,7 +93,24 @@ class Scheduler:
             "Зроби один наступний перевірюваний крок інструментами, якщо потрібно, "
             "і коротко звітуй: що зроблено, що перевірено, що далі."
         )
-        result = await rt.agent.turn(goal["session_id"], grant, prompt, task_id=task, timeout_s=300)
+        cancel = asyncio.Event()
+
+        async def watch_owner_stop():
+            # Owner stop halts background work already in flight, not only the next step.
+            while not cancel.is_set():
+                if not rt.attention.execution_allowed(actor.id):
+                    cancel.set()
+                    return
+                await asyncio.sleep(STOP_POLL_S)
+
+        watcher = asyncio.create_task(watch_owner_stop())
+        try:
+            result = await rt.agent.turn(
+                goal["session_id"], grant, prompt, task_id=task, timeout_s=300, cancel=cancel
+            )
+        finally:
+            watcher.cancel()
+            await asyncio.gather(watcher, return_exceptions=True)
         now = self.clock()
         next_review = now + timedelta(seconds=goal["review_interval_s"])
         checkpoint = f"[{result.state}] {result.content}"[:4000]

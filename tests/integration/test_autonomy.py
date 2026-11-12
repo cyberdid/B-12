@@ -148,6 +148,25 @@ async def test_owner_stop_and_active_user_turn_prevent_background_turns(rig):
     assert state["requests"] == []
 
 
+async def test_owner_stop_cancels_a_background_turn_already_running(rig):
+    state, runtime, scheduler, actor, clock, *_ = rig
+    goal = new_goal(runtime, actor)
+    state["script"] = [{"content": "довгий крок", "hang": True}]
+
+    async def stop_when_the_model_starts():
+        await state["chat_started"].wait()
+        runtime.attention.set_stopped(actor.id, True)
+
+    stopper = asyncio.create_task(stop_when_the_model_starts())
+    started = asyncio.get_running_loop().time()
+    outcome = await asyncio.wait_for(scheduler.run_goal(goal), timeout=10)
+    await stopper
+    assert outcome["state"] == "cancelled"
+    assert asyncio.get_running_loop().time() - started < 5
+    # Stop is a pause: the goal stays and runs again once the owner lifts the stop.
+    assert runtime.goals.get(goal["id"], actor.id)["status"] == "active"
+
+
 async def test_hour_cap_bounds_delivered_proposals_from_many_goals(rig):
     state, runtime, scheduler, actor, clock, *_ = rig
     for index in range(6):
