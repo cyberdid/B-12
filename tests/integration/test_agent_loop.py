@@ -1299,3 +1299,32 @@ async def test_whole_reply_python_call_runs_as_a_real_tool_call(runtime_factory)
     assert result.state == "completed" and result.content == "Запам'ятав: Львів."
     assert [(r.name, r.status) for r in result.tool_results] == [("memory_store", "completed")]
     assert runtime.memory.search("Львові", who.actor)
+
+
+async def test_memory_store_supersedes_an_old_fact_and_recall_skips_it(runtime_factory):
+    from uuid import uuid4
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    old = runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
+    state["script"] = [
+        {"tool_calls": [("memory_store", {
+            "text": "Власник живе у Львові біля Стрийського парку.", "supersedes": [old.id],
+        })]},
+        {"content": "Запам'ятав нову адресу."},
+    ]
+    stored, _ = await run_turn(runtime, who, "Я переїхав до Львова.")
+    assert [(r.name, r.status) for r in stored.tool_results] == [("memory_store", "completed")]
+    assert not runtime.memory.is_live(old.id, who.actor)
+    state["script"] = [{"content": "У Львові."}]
+    await run_turn(runtime, who, "Де я живу? Київ чи Львів?")
+    system = state["requests"][-1]["messages"][0]["content"]
+    assert "Львові" in system and "Подолі" not in system
+
+    state["script"] = [
+        {"tool_calls": [("memory_store", {"text": "x", "supersedes": [str(uuid4())]})]},
+        {"content": "Не вдалося."},
+    ]
+    bad, _ = await run_turn(runtime, who, "запам'ятай x")
+    assert [(r.status, r.error_code) for r in bad.tool_results] == [("failed", "unsupported")]

@@ -50,6 +50,14 @@ class StoreArgs(Args):
             "that document and becomes stale if the document changes or is removed"
         ),
     )
+    supersedes: list[str] = Field(
+        default_factory=list,
+        max_length=8,
+        description=(
+            "Optional ids of older memories this fact replaces (e.g. a previous address); "
+            "they stop being used but are not erased. Only ids you saw, never invented"
+        ),
+    )
 
     @field_validator("text")
     @classmethod
@@ -107,6 +115,7 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                     "source": source,
                     "kind": record.kind,
                     "created_at": record.created_at,
+                    "status": record.status,
                     "evidence_ids": list(record.evidence_ids[:32]),
                 }
             )
@@ -125,6 +134,8 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
         if type(expected_revision) is not int or expected_revision < 0:
             return failure("coordinator_unavailable")
         guard.check()
+        if any(not memory.is_live(old, actor) for old in args.supersedes):
+            return failure("unsupported")  # checked before any write: nothing to undo
         try:
             record = memory.remember(
                 args.text,
@@ -147,8 +158,9 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                 error_code="handler_failed",
                 side_effects=(SideEffect(kind="memory_write", state="possible"),),
             )
+        superseded = [old for old in args.supersedes if memory.supersede(old, actor)]
         return HandlerOutcome(
-            content={"id": record.id, "source": record.source},
+            content={"id": record.id, "source": record.source, "superseded": superseded},
             side_effects=(
                 SideEffect(kind="memory_write", state="completed", evidence_ids=(record.id,)),
             ),
