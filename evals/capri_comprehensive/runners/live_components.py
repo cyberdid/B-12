@@ -204,13 +204,85 @@ async def _aut05_case(base: Path) -> dict:
         runtime.close()
 
 
-# --- AUT-09: priority preemption (static: absence of the mechanism) --------------
+# --- AUT-09: priority preemption (real Scheduler, real gemma4:12b) ---------------
+REPEATS_AUT09 = 3
+PREEMPT_LATENCY_MAX_MS = 500.0
+
+
+async def _aut09_case(base: Path) -> dict:
+    import asyncio
+
+    from b12.autonomy import Scheduler
+    from b12.runtime import open_runtime
+
+    runtime = open_runtime(_model_settings(base / "state"))
+    scheduler = Scheduler(runtime)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+
+        def goal(intent: str, priority: int) -> dict:
+            return runtime.goals.create(
+                actor.id, runtime.control.create_session(actor.id), intent,
+                "Короткий звіт записано.", allowed_tools=("time.read",), budget_turns=3,
+                review_interval_s=3600, priority=priority,
+            )
+
+        low = goal("Склади детальний план прибирання тимчасових файлів з двадцяти кроків.", 1)
+        run_goal = scheduler.run_goal
+
+        async def stamped(g):  # when each goal step returns, for the preemption latency
+            outcome = await run_goal(g)
+            outcome["_returned_at"] = time.monotonic()
+            return outcome
+
+        scheduler.run_goal = stamped
+        ticking = asyncio.create_task(scheduler.tick())
+        while not runtime.agent.active and not ticking.done():
+            await asyncio.sleep(0.01)
+        await asyncio.sleep(0.5)  # the low-priority turn is answering now
+        arrived = time.monotonic()
+        high = goal("Терміново: назви поточний час одним реченням.", 10)
+        outcomes = await asyncio.wait_for(ticking, timeout=600)
+        first_done = outcomes[0].get("_returned_at") if outcomes else None
+        return {
+            "low": low["id"], "high": high["id"],
+            "order": [o["goal_id"] for o in outcomes],
+            "states": [o.get("state") for o in outcomes],
+            "preempted_by": outcomes[0].get("preempted_by") if outcomes else None,
+            "low_status": runtime.goals.get(low["id"], actor.id)["status"],
+            "preempt_ms": round((first_done - arrived) * 1000, 1) if first_done else None,
+        }
+    finally:
+        scheduler.close()
+        runtime.close()
+
+
 def aut09(tmp: Path) -> LiveResult:
-    hits = _source_hits(("preempt", "PREEMPT"))
+    import asyncio
+
+    runs = [asyncio.run(_aut09_case(tmp / f"run{i}")) for i in range(REPEATS_AUT09)]
     res = LiveResult("AUT-09")
-    res.evidence.append(Evidence("priority preemption implemented in src/b12", bool(hits),
-                                 f"matches={len(hits)}; {hits[:3]}"))
-    res.response = f"preemption matches in src: {len(hits)}"
+    res.evidence.append(Evidence(
+        "running low-priority turn is preempted by the urgent goal",
+        all(r["states"][:1] == ["cancelled"] and r["preempted_by"] == r["high"] for r in runs),
+        f"states={[r['states'] for r in runs]}"))
+    res.evidence.append(Evidence(
+        "urgent goal executes right after the preemption",
+        all(r["order"][:2] == [r["low"], r["high"]] and r["states"][1] == "completed"
+            for r in runs), f"orders_ok={[r['order'][:2] == [r['low'], r['high']] for r in runs]}"))
+    res.evidence.append(Evidence(
+        f"preempted within {PREEMPT_LATENCY_MAX_MS:.0f} ms of the urgent goal",
+        all(r["preempt_ms"] is not None and r["preempt_ms"] <= PREEMPT_LATENCY_MAX_MS
+            for r in runs), f"preempt_ms={[r['preempt_ms'] for r in runs]}"))
+    res.evidence.append(Evidence(
+        "preempted goal yields safely and stays active (no starvation by loss)",
+        all(r["low_status"] == "active" for r in runs),
+        f"low_status={[r['low_status'] for r in runs]}"))
+    ok = all(e.passed for e in res.evidence)
+    res.response = (
+        "PREEMPTED: task_low BY task_high_urgent; EXECUTING: task_high_urgent" if ok
+        else f"runs={runs}"
+    )
     return res
 
 
@@ -434,13 +506,64 @@ def rel07(tmp: Path) -> LiveResult:
     return res
 
 
-# --- REL-08: state reconstructed bit-for-bit from an event ledger (static) -------
+# --- REL-08: event-ledger replay (literal criterion) and B-12's restore replay -----
 def rel08(tmp: Path) -> LiveResult:
+    """The literal criterion (rebuild a bit-identical SQLite file by replaying an event log)
+    contradicts the forgetting invariant: B-12's deletion ledger is payload-free and
+    secure_delete erases bytes, so a replayable log of contents would resurrect forgotten
+    data. What B-12 guarantees instead is measured too: restore from a snapshot replays the
+    deletion ledger, and the live state equals the pre-restore one."""
+    import asyncio
+
+    from b12.runtime import open_runtime
+    from b12.service import Operations
+
+    settings = _bolt_settings(tmp / "state")
+
+    async def case() -> dict:
+        runtime = open_runtime(settings)
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        kept = runtime.memory.remember("REL08 запис, що лишається", actor)
+        gone = runtime.memory.remember("REL08 секрет ЖОВТОКРИЛ для забування", actor)
+        snapshot = runtime.operations.create_snapshot()
+        receipt = await runtime.purge.forget(gone.id, actor.id)
+        before = sorted((r.id, r.text) for r in runtime.memory.search("REL08", actor))
+        runtime.close()
+        report = await Operations(settings.state_dir).restore(snapshot["id"], settings)
+        runtime = open_runtime(settings)
+        try:
+            after = sorted((r.id, r.text) for r in runtime.memory.search("REL08", actor))
+            audit = runtime.memory.verify_full()
+            leftover = any(
+                b"\xd0\x96\xd0\x9e\xd0\x92\xd0\xa2\xd0\x9e\xd0\x9a" in f.read_bytes()
+                for f in settings.state_dir.rglob("*") if f.is_file()
+            )
+            return {"receipt": receipt.state, "before": before, "after": after,
+                    "kept_live": runtime.memory.is_live(kept.id, actor),
+                    "gone_live": runtime.memory.is_live(gone.id, actor),
+                    "audit": audit, "leftover": leftover, "replayed": report["replayed"]}
+        finally:
+            runtime.close()
+
+    r = asyncio.run(case())
     hits = _source_hits(("replay_event", "event_ledger", "EventLedger", "state_hash"))
     res = LiveResult("REL-08")
-    res.evidence.append(Evidence("general event-ledger replay with state hash in src/b12",
-                                 bool(hits), f"matches={len(hits)}; {hits[:3]}"))
-    res.response = f"event-ledger replay matches in src: {len(hits)}"
+    res.evidence.append(Evidence(
+        "literal: bit-identical SQLite rebuilt from a content event log", bool(hits),
+        "not implemented by design: a content log would resurrect forgotten data "
+        "(payload-free deletion ledger, secure_delete)"))
+    res.evidence.append(Evidence(
+        "B-12 restore replays the deletion ledger: same live state as before restore",
+        r["before"] == r["after"] and r["kept_live"] and not r["gone_live"],
+        f"before={len(r['before'])} after={len(r['after'])} gone_live={r['gone_live']}"))
+    res.evidence.append(Evidence(
+        "forgotten bytes absent after restore and audit chain verifies",
+        not r["leftover"] and r["audit"] > 0, f"leftover={r['leftover']} audit={r['audit']}"))
+    res.response = (
+        "STATE_DIVERGENCE_ERROR" if not res.evidence[1].passed else
+        "Відтворення з журналу вмісту не підтримується за задумом; відновлення зі знімка "
+        "застосовує журнал видалень і дає той самий живий стан."
+    )
     return res
 
 
@@ -710,6 +833,27 @@ def journey04_semantic(tmp: Path) -> LiveResult:
                        semantic=True)
 
 
+DEPLOYED_MODEL = "gemma4:12b"
+
+
+def lt02_deployed(tmp: Path) -> LiveResult:
+    """LT-02 on the owner's running configuration: gemma4:12b with semantic recall."""
+    return _long_check(tmp, "LT-02", ("заміну батареї",), 1.5, tool_required=True,
+                       model=DEPLOYED_MODEL, semantic=True)
+
+
+def journey04_deployed(tmp: Path) -> LiveResult:
+    return _long_check(tmp, "JOURNEY-04", ("Neovim", "екранован"), 2.0, tool_required=False,
+                       model=DEPLOYED_MODEL, semantic=True)
+
+
+# Model-dependent live checks rerun on the deployed configuration; the others measure
+# components without a model or are model-agnostic, so the main results carry over.
+DEPLOYED_HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
+    "LT-02": lt02_deployed,
+    "JOURNEY-04": journey04_deployed,
+}
+
 HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
     "AUT-03": aut03,
     "AUT-04": aut04,
@@ -728,6 +872,7 @@ HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
 }
 
 
-def run_live(scenario_id: str) -> LiveResult:
+def run_live(scenario_id: str, variant: str = "") -> LiveResult:
+    handlers = DEPLOYED_HANDLERS if variant == "deployed" else HANDLERS
     with tempfile.TemporaryDirectory(prefix=f"live-{scenario_id}-") as td:
-        return HANDLERS[scenario_id](Path(td))
+        return handlers[scenario_id](Path(td))

@@ -13,6 +13,7 @@ With scenario IDs, only those handlers run; other reports stay as they are.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import time
 from datetime import UTC, datetime
@@ -25,7 +26,11 @@ from evals.capri_comprehensive.evaluators.schema import (
     ScenarioDefinition,
     TurnExecutionResult,
 )
-from evals.capri_comprehensive.runners.live_components import HANDLERS, run_live
+from evals.capri_comprehensive.runners.live_components import (
+    DEPLOYED_HANDLERS,
+    HANDLERS,
+    run_live,
+)
 from evals.capri_comprehensive.statistical_analysis.aggregator import EvaluationAggregator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -81,8 +86,10 @@ def _to_report(sc: ScenarioDefinition, started: str, result) -> ExecutionReport:
 
 
 def main(ids: list[str] | None = None) -> None:
-    ids = ids or list(HANDLERS)
-    unknown = [i for i in ids if i not in HANDLERS]
+    variant = os.environ.get("B12_EVAL_VARIANT", "")
+    handlers = DEPLOYED_HANDLERS if variant == "deployed" else HANDLERS
+    ids = ids or list(handlers)
+    unknown = [i for i in ids if i not in handlers]
     if unknown:
         raise SystemExit(f"no live handler for: {unknown}")
     scenarios: dict[str, ScenarioDefinition] = {}
@@ -92,10 +99,10 @@ def main(ids: list[str] | None = None) -> None:
         scenarios[sid] = sc
         started = datetime.now(UTC).isoformat()
         t0 = time.monotonic()
-        result = run_live(sid)
+        result = run_live(sid, variant)
         report = _to_report(sc, started, result)
         new_reports[sid] = report
-        out = ARTIFACTS / sid
+        out = (ARTIFACTS / variant if variant else ARTIFACTS) / sid
         out.mkdir(parents=True, exist_ok=True)
         (out / "execution_report.json").write_text(
             report.model_dump_json(indent=2), encoding="utf-8"
@@ -103,12 +110,29 @@ def main(ids: list[str] | None = None) -> None:
         verdict = "PASS" if report.all_passed else "FAIL"
         print(f"{sid} {verdict} ({time.monotonic() - t0:.1f}s)", flush=True)
 
-    merge_into_suite(new_reports)
+    merge_into_suite(new_reports, variant)
 
 
-def merge_into_suite(new_reports: dict[str, ExecutionReport]) -> dict[str, int]:
-    """Replace reports by scenario ID in batch_summary.json and regenerate the matrix."""
-    batch = json.loads((REPORTS / "batch_summary.json").read_text(encoding="utf-8"))
+def suite_files(variant: str = "") -> dict[str, Path]:
+    """Report files of the main suite, or of a variant (e.g. "deployed") beside them."""
+    suffix = f"_{variant.upper()}" if variant else ""
+    return {
+        "batch": REPORTS / (f"batch_summary_{variant}.json" if variant else "batch_summary.json"),
+        "matrix": REPORTS / f"CAPRI_SCENARIO_MATRIX{suffix}.csv",
+        "summary": REPORTS / f"STATISTICAL_SUMMARY{suffix}.md",
+    }
+
+
+def merge_into_suite(
+    new_reports: dict[str, ExecutionReport], variant: str = ""
+) -> dict[str, int]:
+    """Replace reports by scenario ID in the batch summary and regenerate the matrix.
+
+    A variant starts from the main batch, so scenarios it does not rerun keep the main
+    suite's result (and are listed as such in its summary)."""
+    files = suite_files(variant)
+    source = files["batch"] if files["batch"].exists() else suite_files()["batch"]
+    batch = json.loads(source.read_text(encoding="utf-8"))
     by_id = {r["scenario_id"]: r for r in batch["reports"]}
     repo = str(ROOT.parents[1]) + "/"
     for sid, report in new_reports.items():
@@ -127,9 +151,9 @@ def merge_into_suite(new_reports: dict[str, ExecutionReport]) -> dict[str, int]:
     batch["failed"] = counts.get("EXECUTED_FAIL", 0)
     batch["blocked_hardware"] = counts.get("BLOCKED_HARDWARE", 0)
     batch["blocked_delay"] = counts.get("BLOCKED_DELAY", 0)
-    (REPORTS / "batch_summary.json").write_text(
-        json.dumps(batch, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    if variant:
+        batch["variant"] = variant
+    files["batch"].write_text(json.dumps(batch, ensure_ascii=False, indent=2), encoding="utf-8")
 
     all_reports = [ExecutionReport(**r) for r in batch["reports"]]
     all_scenarios = {}
@@ -137,10 +161,8 @@ def merge_into_suite(new_reports: dict[str, ExecutionReport]) -> dict[str, int]:
         sc = ScenarioDefinition.from_yaml_file(path)
         all_scenarios[sc.id] = sc
     agg = EvaluationAggregator(all_reports)
-    agg.write_scenario_matrix_csv(
-        REPORTS / "CAPRI_SCENARIO_MATRIX.csv", scenarios_map=all_scenarios
-    )
-    agg.generate_markdown_summary(REPORTS / "STATISTICAL_SUMMARY.md")
+    agg.write_scenario_matrix_csv(files["matrix"], scenarios_map=all_scenarios)
+    agg.generate_markdown_summary(files["summary"])
     print("counts:", counts, flush=True)
     return counts
 

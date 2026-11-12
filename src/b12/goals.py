@@ -62,6 +62,9 @@ class GoalStore:
         self.db.execute("PRAGMA journal_mode=DELETE")
         self.db.execute("PRAGMA synchronous=FULL")
         self.db.executescript(_SCHEMA)
+        columns = {row[1] for row in self.db.execute("PRAGMA table_info(goals)")}
+        if "priority" not in columns:  # databases created before goal priorities
+            self.db.execute("ALTER TABLE goals ADD COLUMN priority INTEGER NOT NULL DEFAULT 0")
 
     def close(self):
         self.db.close()
@@ -96,11 +99,14 @@ class GoalStore:
         review_interval_s: float = 3600,
         check: dict | None = None,
         tags: dict | None = None,
+        priority: int = 0,
     ) -> dict:
         if not intent.strip() or len(intent) > 4000 or len(criteria) > 4000:
             raise ValueError("intent/criteria size")
         if type(budget_turns) is not int or not 1 <= budget_turns <= 100:
             raise ValueError("budget must be 1..100 turns")
+        if type(priority) is not int or not 0 <= priority <= 10:
+            raise ValueError("priority must be 0..10")
         if check is not None and (
             not isinstance(check, dict)
             or check.get("kind") not in CHECKS
@@ -111,7 +117,8 @@ class GoalStore:
         goal_id, now = str(uuid4()), _now()
         with self._atomic():
             self.db.execute(
-                "INSERT INTO goals VALUES (?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?)",
+                "INSERT INTO goals VALUES "
+                "(?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?,?)",
                 (
                     goal_id,
                     actor_id,
@@ -126,6 +133,7 @@ class GoalStore:
                     now,
                     now,
                     float(review_interval_s),
+                    priority,
                 ),
             )
         return self.get(goal_id, actor_id)
@@ -149,7 +157,7 @@ class GoalStore:
             self._goal(row)
             for row in self.db.execute(
                 "SELECT * FROM goals WHERE status='active' AND next_review<=? "
-                "AND consumed_turns<budget_turns ORDER BY next_review",
+                "AND consumed_turns<budget_turns ORDER BY priority DESC, next_review",
                 (now.astimezone(UTC).isoformat(),),
             )
         ]
@@ -272,6 +280,16 @@ class GoalStore:
                 ),
             )
         return self.preference_history(actor_id, key)[-1]
+
+    def current_preferences(self, actor_id, limit: int = 16) -> dict[str, str]:
+        """The latest live value of each preference key of this actor (newest keys first)."""
+        rows = self.db.execute(
+            "SELECT p.key, p.value FROM preferences p WHERE p.actor_id=? AND p.redacted=0 "
+            "AND p.version=(SELECT MAX(q.version) FROM preferences q "
+            "WHERE q.actor_id=p.actor_id AND q.key=p.key) ORDER BY p.created_at DESC LIMIT ?",
+            (actor_id, limit),
+        ).fetchall()
+        return {row["key"]: row["value"] for row in rows if row["value"] is not None}
 
     def preference_history(self, actor_id, key) -> list[dict]:
         return [

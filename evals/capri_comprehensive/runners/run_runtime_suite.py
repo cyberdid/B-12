@@ -9,6 +9,9 @@ which refuses to start outside the bubblewrap sandbox.
 
 Usage (from the repository root):
     evals/capri_comprehensive/runners/sandboxed_suite.sh [SCENARIO_ID ...]
+    B12_EVAL_VARIANT=deployed evals/capri_comprehensive/runners/sandboxed_suite.sh
+The deployed variant (gemma4:12b with semantic recall) writes artifacts/deployed/ and the
+*_DEPLOYED report files instead of the main matrix.
 """
 
 from __future__ import annotations
@@ -30,6 +33,7 @@ from evals.capri_comprehensive.runners.runner import ScenarioRunner
 from evals.capri_comprehensive.runners.runtime_executor import RuntimeTurnExecutor
 
 SANDBOX_MARKER = "B12_EVAL_SANDBOX"
+VARIANT = os.environ.get("B12_EVAL_VARIANT", "")  # "" (pinned models) or "deployed"
 
 
 def runtime_scenarios() -> list[ScenarioDefinition]:
@@ -56,7 +60,10 @@ def main(ids: list[str]) -> None:
             raise SystemExit(f"not a runtime scenario: {unknown}")
         chosen = [sc for sc in chosen if sc.id in ids]
     base = Path(tempfile.mkdtemp(prefix="b12-runtime-suite-"))
-    runner = ScenarioRunner(artifacts_dir=ARTIFACTS, turn_executor=RuntimeTurnExecutor(base))
+    artifacts = ARTIFACTS / VARIANT if VARIANT else ARTIFACTS
+    runner = ScenarioRunner(
+        artifacts_dir=artifacts, turn_executor=RuntimeTurnExecutor(base, variant=VARIANT)
+    )
     reports = {}
     for i, sc in enumerate(chosen, 1):
         t0 = time.monotonic()
@@ -64,7 +71,7 @@ def main(ids: list[str]) -> None:
         reports[sc.id] = report
         verdict = "PASS" if report.all_passed else "FAIL"
         print(f"[{i}/{len(chosen)}] {sc.id} {verdict} ({time.monotonic() - t0:.1f}s)", flush=True)
-    merge_into_suite(reports)
+    merge_into_suite(reports, VARIANT)
 
 
 if __name__ == "__main__":

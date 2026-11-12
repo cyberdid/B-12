@@ -232,10 +232,20 @@ async def test_goals_attention_and_proposals_over_api(api):
     _, client, token, app, _ = api
     created = await client.post(
         "/api/goals",
-        json={"intent": "Ціль через API", "criteria": "звіт", "allowed_tools": ["time.read"]},
+        json={
+            "intent": "Ціль через API",
+            "criteria": "звіт",
+            "allowed_tools": ["time.read"],
+            "priority": 7,
+        },
         headers=auth(token),
     )
     assert created.status_code == 200 and created.json()["allowed_tools"] == ["time.read"]
+    assert created.json()["priority"] == 7
+    too_high = await client.post(
+        "/api/goals", json={"intent": "x", "criteria": "y", "priority": 11}, headers=auth(token)
+    )
+    assert too_high.status_code == 422
     goal_id = created.json()["id"]
     assert [g["id"] for g in (await client.get("/api/goals", headers=auth(token))).json()] == [
         goal_id

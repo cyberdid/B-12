@@ -34,8 +34,19 @@ from evals.capri_comprehensive.runners.live_components import (
 TURN_TIMEOUT_S = 600.0
 
 
-def model_templates(state_dir: Path) -> dict[str, Any]:
-    """Settings per model alias, resolved now: the scenario sandbox later replaces HOME."""
+def model_templates(state_dir: Path, variant: str = "") -> dict[str, Any]:
+    """Settings per model alias, resolved now: the scenario sandbox later replaces HOME.
+
+    variant "deployed" is the owner's running configuration: gemma4:12b for every
+    scenario, with semantic recall through the EmbeddingGemma 2 bridge.
+    """
+    if variant == "deployed":
+        from evals.capri_comprehensive.runners.live_components import SEMANTIC_PYTHON
+
+        gemma = _model_settings(state_dir).model_copy(
+            update={"embedding_python": SEMANTIC_PYTHON}
+        )
+        return {"pinned_primary": gemma, "any_swappable": gemma}
     return {
         # Capri's own defaults for Bolt (Settings: 4096 context, 1024 output tokens).
         "pinned_primary": _bolt_settings(state_dir).model_copy(
@@ -68,10 +79,17 @@ def settings_for(scenario, state_dir: Path, templates: dict[str, Any] | None = N
 class RuntimeTurnExecutor:
     """Scenario-aware turn executor backed by `b12.runtime.open_runtime`."""
 
-    def __init__(self, base_dir: Path, templates: dict[str, Any] | None = None):
+    def __init__(
+        self, base_dir: Path, templates: dict[str, Any] | None = None, variant: str = ""
+    ):
         self.base_dir = Path(base_dir)
-        self.templates = templates or model_templates(self.base_dir / "template")
+        self.templates = templates or model_templates(self.base_dir / "template", variant)
+        if variant == "deployed":
+            # The scenario sandbox replaces HOME; the embedding bridge must still find the
+            # cached weights under the real one.
+            os.environ.setdefault("HF_HOME", str(Path.home() / ".cache" / "huggingface"))
         self.runtime = None
+        self.loop: asyncio.AbstractEventLoop | None = None
         self.actors: dict[str, Any] = {}
         self.sessions: dict[str, str] = {}
         self.workspace: Path | None = None
@@ -86,8 +104,15 @@ class RuntimeTurnExecutor:
         state_dir.parent.mkdir(parents=True, exist_ok=True)
         settings = settings_for(scenario, state_dir, self.templates)
         self.model = settings.model
+        # One event loop for all turns of the scenario: the embedding bridge process and
+        # its lock belong to the loop that started them.
+        self.loop = asyncio.new_event_loop()
         self.runtime = open_runtime(settings)
         self.workspace = Path(workspace)
+        # The scenario's files are the owner's files: the agent tells the model its home
+        # directory (Path.home()), so home is the workspace that holds them.
+        previous_home = os.environ.get("HOME")
+        os.environ["HOME"] = str(self.workspace)
         self.actors, self.sessions = {}, {}
         state = scenario.pre_conditions.initial_state
         try:
@@ -115,8 +140,14 @@ class RuntimeTurnExecutor:
                 )
             yield
         finally:
+            if previous_home is None:
+                os.environ.pop("HOME", None)
+            else:
+                os.environ["HOME"] = previous_home
             self.runtime.close()
             self.runtime = None
+            self.loop.close()
+            self.loop = None
 
     def _session(self, actor_id: str, new_session: bool) -> str:
         if new_session or actor_id not in self.sessions:
@@ -153,7 +184,7 @@ class RuntimeTurnExecutor:
         cwd = Path.cwd()
         os.chdir(self.workspace)  # relative paths in prompts name files of the scenario
         try:
-            result = asyncio.run(self.runtime.agent.turn(
+            result = self.loop.run_until_complete(self.runtime.agent.turn(
                 session, grant, turn.input, task_id=task, timeout_s=TURN_TIMEOUT_S
             ))
         finally:

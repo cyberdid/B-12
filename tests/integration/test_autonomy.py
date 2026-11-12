@@ -10,6 +10,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 CAPS = ("filesystem.read", "filesystem.write", "memory.read", "memory.write", "time.read")
+OWNER_ID = "owner-actor"
 
 
 class Clock:
@@ -165,6 +166,51 @@ async def test_owner_stop_cancels_a_background_turn_already_running(rig):
     assert asyncio.get_running_loop().time() - started < 5
     # Stop is a pause: the goal stays and runs again once the owner lifts the stop.
     assert runtime.goals.get(goal["id"], actor.id)["status"] == "active"
+
+
+async def test_higher_priority_goal_runs_first(rig):
+    state, runtime, scheduler, actor, clock, *_ = rig
+    low = new_goal(runtime, actor, intent="Низький пріоритет", priority=1)
+    high = new_goal(runtime, actor, intent="Терміново", priority=10)
+    assert [g["id"] for g in runtime.goals.due(clock.now + timedelta(hours=2))][:2] == [
+        high["id"], low["id"]
+    ]
+
+
+async def test_due_higher_priority_goal_preempts_a_running_lower_one(rig):
+    state, runtime, scheduler, actor, clock, *_ = rig
+    low = new_goal(runtime, actor, intent="Фонове прибирання", priority=1)
+    clock.now += timedelta(hours=2)
+    state["script"] = [{"content": "довгий крок", "hang": True}, {"content": "Терміново: готово."}]
+
+    async def urgent_goal_arrives():
+        await state["chat_started"].wait()
+        new_goal(runtime, actor, intent="Терміново перевірити датчик", priority=10)
+
+    arrival = asyncio.create_task(urgent_goal_arrives())
+    outcomes = await asyncio.wait_for(scheduler.tick(), timeout=10)
+    await arrival
+    assert outcomes[0]["goal_id"] == low["id"] and outcomes[0]["state"] == "cancelled"
+    assert outcomes[0]["preempted_by"]
+    assert outcomes[1]["goal_id"] == outcomes[0]["preempted_by"]
+    assert outcomes[1]["state"] == "completed"
+    # The preempted goal yielded safely: it is still active and will run again later.
+    assert runtime.goals.get(low["id"], actor.id)["status"] == "active"
+
+
+def test_priority_column_is_added_to_an_existing_goal_database(tmp_path):
+    from b12.goals import GoalStore
+
+    store = GoalStore(tmp_path / "goals")
+    store.close()
+    db = sqlite3.connect(tmp_path / "goals" / "goals.sqlite3")
+    db.execute("ALTER TABLE goals DROP COLUMN priority")  # a database from before priorities
+    db.commit()
+    db.close()
+    store = GoalStore(tmp_path / "goals")
+    goal = store.create(OWNER_ID, "session", "Ціль", "Критерій", priority=3)
+    assert goal["priority"] == 3
+    store.close()
 
 
 async def test_hour_cap_bounds_delivered_proposals_from_many_goals(rig):

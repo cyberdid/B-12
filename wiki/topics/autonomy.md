@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-10-26
+updated: 2026-11-12
 status: partially_implemented
-sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/attention.py, src/b12/goals.py, src/b12/reflection.py, src/b12/autonomy.py, tests/integration/test_autonomy.py, tests/e2e/test_bolt_autonomy.py]
+sources: [raw/B-12_Master_Project_2026-10-24.md, src/b12/attention.py, src/b12/goals.py, src/b12/reflection.py, src/b12/autonomy.py, tests/integration/test_autonomy.py, tests/e2e/test_bolt_autonomy.py, evals/capri_comprehensive/runners/live_components.py]
 tags: [initiative, reflection, goals]
 ---
 # Ініціатива, цікавість і рефлексія
@@ -33,3 +33,8 @@ Quiet mode вимикає доставку пропозицій, але не в�
 
 **Межі:** цілі ставить лише власник; модель поки не генерує curiosity-кандидатів самостійно. Окрім збережених спогадів, рефлексій і уподобань, «навчання» не стверджується. Тривала поведінка (тижні) не перевірена; це Task 19.
 
+## Зупинка й пріоритети цілей (12.11.2026)
+
+- **Перевірений факт:** зупинка власника (`b12 stop on`, `POST /api/attention {"stopped": true}`) скасовує фоновий хід цілі, що вже виконується: планувальник перевіряє прапорець кожні 0,1 с (`STOP_POLL_S`). Ціль лишається активною й продовжиться після `stop off`, тобто зупинка — пауза, а не скасування цілей. Вимір на реальній моделі: 138–144 мс до скасування (AUT-05, 3 запуски).
+- **Перевірений факт:** ціль має `priority` 0–10 (типово 0; API `GoalBody.priority`, CLI `goals add --priority`). `due()` віддає вищий пріоритет першим. Якщо під час кроку нижчої цілі настає строк вищої, хід нижчої скасовується, вона отримує checkpoint і лишається активною; планувальник одразу запускає вищу. Голодування немає, бо кожен крок цілі зсуває її наступний огляд на `review_interval_s`. Вимір на gemma4:12b: витіснення за 113–116 мс (AUT-09, 3 запуски).
+- **Межа:** витіснений крок зараховується до бюджету `budget_turns` цілі.

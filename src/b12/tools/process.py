@@ -8,6 +8,7 @@ import asyncio
 import ctypes
 import os
 import platform
+import re
 import shlex
 import shutil
 import signal
@@ -198,7 +199,77 @@ def normalize_argv(executable: str, argv: list[str]) -> list[str]:
     return argv
 
 
+ESCALATORS = {"sudo", "su", "doas", "pkexec", "run0"}
+# Words that may precede the real program in a command position.
+_PREFIXES = {"env", "exec", "nohup", "time", "command", "builtin", "nice", "setsid", "stdbuf"}
+_SEPARATORS = re.compile(r"\$\(|`|\|\||&&|[;|&\n(){}]")
+
+
+def _command_words(line: str) -> list[str]:
+    """The program word of every simple command in a shell line (best effort)."""
+    words = []
+    for segment in _SEPARATORS.split(line):
+        try:
+            tokens = shlex.split(segment, comments=True)
+        except ValueError:
+            tokens = segment.split()
+        for token in tokens:
+            if "=" in token.split("/")[0] or token.startswith("-") or token in _PREFIXES:
+                continue  # VAR=value, a prefix command or its options
+            words.append(os.path.basename(token))
+            break
+    return words
+
+
+NETWORK_CLIENTS = {
+    "curl", "wget", "nc", "ncat", "netcat", "socat", "ssh", "scp", "sftp", "ftp", "telnet",
+    "http", "https", "aria2c", "lftp",
+}
+
+
+def reaches_network(raw: dict) -> bool:
+    """A command that runs a network client (or bash /dev/tcp) needs the owner's approval.
+
+    http_fetch obeys network_allow; without this a command line would send data anywhere
+    with no approval. Best effort, like `escalates`: not a network sandbox."""
+    if isinstance(raw.get("command"), str):
+        line = raw["command"]
+        return "/dev/tcp/" in line or "/dev/udp/" in line or any(
+            word in NETWORK_CLIENTS for word in _command_words(line)
+        )
+    executable, argv = raw.get("executable"), raw.get("argv")
+    if not isinstance(executable, str) or not isinstance(argv, list):
+        return False
+    argv = normalize_argv(executable, [str(a) for a in argv])
+    name = os.path.basename(executable)
+    if name in NETWORK_CLIENTS:
+        return True
+    if name in SHELLS and len(argv) >= 2 and argv[0] == "-c":
+        return reaches_network({"command": argv[1]})
+    if name in _PREFIXES:
+        return reaches_network({"command": " ".join(argv)})
+    return False
+
+
+def escalates(executable: str, argv: list[str]) -> bool:
+    """True when a call would run something as another user (sudo, su, doas, pkexec, run0).
+
+    Privilege escalation goes only through sudo_exec, where every exact command needs the
+    owner's approval. This is a guard against the obvious routes, not a sandbox.
+    """
+    name = os.path.basename(executable)
+    if name in ESCALATORS:
+        return True
+    if name in SHELLS and len(argv) >= 2 and argv[0] == "-c":
+        return any(word in ESCALATORS for word in _command_words(argv[1]))
+    if name in _PREFIXES:
+        return any(word in ESCALATORS for word in _command_words(" ".join(argv)))
+    return False
+
+
 async def shell_exec(args, guard):
+    if escalates(args.executable, normalize_argv(args.executable, args.argv)):
+        return failure("privilege_escalation_denied")
     proc = None
     spawn = None
     drains = []
@@ -361,6 +432,7 @@ def register(registry):
         shell_exec,
         "process.execute",
         risk=Risk.ARBITRARY,
+        approval_when=reaches_network,
     )
     registry.register(
         "run_command",
@@ -370,4 +442,5 @@ def register(registry):
         run_command,
         "process.execute",
         risk=Risk.ARBITRARY,
+        approval_when=reaches_network,
     )
