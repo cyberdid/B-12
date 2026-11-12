@@ -1485,3 +1485,38 @@ async def test_memory_store_supersedes_an_old_fact_and_recall_skips_it(runtime_f
     ]
     bad, _ = await run_turn(runtime, who, "запам'ятай x")
     assert [(r.status, r.error_code) for r in bad.tool_results] == [("failed", "unsupported")]
+
+
+async def test_store_lists_similar_facts_and_supersede_tool_retires_the_old_one(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    old = runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
+
+    def supersede_from_result(request):
+        stored = json.loads(tool_messages(request)[-1]["content"])["content"]
+        assert [s["id"] for s in stored["similar_active"]] == [old.id]
+        return {"tool_calls": [("memory_supersede", {
+            "memory_id": stored["similar_active"][0]["id"], "replaced_by": stored["id"],
+        })]}
+
+    state["script"] = [
+        {"tool_calls": [("memory_store", {"text": "Власник живе у Львові біля парку."})]},
+        supersede_from_result,
+        {"content": "Оновив адресу."},
+    ]
+    result, _ = await run_turn(runtime, who, "Я переїхав до Львова.")
+    assert [(r.name, r.status) for r in result.tool_results] == [
+        ("memory_store", "completed"), ("memory_supersede", "completed")
+    ]
+    assert not runtime.memory.is_live(old.id, who.actor)
+
+    guest_owned = runtime.memory.remember("Власник живе у Харкові.", who.actor)
+    state["script"] = [
+        {"tool_calls": [("memory_supersede", {
+            "memory_id": guest_owned.id, "replaced_by": guest_owned.id,
+        })]},
+        {"content": "Ні."},
+    ]
+    same, _ = await run_turn(runtime, who, "заміни сам себе")
+    assert [(r.status, r.error_code) for r in same.tool_results] == [("failed", "unsupported")]

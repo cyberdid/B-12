@@ -96,6 +96,36 @@ async def current_time(args, guard):
     return HandlerOutcome(content={"utc": datetime.now(UTC).isoformat()})
 
 
+def _similar_active(memory, text: str, actor, *, exclude: set[str], limit: int = 3) -> list:
+    """Live memories sharing at least two content words with `text` (cheap, lexical)."""
+    import re
+
+    from b12.memory import _STOP_TERMS
+
+    words = [w for w in re.findall(r"[^\W_]{4,}", text.lower()) if w not in _STOP_TERMS]
+    shared: dict[str, int] = {}
+    records = {}
+    for word in list(dict.fromkeys(words))[:8]:
+        for record in memory.search(word, actor, limit=5):
+            if record.id in exclude or record.status != "active":
+                continue
+            shared[record.id] = shared.get(record.id, 0) + 1
+            records[record.id] = record
+    ranked = sorted((i for i, n in shared.items() if n >= 2), key=lambda i: -shared[i])
+    return [{"id": i, "text": clip(records[i].text, 256)[0]} for i in ranked[:limit]]
+
+
+class SupersedeArgs(Args):
+    memory_id: str = Field(description="Id of the older memory that is now outdated")
+    replaced_by: str = Field(description="Id of the newer memory that replaces it")
+
+    @field_validator("memory_id", "replaced_by")
+    @classmethod
+    def _ids(cls, value):
+        UUID(value)
+        return value
+
+
 def register(registry, *, memory=None, knowledge=None, purge=None, memory_revision=None):
     async def memory_search(args, guard):
         if memory is None:
@@ -159,10 +189,38 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                 side_effects=(SideEffect(kind="memory_write", state="possible"),),
             )
         superseded = [old for old in args.supersedes if memory.supersede(old, actor)]
+        # Older live facts on the same words: the model decides whether one is now outdated.
+        similar = _similar_active(memory, args.text, actor, exclude={record.id, *superseded})
+        content = {"id": record.id, "source": record.source, "superseded": superseded}
+        if similar:
+            content["similar_active"] = similar
+            content["note"] = (
+                "If the new fact replaces one of similar_active, call memory_supersede "
+                "with its id and replaced_by=id."
+            )
         return HandlerOutcome(
-            content={"id": record.id, "source": record.source, "superseded": superseded},
+            content=content,
             side_effects=(
                 SideEffect(kind="memory_write", state="completed", evidence_ids=(record.id,)),
+            ),
+        )
+
+    async def memory_supersede(args, guard):
+        if memory is None:
+            return failure("coordinator_unavailable")
+        guard.check()
+        actor = guard.store.resolve_actor(guard.context.actor_id)
+        if args.memory_id == args.replaced_by or not memory.is_live(args.replaced_by, actor):
+            return failure("unsupported")
+        guard.check()
+        if not memory.supersede(args.memory_id, actor):
+            return failure("unsupported")
+        return HandlerOutcome(
+            content={"superseded": args.memory_id, "replaced_by": args.replaced_by},
+            side_effects=(
+                SideEffect(
+                    kind="memory_write", state="completed", evidence_ids=(args.memory_id,)
+                ),
             ),
         )
 
@@ -247,6 +305,14 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
         "kind (a short type such as fact or user_preference).",
         StoreArgs,
         memory_store,
+        "memory.write",
+    )
+    registry.register(
+        "memory_supersede",
+        "Mark an older memory as outdated because a newer memory replaces it (it is kept, "
+        "not erased). Arguments: memory_id (old), replaced_by (new).",
+        SupersedeArgs,
+        memory_supersede,
         "memory.write",
     )
     registry.register(
