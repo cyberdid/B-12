@@ -122,7 +122,7 @@ async def test_errors_unknown_and_invalid_calls_become_structured_results(
         {
             "tool_calls": [
                 ("teleport", {"where": "Mars"}),
-                ("file_read", {"path": "relative/path"}),
+                ("file_read", {"path": str(tmp_path / "a"), "bogus": 1}),
                 ("file_read", {"path": str(tmp_path / "missing")}),
             ]
         },
@@ -737,8 +737,8 @@ async def test_text_written_as_a_tool_call_is_not_a_final_answer(runtime_factory
     runtime = factory()
     who = owner(runtime)
     state["script"] = [
+        # The whole reply is the call: it runs (formerly it was nudged and repeated natively).
         {"content": 'memory_store(text="бірюзовий", kind="fact")'},
-        {"tool_calls": [("memory_store", {"text": "бірюзовий", "kind": "fact"})]},
         {"content": "Запам'ятав. ГОТОВО"},
     ]
     result, _ = await run_turn(runtime, who, "запам'ятай колір")
@@ -894,11 +894,25 @@ async def test_model_native_call_syntax_in_text_is_not_a_final_answer(runtime_fa
     assert "memory_store{" not in result.content
 
 
-async def test_repeated_native_call_text_ends_as_failed(runtime_factory):
+async def test_native_call_text_is_executed_not_reported(runtime_factory):
+    """A whole reply in native call syntax is the call itself (formerly it failed the turn)."""
     state, factory = runtime_factory
     runtime = factory()
     who = owner(runtime)
-    bad = {"content": 'memory_store{kind:<|"|>fact<|"|>,text:<|"|>x<|"|>}'}
+    state["script"] = [
+        {"content": 'memory_store{kind:<|"|>fact<|"|>,text:<|"|>x<|"|>}'},
+        {"content": "Записав."},
+    ]
+    result, _ = await run_turn(runtime, who, "запам'ятай x")
+    assert result.state == "completed" and result.content == "Записав."
+    assert [r.name for r in result.tool_results] == ["memory_store"]
+
+
+async def test_repeated_native_call_mixed_with_text_ends_as_failed(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    bad = {"content": 'Зараз: memory_store{kind:<|"|>fact<|"|>,text:<|"|>x<|"|>}'}
     state["script"] = [bad, bad, bad, bad]
     result, _ = await run_turn(runtime, who, "аналіз")
     assert result.state == "failed"
@@ -1021,7 +1035,8 @@ async def test_pseudo_call_catches_file_search_and_knowledge_search_written_as_t
     target = tmp_path / "sample.py"
     target.write_text("def hello(): pass\n")
     state["script"] = [
-        {"content": f'file_search(path="{tmp_path}", query="hello")'},
+        # Inside prose a call is not executed: the model is nudged to make the real call.
+        {"content": f'Шукаю:\nfile_search(path="{tmp_path}", query="hello")'},
         {"tool_calls": [("file_search", {"path": str(tmp_path), "query": "hello"})]},
         {"content": "Знайдено функцію hello."},
     ]
@@ -1152,3 +1167,135 @@ async def test_guest_prompt_names_the_guest_and_carries_no_owner_data(runtime_fa
     await run_turn(runtime, who, "Який кодовий пароль стенда?")
     system = state["requests"][-1]["messages"][0]["content"]
     assert "власник" in system and str(Path.home()) in system and "AURORA-77" in system
+
+
+async def test_memory_store_reports_low_disk_and_writes_nothing(runtime_factory):
+    import shutil
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    free_mb = shutil.disk_usage(runtime.settings.state_dir).free // 2**20
+    runtime.memory.min_free_bytes = (free_mb + 1024) * 2**20
+    state["script"] = [
+        {"tool_calls": [("memory_store", {"text": "запис при нестачі місця"})]},
+        {"content": "Не вдалося зберегти: замало місця на диску."},
+    ]
+    result, _ = await run_turn(runtime, who, "Запам'ятай: запис при нестачі місця")
+    stored = [r for r in result.tool_results if r.name == "memory_store"]
+    assert [(r.status, r.error_code) for r in stored] == [("failed", "disk_space_low")]
+    assert runtime.memory.search("нестачі", who.actor) == []
+
+
+async def test_repeated_prose_call_text_ends_as_failed_not_as_an_answer(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    bad = {"content": "Читаю:\nfile_read(path='secrets/api_token.env')"}
+    state["script"] = [bad, bad, bad, bad]
+    result, _ = await run_turn(runtime, who, "прочитай токен")
+    assert (result.state, result.error_code) == ("failed", "pseudo_call")
+    assert result.tool_results == ()
+
+
+async def test_prompt_states_memory_is_off_without_consent(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime, consent=False)
+    state["script"] = [{"content": "Пам'ять вимкнена, тож не збережу."}]
+    await run_turn(runtime, who, "Запам'ятай: день народження мами 15 травня.")
+    system = state["requests"][-1]["messages"][0]["content"]
+    assert "згоди на пам'ять немає" in system
+
+
+def test_system_prompt_forbids_offering_workarounds_for_unavailable_tools():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "не пропонуй обхід" in SYSTEM_PROMPT
+
+
+def test_system_prompt_asks_to_retry_memory_search_with_specific_names():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "повтори його конкретними назвами" in SYSTEM_PROMPT
+
+
+async def test_native_call_syntax_as_text_runs_as_a_real_tool_call(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    runtime.memory.remember("Ємність батареї стенда: 48V 20Ah.", who.actor)
+    state["script"] = [
+        {"content": 'memory_search{query:<|"|>батареї<|"|>,limit:3}'},
+        {"content": "Ємність батареї: 48V 20Ah."},
+    ]
+    result, _ = await run_turn(runtime, who, "Яка ємність батареї?")
+    assert result.state == "completed"
+    assert [(r.name, r.status) for r in result.tool_results] == [("memory_search", "completed")]
+    assert result.tool_results[0].content["records"][0]["text"].startswith("Ємність")
+    assert result.content == "Ємність батареї: 48V 20Ah."
+
+
+def test_native_call_parser_accepts_only_a_whole_well_formed_call():
+    from b12.agent import _native_text_call
+
+    call = _native_text_call('memory_search{query:<|"|>a, b<|"|>,limit:2,exact:true}')
+    assert (call.name, call.arguments) == (
+        "memory_search", {"query": "a, b", "limit": 2, "exact": True}
+    )
+    assert _native_text_call('Ось виклик: memory_search{query:<|"|>x<|"|>}') is None
+    assert _native_text_call('unknown_tool{query:<|"|>x<|"|>}') is None
+    assert _native_text_call("memory_search{query:<|\"|>x}") is None
+
+
+async def test_current_preferences_reach_the_prompt_for_their_own_actor_only(runtime_factory):
+    from b12.auth import GUEST_CAPABILITIES
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    runtime.goals.set_preference(who.actor.id, "editor", "vim", "сказав власник")
+    runtime.goals.set_preference(who.actor.id, "editor", "neovim", "власник змінив")
+    runtime.goals.set_preference(who.actor.id, "temperature_units", "°C", "сказав власник")
+    state["script"] = [{"content": "Neovim."}]
+    await run_turn(runtime, who, "Який редактор я використовую?")
+    system = state["requests"][-1]["messages"][0]["content"]
+    assert "editor: neovim" in system and "vim;" not in system
+    assert "temperature_units: °C" in system
+
+    guest = runtime.control.create_actor(owner=False, consent=True)
+    session = runtime.control.create_session(guest.id)
+    task = runtime.control.create_task(session)
+    grant = runtime.control.issue_grant(
+        guest.id, session, tuple(sorted(GUEST_CAPABILITIES)), task_id=task
+    )
+    state["script"] = [{"content": "Не знаю."}]
+    await runtime.agent.turn(session, grant, "Який редактор у власника?", task_id=task)
+    assert "neovim" not in state["requests"][-1]["messages"][0]["content"]
+
+
+def test_whole_reply_python_call_is_parsed_but_prose_is_not():
+    from b12.agent import _text_call
+
+    call = _text_call("memory_store(text='Живу у Львові', kind='fact')")
+    assert call.name == "memory_store"
+    assert call.arguments == {"text": "Живу у Львові", "kind": "fact"}
+    assert _text_call("Ось як: memory_store(text='x')") is None
+    assert _text_call("```\nmemory_store(text='x')\n```") is None
+    assert _text_call("memory_store(text=open('/etc/passwd').read())") is None
+    assert _text_call("memory_store('x')") is None  # positional: ambiguous
+    assert _text_call("unknown_tool(x=1)") is None
+
+
+async def test_whole_reply_python_call_runs_as_a_real_tool_call(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [
+        {"content": "memory_store(text='Власник живе у Львові біля Стрийського парку.')"},
+        {"content": "Запам'ятав: Львів."},
+    ]
+    result, _ = await run_turn(runtime, who, "Я переїхав до Львова.")
+    assert result.state == "completed" and result.content == "Запам'ятав: Львів."
+    assert [(r.name, r.status) for r in result.tool_results] == [("memory_store", "completed")]
+    assert runtime.memory.search("Львові", who.actor)
