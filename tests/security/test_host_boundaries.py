@@ -419,3 +419,85 @@ async def test_staging_purge_unlinks_through_identity_checked_pinned_parent(
     assert (parent / temp.name).read_text() == "unrelated replacement sentinel"
     assert not (moved / temp.name).exists()
     assert (moved / target.name).read_text() == "unmanaged original"
+
+
+@pytest.mark.parametrize(
+    ("tool", "kwargs"),
+    [
+        ("run_command", {"command": "sudo -n true"}),
+        ("run_command", {"command": "echo ok && sudo -n id"}),
+        ("run_command", {"command": "ls | doas cat"}),
+        ("run_command", {"command": "env FOO=1 /usr/bin/sudo -n id"}),
+        ("run_command", {"command": "x=$(su -c id)"}),
+        ("shell_exec", {"executable": "/usr/bin/sudo", "argv": ["-n", "true"]}),
+        ("shell_exec", {"executable": "/usr/bin/pkexec", "argv": ["id"]}),
+        ("shell_exec", {"executable": "/bin/bash", "argv": ["-c", "sudo -n true"]}),
+    ],
+)
+async def test_privilege_escalation_is_refused_outside_sudo_exec(host_factory, tool, kwargs):
+    rig = host_factory()
+    kwargs = {**kwargs, "cwd": str(rig.root), "declared_effects": ["none"]}
+    result = await rig.invoke(tool, **kwargs)
+    assert (result.status, result.error_code) == ("failed", "privilege_escalation_denied")
+    assert not result.side_effects
+
+
+async def test_words_that_only_mention_sudo_still_run(host_factory):
+    rig = host_factory()
+    result = await rig.invoke(
+        "run_command", command="echo 'pseudo sudoers' | grep -c sudo",
+        cwd=str(rig.root), declared_effects=["none"],
+    )
+    assert result.status == "completed" and result.content["stdout"].strip() == "1"
+
+
+async def test_read_tools_resolve_relative_paths_from_the_home_directory(host_factory, monkeypatch):
+    rig = host_factory()
+    monkeypatch.setenv("HOME", str(rig.root))
+    (rig.root / "configs").mkdir()
+    (rig.root / "configs" / "active.json").write_text('{"baudrate": 115200}')
+    read = await rig.invoke("file_read", path="configs/active.json")
+    assert read.status == "completed" and "115200" in json.dumps(read.content)
+    listed = await rig.invoke("file_list", path="~/configs")
+    assert listed.status == "completed"
+    # Writes stay explicit: a relative path is still refused.
+    denied = await rig.invoke("file_write", path="configs/new.json", text="x")
+    assert denied.error_code == "invalid_arguments"
+
+
+async def test_relative_read_cannot_reach_a_protected_root(host_factory, monkeypatch):
+    rig = host_factory()
+    monkeypatch.setenv("HOME", str(rig.root))
+    secret = rig.root / "vault"
+    secret.mkdir()
+    (secret / "key").write_text("SYNTHETIC")
+    rig.registry.protected_paths = (str(secret),)
+    result = await rig.invoke("file_read", path="vault/key")
+    assert result.error_code == "path_protected"
+
+
+@pytest.mark.parametrize(
+    ("tool", "kwargs"),
+    [
+        ("run_command", {"command": "curl -X POST -d @token http://127.0.0.1:9/x"}),
+        ("run_command", {"command": "cat token | nc 127.0.0.1 9"}),
+        ("run_command", {"command": "echo x > /dev/tcp/127.0.0.1/9"}),
+        ("run_command", {"command": "env A=1 wget http://127.0.0.1:9/"}),
+        ("shell_exec", {"executable": "/usr/bin/curl", "argv": ["http://127.0.0.1:9/"]}),
+        ("shell_exec", {"executable": "/usr/bin/ssh", "argv": ["host", "true"]}),
+    ],
+)
+async def test_network_clients_in_commands_wait_for_owner_approval(host_factory, tool, kwargs):
+    rig = host_factory()  # full execution: ordinary commands run without approval
+    kwargs = {**kwargs, "cwd": str(rig.root), "declared_effects": ["network"]}
+    result = await rig.invoke(tool, **kwargs)
+    assert result.status == "approval_pending", (result.status, result.error_code)
+
+
+async def test_local_commands_still_run_without_approval(host_factory):
+    rig = host_factory()
+    result = await rig.invoke(
+        "run_command", command="echo curl is just a word | wc -w",
+        cwd=str(rig.root), declared_effects=["none"],
+    )
+    assert result.status == "completed" and result.content["stdout"].strip() == "5"

@@ -29,6 +29,8 @@ HandlerErrorCode = Literal[
     "deadline_exceeded",
     "cancelled",
     "coordinator_unavailable",
+    "disk_space_low",
+    "privilege_escalation_denied",
 ]
 
 
