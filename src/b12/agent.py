@@ -128,7 +128,7 @@ _NUDGE_PSEUDO_CALL = (
     "Виклич інструмент через механізм інструментів, а не текстом."
 )
 _TOOL_NAMES = (
-    "memory_store|memory_forget|memory_search|knowledge_search|"
+    "memory_store|memory_forget|memory_search|memory_supersede|knowledge_search|"
     "run_command|shell_exec|sudo_exec|"
     "file_read|file_list|file_search|file_write|"
     "http_fetch|system_info|process_list|current_time"
