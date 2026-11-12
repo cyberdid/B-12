@@ -171,6 +171,9 @@ class SandboxedEnvironment:
             resolved = target.resolve()
         except Exception:
             return False
+        # Python 3.13 no longer raises on a symlink loop: the result is still a symlink.
+        if resolved.is_symlink():
+            return False
 
         # Check against protected host paths
         for protected in PROTECTED_HOST_PATTERNS:
