@@ -48,9 +48,9 @@ def model_templates(state_dir: Path, variant: str = "") -> dict[str, Any]:
         )
         return {"pinned_primary": gemma, "any_swappable": gemma}
     return {
-        # Capri's own defaults for Bolt (Settings: 4096 context, 1024 output tokens).
+        # Capri's own defaults for Bolt (Settings: 8192 context, 1024 output tokens).
         "pinned_primary": _bolt_settings(state_dir).model_copy(
-            update={"num_ctx": 4096, "output_tokens": 1024}
+            update={"num_ctx": 8192, "output_tokens": 1024}
         ),
         "any_swappable": _model_settings(state_dir),
     }

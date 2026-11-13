@@ -19,7 +19,8 @@ class Settings(BaseModel):
     model_profile: Path | None = None
     tokenizer_dir: Path | None = None
     model_timeout_s: Annotated[float, Field(gt=0, allow_inf_nan=False)] = 120
-    num_ctx: Annotated[int, Field(gt=0)] = 4096
+    # The Capri persona plus 17 tool schemas take ~3.3k tokens: 4096 left no room for input.
+    num_ctx: Annotated[int, Field(gt=0)] = 8192
     output_tokens: Annotated[int, Field(gt=0)] = 1024  # room for a full report
     # Sampling. Eval/determinism default is temperature 0; NVIDIA recommends 1.0 / top_p 0.95.
     temperature: Annotated[float, Field(ge=0, le=2, allow_inf_nan=False)] = 0.0

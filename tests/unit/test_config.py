@@ -195,3 +195,11 @@ def test_embedding_bridge_runs_on_cpu_by_default(tmp_path, monkeypatch):
     assert embedder_env(Settings(state_dir=tmp_path, embedding_device="auto")) == {}
     env = Settings.from_env({"B12_STATE_DIR": str(tmp_path), "B12_EMBEDDING_DEVICE": "auto"})
     assert env.embedding_device == "auto"
+
+
+def test_default_context_leaves_room_for_the_capri_prompt(tmp_path):
+    """Persona + 17 tool schemas are ~3.3k tokens on Bolt; 4096 - 1024 output did not fit."""
+    from b12.config import Settings
+
+    settings = Settings(state_dir=tmp_path)
+    assert settings.num_ctx - settings.output_tokens >= 3300 + 2048

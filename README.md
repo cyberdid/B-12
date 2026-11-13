@@ -90,7 +90,7 @@ sequenceDiagram
     participant R as ToolRegistry
     participant C as ControlStore
     U->>A: «Знайди запис про шафку і забудь його»
-    A->>M: admitted request (exact tokens ≤ 4096)
+    A->>M: admitted request (exact tokens ≤ num_ctx, типово 8192)
     M-->>A: tool_call memory_search
     A->>R: execute(call, ExecutionContext)
     R->>C: check grant · consent · revision
