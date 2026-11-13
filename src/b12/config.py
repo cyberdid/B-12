@@ -55,6 +55,9 @@ class Settings(BaseModel):
     # archive-index venv) running scripts/embed_bridge.py. None keeps lexical-only recall.
     embedding_python: str | None = None
     embedding_backend: str = "archive_index.embed:Embedder"
+    # "cpu" keeps the small embedding model off the GPU: on an 8 GB card it took the VRAM a
+    # local chat model needs and Ollama failed with CUDA out of memory. "auto" lets it choose.
+    embedding_device: Literal["cpu", "auto"] = "cpu"
 
     @field_validator("state_dir", mode="before")
     @classmethod
