@@ -16,3 +16,11 @@ host_access = "full"
 # model_profile = "/absolute/B-12/profiles/bolt-e4b-ollama-0.33.3.json"
 # tokenizer_dir = "/absolute/pinned-tokenizer-assets"
 model_timeout_s = 120.0
+
+# Optional semantic recall through an existing embedding app's interpreter.
+# embedding_python = "/absolute/path/to/embedding/venv/bin/python"
+# "cpu" (default) keeps the embedding model off the GPU, so a local chat model keeps its VRAM;
+# on an 8 GB card the shared GPU made Ollama fail with CUDA out of memory. "auto" lets it choose.
+embedding_device = "cpu"
+# Background category notes ("Neovim" -> редактор) after idle reflection.
+memory_enrichment = true

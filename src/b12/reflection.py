@@ -49,7 +49,7 @@ class Reflector:
             return {"state": "skipped", "reason": "consent_required"}
         memory, agent = self.runtime.memory, self.runtime.agent
         revision = memory.deletion_revision(actor)
-        observations = memory.recent(actor, limit=limit, exclude_kinds=("reflection",))
+        observations = memory.recent(actor, limit=limit, exclude_kinds=("reflection", "category"))
         if len(observations) < 2:
             return {"state": "skipped", "reason": "insufficient_evidence"}
         offered = {record.id for record in observations}

@@ -65,6 +65,11 @@ class Runtime:
                 pass
 
 
+def embedder_env(settings: Settings) -> dict[str, str]:
+    """Environment for the embedding bridge process (CPU unless told otherwise)."""
+    return {"CUDA_VISIBLE_DEVICES": ""} if settings.embedding_device == "cpu" else {}
+
+
 def open_runtime(settings: Settings, *, model=None) -> Runtime:
     root = settings.state_dir
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -111,7 +116,11 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
 
         agent.semantic = SemanticIndex(
             root / "semantic",
-            BridgeEmbedder(settings.embedding_python, backend=settings.embedding_backend),
+            BridgeEmbedder(
+                settings.embedding_python,
+                backend=settings.embedding_backend,
+                env=embedder_env(settings),
+            ),
             memory,
         )
     register_host_tools(
