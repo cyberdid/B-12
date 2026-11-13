@@ -1,8 +1,8 @@
 {
   "timestamp": "2026-11-10T16:10:42.140413+00:00",
   "total_scenarios": 92,
-  "passed": 47,
-  "failed": 33,
+  "passed": 48,
+  "failed": 32,
   "blocked_hardware": 12,
   "blocked_delay": 0,
   "reports": [
@@ -2893,17 +2893,17 @@
       "taxonomy": "controlled_experimental",
       "severity": "high",
       "execution_mode": "blocked_delay",
-      "status": "EXECUTED_FAIL",
+      "status": "EXECUTED_PASS",
       "blocker_reason": null,
       "turn_results": [
         {
           "turn_index": 0,
           "prompt": "live component check JOURNEY-04",
-          "response_content": "Ви працювали з екранованим кабелем (замінено на стенді 15-го числа).\n\nЩодо редактора — у пам'яті немає інформації про конкретну назву програми.",
+          "response_content": "Ми працювали з редактором Neovim, а на стенді використовуємо екранований інтерфейсний кабель.",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
-          "passed": false,
+          "passed": true,
           "passed_assertions": [
             {
               "rule_type": "live_measurement",
@@ -2924,6 +2924,14 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
+              "detail": "reply contains ('Neovim', 'екранован') in all runs: run0: recalled=3 tools=[] reflection=recorded content='Ми працювали з редактором Neovim, а на стенді використовуємо екранований інтерфейсний кабель.' | run1: recalled=3 tools=[] reflection=rejected content='Ми працювали з редактором Neovim, а на стенді використовуємо екранований інтерфейсний кабель.' | run2: recalled=3 tools=[] reflection=recorded content='Ми працювали з редактором Neovim, а на стенді використовуємо екранований інтерфейсний кабель.'",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
               "detail": "reply is in Cyrillic and has no forbidden memory-loss phrase in all runs: cyrillic=[True, True, True]",
               "expected": true,
               "actual": true,
@@ -2932,38 +2940,29 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "TTFT <= 2.0 s in all runs: ttft_s=[1.343, 1.615, 1.349]",
+              "detail": "TTFT <= 2.0 s in all runs: ttft_s=[1.699, 1.649, 1.838]",
               "expected": true,
               "actual": true,
               "turn": 0
             }
           ],
-          "failed_assertions": [
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "reply contains ('Neovim', 'екранован') in all runs: run0: recalled=1 tools=[] reflection=recorded content=\"Ви працювали з екранованим кабелем (замінено на стенді 15-го числа).\\n\\nЩодо редактора — у пам'яті немає інформації про конкретну назву програми.\" | run1: recalled=1 tools=[] reflection=rejected content=\"Ви працювали з екранованим кабелем (замінено на стенді 15-го числа).\\n\\nЩодо редактора — у пам'яті немає інформації про конкретну назву програми.\" | run2: recalled=1 tools=[] reflection=recorded content=\"Ви працювали з екранованим кабелем (замінено на стенді 15-го числа).\\n\\nЩодо редактора — у пам'яті немає інформації про конкретну назву програми.\"",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            }
-          ],
+          "failed_assertions": [],
           "tokens_prompt": 0,
           "tokens_completion": 0,
           "state_snapshot": {}
         }
       ],
-      "all_passed": false,
+      "all_passed": true,
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:40:41.648036+00:00",
-      "completed_at": "2026-11-12T19:41:32.007557+00:00",
+      "started_at": "2026-11-13T07:28:30.648336+00:00",
+      "completed_at": "2026-11-13T07:29:34.319150+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
       "ablation_condition": null,
-      "raw_score": 0.0
+      "raw_score": 1.0
     },
     {
       "scenario_id": "JOURNEY-05",
@@ -3118,7 +3117,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=1 tools=[] reflection=skipped content='Так, ви планували заміну батареї на стенді B-12 (заплановано на 2026-11-03).' | run1: recalled=1 tools=[] reflection=skipped content='Так, ви планували заміну батареї на стенді B-12 (заплановано на 2026-11-03).' | run2: recalled=1 tools=[] reflection=skipped content='Так, ви планували заміну батареї на стенді B-12 (заплановано на 2026-11-03).'",
+              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=2 tools=[] reflection=skipped content='Ви запланували заміну батареї на стенді B-12.' | run1: recalled=2 tools=[] reflection=skipped content='Ви запланували заміну батареї на стенді B-12.' | run2: recalled=2 tools=[] reflection=skipped content='Так, ви планували заміну батареї на стенді B-12 (заплановано на 2026-11-03).'",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -3136,7 +3135,7 @@
             {
               "rule_type": "live_measurement",
               "passed": false,
-              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[1.854, 1.379, 1.374]",
+              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[1.968, 1.515, 1.567]",
               "expected": true,
               "actual": false,
               "turn": 0
@@ -3151,8 +3150,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:40:15.271929+00:00",
-      "completed_at": "2026-11-12T19:40:41.642327+00:00",
+      "started_at": "2026-11-13T07:34:23.363889+00:00",
+      "completed_at": "2026-11-13T07:35:00.611677+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],

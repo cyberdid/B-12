@@ -1,8 +1,8 @@
 {
   "timestamp": "2026-11-10T16:10:42.140413+00:00",
   "total_scenarios": 92,
-  "passed": 46,
-  "failed": 34,
+  "passed": 47,
+  "failed": 33,
   "blocked_hardware": 12,
   "blocked_delay": 0,
   "reports": [
@@ -262,8 +262,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:20:37.669940+00:00",
-      "completed_at": "2026-11-12T19:20:37.685645+00:00",
+      "started_at": "2026-11-13T07:20:53.789747+00:00",
+      "completed_at": "2026-11-13T07:20:53.800872+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -308,8 +308,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:20:37.695081+00:00",
-      "completed_at": "2026-11-12T19:20:37.737994+00:00",
+      "started_at": "2026-11-13T07:20:53.805802+00:00",
+      "completed_at": "2026-11-13T07:20:53.819705+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -354,7 +354,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "cancelled within 500 ms of the stop: stop_to_return_ms=[142.7, 140.7, 138.2]",
+              "detail": "cancelled within 500 ms of the stop: stop_to_return_ms=[133.4, 135.2, 132.5]",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -378,8 +378,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:20:37.741231+00:00",
-      "completed_at": "2026-11-12T19:20:42.315978+00:00",
+      "started_at": "2026-11-13T07:20:53.823579+00:00",
+      "completed_at": "2026-11-13T07:20:58.496407+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -602,8 +602,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:20:42.319540+00:00",
-      "completed_at": "2026-11-12T19:21:44.973894+00:00",
+      "started_at": "2026-11-13T07:20:58.500084+00:00",
+      "completed_at": "2026-11-13T07:22:07.515659+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -648,7 +648,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "preempted within 500 ms of the urgent goal: preempt_ms=[87.8, 97.4, 107.7]",
+              "detail": "preempted within 500 ms of the urgent goal: preempt_ms=[114.6, 114.2, 119.0]",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -672,8 +672,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:21:44.977601+00:00",
-      "completed_at": "2026-11-12T19:21:54.337637+00:00",
+      "started_at": "2026-11-13T07:22:07.519737+00:00",
+      "completed_at": "2026-11-13T07:22:17.289519+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -2969,17 +2969,17 @@
       "taxonomy": "controlled_experimental",
       "severity": "high",
       "execution_mode": "blocked_delay",
-      "status": "EXECUTED_FAIL",
+      "status": "EXECUTED_PASS",
       "blocker_reason": null,
       "turn_results": [
         {
           "turn_index": 0,
           "prompt": "live component check JOURNEY-04",
-          "response_content": "Інформація про редактор відсутня. Згідно з пам'яттю, цього місяця власник замінив інтерфейсний кабель на стенді на екранований (День 15).",
+          "response_content": "Neovim — редактор, і екранований кабель — на стенді.",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
-          "passed": false,
+          "passed": true,
           "passed_assertions": [
             {
               "rule_type": "live_measurement",
@@ -3000,6 +3000,14 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
+              "detail": "reply contains ('Neovim', 'екранован') in all runs: run0: recalled=4 tools=['memory_search', 'memory_search'] reflection=recorded content='Neovim — редактор, і екранований кабель — на стенді.' | run1: recalled=4 tools=['memory_search', 'memory_search'] reflection=recorded content='Neovim — редактор, і інтерфейсний кабель на стенді був замінений на екранований (День 15).' | run2: recalled=4 tools=['memory_search', 'memory_search'] reflection=recorded content='Neovim — редактор, і екранований кабель — на стенді.'",
+              "expected": true,
+              "actual": true,
+              "turn": 0
+            },
+            {
+              "rule_type": "live_measurement",
+              "passed": true,
               "detail": "reply is in Cyrillic and has no forbidden memory-loss phrase in all runs: cyrillic=[True, True, True]",
               "expected": true,
               "actual": true,
@@ -3008,38 +3016,29 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "TTFT <= 2.0 s in all runs: ttft_s=[0.633, 0.68, 0.646]",
+              "detail": "TTFT <= 2.0 s in all runs: ttft_s=[0.763, 0.869, 0.97]",
               "expected": true,
               "actual": true,
               "turn": 0
             }
           ],
-          "failed_assertions": [
-            {
-              "rule_type": "live_measurement",
-              "passed": false,
-              "detail": "reply contains ('Neovim', 'екранован') in all runs: run0: recalled=2 tools=['memory_search'] reflection=recorded content=\"Інформація про редактор відсутня. Згідно з пам'яттю, цього місяця власник замінив інтерфейсний кабель на стенді на екранований (День 15).\" | run1: recalled=2 tools=['memory_search'] reflection=recorded content=\"Інформація про редактор відсутня. Згідно з пам'яттю, цього місяця (або раніше) власник замінив інтерфейсний кабель на стенді на екранований (День 15).\" | run2: recalled=2 tools=['memory_search'] reflection=recorded content=\"Інформація про редактор відсутня. Згідно з пам'яттю, цього місяця власник замінив інтерфейсний кабель на стенді на екранований (День 15).\"",
-              "expected": true,
-              "actual": false,
-              "turn": 0
-            }
-          ],
+          "failed_assertions": [],
           "tokens_prompt": 0,
           "tokens_completion": 0,
           "state_snapshot": {}
         }
       ],
-      "all_passed": false,
+      "all_passed": true,
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:21:54.342074+00:00",
-      "completed_at": "2026-11-12T19:22:17.761479+00:00",
+      "started_at": "2026-11-13T07:22:17.294668+00:00",
+      "completed_at": "2026-11-13T07:22:47.892308+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
       "ablation_condition": null,
-      "raw_score": 0.0
+      "raw_score": 1.0
     },
     {
       "scenario_id": "JOURNEY-05",
@@ -3175,7 +3174,7 @@
         {
           "turn_index": 0,
           "prompt": "live component check LT-02",
-          "response_content": "Я пам'ятаю, що 2026-11-03 ви запланували заміну батареї на стенді B-12.",
+          "response_content": "Так, пам'ятаю. Ви планували заміну батареї на стенді B-12, що було заплановано на 2026-11-03.",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
@@ -3200,7 +3199,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=1 tools=['memory_search'] reflection=skipped content=\"Пам'ятаю, ви планували заміну батареї на стенді B-12 (2026-11-03).\" | run1: recalled=1 tools=['memory_search'] reflection=skipped content=\"Я пам'ятаю, що 2026-11-03 Ви запланували заміну батареї на стенді B-12.\" | run2: recalled=1 tools=['memory_search'] reflection=skipped content=\"Я пам'ятаю, що 2026-11-03 ви запланували заміну батареї на стенді B-12.\"",
+              "detail": "reply contains ('заміну батареї',) in all runs: run0: recalled=2 tools=['memory_search'] reflection=skipped content=\"Пам'ятаю, що 2026-11-03 Ви запланували заміну батареї на стенді B-12.\" | run1: recalled=2 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. Ви планували заміну батареї на стенді B-12, що було заплановано на 2026-11-03.\" | run2: recalled=2 tools=['memory_search'] reflection=skipped content=\"Так, пам'ятаю. Ви планували заміну батареї на стенді B-12, що було заплановано на 2026-11-03.\"",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -3216,7 +3215,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[0.656, 0.653, 0.648]",
+              "detail": "TTFT <= 1.5 s in all runs: ttft_s=[0.7, 0.754, 0.746]",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -3232,8 +3231,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:17.764442+00:00",
-      "completed_at": "2026-11-12T19:22:28.797637+00:00",
+      "started_at": "2026-11-13T07:35:01.615147+00:00",
+      "completed_at": "2026-11-13T07:35:20.561415+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -5692,8 +5691,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:28.801447+00:00",
-      "completed_at": "2026-11-12T19:22:29.865413+00:00",
+      "started_at": "2026-11-13T07:24:34.996695+00:00",
+      "completed_at": "2026-11-13T07:24:36.105735+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -5713,7 +5712,7 @@
         {
           "turn_index": 0,
           "prompt": "live component check REL-02",
-          "response_content": "MODEL_UNAVAILABLE: No turn executor configured and local Ollama service is unavailable at http://127.0.0.1:43781: <urlopen error [Errno 111] Connection refused>",
+          "response_content": "MODEL_UNAVAILABLE: No turn executor configured and local Ollama service is unavailable at http://127.0.0.1:52925: <urlopen error [Errno 111] Connection refused>",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
@@ -5730,7 +5729,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "diagnostic names the unavailable service: No turn executor configured and local Ollama service is unavailable at http://127.0.0.1:43781: <urlopen error [Errno 111] Connection refused",
+              "detail": "diagnostic names the unavailable service: No turn executor configured and local Ollama service is unavailable at http://127.0.0.1:52925: <urlopen error [Errno 111] Connection refused",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -5746,8 +5745,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:29.867724+00:00",
-      "completed_at": "2026-11-12T19:22:29.882130+00:00",
+      "started_at": "2026-11-13T07:24:36.138536+00:00",
+      "completed_at": "2026-11-13T07:24:36.366531+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -5776,7 +5775,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "tool aborted at the 1 s deadline: raised=False error_code=cancelled elapsed=1.01s",
+              "detail": "tool aborted at the 1 s deadline: raised=False error_code=cancelled elapsed=1.17s",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -5808,8 +5807,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:29.883803+00:00",
-      "completed_at": "2026-11-12T19:22:31.398924+00:00",
+      "started_at": "2026-11-13T07:24:36.405088+00:00",
+      "completed_at": "2026-11-13T07:24:38.082157+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -5941,8 +5940,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:31.403561+00:00",
-      "completed_at": "2026-11-12T19:22:31.442320+00:00",
+      "started_at": "2026-11-13T07:24:38.121188+00:00",
+      "completed_at": "2026-11-13T07:24:38.212237+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -5962,7 +5961,7 @@
         {
           "turn_index": 0,
           "prompt": "live component check REL-06",
-          "response_content": "WRITE_REFUSED: НЕДОСТАТНЬО МІСЦЯ (free space 4478 MB is below the reserve 5502 MB); база цілісна.",
+          "response_content": "WRITE_REFUSED: НЕДОСТАТНЬО МІСЦЯ (free space 4056 MB is below the reserve 5081 MB); база цілісна.",
           "tool_calls": [],
           "ttft_ms": 0.0,
           "total_duration_ms": 0.0,
@@ -5971,7 +5970,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "write refused below the reserve: free=4478 MB reserve=5502 MB; free space 4478 MB is below the reserve 5502 MB",
+              "detail": "write refused below the reserve: free=4057 MB reserve=5081 MB; free space 4056 MB is below the reserve 5081 MB",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -5995,8 +5994,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:31.444224+00:00",
-      "completed_at": "2026-11-12T19:22:32.895826+00:00",
+      "started_at": "2026-11-13T07:24:38.235119+00:00",
+      "completed_at": "2026-11-13T07:24:53.690755+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -6025,7 +6024,7 @@
             {
               "rule_type": "live_measurement",
               "passed": true,
-              "detail": "server became healthy before SIGTERM: port=45381",
+              "detail": "server became healthy before SIGTERM: port=33897",
               "expected": true,
               "actual": true,
               "turn": 0
@@ -6057,8 +6056,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:32.899244+00:00",
-      "completed_at": "2026-11-12T19:22:35.228012+00:00",
+      "started_at": "2026-11-13T07:24:53.727580+00:00",
+      "completed_at": "2026-11-13T07:25:17.412146+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],
@@ -6120,8 +6119,8 @@
       "latencies_ms": [],
       "ttft_ms_list": [],
       "artifacts": {},
-      "started_at": "2026-11-12T19:22:35.231352+00:00",
-      "completed_at": "2026-11-12T19:22:37.672381+00:00",
+      "started_at": "2026-11-13T07:25:17.444887+00:00",
+      "completed_at": "2026-11-13T07:25:40.396758+00:00",
       "tokens_prompt": 0,
       "tokens_completion": 0,
       "judge_evaluations": [],

@@ -1,8 +1,8 @@
 # Capri Comprehensive Evaluation: Statistical Summary
 
-**Generated:** 2026-11-12T19:41:32.653227+00:00  
+**Generated:** 2026-11-13T07:35:01.225197+00:00  
 **Total Scenarios Evaluated:** 92  
-**Automated Pass Rate (Runnable):** 58.8% [47.8%, 68.9%]  
+**Automated Pass Rate (Runnable):** 60.0% [49.0%, 70.0%]  
 **Blocked Hardware:** 12  
 **Blocked Delay (Long-Term):** 0  
 
@@ -20,13 +20,13 @@
 | Group H: Voice & Real-Time Interaction | 8 | 2 | 1 | 5 | 0 | 66.7% [20.8%, 93.9%] | 6421.6 [3938.4, 10756.0] | 10421.0 [4320.5, 10756.0] |
 | Group I: Reliability & Fault Tolerance | 8 | 6 | 2 | 0 | 0 | 75.0% [40.9%, 92.9%] | 4082.3 [4082.3, 4082.3] | 4082.3 [4082.3, 4082.3] |
 | Group J: Embodiment & Robotics | 6 | 0 | 0 | 6 | 0 | N/A (0/0) | N/A | N/A |
-| Group K: Multi-Session Journeys | 5 | 1 | 3 | 1 | 0 | 25.0% [4.6%, 69.9%] | 9738.8 [4575.4, 14926.1] | 27726.3 [14926.1, 28767.3] |
+| Group K: Multi-Session Journeys | 5 | 2 | 2 | 1 | 0 | 50.0% [15.0%, 85.0%] | 9738.8 [4575.4, 14926.1] | 27726.3 [14926.1, 28767.3] |
 
 ## 2. Four-Tier Scientific Taxonomy Breakdown
 
 | Taxonomy Category | Scenarios | Executed Pass | Executed Fail | Blocked |
 |:---|---:|---:|---:|---:|
-| `controlled_experimental` | 13 | 7 | 6 | 0 |
+| `controlled_experimental` | 13 | 8 | 5 | 0 |
 | `deterministic_software` | 28 | 16 | 12 | 0 |
 | `physical_acceptance` | 12 | 0 | 0 | 12 |
 | `real_model_behavioral` | 39 | 24 | 15 | 0 |

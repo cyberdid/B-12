@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-11-12
+updated: 2026-11-13
 status: active
 sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md]
 tags: [progress, next]
@@ -108,3 +108,9 @@ tags: [progress, next]
 - **Перевірений факт:** у власному venv гілки desktop з `--extra desktop` проходять обидва e2e-тести, що падали в спільному venv, і 74 тести desktop-клієнта.
 - **Перевірений факт:** `main` проходить на Python 3.13 (721 passed); виправлено виявлення циклу символьних посилань у пісочниці оцінки. Гілка desktop на 3.13 з усіма extras — 811 passed. PR #1 і PR #2 — `MERGEABLE`.
 - **Перевірений факт (останній прогін):** основний 46/80 (той самий список провалів), gemma 47/80. Додано `memory_supersede` і схожі записи в результаті `memory_store`. Злиття PR заблоковане захистом як злиття без рецензії — за власником. Нестабільний e2e-тест `test_abrupt_kill_recovers_integrity_and_marks_started_unknown`: 1 провал з 11 запусків.
+
+## Оновлення 13.11.2026 — збагачення пам'яті, ембедер на CPU
+
+- **Перевірений факт:** фонове збагачення пам'яті категоріями закрило JOURNEY-04 (3/3 на обох моделях). Остаточно: основний 47/33/12 (58,8%), gemma 48/32/12 (60,0%).
+- **Перевірений факт:** міст EmbeddingGemma на GPU спричиняв `CUDA out of memory` в Ollama поруч із gemma4:12b; тепер він типово на CPU (`embedding_device`). Тести: 725 passed, 4 skipped.
+- **Відкрито:** MEM-07 (моделі не користуються `memory_supersede`), багатосесійні сценарії, злиття PR (за власником), 7/30-денні тести (17.11, 26.11), голос і робот.
