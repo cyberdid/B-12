@@ -17,7 +17,7 @@ BOLT_TOKENIZER="$HOME/Downloads/B-12-runtime/tokenizer"
 VENV="$(readlink -f "$REPO/.venv")"
 mkdir -p "$EVAL/artifacts" "$EVAL/reports"
 EXTRA=()
-if [ "${B12_EVAL_VARIANT:-}" = "deployed" ]; then
+case "${B12_EVAL_VARIANT:-}" in deployed*)
   # Semantic recall: the EmbeddingGemma 2 bridge, its interpreter, package source and the
   # cached weights, all read-only. Nothing else of that project is visible.
   EMB_VENV="$HOME/.local/share/embeddinggemma2/venv"
@@ -29,8 +29,9 @@ if [ "${B12_EVAL_VARIANT:-}" = "deployed" ]; then
   done
   EXTRA=(--ro-bind "$EMB_VENV" "$EMB_VENV" --ro-bind "$UV_PYTHONS" "$UV_PYTHONS"
          --ro-bind "$EMB_PKG" "$EMB_PKG"
-         --ro-bind "$EMB_WEIGHTS" "$EMB_WEIGHTS" --setenv B12_EVAL_VARIANT deployed)
-fi
+         --ro-bind "$EMB_WEIGHTS" "$EMB_WEIGHTS" --setenv B12_EVAL_VARIANT "$B12_EVAL_VARIANT")
+  ;;
+esac
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do
   [ -d "$path" ] || { echo "missing $path" >&2; exit 1; }
 done

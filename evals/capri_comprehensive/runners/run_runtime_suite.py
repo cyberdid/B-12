@@ -33,7 +33,7 @@ from evals.capri_comprehensive.runners.runner import ScenarioRunner
 from evals.capri_comprehensive.runners.runtime_executor import RuntimeTurnExecutor
 
 SANDBOX_MARKER = "B12_EVAL_SANDBOX"
-VARIANT = os.environ.get("B12_EVAL_VARIANT", "")  # "" (pinned models) or "deployed"
+VARIANT = os.environ.get("B12_EVAL_VARIANT", "")  # "", "deployed" or "deployed-<model>"
 
 
 def runtime_scenarios() -> list[ScenarioDefinition]:

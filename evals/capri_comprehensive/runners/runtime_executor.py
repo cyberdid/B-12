@@ -38,9 +38,10 @@ def model_templates(state_dir: Path, variant: str = "") -> dict[str, Any]:
     """Settings per model alias, resolved now: the scenario sandbox later replaces HOME.
 
     variant "deployed" is the owner's running configuration: gemma4:12b for every
-    scenario, with semantic recall through the EmbeddingGemma 2 bridge.
+    scenario, with semantic recall through the EmbeddingGemma 2 bridge. "deployed-<name>"
+    is the same configuration with the model named by B12_EVAL_MODEL.
     """
-    if variant == "deployed":
+    if variant.startswith("deployed"):
         from evals.capri_comprehensive.runners.live_components import SEMANTIC_PYTHON
 
         gemma = _model_settings(state_dir).model_copy(
@@ -84,7 +85,7 @@ class RuntimeTurnExecutor:
     ):
         self.base_dir = Path(base_dir)
         self.templates = templates or model_templates(self.base_dir / "template", variant)
-        if variant == "deployed":
+        if variant.startswith("deployed"):
             # The scenario sandbox replaces HOME; the embedding bridge must still find the
             # cached weights under the real one.
             os.environ.setdefault("HF_HOME", str(Path.home() / ".cache" / "huggingface"))

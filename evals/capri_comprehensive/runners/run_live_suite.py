@@ -87,7 +87,7 @@ def _to_report(sc: ScenarioDefinition, started: str, result) -> ExecutionReport:
 
 def main(ids: list[str] | None = None) -> None:
     variant = os.environ.get("B12_EVAL_VARIANT", "")
-    handlers = DEPLOYED_HANDLERS if variant == "deployed" else HANDLERS
+    handlers = DEPLOYED_HANDLERS if variant.startswith("deployed") else HANDLERS
     ids = ids or list(handlers)
     unknown = [i for i in ids if i not in handlers]
     if unknown:

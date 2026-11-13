@@ -575,14 +575,34 @@ CHECKPOINT_TEXT = (
 )
 
 
+# Swappable models with a calibrated profile: (profile file, tokenizer dir), under
+# ~/.local/share/b12. B12_EVAL_MODEL picks one for a "deployed-*" variant, and
+# B12_EVAL_OLLAMA_URL may point at another Ollama (for example a GPU host via a tunnel).
+EVAL_PROFILES = {
+    "gemma4:12b": ("gemma4-12b-ollama-0.33.3.json",
+                   "gemma4-12b/43c9d014b231474fa7212dbb48a762566c2b255d"),
+    "gemma4:26b": ("gemma4-26b-ollama-0.33.3.json",
+                   "gemma4-26b/4d7ae4984b7db7de8f8457170b3f1a419ee76d52"),
+    "gemma4:31b": ("gemma4-31b-ollama-0.33.3.json",
+                   "gemma4-31b/842da3794eaa0b77d5f08bae87a17459d91ff475"),
+}
+EVAL_MODEL = os.environ.get("B12_EVAL_MODEL", "gemma4:12b")
+
+
 def _model_settings(state_dir: Path):
     from b12.config import Settings
 
+    profile, tokenizer = EVAL_PROFILES[EVAL_MODEL]
+    share = Path.home() / ".local/share/b12"
+    extra = {}
+    if os.environ.get("B12_EVAL_OLLAMA_URL"):
+        extra["ollama_url"] = os.environ["B12_EVAL_OLLAMA_URL"]
     return Settings(
         state_dir=state_dir,
-        model="gemma4:12b",
-        model_profile=Path.home() / ".local/share/b12/profiles/gemma4-12b-ollama-0.33.3.json",
-        tokenizer_dir=Path.home() / ".local/share/b12/tokenizers/gemma4-12b/43c9d014b231474fa7212dbb48a762566c2b255d",
+        model=EVAL_MODEL,
+        model_profile=share / "profiles" / profile,
+        tokenizer_dir=share / "tokenizers" / tokenizer,
+        **extra,
         num_ctx=8192,
         output_tokens=512,
         quiet_start="00:00",
@@ -838,11 +858,12 @@ def journey04_semantic(tmp: Path) -> LiveResult:
                        semantic=True)
 
 
-DEPLOYED_MODEL = "gemma4:12b"
+DEPLOYED_MODEL = EVAL_MODEL
 
 
 def lt02_deployed(tmp: Path) -> LiveResult:
-    """LT-02 on the owner's running configuration: gemma4:12b with semantic recall."""
+    """LT-02 on the owner's running configuration (gemma4:12b, or B12_EVAL_MODEL) with
+    semantic recall."""
     return _long_check(tmp, "LT-02", ("заміну батареї",), 1.5, tool_required=True,
                        model=DEPLOYED_MODEL, semantic=True)
 
@@ -878,6 +899,6 @@ HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
 
 
 def run_live(scenario_id: str, variant: str = "") -> LiveResult:
-    handlers = DEPLOYED_HANDLERS if variant == "deployed" else HANDLERS
+    handlers = DEPLOYED_HANDLERS if variant.startswith("deployed") else HANDLERS
     with tempfile.TemporaryDirectory(prefix=f"live-{scenario_id}-") as td:
         return handlers[scenario_id](Path(td))
