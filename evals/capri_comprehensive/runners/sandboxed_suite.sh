@@ -32,12 +32,16 @@ case "${B12_EVAL_VARIANT:-}" in deployed*)
          --ro-bind "$EMB_WEIGHTS" "$EMB_WEIGHTS" --setenv B12_EVAL_VARIANT "$B12_EVAL_VARIANT")
   ;;
 esac
+# Some containers (e.g. a Colab VM) refuse a fresh procfs; B12_EVAL_PROC_BIND=1 binds the
+# host's /proc instead. The filesystem isolation below is unchanged.
+PROC=(--proc /proc)
+[ "${B12_EVAL_PROC_BIND:-}" = "1" ] && PROC=(--bind /proc /proc)
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do
   [ -d "$path" ] || { echo "missing $path" >&2; exit 1; }
 done
 exec bwrap \
   --ro-bind / / \
-  --dev /dev --proc /proc \
+  --dev /dev "${PROC[@]}" \
   --tmpfs /tmp --tmpfs /home --tmpfs /media --tmpfs /mnt --tmpfs /run/user \
   --dir "$HOME" \
   --ro-bind "$REPO" "$REPO" \
