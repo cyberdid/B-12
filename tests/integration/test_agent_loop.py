@@ -1605,3 +1605,51 @@ async def test_similar_fact_after_store_gets_one_supersede_nudge(runtime_factory
         if m["role"] == "user" and "memory_supersede" in str(m.get("content"))
     ]
     assert nudges and "[авто]" in nudges[-1]
+
+
+async def test_claim_of_remembering_without_a_memory_call_gets_one_nudge(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [
+        {"content": "Зрозуміло. Львів, біля парку. Записую це."},
+        {"tool_calls": [("memory_store", {"text": "Власник живе у Львові."})]},
+        {"content": "Записав."},
+    ]
+    result, _ = await run_turn(runtime, who, "Я переїхав до Львова.")
+    assert [r.name for r in result.tool_results] == ["memory_store"]
+    assert result.content == "Записав."
+    assert runtime.memory.search("Львові", who.actor)
+
+
+async def test_claim_nudge_fires_once_and_not_without_consent(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [{"content": "Записую це."}, {"content": "Записую це."}]
+    result, _ = await run_turn(runtime, who, "Я переїхав.")
+    assert result.state == "completed" and len(state["requests"]) == 2
+    quiet = owner(runtime, consent=False)
+    state["script"] = [{"content": "Запам'ятав."}]
+    before = len(state["requests"])
+    await run_turn(runtime, quiet, "Я переїхав.")
+    assert len(state["requests"]) == before + 1
+
+
+def test_system_prompt_asks_to_store_new_stable_facts_about_the_owner():
+    from b12.agent import SYSTEM_PROMPT
+
+    assert "новий стійкий факт про себе" in SYSTEM_PROMPT
+
+
+async def test_claim_after_a_file_write_is_not_a_missing_memory_write(runtime_factory, tmp_path):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    target = tmp_path / "note.txt"
+    state["script"] = [
+        {"tool_calls": [("file_write", {"path": str(target), "text": "x"})]},
+        {"content": "Записав."},
+    ]
+    result, _ = await run_turn(runtime, who, "Запиши x у файл.")
+    assert result.content == "Записав." and len(state["requests"]) == 2

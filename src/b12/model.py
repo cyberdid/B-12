@@ -17,6 +17,7 @@ import inspect
 import json
 import logging
 import math
+import re
 import time
 from collections.abc import Awaitable, Callable
 from uuid import uuid4
@@ -80,6 +81,22 @@ class _PublicText:
             raise ModelError("unterminated_reasoning", "incomplete reasoning delimiter")
         return ""
 
+
+
+# Reasoning-channel markers some models leak into content (gemma: "thought\n<channel|>").
+# In history Ollama tokenizes them as special tokens while exact admission counts them as
+# text, so the provider count exceeds the admitted one and the request is refused.
+_CHANNEL_RESIDUE = re.compile(
+    r"\s*<\|?channel\|?>\s*(?:thought|analysis|commentary|final)?\s*\n?"
+    r"|\s*\b(?:thought|analysis|commentary|final)\s*\n?\s*<\|?channel\|?>\s*",
+)
+
+
+def strip_channel_residue(text: str) -> str:
+    """Remove leaked reasoning-channel markers (and their channel name) from a reply."""
+    if "channel" not in text:
+        return text
+    return _CHANNEL_RESIDUE.sub("", text).strip()
 
 class _Calls:
     """Native object arguments are merged by index/id, never interpreted as JSON fragments."""
@@ -306,7 +323,7 @@ class OllamaModel:
                             metrics.update(ttft_s=first, elapsed_s=time.monotonic() - started)
                             _check_cancel(cancel, deadline)
                             return ModelReply(
-                                content="".join(content),
+                                content=strip_channel_residue("".join(content)),
                                 tool_calls=calls.finish(),
                                 metrics=metrics,
                                 finish_reason=item["done_reason"],
