@@ -617,6 +617,19 @@ class MemoryStore:
             ).fetchone()
             return self._record(row) if row else None
 
+    def cited_by_kind(self, actor: Actor, kind: str) -> set[str]:
+        """Ids of memories cited as evidence by live memories of `kind` (same actor)."""
+        self._consent(actor)
+        with self._transaction():
+            rows = self._connection.execute(
+                """SELECT DISTINCT s.ref_id FROM memory_sources s
+                   JOIN memories m ON m.id=s.memory_id
+                   WHERE s.kind='memory' AND m.actor_id=? AND m.kind=? AND m.status='active'
+                   AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                (actor.id, kind),
+            ).fetchall()
+        return {row[0] for row in rows}
+
     def recent(self, actor: Actor, *, limit: int = 20, exclude_kinds=()) -> list[MemoryRecord]:
         """Newest live records in the exact actor namespace (consent required)."""
         self._consent(actor)

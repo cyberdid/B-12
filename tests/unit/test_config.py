@@ -134,7 +134,9 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "scheduler_tick_s": 60,
         "embedding_python": None,
         "embedding_backend": "archive_index.embed:Embedder",
+        "embedding_device": "cpu",
         "forget_requires_approval": True,
+        "memory_enrichment": True,
         "sudo_access": "off",
         "network_allow": (),
         "tool_result_bytes": 4096,
@@ -181,3 +183,15 @@ def test_network_allow_parses_comma_list_and_toml_list(tmp_path, monkeypatch):
     monkeypatch.delenv("B12_NETWORK_ALLOW", raising=False)
     monkeypatch.setenv("B12_STATE_DIR", str(tmp_path))
     assert load_settings(str(config)).network_allow == ("a.example", "*.b.example")
+
+
+def test_embedding_bridge_runs_on_cpu_by_default(tmp_path, monkeypatch):
+    """EmbeddingGemma on the GPU took VRAM from gemma4:12b and Ollama hit CUDA OOM."""
+    from b12.config import Settings
+    from b12.runtime import embedder_env
+
+    assert Settings(state_dir=tmp_path).embedding_device == "cpu"
+    assert embedder_env(Settings(state_dir=tmp_path)) == {"CUDA_VISIBLE_DEVICES": ""}
+    assert embedder_env(Settings(state_dir=tmp_path, embedding_device="auto")) == {}
+    env = Settings.from_env({"B12_STATE_DIR": str(tmp_path), "B12_EMBEDDING_DEVICE": "auto"})
+    assert env.embedding_device == "auto"
