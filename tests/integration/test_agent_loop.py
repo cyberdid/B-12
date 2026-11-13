@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import re
 from types import SimpleNamespace
 
 import pytest
@@ -1572,3 +1573,35 @@ async def test_enrichment_needs_consent(runtime_factory):
         "state": "skipped", "reason": "consent_required"
     }
     assert state["requests"] == []
+
+
+async def test_recalled_facts_carry_their_date_and_the_newer_wins_rule(runtime_factory):
+    from b12.agent import SYSTEM_PROMPT
+
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
+    state["script"] = [{"content": "У Києві."}]
+    await run_turn(runtime, who, "Де живе власник? У Києві?")
+    system = state["requests"][-1]["messages"][0]["content"]
+    assert re.search(r"\[\d{4}-\d{2}-\d{2}\] Власник живе у Києві", system)
+    assert "найновіший" in SYSTEM_PROMPT
+
+
+async def test_similar_fact_after_store_gets_one_supersede_nudge(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
+    state["script"] = [
+        {"tool_calls": [("memory_store", {"text": "Власник живе у Львові біля парку."})]},
+        {"content": "Запам'ятав."},
+        {"content": "Добре."},
+    ]
+    await run_turn(runtime, who, "Я переїхав до Львова.")
+    nudges = [
+        m["content"] for r in state["requests"] for m in r["messages"]
+        if m["role"] == "user" and "memory_supersede" in str(m.get("content"))
+    ]
+    assert nudges and "[авто]" in nudges[-1]
