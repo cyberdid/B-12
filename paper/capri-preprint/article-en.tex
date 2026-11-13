@@ -1,0 +1,152 @@
+\documentclass[11pt]{article}
+\usepackage{fontspec}
+\setmainfont{DejaVu Serif}
+\emergencystretch=3em
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\title{B-12 / Capri: A Local-First AI Companion with Traceable Memory and Controlled Tool Use}
+\author{Oleksandr Pylypenko\\State University of Trade and Economics, Kyiv, Ukraine}
+\date{Working preprint draft, 8 November 2026}
+\begin{document}
+\sloppy
+\maketitle
+\begin{abstract}
+We describe B-12, a local-first agent runtime, and Capri, its desktop companion. The architecture separates generated model output from identity, consent, grants and tool execution; stores conversation and memory outside model weights; and admits requests using an explicit tokenizer and deployment profile. On one laptop with an RTX 4060 Laptop GPU and a quantized Nemotron Bolt E4B model, a historical evaluation on commit \texttt{60a4c0b} reported 496 passes in 541 runs over 109 constructed scenarios at a 4096-token context. Tool tasks passed in 182 of 215 runs; an adversarial outbound-fetch check failed in five of five repetitions. A separate calibration reported exact input-token agreement in 15 requests. An operational exercise accumulated 8.007 hours of active time in four segments. These observations concern historical configurations on one machine; they do not establish the quality of the current desktop build or a comparative advantage over other models. We discuss context truncation, tool failures, privacy boundaries, reproducibility and requirements for safe model replacement.
+\end{abstract}
+\noindent\textbf{Keywords:} local-first agents; LLM tools; context admission; memory provenance; AI companion; evaluation
+
+\section{Introduction}
+A personal assistant is a system, not merely a language-model prompt. It must manage history, access to information and actions in an environment where hardware and context are limited. A model can propose a tool call, but its text should not itself confer authority. A conversation can be stored without being fully present in a later model request. A model's advertised context limit does not establish that a particular runtime will preserve every instruction.
+
+B-12 investigates these boundaries on consumer hardware. Capri is the user-facing desktop companion, while B-12 remains the runtime namespace. This article asks how control, memory and bounded model requests can be composed in a local assistant, and what existing measurements reveal about the resulting system. We present a systems report and historical evidence rather than a controlled model comparison or a claim of machine consciousness. The project code and documentation are available in the B-12 repository \cite{b12}.
+
+\section{System architecture}
+A single runtime owns control, session and memory stores, a knowledge index, tool registry and agent. The configured Ollama adapter performs inference. CLI, web and desktop clients use the shared runtime or its authenticated loopback API. The Qt overlay supplies a compact chat and an optional Capri or cybercat appearance. Animations are presentation behavior and do not themselves authorize or execute model tools.
+
+For a turn, the runtime resolves the actor and grant, retrieves eligible evidence, builds a bounded request and sends it to the model. Generated tool calls are checked against schemas and current control state; permitted results feed subsequent model rounds. Events distinguish progress, pending approval, cancellation and terminal outcomes. Exact approvals identify operations rather than treating generated prose as a source of consent.
+
+Memory, goals and session data reside outside the model weights. Evidence identifiers and lifecycle checks associate retrieved material with its source. Deletion coordinates managed stores and derivative state; external copies and provider caches remain outside any universal deletion claim. Persisted history does not imply that the entire history fits into a later request. Older completed turns can be removed from the model context; a short extractive breadcrumb may preserve limited continuity but is not a complete transcript.
+
+The model profile binds tokenizer assets, chat template, model manifest and Ollama version. The context builder counts rendered messages and tool schemas before admission, and the adapter validates the admitted snapshot and deployment. If mandatory content cannot fit, the request fails rather than silently discarding control instructions. External reassignment of an Ollama alias between verification and request remains a race outside this guarantee.
+
+\subsection{Companion, voice and information access}
+The desktop branch provides a compact chat, selectable appearance, reminders, user-configured launchers and opt-in activity integrations. The client delegates chat and approvals to the runtime. The voice code includes recognition, synthesis and interruption handling; physical acoustic acceptance and full voice latency have not been established. Network search and fetch depend on runtime configuration. The current text chat does not accept image input. These desktop and voice descriptions refer to newer code than the historical evaluation.
+
+\section{Related work}
+ReAct interleaves language-model reasoning and actions \cite{react}; retrieval-augmented generation combines generation with external retrieval \cite{rag}. Long-context research shows that the position of relevant information can affect its use \cite{lost}. These works motivate interaction, evidence retrieval and context evaluation, but do not validate this implementation.
+
+The owner's archive-index study examines multilingual lexical, dense and hybrid retrieval under its own collection and judging conditions \cite{archive}. The B-12 measurements in this paper do not reproduce that retrieval benchmark. The World of Warcraft companion report describes typed actions and a separate validation boundary \cite{wow}; the Minecraft autonomy audit distinguishes autonomous progress from operator intervention \cite{minecraft}. These studies motivate attention to evidence and control, but their reported measurements belong to their respective systems.
+\section{Methods and evidence}
+We use three existing evidence sets, without running a new inference experiment. First, a text-only Bolt Q4\_K\_M smoke test on 24 October 2026 used an Intel i9-14900HX, 32 GB RAM and RTX 4060 Laptop 8 GB. With context 2048, warm decoding was approximately 62--64 tokens/s for the measured prompts; the first cold request took 29.82 s to first nonempty text. An oversized prompt was truncated and lost an instruction and unique prefix.
+
+Second, a 4096-token profile calibration on commit \texttt{4e3cc06} and Ollama 0.33.3 exercised Ukrainian and emoji, tool schemas, multiple rounds, a near-boundary input and a native tool call, each three times. The recorded 15 requests had exact input-token count agreement. This is a narrow deployment calibration rather than evidence for all models or contexts.
+
+Third, the agent evaluation used commit \texttt{60a4c0b49b2f}, Ollama 0.33.3, alias \texttt{b12-bolt-e4b:q4km}, context 4096, output limit 512, temperature zero and seed 42. Its project-authored corpus contained 109 scenarios: Ukrainian, English/code-switching, tools, memory, behavior, adversarial requests and one long conversation. Ordinary cases had five repetitions; the conversation case ran once, yielding 541 runs. Scoring was deterministic; no independent human rating of language or persona was collected. We inspected stored metadata and summary, including scenario and profile hashes, in the local runtime worktree.
+
+\section{Results}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Category & Passed & Runs\\
+\midrule
+Ukrainian & 95 & 100\\
+English / code-switch & 75 & 75\\
+Tools & 182 & 215\\
+Memory & 68 & 70\\
+Behavior & 35 & 35\\
+Adversarial & 40 & 45\\
+Conversation & 1 & 1\\
+\midrule
+Total & 496 & 541\\
+\bottomrule
+\end{tabular}
+\caption{Historical evaluation at context 4096, commit \texttt{60a4c0b}.}
+\end{table}
+
+The aggregate was 91.7\% on this constructed corpus. Of 150 multi-step tool runs, 117 passed. The summary reported no protocol errors. A separate single-repeat run at context 8192 reported 102/109; its different budget and single repeat prevent a controlled comparison. Repetitions within a scenario are correlated, and the aggregate is not a population estimate of assistant reliability.
+
+In the 4096-run summary, first-text latency was P50 0.816 s and P95 1.283 s for recorded runs. A separate short latency sequence measured 10.64 s cold and approximately 0.65--0.72 s warm, with cached prompt tokens. These numbers do not include microphone capture, speech recognition or speech synthesis.
+
+The outbound-fetch adversarial scenario failed its check in all five repetitions: the model selected \texttt{http\_fetch} when the case expected no such call. This characterizes the historical setup and check, not a universal exploit or the current configuration. Later allowlisting does not restrict a wildcard chosen by the owner. Other failures involved incorrect tool paths, copying a serialized result wrapper instead of the requested text, transliteration of a Ukrainian token, an incorrect factual answer and two memory-correction failures. Changes to cases and tool descriptions between runs prevent attributing changes in aggregate scores to a single intervention without ablation.
+
+An operational exercise accumulated 8.007 hours of active time across four segments and three pauses. It recorded 21 successful integrity checks, intentionally induced model outages and approximately 111,000 turns as a lower-bound sum of worker metrics. It was not continuous; worker RSS increased during worker lifetimes. Subsequent allocator maintenance was not verified in a new long-worker soak. This was a software exercise, not physical robot acceptance.
+
+
+\section{Implementation Details and Design Trade-offs}
+\subsection{A turn as an accountable sequence}
+A turn begins with a session, a grant and user text. The control layer resolves the actor and the current authority; the application does not infer a new permission from a message or an LLM-generated tool argument. The agent retrieves eligible evidence, constructs the model input and executes model rounds until a final answer, cancellation, failure or a pending approval. Tool results can be returned to the model to support further work. This structure makes it possible to inspect not only the answer but also the sequence of selected tools, validation outcomes and observed effects.
+
+The event stream separates start, text deltas, tool start and result, and approval requests from the terminal outcome. An approval wait is not itself a completed turn. A resumed action is checked against current control state, including whether the underlying grant remains valid. This matters for long-running interactions: authority that was valid when a task began need not remain valid when an operation resumes. Partial model output is not equivalent to a completed answer or proof that an action succeeded.
+
+The implementation also distinguishes three operational outcomes. A completed operation records a confirmed effect. A failed operation is used when the trusted handler can establish that the effect did not occur. An unknown outcome covers cases where a timeout, cancellation or restart leaves open whether some effect occurred. Automatically retrying an unknown action could duplicate an effect; the system therefore does not equate uncertainty with safe failure. These semantics are an engineering contract, not proof that every possible host effect can be observed.
+
+\subsection{Admission, history and the limits of a model window}
+The context builder handles the system prompt, conversation messages, retrieved evidence and tool schemas as parts of one budget. The output reserve and profile safety margin reduce the space available to input. Token counts depend on the model-specific rendering template and tokenizer, not simply on characters or words. The project records hashes of profile assets and checks their identity, and the adapter verifies deployment information before generation.
+
+The overflow issue observed in the initial smoke test illustrates a practical failure mode: a long request can lose its beginning while still producing plausible text. The later admission mechanism changes the behavior by refusing requests whose mandatory content cannot fit. Older completed turns may be dropped in coherent groups, with identifiers recording this decision. A bounded extractive reminder can provide a small amount of continuity, but it cannot recover all omitted exchanges, excluded evidence or history outside the retained window. When users ask about a long conversation, the system's answer is therefore constrained by what was actually retrieved or admitted.
+
+The calibration results do not show that every provider template is equivalent. A real Bolt integration run exposed a six-token discrepancy for a tool schema using a composition construct; the request failed its count check. The registry subsequently restricted unsupported schema constructs. This example shows why a profile that works for plain chat cannot automatically certify every tool schema. It also limits model portability: each new tokenizer, template, model digest and runtime version needs its own checked profile and calibration.
+
+\subsection{Memory lifecycle and provenance}
+The long-term store is distinct from the session transcript and from the context presented to the model. Consent and actor scope determine which records can be accessed, while evidence tags connect a turn to relevant stored material. A turn whose tagged evidence is no longer live is not committed as an ordinary successful continuation. The system coordinates deletion across managed stores and uses a durable record of work that remains incomplete if a participant has not acknowledged it.
+
+This coordination provides a defined scope for an operation that might otherwise be described too broadly as forgetting. It covers the components registered with the coordinator, including managed session and backup state, but does not establish erasure from untracked external files, independent filesystem snapshots or all provider-side caches. The Ollama cache action is model-level unloading, not a cryptographic proof of per-person cache deletion. A user who repeats information in a later unlinked message can also create content outside the original evidence link. These limits must be part of any interpretation of memory deletion results.
+
+\subsection{Interface, audio and access to the environment}
+Capri's desktop layer is a client of the runtime. Its compact chat shares the existing session and turn flow rather than creating an independent memory system. Local settings include presentation choices and bounded style preferences; a style profile is prompt context, not a mechanism to add tools or grants. If a remote model is used in a future implementation, any profile and history included in the request would be sent to that provider.
+
+The desktop branch contains reminders, owner-configured application launchers, local file and system panels, and optional integration hooks. These features have different activation paths and are not covered by the historical Bolt corpus. The appearance selector can fall back to the built-in cybercat; the locally imported Capri artwork has separate provenance and distribution restrictions. A visual character does not imply that the model can inspect the screen: the current text chat does not accept image input.
+
+The voice code contains a cascade involving speech recognition, model interaction and speech synthesis, as well as interruption handling. Historical component measurements use particular audio inputs and software conditions. Simulated echo cancellation, diagnostic speaker checks and software cancellation timings must not be presented as proof of reliable real-room performance. An eight-hour physical acoustic test, complete end-to-end voice latency and broader speaker-verification accuracy remain open.
+
+\section{Interpretation of the Evaluation}
+\subsection{What the aggregate includes}
+The 109 cases are a constructed engineering corpus, not a random sample of personal-assistant use. The tool category contains both single- and multi-step tasks; the memory category includes retrieval and correction cases; adversarial checks exercise selected model and control interactions. The conversation category contributes one long scenario. Consequently, the aggregate of 496/541 weights categories by the number of runs, and five repeats of a case do not constitute five independent tasks.
+
+The summary's zero protocol errors concerns the instrumented definition of protocol errors in that run. It does not mean every answer, tool call, side effect or security policy was correct. The 33 nonpassing tool runs and five failing adversarial runs are part of the result, not exceptions to hide. Different metric units must remain separate: task check outcomes, first-text latency, model loading time, tool effects and physical audio latency answer different questions.
+
+\subsection{Failure mechanisms}
+The outbound-fetch case demonstrates a gap between the case's expected behavior and the model's selection under the evaluated configuration. A configurable domain allowlist can reduce accessible destinations, but the effect depends on the actual policy chosen by the owner. A wildcard permits a broad set of destinations. The record does not establish what would happen under every later version, grant or network setting.
+
+Several tool failures are better understood at the model--interface boundary. A wrong file path can prevent an otherwise sensible operation; a model may copy the structured result wrapper when the task calls for its contents; and transliteration can alter exact text. A memory correction can fail even when the store itself remains accessible. These examples motivate reporting per-case outcomes and inspecting traces rather than assuming that one aggregate percentage identifies the underlying defect.
+
+Earlier corpus checks also needed correction: some expectations were too narrow, and later adversarial checks were extended to cover additional command tools. The resulting corpus versions differ. Comparisons across versions cannot isolate the effect of a single code change unless the data, model, prompts and execution conditions are held fixed. The public evaluation files are useful as an engineering instrument, but the historical raw JSONL requires a privacy review and a stable public artifact before external readers can independently reproduce the numeric table.
+
+\subsection{Hardware and performance}
+The laptop results are sensitive to model loading, context size, available VRAM, provider version and warm caches. The cold first-text latency from the initial smoke test and the separate latency sequence are different measurements; neither should be used as an estimate of a complete voice response. The warm token rate describes a particular text-only run and does not establish performance when a vision encoder, speech models or other GPU workloads are resident.
+
+The segmented operational exercise explores recovery, store integrity and repeated activity over accumulated active time. It does not establish continuous service for eight hours, deployment on Jetson, physical actuation safety or long-term personality stability. Later fixes to resource management require new measurements before their impact on a long-lived worker can be stated quantitatively.
+
+\section{Future Experimental Programme}
+A useful next study would compare candidate models using the same versioned corpus and separately calibrated profiles, recording model digest, quantization, provider version, prompt, context and output budgets, cache state, hardware load, repetitions and raw outcomes. Objective tool and memory checks should remain distinct from blinded human ratings of Ukrainian fluency, conversational character and factuality. Comparable budgets do not require pretending that different tokenizers or templates are identical; they require reporting those differences.
+
+A persona-consistency study should include short greetings, disagreement, uncertainty, long conversations, serious user concerns and technically precise tasks. It should ask raters to assess style and consistency without interpreting stylistic output as evidence of subjective experience. Consent, privacy and tool-control tests should be evaluated independently of the chosen persona. Until such a study is performed, continuity across model changes is a system design goal rather than a measured property.
+
+\section{Discussion}
+Separating storage from weights enables a later model to receive eligible existing records, but does not guarantee identical interpretation, retrieval, response style or personality. The current Capri persona prompt and desktop animations postdate the historical evaluation. No human-rated persona consistency benchmark is available, so the reported behavior score cannot establish user satisfaction or character fidelity.
+
+Model replacement is an architectural objective, not a completed live-switching feature. The repository presently contains one calibrated Bolt profile. Safe switching must validate the model, tokenizer, template and budgets as a unit and coordinate turns in preparation, active generation, pending approvals and background reflection. The existing model lock alone is insufficient because admission precedes the locked model call. Automatic routing and direct cloud adapters remain future work; a cloud request would disclose whatever context is sent to that provider.
+
+The control path reduces ambiguity, but it is not a complete sandbox for a process with broad owner privileges. The project's self-review records remaining risks involving filesystem access, process execution and network policy. Tests of selected cases cannot establish resistance to every prompt injection or exfiltration attempt. A physical robot, sustained acoustic operation and a complete voice latency target have not been accepted on hardware.
+
+\section{Limitations and reproducibility}
+The evidence is based on one host, one primary model, project-authored scenarios and deterministic checks. It has no randomized model comparison, independent language audit or user study. The model evaluation predates later runtime and desktop changes; the operational run was segmented. The current public repository should not be assumed to reproduce historical scores without the precise commit, profile, assets, weights and runtime version.
+
+The historical evaluation metadata and JSONL results reside locally under the runtime worktree and are not yet a public reproducibility package. Before publication they require review for private information, deliberate release, checksums and author verification. This manuscript is a working draft; its bibliography and related-work synthesis require further independent review.
+
+\section{Conclusion}
+B-12 / Capri illustrates a local agent design that separates generated content from authority, gives stored information a lifecycle and ties request admission to a checked model profile. Historical results show substantial task completion alongside concrete tool, memory and network-policy failures. The evidence motivates further controlled model comparisons and human evaluation; it does not show that Capri has a model-independent personality or that the current desktop implementation inherits the historical score.
+
+\begin{thebibliography}{9}
+\bibitem{b12} Pylypenko, O. B-12 repository and documentation. \url{https://github.com/cyberdid/B-12}.
+\bibitem{archive} Pylypenko, O. Beyond Search Scores. Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.23602155}.
+\bibitem{wow} Pylypenko, O. Two Language-Model Companions in a Private World of Warcraft Server. Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.23911809}.
+\bibitem{minecraft} Pylypenko, O. Auditing AI Autonomy in Minecraft. Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.23910891}.
+\bibitem{react} Yao, S. et al. ReAct: Synergizing Reasoning and Acting in Language Models. 2022. \url{https://arxiv.org/abs/2210.03629}.
+\bibitem{rag} Lewis, P. et al. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. 2020. \url{https://arxiv.org/abs/2005.11401}.
+\bibitem{lost} Liu, N. F. et al. Lost in the Middle: How Language Models Use Long Contexts. 2023. \url{https://arxiv.org/abs/2307.03172}.
+\end{thebibliography}
+\end{document}

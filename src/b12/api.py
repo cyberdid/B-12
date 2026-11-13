@@ -33,11 +33,20 @@ class SessionBody(_Body):
     pass
 
 
+class CompanionProfileBody(_Body):
+    name: str = Field(default="", max_length=60)
+    style_note: str = Field(default="", max_length=800)
+    catchphrases: list[Annotated[str, Field(max_length=240)]] = Field(
+        default_factory=list, max_length=30
+    )
+
+
 class ChatBody(_Body):
     session_id: str = Field(min_length=1, max_length=64)
     text: str = Field(min_length=1, max_length=16000)
     timeout_s: float = Field(default=300.0, gt=0, le=3600)
     persist: bool = False
+    companion_profile: CompanionProfileBody | None = None
 
 
 class MemoryBody(_Body):
@@ -304,7 +313,7 @@ def create_app(
             runtime.close()
             lock.release()
 
-    app = FastAPI(title="B-12", lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = FastAPI(title="Capri", lifespan=lifespan, docs_url=None, redoc_url=None)
 
     def runtime_of(request: Request):
         return request.app.state.runtime
@@ -414,6 +423,9 @@ def create_app(
                 cancel=cancel,
                 timeout_s=timeout_s,
                 persist=body.persist,
+                companion_profile=(
+                    body.companion_profile.model_dump() if body.companion_profile else None
+                ),
             )
         )
 
@@ -434,6 +446,12 @@ def create_app(
 
         Agent.discard_waiting(runtime.sessions, runtime.agent._waiting, turn_id, who.actor.id)
         return {"cancelled": turn_id}
+
+    @app.get("/api/turns/{turn_id}/status")
+    async def turn_status(request: Request, turn_id: str, who: Identity):
+        own_turn(request, who, turn_id)
+        runtime = runtime_of(request)
+        return {"turn_id": turn_id, "active": turn_id in runtime.agent.active}
 
     @app.get("/api/memory/records")
     async def memory_records(request: Request, who: Identity, limit: int = 500):

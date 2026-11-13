@@ -54,7 +54,7 @@ class Turn:
 
 class B12App(App):
     CSS = CSS
-    TITLE = "B-12"
+    TITLE = "Capri"
     ENABLE_COMMAND_PALETTE = False
     BINDINGS = [
         Binding("ctrl+n", "new_session", "Нова розмова"),
@@ -123,14 +123,14 @@ class B12App(App):
                 yield Static("F2  навігація\nТвій простір. Твої історії.", id="nav-note")
             with Vertical(id="conversation"):
                 with Horizontal(id="chat-heading"):
-                    yield Static("ЗВ’ЯЗОК ІЗ B-12", id="chat-title")
+                    yield Static("ЗВ’ЯЗОК ІЗ CAPRI", id="chat-title")
                     yield Static("// CHAT", id="channel-tag")
                 yield Static("Готовий до розмови", id="turn-report", markup=False)
                 yield VerticalScroll(id="chat")
                 with Vertical(id="bar"):
                     yield Static("ТВОЯ ДУМКА  /  Enter — надіслати", id="compose-label")
                     with Horizontal(id="compose-line"):
-                        yield Input(placeholder="Напиши B-12…", id="prompt")
+                        yield Input(placeholder="Напиши Capri…", id="prompt")
                         yield Button("🎙 F7", id="ptt", disabled=self.preview_mode)
                         yield Button("НАДІСЛАТИ", id="send")
                     with Horizontal(id="compose-options"):
@@ -146,7 +146,7 @@ class B12App(App):
             with Vertical(id="right-rail"):
                 with Vertical(id="companion"):
                     yield Static("COMPANION  /  F9", id="companion-title")
-                    yield Static("B-12  ·  КІБЕРКІТ", id="companion-name")
+                    yield Static("CAPRI  ·  КІБЕРКІТ", id="companion-name")
                     yield CyberCat(id="pet")
                     yield Static("мишка · клік · Ctrl+K · F9", id="pet-hint")
                     yield Static("HOOKS / очікую подій", id="activity-status", markup=False)
@@ -261,7 +261,7 @@ class B12App(App):
             if pet.skin_id != "cybercat":
                 had_error = bool(pet.skin_error)
                 pet.set_skin("cybercat")
-                self.query_one("#companion-name", Static).update(f"B-12  ·  {pet.skin_name}")
+                self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
                 self.query_one("#pet-hint", Static).update(
                     "Pack пошкоджений · повернувся кіберкіт"
                     if had_error
@@ -278,7 +278,7 @@ class B12App(App):
         ids = [option.id for option in options]
         position = ids.index(pet.skin_id) if pet.skin_id in ids else 0
         selected = pet.set_skin(ids[(position + 1) % len(ids)])
-        self.query_one("#companion-name", Static).update(f"B-12  ·  {pet.skin_name}")
+        self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
         self.query_one("#pet-hint", Static).update(
             "мишка · клік · Ctrl+K · F9" if selected else "Pack недоступний · кіберкіт поруч"
         )
@@ -1057,7 +1057,7 @@ class B12App(App):
 
     async def add_assistant(self, text: str) -> Markdown:
         chat = self.query_one("#chat", VerticalScroll)
-        await chat.mount(Static("◆ B-12   /   відповідь", classes="msg-tag", markup=False))
+        await chat.mount(Static("◆ CAPRI   /   відповідь", classes="msg-tag", markup=False))
         md = Markdown(text)
         await chat.mount(md)
         if self.turn:

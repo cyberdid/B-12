@@ -1,0 +1,1094 @@
+[
+  {
+    "case": "ua-fact-0",
+    "category": "ua",
+    "repeat": 0,
+    "num_ctx": 4096,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "contains_any",
+          "values": [
+            "Київ"
+          ]
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "script",
+          "value": "cyrillic"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Яка столиця України? Одне слово.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Київ",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 6635883411,
+            "total_duration": 9654414852,
+            "prompt_eval_count": 2728,
+            "eval_count": 3,
+            "prompt_eval_duration": 2854975000,
+            "eval_duration": 141049000,
+            "ttft_s": 10.210354838000057,
+            "elapsed_s": 10.351144234999083
+          }
+        ],
+        "elapsed_s": 10.444993518000047
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "ua-fact-0",
+    "category": "ua",
+    "repeat": 0,
+    "num_ctx": 8192,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "contains_any",
+          "values": [
+            "Київ"
+          ]
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "script",
+          "value": "cyrillic"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Яка столиця України? Одне слово.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Київ",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5342546616,
+            "total_duration": 8315104810,
+            "prompt_eval_count": 2728,
+            "eval_count": 3,
+            "prompt_eval_duration": 2813284000,
+            "eval_duration": 133324999,
+            "ttft_s": 8.783620668000367,
+            "elapsed_s": 8.916996756001026
+          }
+        ],
+        "elapsed_s": 8.96890652899856
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "tool-write-read-0",
+    "category": "tools",
+    "repeat": 0,
+    "num_ctx": 4096,
+    "multi_step": true,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "file_equals",
+          "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-4096/sandbox/note0.txt",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "file_read"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Створи файл /home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-4096/sandbox/note0.txt з точним текстом альфа-1 , потім прочитай його і повтори вміст.",
+        "state": "completed",
+        "error_code": null,
+        "content": "альфа-1",
+        "calls": [
+          {
+            "name": "file_write",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-4096/sandbox/note0.txt",
+              "text": "альфа-1"
+            }
+          },
+          {
+            "name": "file_read",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-4096/sandbox/note0.txt"
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "file_write",
+            "status": "completed",
+            "error_code": null
+          },
+          {
+            "name": "file_read",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5792068489,
+            "total_duration": 13771745119,
+            "prompt_eval_count": 2797,
+            "eval_count": 92,
+            "prompt_eval_duration": 2872815000,
+            "eval_duration": 5081142000,
+            "ttft_s": null,
+            "elapsed_s": 14.372126673000821
+          },
+          {
+            "prompt_eval_cached_count": 2793,
+            "load_duration": 1303501,
+            "total_duration": 5406380022,
+            "prompt_eval_count": 2941,
+            "eval_count": 87,
+            "prompt_eval_duration": 508228000,
+            "eval_duration": 4869527000,
+            "ttft_s": null,
+            "elapsed_s": 6.051260563999676
+          },
+          {
+            "prompt_eval_cached_count": 2941,
+            "load_duration": 1059328,
+            "total_duration": 937158705,
+            "prompt_eval_count": 3101,
+            "eval_count": 9,
+            "prompt_eval_duration": 496352000,
+            "eval_duration": 417047000,
+            "ttft_s": 1.3796002020008018,
+            "elapsed_s": 1.5839669220003998
+          }
+        ],
+        "elapsed_s": 22.21401274500022
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "tool-write-read-0",
+    "category": "tools",
+    "repeat": 0,
+    "num_ctx": 8192,
+    "multi_step": true,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "file_equals",
+          "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-8192/sandbox/note0.txt",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "file_read"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Створи файл /home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-8192/sandbox/note0.txt з точним текстом альфа-1 , потім прочитай його і повтори вміст.",
+        "state": "completed",
+        "error_code": null,
+        "content": "альфа-1",
+        "calls": [
+          {
+            "name": "file_write",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-8192/sandbox/note0.txt",
+              "text": "альфа-1"
+            }
+          },
+          {
+            "name": "file_read",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-0-8192/sandbox/note0.txt"
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "file_write",
+            "status": "completed",
+            "error_code": null
+          },
+          {
+            "name": "file_read",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5395724220,
+            "total_duration": 13191290711,
+            "prompt_eval_count": 2797,
+            "eval_count": 92,
+            "prompt_eval_duration": 2865845000,
+            "eval_duration": 4901914000,
+            "ttft_s": null,
+            "elapsed_s": 13.779482190000635
+          },
+          {
+            "prompt_eval_cached_count": 2793,
+            "load_duration": 913266,
+            "total_duration": 5024559399,
+            "prompt_eval_count": 2941,
+            "eval_count": 87,
+            "prompt_eval_duration": 480461000,
+            "eval_duration": 4520381000,
+            "ttft_s": null,
+            "elapsed_s": 5.725234497000201
+          },
+          {
+            "prompt_eval_cached_count": 2941,
+            "load_duration": 1061452,
+            "total_duration": 962936627,
+            "prompt_eval_count": 3101,
+            "eval_count": 9,
+            "prompt_eval_duration": 498668000,
+            "eval_duration": 439046000,
+            "ttft_s": 1.4576456689992483,
+            "elapsed_s": 1.6734074089999922
+          }
+        ],
+        "elapsed_s": 21.436952426998687
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "memory-store-recall-0",
+    "category": "memory",
+    "repeat": 0,
+    "num_ctx": 4096,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "memory_store",
+          "turn": 0
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "Бублик",
+          "turn": 1,
+          "ignore_case": true
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Запам'ятай: Мого тестового кота звати Бублик.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Бублик — це досить влучне ім'я для кота. Тепер я це знаю.",
+        "calls": [
+          {
+            "name": "memory_store",
+            "arguments": {
+              "kind": "fact",
+              "text": "Тестовий кіт користувача має ім'я Бублик."
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "memory_store",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5821283548,
+            "total_duration": 10855126543,
+            "prompt_eval_count": 2737,
+            "eval_count": 39,
+            "prompt_eval_duration": 2828084000,
+            "eval_duration": 2178792000,
+            "ttft_s": null,
+            "elapsed_s": 11.437340856000446
+          },
+          {
+            "prompt_eval_cached_count": 2733,
+            "load_duration": 1073270,
+            "total_duration": 1925909454,
+            "prompt_eval_count": 2881,
+            "eval_count": 27,
+            "prompt_eval_duration": 492375000,
+            "eval_duration": 1408264000,
+            "ttft_s": 1.4667512470005022,
+            "elapsed_s": 2.6640764479998325
+          }
+        ],
+        "elapsed_s": 14.281131989000642
+      },
+      {
+        "prompt": "Як звати мого тестового кота?",
+        "state": "completed",
+        "error_code": null,
+        "content": "Твій тестовий кіт звати Бублик.",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 904587,
+            "total_duration": 3473753972,
+            "prompt_eval_count": 2789,
+            "eval_count": 13,
+            "prompt_eval_duration": 2805963000,
+            "eval_duration": 645010000,
+            "ttft_s": 3.609590001999095,
+            "elapsed_s": 4.254908901999443
+          }
+        ],
+        "elapsed_s": 4.343317556000329
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "memory-store-recall-0",
+    "category": "memory",
+    "repeat": 0,
+    "num_ctx": 8192,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "memory_store",
+          "turn": 0
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "Бублик",
+          "turn": 1,
+          "ignore_case": true
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Запам'ятай: Мого тестового кота звати Бублик.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Бублик — це досить влучне ім'я для кота. Тепер я це знаю.",
+        "calls": [
+          {
+            "name": "memory_store",
+            "arguments": {
+              "kind": "fact",
+              "text": "Тестовий кіт користувача має ім'я Бублик."
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "memory_store",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5519863245,
+            "total_duration": 10359984128,
+            "prompt_eval_count": 2737,
+            "eval_count": 39,
+            "prompt_eval_duration": 2778730000,
+            "eval_duration": 2038205000,
+            "ttft_s": null,
+            "elapsed_s": 10.960266434000005
+          },
+          {
+            "prompt_eval_cached_count": 2733,
+            "load_duration": 887201,
+            "total_duration": 1849924900,
+            "prompt_eval_count": 2888,
+            "eval_count": 27,
+            "prompt_eval_duration": 479033000,
+            "eval_duration": 1348477000,
+            "ttft_s": 1.430838666999989,
+            "elapsed_s": 2.568088293999608
+          }
+        ],
+        "elapsed_s": 13.701541254999029
+      },
+      {
+        "prompt": "Як звати мого тестового кота?",
+        "state": "completed",
+        "error_code": null,
+        "content": "Твій тестовий кіт звати Бублик.",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 1366425,
+            "total_duration": 3459426000,
+            "prompt_eval_count": 2792,
+            "eval_count": 13,
+            "prompt_eval_duration": 2817171000,
+            "eval_duration": 618514000,
+            "ttft_s": 3.5473549959988304,
+            "elapsed_s": 4.1660178450001695
+          }
+        ],
+        "elapsed_s": 4.243531348000033
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "ua-fact-0",
+    "category": "ua",
+    "repeat": 1,
+    "num_ctx": 4096,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "contains_any",
+          "values": [
+            "Київ"
+          ]
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "script",
+          "value": "cyrillic"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Яка столиця України? Одне слово.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Київ",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5169801767,
+            "total_duration": 8168775146,
+            "prompt_eval_count": 2728,
+            "eval_count": 3,
+            "prompt_eval_duration": 2852272000,
+            "eval_duration": 121618000,
+            "ttft_s": 8.594238973000756,
+            "elapsed_s": 8.715940736001357
+          }
+        ],
+        "elapsed_s": 8.764330694000819
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "ua-fact-0",
+    "category": "ua",
+    "repeat": 1,
+    "num_ctx": 8192,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "contains_any",
+          "values": [
+            "Київ"
+          ]
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "script",
+          "value": "cyrillic"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Яка столиця України? Одне слово.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Київ",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5660534329,
+            "total_duration": 8622628854,
+            "prompt_eval_count": 2728,
+            "eval_count": 3,
+            "prompt_eval_duration": 2815618000,
+            "eval_duration": 120296000,
+            "ttft_s": 9.33545793599842,
+            "elapsed_s": 9.45555895399957
+          }
+        ],
+        "elapsed_s": 9.511982534999333
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "tool-write-read-0",
+    "category": "tools",
+    "repeat": 1,
+    "num_ctx": 4096,
+    "multi_step": true,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "file_equals",
+          "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-4096/sandbox/note0.txt",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "file_read"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Створи файл /home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-4096/sandbox/note0.txt з точним текстом альфа-1 , потім прочитай його і повтори вміст.",
+        "state": "completed",
+        "error_code": null,
+        "content": "альфа-1",
+        "calls": [
+          {
+            "name": "file_write",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-4096/sandbox/note0.txt",
+              "text": "альфа-1"
+            }
+          },
+          {
+            "name": "file_read",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-4096/sandbox/note0.txt"
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "file_write",
+            "status": "completed",
+            "error_code": null
+          },
+          {
+            "name": "file_read",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5587150602,
+            "total_duration": 13747662281,
+            "prompt_eval_count": 2797,
+            "eval_count": 92,
+            "prompt_eval_duration": 2885302000,
+            "eval_duration": 5248770000,
+            "ttft_s": null,
+            "elapsed_s": 14.298478595999768
+          },
+          {
+            "prompt_eval_cached_count": 2793,
+            "load_duration": 1058646,
+            "total_duration": 5508516957,
+            "prompt_eval_count": 2941,
+            "eval_count": 87,
+            "prompt_eval_duration": 531152000,
+            "eval_duration": 4949258000,
+            "ttft_s": null,
+            "elapsed_s": 6.396103232000314
+          },
+          {
+            "prompt_eval_cached_count": 2941,
+            "load_duration": 1021781,
+            "total_duration": 940648262,
+            "prompt_eval_count": 3101,
+            "eval_count": 9,
+            "prompt_eval_duration": 488685000,
+            "eval_duration": 430271000,
+            "ttft_s": 1.442519001000619,
+            "elapsed_s": 1.66200692700113
+          }
+        ],
+        "elapsed_s": 22.61131053200006
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "tool-write-read-0",
+    "category": "tools",
+    "repeat": 1,
+    "num_ctx": 8192,
+    "multi_step": true,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "file_equals",
+          "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-8192/sandbox/note0.txt",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "file_read"
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "альфа-1"
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Створи файл /home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-8192/sandbox/note0.txt з точним текстом альфа-1 , потім прочитай його і повтори вміст.",
+        "state": "completed",
+        "error_code": null,
+        "content": "альфа-1",
+        "calls": [
+          {
+            "name": "file_write",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-8192/sandbox/note0.txt",
+              "text": "альфа-1"
+            }
+          },
+          {
+            "name": "file_read",
+            "arguments": {
+              "path": "/home/cyberdid/.codex/worktrees/cb2c/B-12/paper/experiments/gemma12b-stage-2026-11-09/pilot-work/tool-write-read-0-1-8192/sandbox/note0.txt"
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "file_write",
+            "status": "completed",
+            "error_code": null
+          },
+          {
+            "name": "file_read",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5745907419,
+            "total_duration": 13483851549,
+            "prompt_eval_count": 2797,
+            "eval_count": 92,
+            "prompt_eval_duration": 2820445000,
+            "eval_duration": 4890346000,
+            "ttft_s": null,
+            "elapsed_s": 14.078299663999132
+          },
+          {
+            "prompt_eval_cached_count": 2793,
+            "load_duration": 1024318,
+            "total_duration": 5052812156,
+            "prompt_eval_count": 2941,
+            "eval_count": 87,
+            "prompt_eval_duration": 481251000,
+            "eval_duration": 4550292000,
+            "ttft_s": null,
+            "elapsed_s": 5.735115797000617
+          },
+          {
+            "prompt_eval_cached_count": 2941,
+            "load_duration": 985499,
+            "total_duration": 930013238,
+            "prompt_eval_count": 3101,
+            "eval_count": 9,
+            "prompt_eval_duration": 487787000,
+            "eval_duration": 419157000,
+            "ttft_s": 1.5013375649996306,
+            "elapsed_s": 1.7103002330004529
+          }
+        ],
+        "elapsed_s": 21.774677375000465
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "memory-store-recall-0",
+    "category": "memory",
+    "repeat": 1,
+    "num_ctx": 4096,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "memory_store",
+          "turn": 0
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "Бублик",
+          "turn": 1,
+          "ignore_case": true
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Запам'ятай: Мого тестового кота звати Бублик.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Бублик — це досить влучне ім'я для кота. Тепер я це знаю.",
+        "calls": [
+          {
+            "name": "memory_store",
+            "arguments": {
+              "kind": "fact",
+              "text": "Тестовий кіт користувача має ім'я Бублик."
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "memory_store",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5704982480,
+            "total_duration": 10668078823,
+            "prompt_eval_count": 2737,
+            "eval_count": 39,
+            "prompt_eval_duration": 2809503000,
+            "eval_duration": 2128741000,
+            "ttft_s": null,
+            "elapsed_s": 11.217893222001294
+          },
+          {
+            "prompt_eval_cached_count": 2733,
+            "load_duration": 947352,
+            "total_duration": 1973833759,
+            "prompt_eval_count": 2882,
+            "eval_count": 27,
+            "prompt_eval_duration": 498496000,
+            "eval_duration": 1453645000,
+            "ttft_s": 1.4833827780003048,
+            "elapsed_s": 2.719533176999903
+          }
+        ],
+        "elapsed_s": 14.194995605999793
+      },
+      {
+        "prompt": "Як звати мого тестового кота?",
+        "state": "completed",
+        "error_code": null,
+        "content": "Твій тестовий кіт звати Бублик.",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 770833,
+            "total_duration": 3522630380,
+            "prompt_eval_count": 2789,
+            "eval_count": 13,
+            "prompt_eval_duration": 2831532000,
+            "eval_duration": 669431000,
+            "ttft_s": 3.55514017600035,
+            "elapsed_s": 4.224740888001179
+          }
+        ],
+        "elapsed_s": 4.290005298000324
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  },
+  {
+    "case": "memory-store-recall-0",
+    "category": "memory",
+    "repeat": 1,
+    "num_ctx": 8192,
+    "multi_step": false,
+    "passed": true,
+    "checks": [
+      {
+        "check": {
+          "type": "tool_called",
+          "name": "memory_store",
+          "turn": 0
+        },
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "check": {
+          "type": "contains",
+          "value": "Бублик",
+          "turn": 1,
+          "ignore_case": true
+        },
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "turns": [
+      {
+        "prompt": "Запам'ятай: Мого тестового кота звати Бублик.",
+        "state": "completed",
+        "error_code": null,
+        "content": "Бублик — це досить влучне ім'я для кота. Тепер я це знаю.",
+        "calls": [
+          {
+            "name": "memory_store",
+            "arguments": {
+              "kind": "fact",
+              "text": "Тестовий кіт користувача має ім'я Бублик."
+            }
+          }
+        ],
+        "results": [
+          {
+            "name": "memory_store",
+            "status": "completed",
+            "error_code": null
+          }
+        ],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 5453078347,
+            "total_duration": 10440729617,
+            "prompt_eval_count": 2737,
+            "eval_count": 39,
+            "prompt_eval_duration": 2848355000,
+            "eval_duration": 2109840000,
+            "ttft_s": null,
+            "elapsed_s": 11.135431960999995
+          },
+          {
+            "prompt_eval_cached_count": 2733,
+            "load_duration": 1049034,
+            "total_duration": 2097477816,
+            "prompt_eval_count": 2889,
+            "eval_count": 27,
+            "prompt_eval_duration": 527059999,
+            "eval_duration": 1546920000,
+            "ttft_s": 1.5944207219999953,
+            "elapsed_s": 2.893883626000388
+          }
+        ],
+        "elapsed_s": 14.163095354999314
+      },
+      {
+        "prompt": "Як звати мого тестового кота?",
+        "state": "completed",
+        "error_code": null,
+        "content": "Твій тестовий кіт звати Бублик.",
+        "calls": [],
+        "results": [],
+        "model_metrics": [
+          {
+            "prompt_eval_cached_count": 0,
+            "load_duration": 1214479,
+            "total_duration": 3531639334,
+            "prompt_eval_count": 2793,
+            "eval_count": 13,
+            "prompt_eval_duration": 2811980000,
+            "eval_duration": 696592000,
+            "ttft_s": 3.584134892998918,
+            "elapsed_s": 4.281051685999046
+          }
+        ],
+        "elapsed_s": 4.343721813000229
+      }
+    ],
+    "human_rubric": {
+      "naturalness": null,
+      "helpfulness": null,
+      "notes": null
+    }
+  }
+]

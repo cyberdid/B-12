@@ -1,6 +1,6 @@
 /* B-12 web UI, terminal skin ("cyberpunk TUI").
    Design plan: a monospace console. Square corners, one-pixel rules in dim cyan, uppercase
-   labels, role tags ([ТИ], [B-12]) instead of avatars, inverse video for the selected item.
+   labels, role tags ([ТИ], [CAPRI]) instead of avatars, inverse video for the selected item.
    Palette (dark only, by design): near-black ground, cyan as the working accent, magenta for
    the owner, amber for attention, green and red for results. Text keeps high contrast; glow is
    reserved for the brand and the live status dot. One monospace family, one scale: 14 / 12 / 11px. */
@@ -156,7 +156,7 @@ input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 .msg.user { align-self: stretch; border-left: 2px solid var(--owner); padding: 2px 0 2px 12px; }
 .msg.user::before { content: "[ ТИ ]"; display: block; font-size: 11px; letter-spacing: 0.12em; color: var(--owner); margin-bottom: 2px; }
 .msg.assistant { white-space: normal; max-width: 100%; padding: 0 0 0 12px; border-left: 2px solid var(--rule-hot); }
-.msg.assistant::before { content: "[ B-12 ]"; display: block; font-size: 11px; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 2px; }
+.msg.assistant::before { content: "[ CAPRI ]"; display: block; font-size: 11px; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 2px; }
 .msg.assistant p { margin: 0 0 9px; }
 .msg.assistant p:last-child, .msg.assistant ul:last-child, .msg.assistant ol:last-child { margin-bottom: 0; }
 .msg.assistant ul, .msg.assistant ol { margin: 0 0 9px; padding-left: 20px; }

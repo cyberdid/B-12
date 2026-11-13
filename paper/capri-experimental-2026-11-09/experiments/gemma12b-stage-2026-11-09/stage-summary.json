@@ -1,0 +1,89 @@
+{
+  "budget": {
+    "current": {
+      "repetitions": 3,
+      "assertion_passes": 0,
+      "last_message_chars": 11344,
+      "system_prompt_chars": 4613,
+      "prefix_chars": 1458,
+      "last_request_chars_by_role": {
+        "system": 4693,
+        "user": 1077,
+        "assistant": 47,
+        "tool": 5527
+      }
+    },
+    "head": {
+      "repetitions": 3,
+      "assertion_passes": 0,
+      "last_message_chars": 10598,
+      "system_prompt_chars": 3867,
+      "prefix_chars": 712,
+      "last_request_chars_by_role": {
+        "system": 3947,
+        "user": 1077,
+        "assistant": 47,
+        "tool": 5527
+      }
+    },
+    "removed": {
+      "repetitions": 3,
+      "assertion_passes": 3,
+      "last_message_chars": 9886,
+      "system_prompt_chars": 3155,
+      "prefix_chars": 0,
+      "last_request_chars_by_role": {
+        "system": 3235,
+        "user": 1077,
+        "assistant": 47,
+        "tool": 5527
+      }
+    },
+    "neutral": {
+      "repetitions": 3,
+      "assertion_passes": 0,
+      "last_message_chars": 11344,
+      "system_prompt_chars": 4613,
+      "prefix_chars": 1458,
+      "last_request_chars_by_role": {
+        "system": 4693,
+        "user": 1077,
+        "assistant": 47,
+        "tool": 5527
+      }
+    }
+  },
+  "calibration": {
+    "requests": 8,
+    "exact_count_matches": 8,
+    "input_tokens_by_case": {
+      "ua": 32,
+      "emoji": 27,
+      "schema": 75,
+      "tool-history": 98
+    },
+    "all_finish_stop": true
+  },
+  "pilot": {
+    "executions": 12,
+    "passes": 12,
+    "distinct_cases": 3,
+    "user_turns": 16,
+    "contexts": {
+      "4096": {
+        "executions": 6,
+        "passes": 6
+      },
+      "8192": {
+        "executions": 6,
+        "passes": 6
+      }
+    }
+  },
+  "cleanup": {
+    "calibration_unloaded": true,
+    "pilot_unloaded": true
+  },
+  "new_experiment_limits": "three hand-selected model scenarios, two repeats per context; not a model ranking, full benchmark or persona continuity evaluation",
+  "production_and_test_sources_unchanged": true
+}

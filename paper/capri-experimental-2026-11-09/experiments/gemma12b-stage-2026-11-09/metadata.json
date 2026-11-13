@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-09",
+  "head": "1de4eee74776b6054d2bfd27bbe29b519d8c76c8",
+  "branch": "feat/b12-desktop-companion",
+  "host": "cyberdid-Crosshair",
+  "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.39",
+  "model": "scripted test-model fixture; no LLM",
+  "quantization": "not applicable",
+  "num_ctx": 32768,
+  "output_tokens": 512,
+  "tokenizer": "synthetic ByteLevel BPE, no merges",
+  "corpus": "existing long persist fixed budget test, 30 synthetic files",
+  "repeats_per_arm": 3,
+  "scoring": "unchanged original test assertion plus request-size instrumentation",
+  "cache": "uncontrolled; not a latency benchmark",
+  "power_mode": "not measured",
+  "source_sha256": {
+    "src/b12/agent.py": "5919548133466bbbb0fa5a28d0f7b14050e4b96248950db1b408b11cbd6403ca",
+    "src/b12/persona.py": "ef2b84b8393ffdc32c27c4cd3534387f1a15cf8062ed54d694ab69ce99504dbf",
+    "src/b12/context.py": "dec006ae00b855f135ab4c41699347a9582252d48b1a0bae91c4b789b9950c0d",
+    "src/b12/model_profile.py": "7cdd1d6475e205755ca9b415bf1a6c5fa348140aa9ddbab552d577a3955b2e1c",
+    "tests/conftest.py": "1357baba59d8c88ae1c0256badd28cfe2bedfc7bf3a2d83332bc2f1f4a2f54ca",
+    "tests/integration/test_agent_loop.py": "7b492e97854a5ac549f6f4886acb2d257f6aef9583e0ee60f95e8f15f96856b7"
+  },
+  "test_python": "3.13.14 (main, Jul 23 2026, 14:44:45) [Clang 22.1.3 ]",
+  "source_stage": "CPU ablation; Gemma pilots have their own metadata files",
+  "hardware": {
+    "cpu": "Intel(R) Core(TM) i9-14900HX",
+    "logical_cpus": "32",
+    "ram_bytes": 33330786304,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_total_mib": 8188,
+    "driver_version": "610.57.04",
+    "inventory_time": "read-only same-host inventory after the bounded pilots"
+  }
+}

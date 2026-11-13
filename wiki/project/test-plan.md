@@ -1,8 +1,8 @@
 ---
 type: plan
-updated: 2026-11-04
+updated: 2026-11-08
 status: active
-sources: [tests/, src/b12/tui/, src/b12/agent.py, src/b12/context.py, wiki/log.md]
+sources: [tests/, tests/desktop/, src/b12/tui/, src/b12/desktop/, src/b12/agent.py, src/b12/context.py, wiki/log.md]
 tags: [testing, tui, agent, release]
 ---
 # План тестування B-12 (термінал і агент)
@@ -48,6 +48,14 @@ Textual `run_test` з **справжнім** `ApiClient` до живого се�
 - Цикли в режимі «Не зупинятися»: повтор виклику, повтор відповіді з незавершеними файлами (перенаправлення), вичерпання перенаправлень.
 - Збереження невдалих і зупинених ходів: позначка є, історія далі відкривається, відповідь моделі не зламана.
 - Немає «висячих» викликів в історії після будь-якого кінця ходу.
+
+## Desktop-компаньйон
+- Qt offscreen: фази кіберкота, pointer/drag, safe transcript, session/history guards, approvals і API I/O поза GUI thread.
+- Порожня approval viewport: відрендерений центр має темний `#0a1020` колір, не системний `#efefef`.
+- Загублений NDJSON після `turn_started`: запит status не стартує до успішного cancel acknowledgement; саме acknowledgement не розблоковує composer. Authenticated `GET /api/turns/{id}/status` має підтвердити `active=false`, а свіжий history response — успішно завантажитися.
+- Конкурентність: застарілі stream, history, approval, cancel і turn-status callbacks не змінюють новіший turn/session.
+- X11 host smoke: Qt window viewable 244×272, depth 32, tray API доступний; app запускався з offline dummy API і автоматично зупинений. Візуальний screenshot compositor/tray, клік/drag host acceptance і Wayland лишаються відкритими.
+- Pending approval: offline poll не стирає approval pose; reconnect із тим самим operation ID продовжує показувати очікування рішення.
 
 ## Рівень 5. Реальна модель (перед відповіддю «готово» і після змін агента)
 Фіксований набір із 6 задач, запуск з `B12_REAL_MODEL=1`. Кожна задача має критерій успіху, який перевіряє код, а не ми на око:

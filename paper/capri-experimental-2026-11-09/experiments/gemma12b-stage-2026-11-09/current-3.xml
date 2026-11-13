@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.562" timestamp="2026-11-09T11:53:03.558802+02:00" hostname="cyberdid-Crosshair"><testcase classname="tests.integration.test_agent_loop" name="test_long_persist_turn_keeps_the_window_within_a_fixed_budget" time="1.528"><failure message="AssertionError: 11344&#10;assert 11344 &lt; (6000 + 4000)">runtime_factory = ({'script': [], 'requests': [{'model': 'test-model', 'messages': [{'role': 'system', 'content': 'Ти — Capri. Це твоє і...': True, ...}, ...], 'loaded': True, 'unloads': 0, ...}, &lt;function runtime_factory.&lt;locals&gt;.factory at 0x7f4a9d629940&gt;)
+tmp_path = PosixPath('/tmp/capri-paper-budget-probe/test_long_persist_turn_keeps_t0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4a9d894050&gt;
+
+    async def test_long_persist_turn_keeps_the_window_within_a_fixed_budget(
+        runtime_factory, tmp_path, monkeypatch
+    ):
+        """Regression: the window grew linearly with rounds (fixed per-message cuts) and overflowed."""
+        import b12.agent as agent_mod
+    
+        monkeypatch.setattr(agent_mod, "PERSIST_HISTORY_CHARS", 6000)
+        monkeypatch.setattr(agent_mod, "_LARGE_FILE_CHUNKS", 1000)
+        state, factory = runtime_factory
+        runtime = factory()
+        who = owner(runtime)
+        files = []
+        for i in range(30):
+            p = tmp_path / f"f{i}.cc"
+            p.write_text(f"// file {i}\n" + "int x = 1; " * 250)
+            files.append(str(p))
+        state["script"] = [{"tool_calls": [("file_read", {"path": p})]} for p in files]
+        state["script"] += [{"content": "Звіт. ГОТОВО"}]
+        await run_turn(runtime, who, "прочитай", persist=True)
+        last = state["requests"][-1]["messages"]
+        total = sum(len(m.get("content") or "") for m in last)
+&gt;       assert total &lt; 6000 + 4000, total
+E       AssertionError: 11344
+E       assert 11344 &lt; (6000 + 4000)
+
+tests/integration/test_agent_loop.py:1130: AssertionError</failure></testcase></testsuite></testsuites>

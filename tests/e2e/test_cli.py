@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import signal
+import subprocess
 import sys
 from pathlib import Path
 
@@ -176,6 +177,34 @@ def test_installed_entry_point_is_declared():
     root = Path(__file__).resolve().parents[2]
     scripts = tomllib.loads((root / "pyproject.toml").read_text())["project"]["scripts"]
     assert scripts["b12"] == "b12.cli:main"
+
+
+def test_desktop_command_is_optional_and_server_owned(monkeypatch, tmp_path, capsys):
+    from b12.cli import SERVER_OWNED, main, parser
+
+    monkeypatch.setenv("B12_STATE_DIR", str(tmp_path / "state"))
+    args = parser().parse_args(["desktop", "--url", "http://127.0.0.1:18712", "--persist"])
+    assert args.url == "http://127.0.0.1:18712" and args.persist is True
+    assert "desktop" in SERVER_OWNED
+    assert main(["desktop"]) == 1
+    result = json.loads(capsys.readouterr().out)
+    assert result["error"] == "owner_token_missing"
+    assert result["hint"] == "run: b12 init"
+    assert not (tmp_path / "state").exists()
+
+
+def test_importing_standard_cli_does_not_import_qt():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys; import b12.cli; print('PySide6' in sys.modules)",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout.strip() == "False"
 
 
 async def test_chat_startup_finishes_pending_purge_first(cli):

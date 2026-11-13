@@ -264,7 +264,7 @@ async def _converse(args, runtime, owner) -> int:
         if not line.strip():
             continue
         grant, task = owner.grant(timeout)
-        print("B-12> ", end="", flush=True)
+        print("Capri> ", end="", flush=True)
         result = await run_with_interrupt(
             runtime.agent.turn,
             owner.session_id,
@@ -720,6 +720,34 @@ async def cmd_tui(args, settings) -> int:
     return 0
 
 
+async def cmd_desktop(args, settings) -> int:
+    """Run the optional Qt companion against the existing owner API."""
+    try:
+        from b12.desktop.app import run_desktop
+        from b12.desktop.client import DesktopApiError
+    except ModuleNotFoundError as exc:
+        if exc.name and (exc.name.startswith("PySide6") or exc.name == "PIL"):
+            emit_json({"error": "desktop_extra_missing", "hint": "uv sync --extra desktop"})
+            return 1
+        raise
+    try:
+        return run_desktop(settings, args.url, persist_default=args.persist)
+    except DesktopApiError as exc:
+        detail = {"error": exc.code}
+        if exc.code == "owner_token_missing":
+            detail["hint"] = "run: b12 init"
+        emit_json(detail)
+        return 1
+    except ValueError as exc:
+        code = (
+            str(exc)
+            if str(exc) in {"api_url_invalid", "api_url_must_be_loopback"}
+            else "api_url_invalid"
+        )
+        emit_json({"error": code})
+        return 1
+
+
 def _emit_tui_hook_noop(args) -> None:
     """Protocol response depends only on recognized CLI configuration, never payload."""
     if getattr(args, "source", None) != "antigravity":
@@ -839,7 +867,7 @@ async def cmd_serve(args, settings) -> int:
 
 
 def parser() -> argparse.ArgumentParser:
-    root = argparse.ArgumentParser(prog="b12", description="Локальний компаньйон B-12")
+    root = argparse.ArgumentParser(prog="b12", description="Локальний компаньйон Capri")
     root.add_argument("--config", help="TOML settings file (B12_* env overrides it)")
     sub = root.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="стан моделі, профілю й сховищ").add_argument(
@@ -878,6 +906,11 @@ def parser() -> argparse.ArgumentParser:
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
+    desktop = sub.add_parser(
+        "desktop", help="графічний Capri / Кіберкіт компаньйон (optional Qt extra)"
+    )
+    desktop.add_argument("--url", default=os.environ.get("B12_API_URL", "http://127.0.0.1:8712"))
+    desktop.add_argument("--persist", action="store_true", help="початково ввімкнути довгий хід")
     hook = sub.add_parser(
         "tui-hook", help="локальні metadata lifecycle hooks без provider decisions"
     )
@@ -932,9 +965,9 @@ def parser() -> argparse.ArgumentParser:
     return root
 
 
-# Commands without the runtime lock: serve takes it itself; tui uses the API;
-# tui-hook writes only the independent local UI metadata spool.
-SERVER_OWNED = frozenset({"serve", "tui", "tui-hook"})
+# Commands without the runtime lock: serve takes it itself; tui and desktop use the
+# API; tui-hook writes only the independent local UI metadata spool.
+SERVER_OWNED = frozenset({"serve", "tui", "desktop", "tui-hook"})
 EXIT_SERVER_UNAVAILABLE = 4
 EXIT_REQUIRES_STOPPED_SERVER = 5
 
@@ -1138,6 +1171,7 @@ def main(argv=None) -> int:
         "tools": cmd_tools,
         "serve": cmd_serve,
         "tui": cmd_tui,
+        "desktop": cmd_desktop,
         "tui-hook": cmd_tui_hook,
         "goals": cmd_goals,
         "quiet": cmd_flag,

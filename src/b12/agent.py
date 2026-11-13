@@ -27,6 +27,7 @@ from b12.context import ContextBuilder
 from b12.contracts import Actor, ToolCall, ToolResult
 from b12.control import ControlError, ExecutionContext
 from b12.model_errors import ModelError
+from b12.persona import CAPRI_PERSONA_PROMPT, build_companion_profile_context
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ _TERMINAL = {"completed": "turn_completed", "failed": "turn_failed", "cancelled"
 _MESSAGE_KEYS = ("id", "role", "content", "tool_calls", "tool_name", "tool_call_id")
 
 SYSTEM_PROMPT = (
-    "Ти — B-12, локальний компаньйон власника. Відповідай мовою ОСТАННЬОГО повідомлення "
+    CAPRI_PERSONA_PROMPT + " Відповідай мовою ОСТАННЬОГО повідомлення "
     "користувача: на українське — українською, на англійське — англійською "
     "(if the user writes in English, answer in English). Стисло й чесно; можеш "
     "аргументовано не погоджуватися. "
@@ -350,10 +351,7 @@ def _history_continuity_note(history: list[dict], omitted_ids: set[str]) -> str:
             "Не стверджуй, що попередніх повідомлень не було; якщо даних бракує, прямо скажи, "
             "що доступний контекст неповний."
         )
-    excerpts = [
-        {role: text for role, text in turn.items()}
-        for turn in turns[-3:]
-    ]
+    excerpts = [{role: text for role, text in turn.items()} for turn in turns[-3:]]
     encoded = json.dumps(excerpts, ensure_ascii=False, separators=(",", ":"))
     return (
         "[Контекст історії] Частину старіших реплік вилучено з поточного вікна. Нижче — "
@@ -605,6 +603,7 @@ class Agent:
         cancel: asyncio.Event | None = None,
         timeout_s: float = 300.0,
         persist: bool = False,
+        companion_profile: Mapping[str, object] | None = None,
     ) -> TurnResult:
         if not isinstance(text, str) or not text.strip():
             raise ValueError("user text required")
@@ -636,6 +635,7 @@ class Agent:
                 "evidence": [],
                 "persist": bool(persist),
                 "nudges": 0,
+                "companion_profile_context": build_companion_profile_context(companion_profile),
             }
             for item in await self._recall(text, actor):
                 state["evidence"].append(item)
@@ -806,9 +806,7 @@ class Agent:
             gaps = self._coverage_gaps(state)
             if gaps:
                 content = (
-                    f"{content}\n\nНе завершено за журналом інструментів: "
-                    + "; ".join(gaps)
-                    + "."
+                    f"{content}\n\nНе завершено за журналом інструментів: " + "; ".join(gaps) + "."
                 )
                 return await finish("failed", content=content, code="incomplete_coverage")
             return await finish("completed", content=content)
@@ -836,9 +834,7 @@ class Agent:
                 round_limit = PERSIST_ROUNDS
                 if persist and self._coverage_gaps(state):
                     round_limit += PERSIST_COVERAGE_EXTRA_ROUNDS
-                last = state["round"] >= (
-                    round_limit if persist else self.settings.max_rounds
-                )
+                last = state["round"] >= (round_limit if persist else self.settings.max_rounds)
                 if (
                     persist
                     and not last
@@ -863,6 +859,9 @@ class Agent:
                     if actor.owner
                     else f"{self.system_prompt} {GUEST_SPEAKER}"
                 )
+                # The owner's local profile (name, style) is the owner's data: never a guest's.
+                if actor.owner and state["companion_profile_context"]:
+                    system += "\n" + state["companion_profile_context"]
                 if not actor.consent:
                     system += f" {CONSENT_OFF}"
                 elif getattr(self, "goals", None) is not None:
@@ -1064,11 +1063,7 @@ class Agent:
                 offsets.pop(path, None)
             else:
                 dirs[path] = False
-                offsets[path] = (
-                    next_offset
-                    if isinstance(next_offset, int)
-                    else page_offset
-                )
+                offsets[path] = next_offset if isinstance(next_offset, int) else page_offset
             for entry in result.content.get("entries", []):
                 if isinstance(entry, str) and entry.endswith("/"):
                     dirs.setdefault(f"{path}/{entry.rstrip('/')}", False)
@@ -1186,9 +1181,7 @@ class Agent:
                 known_omissions = continuity_ids | shortened_ids
                 request_system = system
                 if known_omissions:
-                    request_system += "\n\n" + _history_continuity_note(
-                        history, known_omissions
-                    )
+                    request_system += "\n\n" + _history_continuity_note(history, known_omissions)
                 if state.get("notes"):  # fresh each round, never trimmed: findings must survive
                     messages.append(
                         {
@@ -1198,9 +1191,7 @@ class Agent:
                         }
                     )
                 try:
-                    request = self.builder.build(
-                        request_system, messages, state["evidence"], tools
-                    )
+                    request = self.builder.build(request_system, messages, state["evidence"], tools)
                 except ModelError as exc:
                     if exc.code != "context_overflow" or attempt == len(ladder) - 1:
                         raise

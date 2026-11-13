@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-10-26
+updated: 2026-11-09
 status: candidates
-sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/sources/external-checks.md]
+sources: [wiki/sources/gemma12b-desktop-launch-2026-11-09.md, wiki/sources/gemma12b-followup-2026-11-09.md, raw/B-12_Master_Project_2026-10-24.md, wiki/sources/external-checks.md]
 tags: [models, benchmark]
 ---
 # Моделі та план порівняння
@@ -26,3 +26,13 @@ Bolt не створює [автобіографічну пам’ять](memory
 RTX 4060 Laptop 8GB / Ollama 0.33.3 успішно запустили офіційний text-only Q4_K_M без drafter: warm decode ~62–64 tok/s, uncached first-content medians ~0,17–0,56 с для ~440–1700 нових токенів; cold first-content ~29,82 с. Точні умови, недоліки поведінки та overflow case наведені у [власному експерименті](../project/bolt-first-test.md). Це не результат Nano та не voice SLO.
 
 Registry `nemotron-3.5-bolt:latest` веде на більший 74B-A9B пакет, а `:e4b` додає projector і drafter. [Точні manifests](../project/model-test-readiness.md) запобігають підміні конфігурації. Наявні Gemma QAT Q4_0 не мають тотожної Bolt Q4_K_M квантизації; це потрібно врахувати при порівнянні. Мовчазне context truncation здатне видалити instructions, тому token admission control має передувати довгим діалогам.
+
+
+## Gemma 12B: обраний експериментальний кандидат (09.11.2026)
+
+**Вимога:** власник вказав Gemma 12B для наступного наукового етапу. **Перевірено:** локальний alias gemma4:12b Q4_K_M; кандидатний profile у paper/experiments, 8/8 token counts і 12/12 вибраних task executions. Це не full benchmark, рейтинг чи автоматичне перемикання моделі. Production profiles/config залишилися без змін. [Протокол, результати й межі](../sources/gemma12b-followup-2026-11-09.md).
+
+
+## Live запуск після пілота (09.11.2026)
+
+**Пряме доручення власника виконано:** Capri запущена на gemma4:12b через постійну локальну конфігурацію, context 8192, output reserve 1024. Пам’ять/state_dir збережені. API turn completed; поточний deployment використовує 34% CPU / 66% GPU за Ollama ps. Це не динамічний ModelManager і не ретроспективні метадані пілота. [Деталі й межі](../sources/gemma12b-desktop-launch-2026-11-09.md).

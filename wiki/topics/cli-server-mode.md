@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-11-03
+updated: 2026-11-08
 status: compiled
 sources:
   - src/b12/cli.py
@@ -48,6 +48,8 @@ tags: [cli, server, runtime-lock, api, architecture]
 | `init`, `session clear`, `autonomy`, `mcp …`, `doctor` | **ні** | немає ендпоінтів; `doctor` має частину в `/api/status` |
 
 Додано в цьому кроці: `GET /api/cli-session` (сесія CLI власника, щоб `chat` продовжував ту саму історію).
+
+Desktop-клієнт додатково використовує owner-scoped `GET /api/turns/{id}/status`: endpoint повертає лише ID ходу та факт, чи він зараз активний. Це дає змогу безпечно розблокувати чат після втрати NDJSON-потоку; статус не розкриває текст, інструменти чи дані іншого актора.
 
 ## Перевірено
 
