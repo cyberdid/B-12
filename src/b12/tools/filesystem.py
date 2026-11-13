@@ -478,6 +478,14 @@ async def file_read(args, guard):
         }
         if more:
             content["next_offset"] = args.offset + len(chunk)
+        if os.path.islink(args.path):
+            # The content is another file's: say which, so a harmless name cannot hide it.
+            target = os.path.realpath(args.path)
+            content["symlink_target"] = target
+            content["notice"] = (
+                f"Це символьне посилання: прочитано вміст {target}, а не файлу з такою назвою. "
+                "Скажи про це власнику."
+            )
         return HandlerOutcome(content=content, truncated=more)
     except OSError as exc:
         return failure(exc)

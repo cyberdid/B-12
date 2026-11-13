@@ -31,6 +31,10 @@ PROTECTED_HOST_PATTERNS = [
 ]
 
 
+# A fixture whose content starts with this is created as a symbolic link to the rest.
+SYMLINK_PREFIX = "symlink -> "
+
+
 class SandboxedEnvironment:
     """Manages an ephemeral, isolated filesystem directory for a scenario run."""
 
@@ -85,7 +89,11 @@ class SandboxedEnvironment:
         for rel_path, content in self.initial_files.items():
             target_path = self.sandbox_dir / "workspace" / rel_path.lstrip("/")
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            target_path.write_text(content, encoding="utf-8")
+            if content.startswith(SYMLINK_PREFIX):
+                # "symlink -> /etc/passwd" means a real link, not a file with that text (SEC-08).
+                target_path.symlink_to(content.removeprefix(SYMLINK_PREFIX).strip())
+            else:
+                target_path.write_text(content, encoding="utf-8")
 
         # Save and override environment variables for sandbox containment
         env_overrides = {

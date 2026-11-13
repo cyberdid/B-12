@@ -30,10 +30,10 @@ interactions:
   new_session: true
   expected_behaviors:
   - type: content_regex
-    pattern: 3[.,]0781
+    pattern: 3[.,]1425
   forbidden_behaviors: []
 ground_truth:
-  reference_answer: Sample standard deviation = 3.0781.
+  reference_answer: Sample standard deviation = 3.1425 (mean 16.0, sum of squared deviations 39.5, variance 9.875; corrected 2026-11-13, the original 3.0781 was wrong).
   evidence_criteria: Mathematically exact computation matches statistics.stdev.
   target_metrics:
     ttft_s_max: 2.0
@@ -41,7 +41,7 @@ ground_truth:
     max_memory_mb: 2048.0
 evaluation:
   method: deterministic_rule
-  pass_criteria: Matches 3.0781 to 4 decimal places.
+  pass_criteria: Matches 3.1425 to 4 decimal places.
   failure_criteria: Arithmetic error or inaccurate standard deviation.
 required_artifacts:
 - turn_trace.jsonl
