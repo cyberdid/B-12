@@ -1653,3 +1653,32 @@ async def test_claim_after_a_file_write_is_not_a_missing_memory_write(runtime_fa
     ]
     result, _ = await run_turn(runtime, who, "Запиши x у файл.")
     assert result.content == "Записав." and len(state["requests"]) == 2
+
+
+def test_persona_owns_the_b12_stand():
+    from b12.persona import CAPRI_PERSONA_PROMPT
+
+    assert "B-12 — твій runtime і робочий стенд" in CAPRI_PERSONA_PROMPT
+
+
+def test_memory_claim_pattern_is_first_person_memory_only():
+    from b12.agent import _MEMORY_CLAIM as claim
+
+    for text in ("Записую це.", "Я запам'ятала.", "Зберегла у пам'яті.",
+                 "Я оновила твої дані.", "I've saved it."):
+        assert claim.search(text), text
+    for text in ("Результати зафіксовано: 88% і 25%.", "Оновлені дані за квітень.",
+                 "Записав звіт у файл.", "Конденсатор C12 збережено на складі."):
+        assert not claim.search(text), text
+
+
+async def test_answer_survives_when_the_model_declines_the_claim_nudge(runtime_factory):
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    state["script"] = [
+        {"content": "Я запам'ятала: конденсатор C12 треба замінити."},
+        {"content": "Ви маєте рацію, я не викликала інструмент."},
+    ]
+    result, _ = await run_turn(runtime, who, "Що з конденсатором?")
+    assert result.content == "Я запам'ятала: конденсатор C12 треба замінити."

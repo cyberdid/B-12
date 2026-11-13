@@ -1,6 +1,6 @@
 ---
 type: topic
-updated: 2026-11-12
+updated: 2026-11-13
 status: partially_implemented
 sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/tools/outcomes.py, src/b12/tools/filesystem.py, src/b12/tools/process.py, src/b12/tools/network.py, src/b12/tools/memory.py, src/b12/agent.py, tests/security/test_tool_policy.py, tests/unit/test_registry.py, tests/integration/test_host_tools.py, tests/security/test_host_boundaries.py, tests/integration/test_web_search.py, tests/integration/test_agent_loop.py, tests/integration/test_turn_notes.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md]
 tags: [tools, control, approval, provenance]
@@ -90,3 +90,8 @@ Review: перший незалежний review знайшов I1 (resolver Non
 - **Перевірений факт:** `file_read`, `file_list` і `file_search` (capability `filesystem.read`) приймають `~/…` і відносні шляхи: реєстр розв'язує їх від домашньої теки власника до перевірки схеми, захищених шляхів і підтверджень. Мала модель часто передає `configs/a.json` і раніше отримувала `invalid_arguments`, з якого не виходила. Запис (`file_write`) і процеси й далі вимагають абсолютного шляху.
 - **Перевірений факт:** так само обробляється відповідь, що є рівно одним виразом `інструмент(ключ=літерал, …)` в один рядок: аргументи читаються лише як літерали (`ast.literal_eval`), позиційні аргументи, вирази й кодові блоки не приймаються. Раніше на такий текст модель отримувала нагадування і часто відповідала на нього («Зрозумів, не буду…») замість виклику (MEM-07).
 - **Перевірений факт:** якщо вся відповідь моделі — один виклик у її вбудованому токенному синтаксисі (`memory_search{query:<|"|>…<|"|>}`), який Ollama залишила в тексті, агент виконує його як справжній виклик через той самий реєстр, гранти й підтвердження. Виклик, процитований усередині тексту, не виконується; повтор такого тексту після двох нагадувань завершує хід помилкою `pseudo_call`, як і для викликів, написаних прозою.
+
+## Контекст і точний допуск (13.11.2026)
+
+- **Перевірений факт:** після злиття persona Capri, `web_search` і `memory_supersede` системний промпт із 17 схемами займає ~3,3 тис. токенів на Bolt; при `num_ctx` 4096 і резерві 1024 кожен хід завершувався `context_overflow`. Типовий `num_ctx` тепер 8192 (Bolt уже вимірювався з ним у великому eval).
+- **Перевірений факт:** gemma4:12b інколи залишає у відповіді маркер каналу міркувань (`thought\n<channel|>`). В історії Ollama рахувала його як спецтокен, а точний допуск — як текст, тож запит відхилявся (`context_mismatch`, різниця 2 токени). Такий залишок тепер прибирається з відповіді (`strip_channel_residue`).

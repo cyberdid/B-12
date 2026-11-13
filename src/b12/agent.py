@@ -173,9 +173,10 @@ def _dated(record) -> str:
 
 # A reply that says something was saved to memory (uk/en).
 _MEMORY_CLAIM = re.compile(
-    r"(запам['’ʼ]ят(?:ав|ала|аю|овую)|записую|записав|записала|занотува\w*|зберіг|"
-    r"зберегла|зберігаю|збережу|зафіксова\w*|зафіксув\w*|"
-    r"онов(?:л|и)\w*\s+(?:твої|ваші|твою|вашу|інформац\w*|дан\w*)|"
+    r"(запам['’ʼ]ят(?:ав|ала|аю|овую)|записую це|"
+    r"(?:записав|записала|зберіг|зберегла|занотував|занотувала|зафіксував|зафіксувала)"
+    r"\s+(?:це\s+|собі\s+)?(?:у|в)\s+пам|"
+    r"(?:оновив|оновила|оновлюю)\s+(?:твої|ваші|твою|вашу|інформацію про)|"
     r"\bi(?:'ve| have)? (?:saved|noted|remembered)\b)",
     re.I,
 )
@@ -962,6 +963,7 @@ class Agent:
                     ):
                         # The reply claims a memory write that never happened: ask once.
                         state["claim_nudged"] = True
+                        state["claim_original"] = reply.content
                         state["turn_messages"].append(
                             {"id": str(uuid4()), "role": "assistant", "content": reply.content}
                         )
@@ -969,6 +971,16 @@ class Agent:
                             {"id": str(uuid4()), "role": "user", "content": _CLAIM_NUDGE}
                         )
                         continue
+                    if state.get("claim_original") and not any(
+                        r["name"] in _WRITE_TOOLS for r in state["results"]
+                    ):
+                        # The model declined to write after the nudge: its first answer stands;
+                        # the reply to the nudge is not an answer to the user.
+                        original = state.pop("claim_original")
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "assistant", "content": reply.content}
+                        )
+                        return await finish("completed", content=original)
                     if text and _PSEUDO_CALL.search(text) and state.get("pseudo_calls", 0) < 2:
                         # A call written as prose did not run: say so and ask for the real call.
                         state["pseudo_calls"] = state.get("pseudo_calls", 0) + 1
