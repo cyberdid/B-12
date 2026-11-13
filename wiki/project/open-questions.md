@@ -1,13 +1,13 @@
 ---
 type: questions
-updated: 2026-11-08
+updated: 2026-11-12
 status: open
-sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
+sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md, wiki/topics/evals.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
 tags: [unknowns, validation]
 ---
 # Відкриті питання
 
-Q1–Q12 зберігають порядок §14 master brief; Q13–Q19 додані аналізом, експериментами та роботою над TUI. Усі відкриті, крім Q15, закритого аудитом характеристик локального host. Питання не є вимогою зараз відповісти на всі: наступна робота може уточнювати їх поступово.
+Q1–Q12 зберігають порядок §14 master brief; Q13–Q20 додані аналізом, експериментами та роботою над TUI. Усі відкриті, крім Q15, закритого аудитом характеристик локального host. Питання не є вимогою зараз відповісти на всі: наступна робота може уточнювати їх поступово.
 
 | ID | Питання | Як закрити |
 |---|---|---|
@@ -29,8 +29,9 @@ Q1–Q12 зберігають порядок §14 master brief; Q13–Q19 дод
 | Q16 | Що саме означає voice <1,5 с? | Початок/кінець виміру, перцентиль, сценарій, число повторів |
 | Q17 | Які точні версії та ліцензії кандидатів? | Для першого Bolt тесту pinned GGUF/revision/hash, Ollama 0.33.3 та tensor equivalence перевірено. Повний license inventory, голоси й інші кандидати ще відкриті |
 | Q18 | Як запобігти втраті instructions при context overflow? | **Частково закрито для pinned Bolt/Ollama 0.33.3 profile:** `AdmittedRequest` рахує цілі messages/tools, відхиляє обов’язковий overflow і перевіряє native prompt count. Run4 при 3928 tokens зберіг обидві межові інструкції. Інші моделі/templates, загальний model corpus та race зі зміною alias не доведені; див. [transport](../topics/model-transport.md) |
-| Q19 | Чи є власний або ліцензований Capri art pack для TUI? | Потрібні зображення/atlas, письмовий дозвіл або чітка сумісна ліцензія, attribution і manifest; огляд репозиторіїв не підтвердив прав на оригінальні character assets. Після надання pack перевірити manifest і фактичний TUI render окремо. |
+| Q19 | Чи придатна E4B для доказового multi-file code review? | **Поки ні за виміряним сценарієм:** v3 і v4 завершилися `failed/incomplete_coverage`, а звіт не містив перевірюваних знахідок. Потрібні окремі file-by-file trajectory evals із відомою ground truth і порівняння сильнішої моделі; Claude baseline сам по собі не є ground truth. Див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06) |
+| Q20 | Чи є власний або ліцензований Capri art pack для TUI? | Потрібні зображення/atlas, письмовий дозвіл або чітка сумісна ліцензія, attribution і manifest; огляд репозиторіїв не підтвердив прав на оригінальні character assets. Після надання pack перевірити manifest і фактичний TUI render окремо. |
 
-Q1/Q2/Q13/Q14 залишаються фундаментальними для runtime. Перший Bolt smoke test завершено; наступні дослідження мають уточнювати Q6/Q17/Q18. TUI skin loader готовий прийняти дозволений pack, але Q19 лишається відкритим. Конкретний [наступний крок](status.md), [аналіз ризиків](analysis.md) та [дорожня карта](roadmap.md) пов’язують питання з роботою.
+Q1/Q2/Q13/Q14 залишаються фундаментальними для runtime. Перший Bolt smoke test завершено; наступні дослідження мають уточнювати Q6/Q17/Q18/Q19. Конкретний [наступний крок](status.md), [аналіз ризиків](analysis.md) та [дорожня карта](roadmap.md) пов’язують питання з роботою.
 
-Наданий [archive-index-public](../sources/archive-index-public.md) закриває пошук кандидата для retrieval, але не Q1/Q2 про походження історичного B-12 ledger. Перед reuse лишаються exact policy scope, invalidation після запису й окремий огляд відмінної локальної інсталяції.
+Наданий [archive-index-public](../sources/archive-index-public.md) закриває пошук кандидата для retrieval, але не Q1/Q2 про походження історичного B-12 ledger. Перед reuse лишаються exact policy scope, invalidation після запису й окремий огляд відмінної локальної інсталяції. Q19 показує окрему межу якості Bolt для multi-file code review; web search пройшов один live smoke test, але його точність і стійкість лишаються частиною Q6/Q17 eval work.

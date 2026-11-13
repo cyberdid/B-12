@@ -45,6 +45,7 @@ tags: [navigation]
 | [Голос](topics/voice.md) | Каскад, full-duplex, UA, метрики |
 | [Admission і model transport](topics/model-transport.md) | Immutable budget, pinned profile, streaming, cancellation і real calibration |
 | [Контроль і результати інструментів](topics/tool-control.md) | Server-owned grants, exact approval, lifecycle, bounded effects і unknown outcomes |
+| [NVIDIA AI Factory Operations Agent](topics/nvidia-ai-factory-operations-agent.md) | Порівняння кластерного operations агента з local-first архітектурою B-12 |
 | [Agent loop і глобальне забуття](topics/agent-loop.md) | Model→tools→results, events, sessions/provenance, PurgeCoordinator, реальний Bolt |
 | [Експлуатація: snapshots, soak, ріст](topics/operations.md) | Backup/restore, deletion replay, сервіс, знайдені деградації, long-horizon драйвер |
 | [Eval: корпус і результати](topics/evals.md) | 109 сценаріїв, runner, результати Bolt і знайдені дефекти |
@@ -66,6 +67,9 @@ tags: [navigation]
 | [Стаття власника про archive-index](sources/archive-index-paper.md) | Першоджерело бенчмарків пошуку/EmbeddingGemma 2; B-12 посилається, не переміряє |
 | [Native Ollama API](sources/runtime-api-docs.md) | Прочитані wire/streaming sections і межа щодо локального runtime |
 | [Оригінальна обкладинка Capri](sources/capri-original-hero-2026-11-08.md) | Походження hero/social preview, prompt і межі використання локального art pack |
+| [NVIDIA agent frameworks](sources/nvidia-agent-frameworks-2026-11-06.md) | Перевірений статус NeMo Agent Toolkit та локальна оцінка Helix для B-12 |
+| [NVIDIA AI Factory Operations Agent](sources/nvidia-ai-factory-operations-agent-2026-11-07.md) | Вибірковий code/docs огляд кластерного operations blueprint і його меж для B-12 |
+| [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
-Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 116 URL](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).
+Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 120 зовнішніх джерел](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).

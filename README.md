@@ -166,7 +166,7 @@ Web UI обслуговується тим самим API зі строгим CS
 
 | # | Задача | Стан |
 |---|---|---|
-| 1–6 | Контракти, canonical memory, retrieval, model/context admission, контроль tools, 14 host tools | ✅ |
+| 1–6 | Контракти, canonical memory, retrieval, model/context admission, контроль tools і host tools | ✅ |
 | 7 | Agent loop, сесії, evidence, глобальне забуття | ✅ |
 | 8–10 | CLI, автентифікований API, Web UI | ✅ |
 | 11 | Цілі, ініціатива, рефлексія, уподобання | ✅ реальний Bolt 3/3 |

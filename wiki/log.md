@@ -261,6 +261,10 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 **Перевірений факт (живий тест):** після повного покриття 7 файлів модель не писала ГОТОВО, і режим витратив усі 25 нагадувань (294 с, 13 викликів, частину файлів перечитано). **Зміна:** нагадування без маркера — не більше 3 (`PERSIST_GENERIC`); нагадування за непрочитаними файлами — весь бюджет 25. **Межі:** після цієї зміни живий тест не повторювали; перевірено лише автотестами (493 пройшло).
 
+## [2026-10-27] verification | Soak R14 завершено: 8,007 год активно, 4 сегменти, не безперервно
+
+**Перевірений факт** ([events](../artifacts/task15-soak-2026-10-26-run2/events.jsonl), локально): `soak_finished` о 19:09 EET — `active_h` 8,007, `segments` 4, `continuous: false` (три паузи за проханням власника), 15 циклів, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Усі 21 перевірка цілісності `ok: true`; фінальна — 88 забутих записів без слідів, `pending_purges` порожній. Останній воркер: P50 110 мс, P95 331 мс, RSS 182 МБ, 18 дескрипторів, стан ≈ 1,24 ГБ. Сума останніх метрик по воркерах (нижня межа): ≈ 111 тис. ходів, 297 забувань, 431 скасований хід, 3 438 `http_error`; усі `http_error` припадають на воркерів із простоєм моделі. **Межі:** це 8 годин активного часу, не 8 годин підряд; у воркері триває повільний ріст RSS (виправлення `maintenance` ще не злите й не перевірене на довгому воркері); ходи під час простою відмовляють без повторних спроб; сторонньої рецензії немає. Гілки `feat/b12-access` і `feat/b12-runtime` ще не злиті.
+
 ## [2026-10-28] verification | Persist: живий тест на engine (7 .py) пройшов
 
 **Перевірений факт (нова сесія, сервер з 1680b68):** запит «прочитай кожен .py з engine» — 8 викликів за 32 с: перелік теки і 7 файлів `.py` (`agent`, `environment`, `llm_backend`, `memory`, `server`, `simulator`, `telemetry`), хід `completed`, одне авто-нагадування з переліком непрочитаних (спрацювало, як задумано, до підсумку). **Межі:** один прогін; перевірено лише тека однорівнева, без рекурсії; `__pycache__` не є файлом .py і не враховувався.
@@ -434,9 +438,6 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
    - Speaker verification (`src/b12/audio/speaker.py`, `src/b12/purge.py`): додано 16 DCT-II MFCC-подібних кепстральних ознак + log-mel + F0 профіль та метод `PurgeCoordinator.forget_voice_profile()`.
 3. **Перевірка:** розширено інтеграційні тести в `tests/integration/test_voice.py` (7) та `tests/integration/test_duplex.py` (5), оновлено `evals/voice/report.json` та `evals/voice/duplex/report.json` (`erle_mean_db: 30.41` на багатопроменевому RIR із шумом, barge-in stop P50 `0,025 мс` на реальному TTS через ONNX Silero VAD).
 
-
-
-
 ## [2026-11-03] fix | Виправлення з аудитів (без питань безпеки)
 
 За вказівкою власника пункти безпеки (A-01, A-07, A-08, A-18, A-19, A-22, F-03) відкладено; решту виправлено з тестами, що падали до змін.
@@ -550,6 +551,66 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 38 wiki-сторінок, 318 локальних посилань/якорів, frontmatter sources та index coverage пройшли перевірку; broken links і неіндексовані сторінки — 0. Поточний статус містить нові functional results, historical model/voice metrics збережено окремо. Raw originals та source manifest незмінні.
 
+## [2026-11-06] implementation | Повторні фрагменти й пошук в інтернеті
+
+За дорученням власника розпочато покращення аналізу коду та інтернет-доступу. У `feat/b12-runtime` додано облік унікальних offset для ліміту читання: повтор тієї самої частини не витрачає ліміт нових частин. Регресійний тест падав до зміни. Додано `web_search` через Bing RSS з наявною capability `network.http` і перевіркою `network_allow`; прямий HTTP probe повернув три результати. Модельний пошуковий сценарій і новий повний аналіз зовнішньої теки shell-скриптів ще не перевірені. Процес сервера не перезапускався. Подальші зміни й перевірки залишаються відкритими.
+
+## [2026-11-06] research | NVIDIA agent evaluation і live web search
+
+Перевірено вибрані офіційні сторінки NVIDIA: NeMo Agent Toolkit позначено deprecated із жовтня 2026 та EOL до кінця 2026; Relay/Fabric/Helix описані як наступні напрями. Рішення для B-12 — не додавати deprecated runtime; використати поділ task/runner/trial і окреме оцінювання відповіді та trajectory як eval-принципи. Картка джерела й статус кожного URL — [wiki/sources/nvidia-agent-frameworks-2026-11-06.md](sources/nvidia-agent-frameworks-2026-11-06.md) та `raw/source-manifest.json`; локального snapshot немає.
+
+Додано `web_search`: DuckDuckGo Lite, Bing RSS fallback, bounded результат і перевірка `network_allow` через `network.http`. Mock-тести та один live-запит Bolt повернули офіційну NVIDIA Nemotron сторінку. Це підтверджує інструментальний шлях, але не точність пошуку загалом.
+
+## [2026-11-06] fix | Coverage guard для довгого read-only review
+
+Persist-turn тепер не рахує повторний offset як нову частину; `file_search` і shell grep не є доказом повного читання. Фінальний маркер проходить coverage guard, а неповний хід завершується `failed/incomplete_coverage` із назвами прогалин. Доданий TDD regression для продовження інструментів до 60 додаткових раундів, поки перелічені code/config/docs лишаються неповними. Інструкції більше не вимагають `run_command`, якого може не бути у grant; аналіз коду не надає дозволу змінювати long-term memory.
+
+Live Bolt review зовнішньої теки shell-скриптів (v3 і v4) усе ще завершився `failed/incomplete_coverage`: 10/11 файлів до EOF, один файл лише частково прочитаний. Фінал не містив надійних, прив’язаних до рядків знахідок. Це негативний eval якості моделі; Claude baseline залишається неперевіреним і не використаний як ground truth. Умови й межі — [evals](topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06).
+
+Виконані зміни лежать у worktree `.worktrees/runtime`, гілка `feat/b12-runtime`, без commit. Ізольований server на 18712 зупинений; основний процес на 8712 не перезапускався під час активного з’єднання, тому ще не завантажив поточний код.
+
+## [2026-11-06] lint | Runtime search і coverage зміни
+
+Повний suite на точному робочому дереві: 663 passed, 4 skipped за 151,76 с. `ruff check src tests evals` та `git diff --check` пройшли. Перший повний прогін виявив чотири застарілі очікування тестів; тести оновлено під новий контракт incomplete coverage і granted file tools, після чого повторний повний suite пройшов.
+
+Wiki validation: 41 сторінка, 340 локальних посилань, биті шляхи/якорі — 0, відсутні `sources` — 0, сторінки поза індексом — 0. SHA-256 `raw/B-12_Master_Project_2026-10-24.md` лишився `e2b0c4c33054082a4df48fed2785c834a95cfb7fb8f6a6e9198b6de53bd8e37a`, що збігається з `raw/source-manifest.json`. У `raw/` master brief не змінювався; маніфест містить 120 external references, з новими перевірками NVIDIA та межами прочитаного.
+
+## [2026-11-06] fix | Контекстна безперервність після обрізання історії
+
+`Agent._admit` більше не ігнорує `AdmittedRequest.dropped_ids`: після вилучення старих turns повторно збирає запит із короткими цитатами до трьох пропущених user/assistant turns. У system context явно зазначено, що це недовірені уривки, історія неповна і не можна заперечувати попередній діалог. У persist-режимі враховано старі assistant/tool повідомлення, скорочені `_fit_history`. Обов’язкові повідомлення поточного ходу та context fail-closed не змінені.
+
+TDD regression використовує реальний `ContextBuilder`: великий старий turn справді вилучається, запит моделі містить уривок із нього, а поточне запитання лишається останнім. Повний `uv run pytest -q`: **664 passed, 4 skipped** за 148,89 с; `uv run ruff check src tests` і `git diff --check` пройшли.
+
+**Операційна перевірка:** B-12 API перезапущено з worktree `.worktrees/runtime` на `127.0.0.1:8712`; `/api/health` повернув `ok=true`. Kitty TUI перезапущено та підключено до API (активне loopback-з’єднання). Live `/api/tools` показав 19 записів каталогу, серед них `web_search`. Ollama та процеси GPU не перезапускалися й не зупинялися.
+
+## [2026-11-06] lint | Context fix і GitHub підготовка
+
+Перевірено 41 wiki-сторінку, 340 локальних Markdown-посилань і якорів, frontmatter, усі `sources` paths та охоплення індексом: помилок немає, неіндексованих сторінок — 0. Перевірено відсутність нових локальних transcript/download paths у baseline-картці; до публічної wiki перенесені лише широкі категорії неперевірених тверджень. Master brief байтово незмінний, SHA-256 збігається з маніфестом. README/status синхронізовані з датою 06.11 та зафіксованими межами benchmark.
+
+## [2026-11-06] review fix | Повна пагінація file_list у coverage guard
+
+Read-only review виявив, що `Agent._track_files` раніше виставляв `dirs[path]=True` після першої сторінки `file_list`; це могло дозволити persist-звіту завершитися з неповним індексом теки. Тепер у turn state зберігаються очікувані offsets. Тека лишається незавершеною до фінального `next_offset=null`; сторінку поза чергою не приймають за закриття пропущеного діапазону. Auto-nudge і `next_unfinished` називають точний offset, а каталог повністю перелічається до читання знайдених файлів.
+
+**TDD:** тест із 201 записом перевіряє сторінку 0, спробу перескочити на 400, повторне продовження з 200 та успішне завершення лише після правильної сторінки. Цільові regressions — 4 passed. Перший повний прогін після fix виявив застаріле очікування старого тексту системної підказки; assertion оновлено під `next_offset=null`. Повторний повний `uv run pytest -q`: **665 passed, 4 skipped** за 170,36 с. `uv run ruff check src tests evals` та `git diff --check` — clean.
+
+**Незалежний rereview:** на commit `5eb6f62` конкретних findings не залишилось. Перевірено, що непослідовні сторінки не змінюють очікуваний offset і не дають завершити покриття.
+
+**Перезапуск:** після фінального fix B-12 API з worktree знову запущений на `127.0.0.1:8712`; health endpoint повернув `ok=true`. Kitty TUI підключено, API tool catalog містить 19 записів разом із `web_search`. Ollama/GPU-процеси не перезапускалися.
+
+## [2026-11-06] publish | PR з runtime, пошуком і документацією
+
+За дорученням власника три коміти гілки `feat/b12-runtime` опубліковано в публічному `cyberdid/B-12`; відкрито [PR #1 у `main`](https://github.com/cyberdid/B-12/pull/1). PR містить детальний опис змін, перевірок, benchmark меж і негативного live code-review результату. На момент запису PR має стан OPEN і не злитий; `main` не змінювався.
+
+## [2026-11-07] ingest | NVIDIA AI Factory Operations Agent
+
+За URL власника прочитано README, security/multitenancy/installation docs та вибрані chart, RBAC, secrets і tool policy файли на pinned commit `307afa7e485a334389b4f2c8c68128fbf84ff007` (commit 2026-11-05). AFOA — експериментальний Helm/Kubernetes blueprint для кластерних операцій; приватні NGC artifacts вимагають early-access запрошення. Default Edit вимкнений, але кластерний read-only доступ активний; tenant deployment потребує окремої scoped identity. Перевірений кодом lifecycle mutation має стани `running/completed/failed`; його здатність чесно представляти частковий ефект потребує перевірки.
+
+Рекомендація для B-12 — не переносити stack без конкретної задачі роботи із зовнішнім кластером. Патерни поділу tool/credential та server-side policy можна враховувати, але B-12 вже має власні grants і `unknown` outcome. Runtime не змінювався, Helm не встановлювався, тести не запускалися; snapshot у `raw/` не збережено. Картка джерела: [NVIDIA AFOA](sources/nvidia-ai-factory-operations-agent-2026-11-07.md); зіставлення: [придатність для B-12](topics/nvidia-ai-factory-operations-agent.md).
+
+## [2026-11-07] lint | Аналіз NVIDIA AI Factory Operations Agent
+
+Перевірено 43 wiki-сторінки, 352 локальні Markdown-посилання/якорі, frontmatter `type/updated/status/sources/tags`, усі source paths і охоплення індексом: помилок немає, сторінок поза індексом — 0. `raw/source-manifest.json` валідний, URL має `verified_selected_claims` із датою та обсягом читання. SHA-256 незміненого master brief збігається з маніфестом; `git diff --check` пройшов. Runtime-код і тести не змінювалися/не запускалися.
+
 ## [2026-11-08] ingest | Hook-схеми coding agents для TUI
 
 - Повторно прочитано релевантні офіційні розділи Claude Code Hooks, Codex Hooks та Antigravity Hooks: project config locations/trust, stdin schema, output/decision semantics, event-specific safe no-op outputs.
@@ -577,6 +638,14 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 Feature branch `feat/b12-cybercat-tui` локально злито в `main` merge commit `72a06d6`. Конфлікти wiki вирішено зі збереженням свіжих записів аудиту 04.11 та додаванням TUI-оновлень 08.11; кодові зміни злилися автоматично. Ruff, Python/shell syntax, JSON і wiki/source metadata перевірені статично. Повні тести та запуск TUI/API/audio/hooks не виконувалися; push не робився.
 
+## [2026-11-08] ingest | Capri GitHub hero та social preview
+
+За погодженням власника додано оригінальну ілюстрацію Capri для головного README та окремий 1280×640 social-preview asset. Вона не використовує приватний Capri sprite pack. Prompt, походження й межі ліцензування зафіксовані в [source card](sources/capri-original-hero-2026-11-08.md). Capri — видима назва компаньйона; внутрішні `b12` package/API identifiers збережено.
+
+## [2026-11-08] lint | Capri GitHub branding
+
+README hero веде на `docs/images/capri-hero.jpg`; social preview — 1280×640 PNG (904 827 bytes). У main README прямо зазначено, що Capri desktop зміни лишаються у відкритому PR #2. GraphQL підтверджує `usesCustomOpenGraphImage=false`; GitHub не має публічного API для запису цього налаштування, а UI браузера в сесії недоступний. Тому preview asset підготовлений у репозиторії, але settings-level upload потребує ручної дії власника. Повний test suite для цієї візуальної зміни не запускався.
+
 ## [2026-11-10] ingest | Комплексна оцінка Capri (92 сценарії, групи A–K)
 
 - Джерело: `evals/capri_comprehensive/reports/` (звіт, матриця CSV, статистичне резюме, batch_summary.json) і `artifacts/` (92 execution_report.json, абляції A1–A5). Оцінку виконала команда agy (Teamwork) з оркестраторами Gen 0–2; M2–M5 пройшли гейти, фінальний аудит `victory_auditor` дав VICTORY CONFIRMED.
@@ -595,14 +664,6 @@ Feature branch `feat/b12-cybercat-tui` локально злито в `main` mer
 
 - Суперечності: розділи A1–A4 і RQ2 містили механізми й цифри, яких немає в артефактах (SEC-02/SEC-10 у A3, «галюцинації аргументів» у A4, «голка в стозі сіна» на CM-07 в A2, 50% валідності інструментів). Приведено до фактів артефактів; гіпотези позначено як гіпотези.
 - Статус `project/status.md` оновлено.
-
-## [2026-11-08] ingest | Capri GitHub hero та social preview
-
-За погодженням власника додано оригінальну ілюстрацію Capri для головного README та окремий 1280×640 social-preview asset. Вона не використовує приватний Capri sprite pack. Prompt, походження й межі ліцензування зафіксовані в [source card](sources/capri-original-hero-2026-11-08.md). Capri — видима назва компаньйона; внутрішні `b12` package/API identifiers збережено.
-
-## [2026-11-08] lint | Capri GitHub branding
-
-README hero веде на `docs/images/capri-hero.jpg`; social preview — 1280×640 PNG (904 827 bytes). У main README прямо зазначено, що Capri desktop зміни лишаються у відкритому PR #2. GraphQL підтверджує `usesCustomOpenGraphImage=false`; GitHub не має публічного API для запису цього налаштування, а UI браузера в сесії недоступний. Тому preview asset підготовлений у репозиторії, але settings-level upload потребує ручної дії власника. Повний test suite для цієї візуальної зміни не запускався.
 
 ## [2026-11-10] lint | Повторний прогін 92 сценаріїв Capri
 
