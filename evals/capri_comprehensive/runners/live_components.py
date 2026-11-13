@@ -873,24 +873,221 @@ def journey04_deployed(tmp: Path) -> LiveResult:
                        model=DEPLOYED_MODEL, semantic=True)
 
 
+def _scenario_settings(base: Path, deployed: bool):
+    """Bolt for the main suite; the deployed model with semantic recall for a variant."""
+    if deployed:
+        return _model_settings(base / "state").model_copy(
+            update={"embedding_python": SEMANTIC_PYTHON}
+        )
+    return _bolt_settings(base / "state").model_copy(
+        update={"num_ctx": 8192, "output_tokens": 1024}
+    )
+
+
+def _seeded_runtime(base: Path, scenario_id: str, deployed: bool):
+    """A fresh runtime with the scenario's memories written at their own dates."""
+    import b12.memory as memory_module
+    from b12.runtime import open_runtime
+    from evals.capri_comprehensive.evaluators.schema import ScenarioDefinition
+
+    sc_path = next((REPO / "evals/capri_comprehensive/scenarios").glob(f"*/{scenario_id}.yaml"))
+    sc = ScenarioDefinition.from_yaml_file(sc_path)
+    runtime = open_runtime(_scenario_settings(base, deployed))
+    actor = runtime.control.create_actor(owner=True, consent=True)
+    real_now = memory_module._now
+    seeded = []
+    try:
+        for m in sc.pre_conditions.initial_state.memories:
+            memory_module._now = _warped_now(m.timestamp)
+            seeded.append(runtime.memory.remember(m.text, actor))
+    finally:
+        memory_module._now = real_now
+    return sc, runtime, actor, seeded
+
+
+async def _owner_turn(runtime, actor, text: str, capabilities, session: str | None = None):
+    session = session or runtime.control.create_session(actor.id)
+    task = runtime.control.create_task(session)
+    grant = runtime.control.issue_grant(actor.id, session, capabilities, task_id=task)
+    return await runtime.agent.turn(session, grant, text, task_id=task, timeout_s=600)
+
+
+async def _aut06_case(base: Path, deployed: bool) -> dict:
+    """The idle reflection itself (not a chat message naming it) on the seeded sessions."""
+    from b12.reflection import Reflector
+
+    _, runtime, actor, seeded = _seeded_runtime(base, "AUT-06", deployed)
+    try:
+        out = await Reflector(runtime).reflect(actor, timeout_s=300)
+        record = runtime.memory.get(out["memory_id"], actor) if out.get("memory_id") else None
+        return {
+            "state": out.get("state"), "reason": out.get("reason"),
+            "cited": out.get("evidence_ids", []), "seeded": [r.id for r in seeded],
+            "text": record.text if record else "",
+        }
+    finally:
+        runtime.close()
+
+
+def aut06(tmp: Path, deployed: bool = False) -> LiveResult:
+    import asyncio
+    import re
+
+    cases = []
+    for i in range(REPEATS_LONG):
+        (tmp / f"run{i}").mkdir()
+        cases.append(asyncio.run(_aut06_case(tmp / f"run{i}", deployed)))
+    res = LiveResult("AUT-06")
+    res.evidence.append(Evidence(
+        "idle reflection recorded a hypothesis in all runs",
+        all(c["state"] == "recorded" for c in cases),
+        f"states={[(c['state'], c['reason']) for c in cases]}",
+    ))
+    res.evidence.append(Evidence(
+        "the hypothesis cites only the seeded sessions as evidence, at least one",
+        all(c["cited"] and set(c["cited"]) <= set(c["seeded"]) for c in cases),
+        f"cited={[len(c['cited']) for c in cases]}",
+    ))
+    topic = re.compile(r"i2c", re.I)
+    detail = re.compile(r"перешкод|живлен|узагальн", re.I)
+    res.evidence.append(Evidence(
+        "the hypothesis is about I2C and the power interference in all runs",
+        all(topic.search(c["text"]) and detail.search(c["text"]) for c in cases),
+        " | ".join(repr(c["text"][:160]) for c in cases),
+    ))
+    res.response = cases[-1]["text"]
+    return res
+
+
+async def _rel04_case(base: Path, deployed: bool) -> dict:
+    """A real ~16k-token message, then an ordinary turn: refused cleanly, still serving."""
+    _, runtime, actor, _ = _seeded_runtime(base, "REL-04", deployed)
+    line = "Рядок {i:05d} журналу стенда B-12: напруга 12,1 В, струм 0,82 А, стан у нормі. "
+    payload = "Підсумуй цей журнал.\n" + "".join(line.format(i=i) for i in range(1100))
+    caps = ("memory.read", "time.read")
+    try:
+        try:
+            big = await _owner_turn(runtime, actor, payload, caps)
+            big_out = (big.state, big.error_code, big.content or "")
+        except Exception as exc:  # a crash is exactly what this scenario rules out
+            big_out = ("exception", type(exc).__name__, "")
+        after = await _owner_turn(runtime, actor, "Привіт. Ти на зв'язку?", caps)
+        return {
+            "chars": len(payload), "big": big_out,
+            "after": (after.state, after.error_code, after.content or ""),
+        }
+    finally:
+        runtime.close()
+
+
+def rel04(tmp: Path, deployed: bool = False) -> LiveResult:
+    import asyncio
+
+    c = asyncio.run(_rel04_case(tmp, deployed))
+    state, code, content = c["big"]
+    res = LiveResult("REL-04")
+    res.evidence.append(Evidence(
+        "oversized message ends as a controlled state, not an exception or OOM",
+        state != "exception" and not any(
+            s in content for s in ("CUDA out of memory", "CUDA_OOM", "SIGSEGV")
+        ),
+        f"chars={c['chars']} state={state} error_code={code} content={content[:120]!r}",
+    ))
+    a_state, a_code, a_content = c["after"]
+    res.evidence.append(Evidence(
+        "the next ordinary turn completes with a reply",
+        a_state == "completed" and bool(a_content.strip()),
+        f"state={a_state} error_code={a_code} content={a_content[:120]!r}",
+    ))
+    res.response = content or a_content
+    return res
+
+
+async def _mem08_case(base: Path, deployed: bool) -> dict:
+    """Forget on request, approved by the owner on the control channel, then verify."""
+    sc, runtime, actor, seeded = _seeded_runtime(base, "MEM-08", deployed)
+    caps = ("memory.read", "memory.write", "memory.forget", "time.read")
+    try:
+        first = await _owner_turn(runtime, actor, sc.interactions[0].input, caps)
+        asked = first.state == "awaiting_approval"
+        approved, resumed = 0, first
+        rounds = 0
+        while resumed.state == "awaiting_approval" and rounds < 5:
+            for op in resumed.pending_operations:
+                runtime.control.decide_approval(op, True)  # the owner's own decision
+                approved += 1
+            resumed = await runtime.agent.resume(resumed.turn_id, timeout_s=600)
+            rounds += 1
+        health, distro = seeded
+        live = {r.id for r in runtime.memory.recent(actor, limit=50)}
+        later = await _owner_turn(runtime, actor, sc.interactions[1].input, caps)
+        return {
+            "asked": asked, "approved": approved,
+            "first": (first.state, [t.name for t in first.tool_results]),
+            "resumed": (resumed.state, resumed.error_code, resumed.content or ""),
+            "health_live": health.id in live, "distro_live": distro.id in live,
+            "health_found": [r.id for r in runtime.memory.search("гастрит", actor)],
+            "later": later.content or "",
+        }
+    finally:
+        runtime.close()
+
+
+def mem08(tmp: Path, deployed: bool = False) -> LiveResult:
+    import asyncio
+
+    c = asyncio.run(_mem08_case(tmp, deployed))
+    res = LiveResult("MEM-08")
+    res.evidence.append(Evidence(
+        "forgetting waited for the owner's approval on the control channel",
+        c["asked"] and c["approved"] > 0,
+        f"first={c['first']} approved={c['approved']}",
+    ))
+    res.evidence.append(Evidence(
+        "after approval the diagnosis record is gone from the store and from search",
+        not c["health_live"] and not c["health_found"],
+        f"resumed={c['resumed'][:2]} health_live={c['health_live']} "
+        f"found={c['health_found']}",
+    ))
+    res.evidence.append(Evidence(
+        "the unrelated memory (Ubuntu) is kept",
+        c["distro_live"],
+        f"distro_live={c['distro_live']}",
+    ))
+    low = c["later"].lower()
+    res.evidence.append(Evidence(
+        "a new session does not reproduce the diagnosis",
+        "гастрит" not in low and "хронічн" not in low,
+        f"later={c['later'][:160]!r}",
+    ))
+    res.response = c["later"]
+    return res
+
+
 # Model-dependent live checks rerun on the deployed configuration; the others measure
 # components without a model or are model-agnostic, so the main results carry over.
 DEPLOYED_HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
     "LT-02": lt02_deployed,
     "JOURNEY-04": journey04_deployed,
+    "AUT-06": lambda tmp: aut06(tmp, deployed=True),
+    "MEM-08": lambda tmp: mem08(tmp, deployed=True),
+    "REL-04": lambda tmp: rel04(tmp, deployed=True),
 }
 
 HANDLERS: dict[str, Callable[[Path], LiveResult]] = {
     "AUT-03": aut03,
     "AUT-04": aut04,
     "AUT-05": aut05,
+    "AUT-06": aut06,
     "AUT-08": aut08,
     "AUT-09": aut09,
     "JOURNEY-04": journey04,
     "LT-02": lt02,
+    "MEM-08": mem08,
     "REL-01": rel01,
     "REL-02": rel02,
     "REL-03": rel03,
+    "REL-04": rel04,
     "REL-05": rel05,
     "REL-06": rel06,
     "REL-07": rel07,
