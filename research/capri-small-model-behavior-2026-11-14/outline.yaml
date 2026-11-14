@@ -1,0 +1,34 @@
+topic: Capri behavior and latency on small local language models
+scope: >-
+  Research the five supplied problem areas for B-12/Capri under its local-first,
+  model-swappable, deterministic-control, traceable-memory constraints; additionally
+  assess what local memory continuity does and does not establish after model replacement,
+  including the user's AIBEVA comparison question.
+time_range: 2024-2026, with older foundational work clearly labeled
+language: Ukrainian; preserve technical identifiers and publication titles
+items:
+  - name: Short casual replies without tool-use regression
+    category: Prompting and agent runtime
+    description: >-
+      Find evidence-backed ways to bound casual-response length in small local LLMs
+      without suppressing tool calls, changing language, or impairing technical answers.
+  - name: TTFT and prompt-cache reuse in Ollama and llama.cpp
+    category: Local inference performance
+    description: >-
+      Verify version-specific mechanisms and tuning for prompt/KV reuse, num_batch,
+      flash attention, KV cache quantization, keep_alive, partial GPU offload,
+      speculative decoding, schema pruning, and stable prompt prefixes.
+  - name: Contradiction detection, preference adherence, and proactive initiative
+    category: Retrieval, personalization, and dialogue
+    description: >-
+      Compare structural, prompt, verifier, retrieval, and policy approaches for small
+      local models, including low-annoyance surfacing of unresolved memory items.
+execution:
+  batch_size: 3
+  items_per_agent: 1
+  output_dir: ./results
+  first_batch: 3
+  additional_work_by_primary_agent:
+    - Evidence-matched AIBEVA versus Capri memory/model continuity assessment
+    - Paired statistical protocol for 80 scenarios with observed 1-3 flips per repeat
+    - Integrate local artifacts and the supplied user prompt into a Ukrainian report

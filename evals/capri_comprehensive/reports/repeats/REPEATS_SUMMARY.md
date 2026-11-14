@@ -4,6 +4,7 @@
 - Passed per run: 49, 49, 48 (mean 48.7, SD 0.6)
 - Pooled pass rate: 146/240 = 60.8% (Wilson 95% CI 54.5–66.8%; runs are not independent samples of scenarios, so this interval understates scenario-level uncertainty)
 - Stable pass (3/3): 44; stable fail (0/3): 27; flaky: 9
+- Pairwise scenario-level discordance: run 1/2 = 4, run 1/3 = 7, run 2/3 = 7. The total pass counts differ by only 0–1; this is distinct from scenario verdict disagreement.
 
 ## Flaky scenarios
 

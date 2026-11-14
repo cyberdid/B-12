@@ -1,6 +1,6 @@
 ---
 type: questions
-updated: 2026-11-12
+updated: 2026-11-14
 status: open
 sources: [raw/B-12_Master_Project_2026-10-24.md, wiki/project/analysis.md, wiki/topics/evals.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/sources/capri-desktop-companions-2026-11-07.md]
 tags: [unknowns, validation]
@@ -32,6 +32,7 @@ Q1–Q12 зберігають порядок §14 master brief; Q13–Q21 дод
 | Q19 | Чи придатна E4B для доказового multi-file code review? | **Поки ні за виміряним сценарієм:** v3 і v4 завершилися `failed/incomplete_coverage`, а звіт не містив перевірюваних знахідок. Потрібні окремі file-by-file trajectory evals із відомою ground truth і порівняння сильнішої моделі; Claude baseline сам по собі не є ground truth. Див. [evals](../topics/evals.md#live-bolt-перевірки-інтернету-та-кодового-review-2026-11-06) |
 | Q20 | Чи можна поширювати Capri art pack разом із B-12? | У локальному desktop preview використано user-data pack із pinned Linux fork; його LICENSE прямо виключає персонажа Capri/Cyberpunk IP. Локальна наявність/доручення власника не є ліцензією. Не комітити й не випускати арт; для поширення потрібне окреме письмове право або власний сумісно ліцензований персонаж. |
 | Q21 | Чи є власний або ліцензований Capri art pack для TUI? | Потрібні зображення/atlas, письмовий дозвіл або чітка сумісна ліцензія, attribution і manifest; огляд репозиторіїв не підтвердив прав на оригінальні character assets. Після надання pack перевірити manifest і фактичний TUI render окремо. |
+| Q22 | Чи зберігається behavioral continuity Capri після заміни LLM? | Зробити paired same-state migration test із тим самим сховищем, baseline same-model reload, pinned model profiles, однаковими сценаріями, повтореннями та blind behavioral scoring; окремо звітувати data/retrieval/behavior continuity. Див. [deep research](../../research/capri-small-model-behavior-2026-11-14/report.md#7-заміна-моделі-сталість-памяті-та-aibeva). |
 
 Q1/Q2/Q13/Q14 залишаються фундаментальними для runtime. Перший Bolt smoke test завершено; наступні дослідження мають уточнювати Q6/Q17/Q18/Q19. Capri skin доступний лише як зовнішній локальний desktop pack; права на його поширення лишаються відкритим Q20. Конкретний [наступний крок](status.md), [аналіз ризиків](analysis.md) та [дорожня карта](roadmap.md) пов’язують питання з роботою.
 

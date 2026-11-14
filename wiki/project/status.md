@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-11-13
+updated: 2026-11-14
 status: active
 sources: [wiki/sources/master-brief.md, wiki/project/analysis.md, wiki/topics/operations.md, wiki/topics/evals.md, wiki/project/requirements-audit.md, wiki/sources/capri-desktop-companions-2026-11-07.md, wiki/sources/agent-hooks-2026-11-08.md, wiki/sources/gemma12b-desktop-launch-2026-11-09.md, wiki/sources/gemma12b-followup-2026-11-09.md, wiki/sources/capri-academic-formatting-2026-11-09.md, wiki/sources/capri-scientific-revision-2026-11-09.md, src/b12/agent.py, src/b12/persona.py, src/b12/api.py, src/b12/reflection.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, wiki/project/desktop-companion-plan.md, wiki/topics/desktop-companion.md, wiki/sources/capri-personality-review-2026-11-08.md, wiki/sources/scribe-paper-2026-11-08.md, wiki/project/decisions.md, docs/superpowers/specs/2026-11-08-b12-capri-compact-actions-design.md, docs/superpowers/specs/2026-11-08-b12-capri-feature-parity-design.md, docs/superpowers/plans/2026-11-08-b12-capri-feature-parity.md, docs/superpowers/specs/2026-11-08-capri-persona-brand-design.md, docs/superpowers/plans/2026-11-08-capri-persona-brand.md, src/b12/desktop/actions.py, src/b12/desktop/activity.py, src/b12/desktop/hooks.py, src/b12/desktop/integrations.py, src/b12/desktop/local_features.py, src/b12/desktop/profile.py, src/b12/desktop/presentation.py, src/b12/desktop/client.py, src/b12/desktop/app.py, src/b12/desktop/chat.py, src/b12/desktop/cat.py, wiki/sources/nvidia-ai-factory-operations-agent-2026-11-07.md, wiki/topics/nvidia-ai-factory-operations-agent.md]
 tags: [progress, next]
@@ -204,3 +204,10 @@ tags: [progress, next]
 - **Перевірений факт:** PR #1 (вебпошук) і PR #2 (desktop-компаньйон, persona Capri) злито в `main` за дорученням власника. Тести з усіма extras: 829 passed, 4 skipped.
 - **Перевірений факт:** оцінка злитого `main` — 48/32/12 (60,0%) на Bolt, 43/37/12 (53,8%) на gemma4:12b. Регресії після злиття (контекст, persona, ін'єкція з пам'яті, вигадані перевірки) знайдено прогоном і виправлено.
 - **Відкрито (за рішенням власника відкладено):** 7- і 30-денні тести в реальному часі, голос і робот. Також: gemma з persona повільніша й слабша за Bolt; вигадки без явних слів «перевірила» не ловляться.
+
+## Оновлення 14.11.2026 — deep research поведінки Capri
+
+- **Перевірений факт (код):** пам’ять B-12 зберігається в SQLite окремо від Ollama-моделі. Це підтверджує data continuity в архітектурі, але не behavioral continuity після model swap.
+- **Перевірений факт:** виконано бібліографічний огляд стислості/tool use, TTFT/cache, conflict detection, preferences та proactive timing. Повний звіт і A/B план: [дослідницький звіт](../../research/capri-small-model-behavior-2026-11-14/report.md); коментар про AIBEVA залишився лише чернеткою.
+- **Уточнення повторів:** три 80-сценарні прогони мали 49/49/48 PASS; між парами змінювалися 4/7/7 verdicts. У попередньому описі плутали різницю сумарних PASS (0–1) з кількістю scenario-level розбіжностей. Див. [дослідження](../../research/capri-small-model-behavior-2026-11-14/report.md#8-статистичний-протокол-для-80-сценарного-suite).
+- **Відкрито:** не виконувались inference/GPU-заміри. Немає контрольованого same-state migration тесту, який доводить behavioral continuity між моделями; потрібні cache instrumentation, A/B стислості та окремі conflict/preference/initiative набори.

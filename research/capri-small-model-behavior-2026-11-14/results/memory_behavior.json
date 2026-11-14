@@ -1,0 +1,201 @@
+{
+  "title": "Дослідження: конфлікти доказів, вподобання, ініціатива та тяглість пам’яті Capri",
+  "authors_or_maintainer": "Open research synthesis; sources include ACL/NeurIPS/arXiv and AIBEVA first-party statements",
+  "date_and_version": "Accessed 2026-11-14; literature emphasis 2024–2026",
+  "evidence_level": "Mixed: peer-reviewed conference papers; preprints; first-party AIBEVA product claims; project-specific recommendations are hypotheses until tested on Capri",
+  "url": "https://aclanthology.org/2024.emnlp-main.447/; https://papers.nips.cc/paper_files/paper/2024/hash/c63819755591ea972f8570beffca6b1b-Abstract-Datasets_and_Benchmarks_Track.html; https://aclanthology.org/2026.acl-long.11/; https://arxiv.org/abs/2502.09597; https://arxiv.org/abs/2610.30485; https://arxiv.org/abs/2410.12361; https://arxiv.org/abs/2610.25896; https://aibfamily.cloud/",
+  "technical_features": {
+    "claim": "Evidence conflict detection, preference application, and proactive timing are distinct capabilities; durable local storage is only one layer and does not ensure behavioral continuity.",
+    "evidence_and_limits": "Peer-reviewed benchmarks show material weaknesses in all three areas. The cited studies mostly use larger or hosted models and their results must not be presented as measurements of B-12/Capri.",
+    "applicability_to_capri": "Prioritize typed/traceable state and deterministic gates, then test a verifier or brief generation policy on the local suite. Model-switch continuity remains unmeasured behavior.",
+    "approach_and_mechanism": "Use deterministic conflict checks for structured claims; scoped preference retrieval plus runtime validation for explicit operational constraints; and a rate-limited open-loop policy for suggestions. Keep the LLM in the language realization role where possible.",
+    "expected_effect": "Expected benefits are engineering hypotheses for Capri. Literature supports that the target failure classes are real, but does not provide a transferable effect size for the proposed local implementation.",
+    "risks": "False conflict flags, stale or over-applied preferences, missed open loops, notification fatigue, and additional latency from verifier calls.",
+    "cost_and_model_agnosticity": "Typed state and policy are mostly model-agnostic at medium implementation cost; NLI judges, fine-tuning, and generated wording remain model/profile dependent.",
+    "verification_protocol": "Use held-out paired scenarios; separately score conflict recall/precision, source coverage, preference adherence and over-application, and initiative usefulness/timing/annoyance; report latency overhead and model/profile metadata.",
+    "unresolved_questions": "No retrieved study establishes behavioral identity preservation after swapping the LLM in a companion system; no cited paper validates the proposed methods on Capri's exact local quantized models and runtime."
+  },
+  "findings": [
+    {
+      "claim": "Моделі часто не позначають суперечність навіть тоді, коли обидва джерела надані; слабші моделі можуть мати добру точність серед виявлених конфліктів, але пропускати значну частину конфліктів.",
+      "evidence_and_limits": "ECON (Jiayang et al., EMNLP 2024; peer-reviewed) порівнює Natural Language Inference (NLI), factual-consistency models та LLM. Автори повідомляють про високу precision для NLI/LLM, але нижчу recall у слабших моделей; factual-consistency підхід гірше справляється з лексично подібними варіантами; LLM можуть довільно обрати одне джерело або власне parametric knowledge. WikiContradict (Hou et al., NeurIPS 2024 Datasets and Benchmarks; peer-reviewed) має 253 людськи розмічені випадки й понад 3,500 людських оцінок; усі перевірені моделі мали труднощі з повним викладом конфліктів, особливо неявних. Його LLM-оцінювач дав F-score 0.8, що стосується оцінювача на цьому наборі, а не точності Capri. ConfRAG (Yuan et al., ACL 2026; peer-reviewed) охоплює 1,814 запитань, у середньому 9.58 абзаців на питання; 57.2% містили явні суперечності. Висновки стосуються переважно сильних моделей, а не моделей Capri; перенос на конкретні локальні quant GGUF не виміряно.",
+      "applicability_to_capri": "Проблема в prompt про 24 V проти 12 V узгоджується з відомим класом помилок RAG. Не можна очікувати, що загальна інструкція «зверни увагу на суперечності» сама надійно розв’яже задачу для 4B–12B моделі. Для простих полів потрібна детермінована перевірка, а для семантичних — контрольований verifier із можливістю abstain."
+    },
+    {
+      "claim": "Наявність вподобання в історії або пам’яті не означає, що модель застосує його доречно; є два окремі етапи — знайти потрібне правило й реалізувати його у відповіді/дії.",
+      "evidence_and_limits": "PrefEval (Zhao et al., ICLR 2025; peer-reviewed) містить 3,000 вручну підібраних пар preference/query у 20 темах і оцінює інференс, пам’ять та adherence у багато-сесійних контекстах. Автори повідомляють, що в zero-shot режимі точність preference following падає нижче 10% приблизно вже після 10 ходів (~3k токенів) у більшості перевірених моделей; prompting і retrieval не усувають деградацію повністю, fine-tuning допомагає. MemPABench (Li et al., arXiv 2610.30485, 2026-10-21; preprint) перевіряє 14 interaction preferences у 99 сесіях чотирьох simulated users, з п’ятьма змінами вподобань на користувача. У чотирьох memory systems × чотирьох LLM backbones retrieval-based memory не перевершила No Memory у selection; file-based memory підвищила accuracy, але часто застосовувала правила поза їхнім контекстом. Ці результати не є вимірюваннями Capri й не встановлюють універсальну величину ефекту.",
+      "applicability_to_capri": "Приклад з Neovim проти одиниць температури — це не лише retrieval проблема: правило може бути доступним, але не переноситися у відповідну дію. Зберігати вподобання як структурований стан із типом, сферою дії, актуальністю та джерелом; ін’єктувати лише релевантні поля; для однозначних операційних виборів застосовувати окрему перевірку/обмеження аргументів. Не робити глобальну перевагу безконтекстною інструкцією у system prompt."
+    },
+    {
+      "claim": "Проактивне повідомлення має вирішувати не лише що сказати, а й чи доречно взагалі зараз говорити.",
+      "evidence_and_limits": "Proactive Agent (Lu et al., arXiv 2410.12361 v3, 2024-12-03; preprint) формує ProactiveBench із 6,790 подій та навчає reward model/агента на людських рішеннях accepted/rejected; автори повідомляють F1 66.47% для fine-tuned моделі на proactive assistance. Це навчання на task-передбаченні, не доказ ефективності короткої ініціативи у настільному companion. PITCH (Wang et al., arXiv 2610.25896 v2, 2026-10-22; preprint) має 384 candidate contributions і 1,091 оцінку від 89 учасників у 35 групових розмовах. Для моделей точність найкращого ходу впала з 57.8% при доступі до всієї розмови до 19.0% у live-режимі; 46.4% втручань були завчасними. Це multi-party чат, тому застосовність до одного користувача обмежена, але демонструє ризик надмірної ініціативи.",
+      "applicability_to_capri": "Надійніше розділити policy від генерації: детермінована політика вибирає відкриту незавершену ціль/обіцянку, перевіряє строк, релевантність, пріоритет, quiet hours, cooldown і чи немає активного завдання; LLM лише формулює коротке повідомлення. Відхилення користувачем має відкладати повтор. Ініціатива повинна бути пропозицією, а не дозволом на дію."
+    },
+    {
+      "claim": "Зберігання даних поза вагами моделі забезпечує потенційну data continuity, але не є доказом behavioral continuity або збереження «того самого характеру» після заміни моделі.",
+      "evidence_and_limits": "Офіційна AIBfamily сторінка описує наявну AIBEVA як Windows-продукт із пам’яттю на PC, видимою панеллю пам’яті та можливістю вилучати записи; на сторінці прямо розрізнено функції «in AIBEVA today» і цілі AIBfamily, що ще розробляється. Публічна демонстрація «Switched the model, kept the memory» на Reddit показує один сценарій, де AIBEVA зберігає факт після переходу на Claude; автор поста розкриває зв’язок із командою AIBEVA. Це vendor demonstration, а не незалежна перевірка коду, всіх моделей чи behavioral identity. Продуктові матеріали заявляють також перемикання built-in model/Claude/Gemini з тією самою локальною пам’яттю. У науковій літературі знайдені роботи про persona consistency та memory-driven role-play, але не контрольована перевірка, що одна companion-система лишається поведінково тією самою після заміни ваг. Abdulhai et al., “Consistently Simulating Human Personas with Multi-Turn Reinforcement Learning” (arXiv 2511.00222, 2025-10-31; preprint) показує, що внутрішня multi-turn persona consistency потребує оцінювання й може покращуватись fine-tuning; це не cross-model migration study. Wang et al., “Memory-Driven Role-Playing” (arXiv 2603.19313, 2026-03-14; preprint) окремо оцінює Anchoring, Recalling, Bounding, Enacting; заявлений результат для Qwen3-8B після MRPrompt також не доводить модельну тяглість між вагами.",
+      "applicability_to_capri": "Для Capri підтвердження що пам’ять, історія/цілі й налаштування зберігаються поза вагами треба формулювати як архітектурну властивість/перевірений факт коду. Перехід між сесіями на одній моделі підтверджує лише шлях пригадування, а не тест заміни моделі. Чесна відповідь AIBEVA: підхід зі спільною локальною пам’яттю подібний; поведінкова сталість після switch ще не доведена. Перевіряти cross-model swap окремо, із однаковими сценаріями, пам’яттю, profile та сліпим людським оцінюванням."
+    }
+  ],
+  "recommendations": [
+    {
+      "approach_and_mechanism": "[Rank 1 — суперечності] Typed claim store + deterministic pair checks: нормалізувати entity, predicate, value, unit, valid-time interval, provenance; порівнювати записи з тим самим ключем і перекриттям часу. Якщо values несумісні, видавати conflict object із джерелами та не зливати в один факт. Для семантично неоднозначних пар передавати кандидати verifier-класифікатору.",
+      "expected_effect": "Очікується надійне виявлення чітких конфліктів чисел, дат, версій та явних взаємовиключних значень; числовий ефект на Capri не виміряний. Це інженерна гіпотеза, не результат ECON/WikiContradict.",
+      "risks": "Хибні конфлікти при різних одиницях, контекстах/версіях і значеннях, які можна узгодити; recall семантичних конфліктів залишиться обмеженим без verifier.",
+      "cost_and_model_agnosticity": "Середня розробницька вартість; здебільшого model-agnostic, без додаткового LLM виклику для структурованих фактів.",
+      "verification_protocol": "Побудувати 40–60 пар з узгодженими, суперечливими, часовими, одиничними, лексично схожими та лише позірно конфліктними записами. Оцінювати precision/recall, false-conflict rate, provenance coverage та чи містить відповідь обидві позиції або явне уточнення. Розділити пряму структурну евристику і verifier ablation."
+    },
+    {
+      "approach_and_mechanism": "[Rank 2 — суперечності] Pairwise NLI/entailment verifier після дешевого entity/predicate prefilter; схема відповіді entailment / contradiction / unknown + confidence. При contradiction відповідь має цитувати обидва evidence IDs або abstain, а не дозволяти verifier вибирати джерело.",
+      "expected_effect": "ECON (EMNLP 2024) підтримує NLI як сильніший напрям для лексично подібних conflict pairs і high precision, але слабкіші моделі мають низький recall. Жоден effect size для локального NLI або Capri не підтверджено.",
+      "risks": "Друга модель може пропускати тонкі конфлікти; окремий verifier збільшує latency/RAM і мовні збої; confidence може бути погано калібрований.",
+      "cost_and_model_agnosticity": "Середня/висока: потрібна придатна локальна NLI модель, локалізація й calibration. Runtime layer portable, NLI weights-specific.",
+      "verification_protocol": "Порівняти verifier із direct LLM instruction, deterministic-only та combined; калібрувати на окремому dev set, заморозити поріг, оцінити held-out recall/precision і selective risk при abstention українською та англійською. Виміряти p50/p95 overhead."
+    },
+    {
+      "approach_and_mechanism": "[Rank 3 — суперечності] Structured evidence-first generation: спочатку попросити модель сформувати JSON із claims, supporting IDs, conflicting IDs, conflict type, confidence/abstain; лише після валідації детерміновано рендерити коротку відповідь із згадкою різних значень.",
+      "expected_effect": "WikiContradict і ConfRAG обґрунтовують оцінювати повноту покриття сторін конфлікту й пояснення, а не лише збіг фінальної відповіді. Сам JSON не доводить кращого recall; очікуваний ефект для локальних малих моделей невідомий.",
+      "risks": "Додатковий prompt/schema overhead; модель може скласти валідний JSON, але пропустити конфлікт; structured output не є доказом фактичної перевірки.",
+      "cost_and_model_agnosticity": "Низька/середня вартість при підтримці Ollama format constraints; схема portable, але якість залежить від моделі.",
+      "verification_protocol": "Оцінювати conflict recall, source coverage, unsupported resolution, schema validity, time-to-first-token та повну latency; порівняти з вільним текстом на незмінному наборі."
+    },
+    {
+      "approach_and_mechanism": "[Rank 1 — вподобання] Scoped, typed preference records: key, value, scope/context, source/consent, created/updated time, supersedes/stale status. Retrieval gate має додавати тільки preference, релевантне поточній роботі. Показувати моделі як факти/обмеження, не як загальний стильовий абзац.",
+      "expected_effect": "Зменшує irrelevance та stale preference exposure архітектурно; PrefEval показує, що retrieval не усуває degradation, а MemPABench (2026 preprint) виявив, що retrieval memory в середньому не покращила selection проти No Memory, тож ефект Capri треба виміряти.",
+      "risks": "Неправильний scope чи застаріле правило; можливе under-retrieval; надто широке застосування. Додаткові контекстні tokens.",
+      "cost_and_model_agnosticity": "Середня; storage/retrieval policy model-agnostic, consumer behavior model-dependent.",
+      "verification_protocol": "Матриця preference × relevant/irrelevant context × unchanged/updated/revoked × direct/implicit mention; оцінювати correct application, over-application, missed retrieval, conflict update and source trace. Тестувати кожен релевантний model profile."
+    },
+    {
+      "approach_and_mechanism": "[Rank 2 — вподобання] Runtime-side enforcement для чітких, операційних вподобань: перед tool invocation перевіряти/нормалізувати аргументи проти дозволених preference constraints (наприклад, редактор чи одиниця виміру в генерованому config), залишаючи текстову відповідь окремо; запитувати користувача, якщо правило неоднозначне.",
+      "expected_effect": "Може гарантувати дотримання для структурованих аргументів у межах явних правил; не гарантує тон/мовний вибір і не може безпечно переписувати загальну відповідь. Локальний ефект ще не виміряно.",
+      "risks": "Застосування без належного контексту може змінити невідповідні технічні рішення; runtime не повинен перетворювати preference на authorization або privilege.",
+      "cost_and_model_agnosticity": "Середня; validators model-agnostic, потрібні per-tool semantics.",
+      "verification_protocol": "Додати paired cases із і без preference, включити зміну та скасування правила, і перевіряти tool args, кінцевий стан sandbox та provenance. Зробити тест на те, що preference не змінює grants/consent."
+    },
+    {
+      "approach_and_mechanism": "[Rank 3 — вподобання] Two-stage applicability: runtime добирає мінімальну релевантну preference set, а модель отримує коротке структуроване повідомлення `preference / applies_when / avoid_when / evidence`. Для критичних прикладів додати 1–2 позитивні/негативні few-shot demonstrations, не глобальну заборону.",
+      "expected_effect": "PrefEval показує виклик multi-session retrieve+apply; MemPABench показує ризик нецільового застосування. Жодна з робіт не встановлює конкретний benefit цього шаблону для Capri.",
+      "risks": "Few-shot може відволікати малу модель, збільшити prefix length і створити style drift; scope clause може не спрацювати.",
+      "cost_and_model_agnosticity": "Низька/середня; структура portable, приклади треба калібрувати по моделях.",
+      "verification_protocol": "Порівняти preference absent, plain text, typed block, typed block + few-shot. Рандомізувати позицію й формулювання; вимірювати adherence і overgeneralization, а не лише чи з’явилося ключове слово."
+    },
+    {
+      "approach_and_mechanism": "[Rank 1 — ініціатива] Deterministic open-loop queue із явними станами open / waiting / blocked / done / dismissed, owner/source, due time, salience, last surfaced, cooldown і relevance-to-current-context. Policy вирішує чи/коли нагадувати; LLM лише стисло формулює вже прийнятий candidate.",
+      "expected_effect": "Перевага — відтворюване rate limiting, актуальність і контроль користувача; індивідуального ефекту на Capri поки немає. ProactiveBench має навчальний, а не policy-only результат.",
+      "risks": "Хибні або застарілі open loops, notification fatigue, контекстний промах. Потрібні dismiss/snooze controls і чіткі критерії закриття.",
+      "cost_and_model_agnosticity": "Середня; здебільшого model-agnostic.",
+      "verification_protocol": "Offline replay із позитивними й негативними open-loop прикладами: оцінити recall релевантних нагадувань, false interruptions на привітанні/в задачі, дублікати, дозвіл на відкладення/закриття. Далі довготривалий user study із opt-in."
+    },
+    {
+      "approach_and_mechanism": "[Rank 2 — ініціатива] Начинати з session-start/idle-only, одного кандидатного повідомлення за сесію з cooldown, quiet hours, user-controlled frequency і prioritization; не переривати активний хід чи аудіо. Mid-conversation intervention — окрема політика з високим порогом.",
+      "expected_effect": "PITCH (2026 preprint) виявив систематично ранні live interventions у багатосторонній розмові, тож conservative timing має сенс, але величина покращення у one-to-one desktop companion невідома.",
+      "risks": "Може пропустити термінові нагадування; надто рідкісні ініціативи виглядатимуть відсутністю пам’яті.",
+      "cost_and_model_agnosticity": "Низька/середня; policy model-agnostic, текстова якість model-dependent.",
+      "verification_protocol": "A/B між session-start only і session-start+idle; людські оцінювачі оцінюють timing (ideal/acceptable/should-not-appear), usefulness, annoyance, false memory, і чи не відволікає від виконання."
+    },
+    {
+      "approach_and_mechanism": "[Rank 3 — ініціатива] LLM utility/timing judge only as a suggestion to a deterministic gate, trained/calibrated on explicit owner feedback (dismiss, snooze, accepted, completed), not as final authority.",
+      "expected_effect": "Proactive Agent (2024 preprint) reached 66.47% F1 using benchmark-derived fine-tuning/reward modeling; this is evidence that task proactivity can be learned, not evidence for zero-shot prompt success or Capri timing.",
+      "risks": "Extra model calls increase latency and can misread salience; user-acceptance labels may be sparse and personalized; false initiative erodes trust.",
+      "cost_and_model_agnosticity": "High if training; medium if second-call heuristic. Model-specific if fine-tuned.",
+      "verification_protocol": "Use the same held-out open-loop tasks, compare policy-only vs policy+judge, report precision/recall and false-interruption rate, plus time budget. Never let score authorize external side effects."
+    }
+  ],
+  "sources": [
+    {
+      "title": "ECON: On the Detection and Resolution of Evidence Conflicts",
+      "authors_or_maintainer": "Cheng Jiayang et al.",
+      "date_and_version": "EMNLP 2024, November 2024",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2024.emnlp-main.447/"
+    },
+    {
+      "title": "WikiContradict: A Benchmark for Evaluating LLMs on Real-World Knowledge Conflicts from Wikipedia",
+      "authors_or_maintainer": "Yufang Hou et al.",
+      "date_and_version": "NeurIPS 2024 Datasets and Benchmarks Track",
+      "evidence_level": "Peer-reviewed conference paper and benchmark",
+      "url": "https://papers.nips.cc/paper_files/paper/2024/hash/c63819755591ea972f8570beffca6b1b-Abstract-Datasets_and_Benchmarks_Track.html"
+    },
+    {
+      "title": "Benchmarking LLM’s Capability in Reasoning over Conflicting Web References",
+      "authors_or_maintainer": "Yizhen Yuan et al.",
+      "date_and_version": "ACL 2026, July 2026",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2026.acl-long.11/"
+    },
+    {
+      "title": "Do LLMs Recognize Your Preferences? Evaluating Personalized Preference Following in LLMs",
+      "authors_or_maintainer": "Siyan Zhao et al.",
+      "date_and_version": "ICLR 2025; arXiv 2502.09597 submitted 2025-02-13",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://arxiv.org/abs/2502.09597"
+    },
+    {
+      "title": "Why Bother Me Again? Benchmarking Personal Agent Memory for Interaction Preferences",
+      "authors_or_maintainer": "Jialin Li et al.",
+      "date_and_version": "arXiv 2610.30485, submitted 2026-10-21",
+      "evidence_level": "Preprint, not peer reviewed as of access",
+      "url": "https://arxiv.org/abs/2610.30485"
+    },
+    {
+      "title": "Proactive Agent: Shifting LLM Agents from Reactive Responses to Active Assistance",
+      "authors_or_maintainer": "Yaxi Lu et al.",
+      "date_and_version": "arXiv 2410.12361 v3, revised 2024-12-03",
+      "evidence_level": "Preprint; author-reported benchmark result",
+      "url": "https://arxiv.org/abs/2410.12361"
+    },
+    {
+      "title": "When Should AI Chime In? Benchmarking Timely Contribution of Proactive Agents in Multi-Party Chat",
+      "authors_or_maintainer": "Ruotong Wang et al.",
+      "date_and_version": "arXiv 2610.25896 v2, revised 2026-10-22",
+      "evidence_level": "Preprint; human timing judgments in multi-party chat, transfer to one-user companion uncertain",
+      "url": "https://arxiv.org/abs/2610.25896"
+    },
+    {
+      "title": "AIBfamily official page describing AIBEVA features available today",
+      "authors_or_maintainer": "AIBlab / SAY TO PAY s.r.o.",
+      "date_and_version": "Accessed 2026-11-14; live product page, no pinned revision",
+      "evidence_level": "First-party product description; not independent implementation audit",
+      "url": "https://aibfamily.cloud/"
+    },
+    {
+      "title": "Switched the model, kept the memory",
+      "authors_or_maintainer": "AIBEVA-affiliated poster (disclosed connection to product team)",
+      "date_and_version": "Reddit post accessed 2026-11-14",
+      "evidence_level": "Vendor demonstration / affiliated anecdotal evidence; one shown cross-model recall scenario, not independent test",
+      "url": "https://www.reddit.com/r/u_Anxious_Count_8728/comments/1xvzpi9/switched_the_model_kept_the_memory/"
+    },
+    {
+      "title": "Consistently Simulating Human Personas with Multi-Turn Reinforcement Learning",
+      "authors_or_maintainer": "Marwa Abdulhai et al.",
+      "date_and_version": "arXiv 2511.00222, submitted 2025-10-31",
+      "evidence_level": "Preprint; studies within-model multi-turn persona consistency, not cross-model switching",
+      "url": "https://arxiv.org/abs/2511.00222"
+    },
+    {
+      "title": "Memory-Driven Role-Playing: Evaluation and Enhancement of Persona Knowledge Utilization in LLMs",
+      "authors_or_maintainer": "Kai Wang et al.",
+      "date_and_version": "arXiv 2603.19313, submitted 2026-03-14",
+      "evidence_level": "Preprint; persona-memory retrieval benchmark, not model migration study",
+      "url": "https://arxiv.org/abs/2603.19313"
+    }
+  ],
+  "uncertainty": {
+    "unresolved_questions": [
+      "Чи покращить явне structured conflict labeling recall на локальних Bolt/Gemma без неприйнятної затримки, ще не відомо.",
+      "Немає підтвердженої локальної NLI моделі, яка була б перевірена на українських conflicts і могла працювати в межах VRAM/latency B-12.",
+      "Оптимальна частота ініціативи для одного користувача має бути визначена opt-in дослідженням; multi-party timing не можна напряму переносити.",
+      "Публічні матеріали AIBEVA не надають вихідний код або незалежний аудит; заявлене перемикання моделі підтверджене vendor-authored демонстрацією одного факту, а не system-wide behavioral continuity.",
+      "Жоден знайдений науковий результат не встановлює, що одна пам’ять достатня для збереження behavioral identity після swap між різними LLM.",
+      "Ефект на Capri залежить від фактичних Ollama models, prompt shape, tokenizer/template profiles, context settings і system revision; cited papers переважно оцінювали інші моделі/корпуси."
+    ],
+    "uncertain": [
+      "local-small-model transfer of ECON/WikiContradict results",
+      "effect size of typed preference blocks on Capri",
+      "effect size of deterministic open-loop policy on user acceptance",
+      "AIBEVA implementation details beyond first-party product claims",
+      "cross-model behavioral identity continuity"
+    ]
+  }
+}

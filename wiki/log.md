@@ -1019,3 +1019,18 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - Звіт без посилань і дат; числа з нього позначено «потребує перевірки», `keep_alive_slots` в Ollama не знайдено.
 - Звірка з кодом дала перевірений факт: B-12 дописує Evidence у системне повідомлення перед схемами інструментів, тому кешований префікс обривається щоходу. Перенесення Evidence після статичного префікса — перша пропозиція.
 
+## [2026-11-14] ingest | Deep research: поведінка Capri на малих моделях і continuity
+
+- Додано незмінну копію власницького prompt raw/deep-research-prompt-behavior-2026-11-14.md, SHA-256 84ad1d1e5726acd0041fae07dd2b4f412effea0157e70379973527471164df2f; це інший документ, ніж попередній prompt того ж дня.
+- Підготовлено повний український звіт [report.md](../research/capri-small-model-behavior-2026-11-14/report.md), джерельну картку та окремі JSON research traces.
+- Перевірено першоджерела про multi-instruction failures, tool use under constraints, length control, conflict resolution, preferences, timing, model transition та Ollama v0.33.3. Доступ до вебджерел записано без локальних snapshots; рівні доказів розрізнені.
+- Висновок про AIBEVA: принцип локальної зовнішньої пам’яті подібний; Capri не має контрольованого before/after model migration результату. Чернетку англійської відповіді збережено у звіті; не публікували.
+- Не запускали Capri, LLM, GPU, тести чи benchmark; production code не змінювали.
+
+## [2026-11-14] lint | Статистика повторів і межі дослідження
+
+- Перераховано сценарійні статуси з evals/capri_comprehensive/reports/repeats/run1, run2 і run3 batch_summary.json: 49/49/48 PASS, 9 нестабільних кейсів, попарні розбіжності 4/7/7. Попереднє твердження «1–3 вердикти» стосувалося лише зміни сумарної кількості PASS і виправлено в активному summary.
+- Відкрито Q22 про same-state модельну міграцію; збереження SQLite не зараховано за behavioral continuity.
+- Обмеження джерел і технічне питання сімейства Bolt позначені у звіті; вхідний бриф називає Gemma 4 E4B-class, локальний профіль/документація — Bolt/Nemotron. Точну GGUF provenance не звіряли в цьому проході.
+- Перевірити локальні посилання й індекс; звіт компілює research sources, але не є реалізацією чи benchmark result.
+

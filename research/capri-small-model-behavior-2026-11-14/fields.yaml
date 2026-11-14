@@ -1,0 +1,44 @@
+fields:
+  basic_info:
+    - name: title
+      description: Source title or exact document identifier.
+      detail_level: detailed
+    - name: authors_or_maintainer
+      description: Named authors, project, or documentation maintainer.
+      detail_level: moderate
+    - name: date_and_version
+      description: Publication/update date and exact relevant software version or commit.
+      detail_level: detailed
+    - name: evidence_level
+      description: Peer-reviewed, preprint, official documentation, maintainer issue/PR, engineering report, or anecdote.
+      detail_level: detailed
+    - name: url
+      description: Direct source URL, DOI, or arXiv record.
+      detail_level: detailed
+    - name: claim
+      description: One precise source-supported technical claim.
+      detail_level: detailed
+    - name: evidence_and_limits
+      description: Study/document evidence, task/model applicability, uncertainty, and transfer limits.
+      detail_level: detailed
+    - name: applicability_to_capri
+      description: Relevance to local Ollama 0.33.3, small local models, and project invariants.
+      detail_level: detailed
+    - name: approach_and_mechanism
+      description: Best-ranked technique and explanation of how it works; full ranked list can be an additional approaches array.
+      detail_level: detailed
+    - name: expected_effect
+      description: Reported effect size if available; otherwise qualitative hypothesis marked as such.
+      detail_level: detailed
+    - name: risks
+      description: Effects on tool use, language adherence, latency, reliability, and user experience.
+      detail_level: detailed
+    - name: cost_and_model_agnosticity
+      description: Implementation effort and portability across local models.
+      detail_level: detailed
+    - name: verification_protocol
+      description: Concrete measurement needed before adopting the technique.
+      detail_level: detailed
+    - name: unresolved_questions
+      description: Unknown or version-sensitive issues requiring local validation.
+      detail_level: detailed

@@ -907,5 +907,167 @@
     "sha256": "969acb22edf6bc973c180dd9d8b9b6fe64a98d7efc574e69d4f798daabef7a0e",
     "web_snapshot_saved": false,
     "source_card": "wiki/sources/gemma12b-followup-2026-11-09.md"
+  },
+  "deep_research_capri_small_model_behavior_2026_11_14": {
+    "date": "2026-11-14",
+    "source_path": "/home/cyberdid/Documents/B-12-deep-research-prompt-behavior.md",
+    "raw_copy": "raw/deep-research-prompt-behavior-2026-11-14.md",
+    "sha256": "84ad1d1e5726acd0041fae07dd2b4f412effea0157e70379973527471164df2f",
+    "source_card": "wiki/sources/capri-small-model-behavior-2026-11-14.md",
+    "report": "research/capri-small-model-behavior-2026-11-14/report.md",
+    "web_snapshot_saved": false,
+    "read_scope": "Owner brief read in full; selected abstracts, metadata, and relevant full-text sections of primary papers; Ollama v0.33.3 release/API/FAQ; local B-12 runtime/profile/evaluation artifacts. No inference, tests, GPU run, Capri launch, or production changes.",
+    "external_sources": [
+      {
+        "url": "https://aclanthology.org/2025.findings-emnlp.896/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Abstract and venue metadata; instruction-count degradation claim; not direct Capri brevity causal evidence."
+      },
+      {
+        "url": "https://aclanthology.org/2026.findings-aacl.85/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Abstract and venue metadata; CCTU case count, constraints and completion threshold."
+      },
+      {
+        "url": "https://aclanthology.org/2024.findings-emnlp.172/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "RULER abstract, reported length metrics and venue metadata."
+      },
+      {
+        "url": "https://aclanthology.org/2024.findings-emnlp.458/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "DeCRIM abstract, reported Mistral benchmark changes and venue metadata."
+      },
+      {
+        "url": "https://aclanthology.org/2024.emnlp-main.447/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "ECON abstract and conflict detection/resolution findings."
+      },
+      {
+        "url": "https://papers.nips.cc/paper_files/paper/2024/hash/c63819755591ea972f8570beffca6b1b-Abstract-Datasets_and_Benchmarks_Track.html",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "WikiContradict official NeurIPS abstract and dataset details."
+      },
+      {
+        "url": "https://aclanthology.org/2026.acl-long.11/",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "ConfRAG abstract and venue metadata."
+      },
+      {
+        "url": "https://arxiv.org/abs/2502.09597",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "PrefEval arXiv metadata/abstract; ICLR 2025 acceptance note."
+      },
+      {
+        "url": "https://arxiv.org/abs/2610.30485",
+        "status": "verified_preprint_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "MemPABench arXiv metadata/abstract and selected full-text claims; not peer reviewed as of access."
+      },
+      {
+        "url": "https://arxiv.org/abs/2603.16557",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "BenchPreS abstract/version and acceptance note."
+      },
+      {
+        "url": "https://arxiv.org/abs/2410.12361",
+        "status": "verified_preprint_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Proactive Agent metadata/abstract; author-reported trained benchmark result."
+      },
+      {
+        "url": "https://arxiv.org/abs/2610.25896",
+        "status": "verified_preprint_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "PITCH metadata/abstract and selected full-text methods/results; group-chat transfer caveat retained."
+      },
+      {
+        "url": "https://arxiv.org/abs/2611.10628",
+        "status": "verified_preprint_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Model-transition metadata/abstract and selected full text including operationalization and methods limitations."
+      },
+      {
+        "url": "https://arxiv.org/abs/2412.00804",
+        "status": "verified_preprint_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Persona drift metadata and abstract; not a model-transition experiment."
+      },
+      {
+        "url": "https://arxiv.org/abs/2304.03442",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Generative Agents abstract; foundational simulated environment evidence."
+      },
+      {
+        "url": "https://arxiv.org/abs/2310.08560",
+        "status": "verified_selected_claims_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "MemGPT abstract; virtual context management framing."
+      },
+      {
+        "url": "https://github.com/ollama/ollama/releases/tag/v0.33.3",
+        "status": "verified_primary_release_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Release date, commit tag and cached prompt token feature."
+      },
+      {
+        "url": "https://github.com/ollama/ollama/blob/v0.33.3/docs/faq.mdx",
+        "status": "verified_versioned_docs_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "keep_alive, Flash Attention, K/V quantization, GPU placement and concurrency sections."
+      },
+      {
+        "url": "https://github.com/ollama/ollama/blob/v0.33.3/api/types.go",
+        "status": "verified_versioned_source_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Response metrics and runner/request option fields including num_batch and num_predict."
+      },
+      {
+        "url": "https://github.com/ollama/ollama/blob/v0.33.3/llm/server.go",
+        "status": "verified_versioned_source_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Chat response metric fields including prompt_eval_cached_count."
+      },
+      {
+        "url": "https://github.com/ggml-org/llama.cpp/tree/master/tools/server",
+        "status": "verified_current_upstream_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Current upstream prompt cache/server context only; not treated as the exact Ollama 0.33.3 bundled revision."
+      },
+      {
+        "url": "https://www.aibfamily.cloud/",
+        "status": "first_party_product_description_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "AIBEVA local-PC memory product claims; not independent implementation validation."
+      },
+      {
+        "url": "https://www.reddit.com/user/Anxious_Count_8728/comments/1xvzpi9/switched_the_model_kept_the_memory/",
+        "status": "affiliated_demo_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Single model-switch memory recall demonstration; poster discloses affiliation with AIBEVA team."
+      },
+      {
+        "url": "https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/mcnemar.htm",
+        "status": "verified_method_reference_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "McNemar assumptions and paired binary outcome use."
+      },
+      {
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5965657/",
+        "status": "verified_method_reference_no_snapshot",
+        "checked_at": "2026-11-14",
+        "scope": "Cluster bootstrap resamples whole clusters for nested/repeated observations."
+      }
+    ]
   }
 }

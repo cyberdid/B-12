@@ -1,0 +1,202 @@
+{
+  "basic_info": {
+    "title": "TTFT and prompt-cache reuse in Ollama and llama.cpp: version-specific evidence and Capri recommendations",
+    "authors_or_maintainer": "Research synthesis by Codex from Ollama maintainers' versioned source/docs, ggml-org/llama.cpp documentation, and maintainer/community discussions",
+    "date_and_version": "Research accessed 2026-11-14. Ollama evidence is pinned to v0.33.3 (release tag; released 2026-09-02, commit b79067b). llama.cpp server option descriptions refer to moving master documentation accessed 2026-11-14 and must not be assumed to match the llama.cpp revision bundled by Ollama v0.33.3.",
+    "evidence_level": "Mixed: version-pinned official Ollama docs/source; current official llama.cpp documentation; maintainer issue comment; community tutorial and anecdotal issue reports. No controlled performance measurements were found for Capri on the RTX 4060 laptop, and no speedup is claimed.",
+    "url": "See source array for direct URLs. Local research scope: research/capri-small-model-behavior-2026-11-14/fields.yaml.",
+    "claim": "For a local Ollama deployment, measure cached-prefix reuse directly with the v0.33.3 `prompt_eval_cached_count` response metric and client-observed TTFT. Prioritize stable prompt prefixes, warm model residency, and controlled prefill settings; treat every latency gain as a hypothesis until measured on the exact model, prompt, runtime, and GPU state.",
+    "evidence_and_limits": "Ollama v0.33.3 exposes cached prompt-token counts and prompt-evaluation timing, while its API also reports model load and generation timing. llama.cpp documents exact common-prefix KV reuse for its server, but those current server flags do not establish that identical controls are exposed through Ollama. The sources describe mechanisms, not a Capri benchmark. Shorter prompts alone do not demonstrate cache reuse or isolate its effect.",
+    "applicability_to_capri": "Capri uses Ollama and small local models on a laptop RTX 4060 with 8 GB VRAM. The most portable initial action is instrumentation and a controlled warm/warm-prefix test. Preserve control-path permissions and tool authority: cache/prompt changes must not let model-generated text authorize actions. Do not run a benchmark while competing GPU workloads make the device state uncontrolled.",
+    "approach_and_mechanism": "Ranked approach: (1) stabilize and instrument shared prompt prefixes; (2) use a practical keep_alive to avoid cold model loads; (3) sweep num_batch for prefill/memory fit; (4) verify Flash Attention then evaluate q8_0 KV cache if memory pressure is confirmed; (5) test deterministic tool bundles only with tool coverage checks; (6) consider direct llama.cpp cache_prompt separately, and do not prioritize speculative decoding for TTFT.",
+    "expected_effect": "Only qualitative hypotheses are available. Stable-prefix KV reuse may reduce repeated prefill; keep_alive may lower cold load time; num_batch may change prefill throughput and memory; Flash Attention/KV quantization primarily reduce memory. No numerical Capri TTFT effect is established. Speculative decoding primarily affects post-first-token generation throughput.",
+    "risks": "Cache invalidation can follow any early prompt/schema change; rearranged evidence can affect behavior; long keep_alive consumes scarce VRAM; batch size can worsen memory or throughput; KV quantization can affect quality; schema pruning can remove needed tools; speculative decoding adds model-specific memory/compute. Keep permission and approval decisions outside model-generated text.",
+    "cost_and_model_agnosticity": "Instrumentation and warm residency are low-cost and broadly portable through Ollama. Prompt layout is application-portable while cache metrics/mechanics are backend-specific. num_batch and KV/Flash Attention choices require per-device/model validation. Tool bundling is medium-to-high engineering effort. Direct llama.cpp deployment and speculative decoding are less portable.",
+    "verification_protocol": "On an idle documented host, pin runtime/model hash/quantization/context/template and capture rendered prompt tokens, client TTFT to first content token, load_duration, prompt_eval_count, prompt_eval_cached_count, prompt_eval_duration, eval_count/eval_duration, GPU/CPU placement, peak VRAM, and task/tool correctness. Separate cold from warm and cache-hit from cache-miss requests; randomize paired conditions, repeat at least 10 times, and report median/P95 without inferring cache reuse from prompt length alone."
+  },
+  "source": [
+    {
+      "title": "Ollama v0.33.3 release",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "2026-09-02; tag v0.33.3, release commit b79067b",
+      "evidence_level": "Official release record; establishes release identity and changelog only, not Capri performance",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.33.3"
+    },
+    {
+      "title": "Ollama API documentation (tag v0.33.3)",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Version-pinned documentation at tag v0.33.3; accessed 2026-11-14",
+      "evidence_level": "Official version-pinned API documentation",
+      "url": "https://github.com/ollama/ollama/blob/v0.33.3/docs/api.md"
+    },
+    {
+      "title": "Ollama API OpenAPI specification (tag v0.33.3)",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Version-pinned source at tag v0.33.3; accessed 2026-11-14",
+      "evidence_level": "Official version-pinned API specification",
+      "url": "https://github.com/ollama/ollama/blob/v0.33.3/docs/openapi.yaml"
+    },
+    {
+      "title": "Ollama API types.go (tag v0.33.3)",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Version-pinned source at tag v0.33.3; accessed 2026-11-14",
+      "evidence_level": "Official source code",
+      "url": "https://github.com/ollama/ollama/blob/v0.33.3/api/types.go"
+    },
+    {
+      "title": "Ollama FAQ (tag v0.33.3)",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Version-pinned documentation at tag v0.33.3; accessed 2026-11-14",
+      "evidence_level": "Official version-pinned documentation",
+      "url": "https://github.com/ollama/ollama/blob/v0.33.3/docs/faq.mdx"
+    },
+    {
+      "title": "Ollama llama_server.go (tag v0.33.3)",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Version-pinned source at tag v0.33.3; accessed 2026-11-14",
+      "evidence_level": "Official implementation source",
+      "url": "https://github.com/ollama/ollama/blob/v0.33.3/llm/llama_server.go"
+    },
+    {
+      "title": "Ollama issue #13337: flash attention and backend support",
+      "authors_or_maintainer": "Ollama maintainers and issue participants",
+      "date_and_version": "Issue discussion; accessed 2026-11-14; issue may span versions",
+      "evidence_level": "Maintainer issue/comment; useful implementation guidance, not a benchmark",
+      "url": "https://github.com/ollama/ollama/issues/13337"
+    },
+    {
+      "title": "llama.cpp server README",
+      "authors_or_maintainer": "ggml-org/llama.cpp maintainers",
+      "date_and_version": "Moving master documentation accessed 2026-11-14; exact commit not pinned",
+      "evidence_level": "Official documentation for current llama.cpp server; not proof of Ollama v0.33.3 flags",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md"
+    },
+    {
+      "title": "KV cache reuse with llama-server",
+      "authors_or_maintainer": "llama.cpp community discussion participants",
+      "date_and_version": "Discussion posted 2025-05-17; accessed 2026-11-14",
+      "evidence_level": "Community tutorial/discussion; demonstrates logs and prefix behavior, not an independent controlled benchmark",
+      "url": "https://github.com/ggml-org/llama.cpp/discussions/13606"
+    },
+    {
+      "title": "Speculative decoding",
+      "authors_or_maintainer": "ggml-org/llama.cpp maintainers",
+      "date_and_version": "Moving master documentation accessed 2026-11-14; exact commit not pinned",
+      "evidence_level": "Official technical documentation; general mechanism, no Capri measurement",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/master/docs/speculative.md"
+    },
+    {
+      "title": "Ollama issue #1800: num_batch and out-of-memory reports",
+      "authors_or_maintainer": "Ollama issue reporter and maintainers",
+      "date_and_version": "2024 issue; accessed 2026-11-14; older Ollama and different hardware/model",
+      "evidence_level": "User anecdote in an issue; illustrative of memory trade-offs only, not transferable performance evidence",
+      "url": "https://github.com/ollama/ollama/issues/1800"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "Ollama v0.33.3 reports prompt token counts, cached prompt-token counts, prompt-evaluation duration, model-load duration, and generation duration/count in the final response metrics.",
+      "evidence_and_limits": "The tagged API documentation, OpenAPI schema, and API types define `prompt_eval_count`, `prompt_eval_cached_count`, `prompt_eval_duration`, `load_duration`, `eval_count`, and `eval_duration`. The tagged Go type also computes the uncached prompt evaluation rate using prompt tokens minus cached prompt tokens. These server metrics do not replace client-side TTFT measurement: client TTFT includes request/network/runtime overhead and the time until the first content token is actually received.",
+      "applicability_to_capri": "Use `prompt_eval_cached_count` as direct evidence that Ollama reports cache reuse for that request. Record it alongside client TTFT, `load_duration`, prompt count and prompt-evaluation duration. If cached count is missing or zero, do not infer a cache hit from a smaller prompt or a faster response."
+    },
+    {
+      "claim": "A stable, identical prompt prefix can enable KV reuse in llama.cpp server; only the suffix after the common prefix needs new prompt processing when reuse is available.",
+      "evidence_and_limits": "Current llama.cpp server documentation describes `cache_prompt` and reuse of a previous request's KV cache when the new prompt shares a prefix. A 2025 community tutorial illustrates logs for a same-slot request with shared prefix and changed suffix. The tutorial is not a controlled performance study. Exact behavior depends on server version, slot/session selection, tokenizer/template rendering, and cache state. These current llama.cpp controls must not be assumed to exist in the Ollama API or in Ollama v0.33.3's bundled backend.",
+      "applicability_to_capri": "Keep static persona, rules, and stable tool definitions byte/token-identical and early in the rendered prompt; place turn-specific evidence and user content later where semantics permit. Inspect the actual rendered messages and use Ollama's cached-token metric to verify. Tool-schema pruning that changes an early prefix may reduce cache reuse even if it reduces token count."
+    },
+    {
+      "claim": "Ollama v0.33.3 `keep_alive` controls model residency duration; the documented default is five minutes, a negative duration requests indefinite residency, and zero unloads the model after the request.",
+      "evidence_and_limits": "The version-pinned Ollama FAQ documents these settings. Residency avoids a cold model load when the same model is requested while still resident; it does not itself reduce prompt prefill computation. Documentation does not guarantee that every prompt KV prefix remains resident for the whole model-residency interval, so cache reuse must still be checked per request.",
+      "applicability_to_capri": "Measure cold and warm requests separately and configure a practical residency window only if the laptop's VRAM budget allows it. On an 8 GB GPU with small-model weights and other workloads, long residency can compete with other GPU processes."
+    },
+    {
+      "claim": "Ollama v0.33.3 exposes `num_batch` as a runner option and forwards it to llama-server as both logical batch (`-b`) and physical batch (`-ub`) arguments.",
+      "evidence_and_limits": "Version-pinned `api/types.go` defines the runner option, and version-pinned `llm/llama_server.go` maps it to both arguments. Current llama.cpp documentation says batch/ubatch sizing affects how prompt tokens are batched and has memory implications. Neither source provides a measured optimal value or a guaranteed TTFT improvement for Capri. Lower batch values can reduce scratch-memory pressure but may also reduce prompt processing throughput; higher values can increase memory use or trigger offload/OOM.",
+      "applicability_to_capri": "Treat `num_batch` as a controlled prefill/memory-fit tuning variable, not a generation-speed switch. Sweep a few values on the exact v0.33.3 deployment while GPU contention is absent, keeping prompt, context, model, cache state, and all other options fixed."
+    },
+    {
+      "claim": "In Ollama v0.33.3, Flash Attention is conditional on architecture/backend/device support; the FAQ describes it as a way to reduce memory use as context grows, and KV-cache quantization can further reduce KV memory when Flash Attention is active.",
+      "evidence_and_limits": "The tagged FAQ says Flash Attention can be enabled or disabled with `OLLAMA_FLASH_ATTENTION` and that KV cache type can be set globally using `OLLAMA_KV_CACHE_TYPE`. It documents default `f16`, `q8_0` at roughly half the KV memory, and `q4_0` at roughly one quarter, with possible quality loss (more noticeable for q4 at larger contexts). A maintainer response in issue #13337 warns that the environment variable alone does not guarantee active Flash Attention; architecture and backend support and runner logs matter. These are memory statements, not measured TTFT gains.",
+      "applicability_to_capri": "On an 8 GB RTX 4060, first test whether memory pressure or CPU spill is present and whether Flash Attention actually activates. If KV memory is a bottleneck, compare f16 with q8_0 before considering q4_0. Any TTFT change is an empirical result; quality and tool-use checks are required. The Ollama setting is global, so isolate configuration to avoid surprising other models."
+    },
+    {
+      "claim": "Speculative decoding is aimed primarily at increasing generated-token throughput by drafting and verifying tokens; it should not be presumed to improve the time to the first generated token because prompt prefill still precedes decoding.",
+      "evidence_and_limits": "llama.cpp's current speculative decoding documentation describes draft/verification mechanisms and options. It does not provide a transferable Capri TTFT effect size. The draft model adds compute and memory demands, and performance depends on draft quality and acceptance rate. Current llama.cpp options are not evidence that the same controls are exposed by Ollama v0.33.3.",
+      "applicability_to_capri": "Deprioritize speculative decoding for the stated first-token latency problem. Consider only if measured post-first-token generation speed is also a goal and the GPU/VRAM budget can hold the draft mechanism."
+    },
+    {
+      "claim": "No source reviewed provides a reliable numerical TTFT gain for Capri's RTX 4060 laptop, local model, prompt, and current Ollama build from cache reuse, Flash Attention, KV quantization, or batch tuning.",
+      "evidence_and_limits": "Official sources specify mechanisms and response metrics; the available community reports are not comparable controlled experiments. Background GPU utilization, model offload, warm/cold state, context length, and runner configuration can dominate or confound observed latency. A prior shorter-prompt comparison without controlled device state cannot establish that shorter input has no effect or that cache reuse occurred.",
+      "applicability_to_capri": "Keep all expected gains qualitative and label them hypotheses. Do not put fabricated speedup percentages in the article or product documentation. Run an A/B protocol on an idle, documented host before selecting defaults."
+    }
+  ],
+  "recommendations": [
+    {
+      "rank": 1,
+      "approach_and_mechanism": "Instrument and stabilize the prompt prefix. Preserve invariant persona, system rules, and stable tool schemas at the start of the rendered conversation; append changing evidence and turn-specific content later when this preserves semantics. Capture `prompt_eval_cached_count` on every response rather than treating fewer prompt tokens as proof of reuse.",
+      "expected_effect": "Hypothesis: a stable shared prefix can avoid reprocessing those prefix tokens on a cache-capable backend, reducing prompt-evaluation work and potentially client TTFT. No effect size is available for Capri; actual benefit depends on cache hits, prefix length, memory pressure, and runtime behavior.",
+      "risks": "Reordering evidence can alter model behavior or weaken recency/provenance cues. Changing tool schema, template, timestamps, or other early tokens can invalidate reuse after the first mismatch. Keep permission grants and action authorization in deterministic control paths; prompt caching must not alter authority.",
+      "cost_and_model_agnosticity": "Low-to-medium instrumentation and prompt-layout effort. Application-level stable ordering is broadly portable, but cache implementation and metrics are backend-specific; Ollama v0.33.3 metric support is version-pinned.",
+      "verification_protocol": "On the exact runtime/model, send a fixed series of multi-turn requests with the same model and stable prompt prefix, then vary only a controlled suffix. Record full rendered prompt/token counts, `prompt_eval_cached_count`, `prompt_eval_duration`, `load_duration`, client time-to-first-content-token, total latency, output tokens, and tool correctness. Include a cache-cold baseline and repeat each condition in randomized order. Verify that cached count rises for intended shared-prefix requests."
+    },
+    {
+      "rank": 2,
+      "approach_and_mechanism": "Keep the model warm with an explicit Ollama `keep_alive` appropriate to the interactive session so repeated requests avoid a cold model load.",
+      "expected_effect": "Expected to reduce cold-start/load component when the model would otherwise have unloaded. It is not expected to accelerate prompt prefill by itself. The gain should appear primarily as a lower `load_duration`; no Capri effect size is measured.",
+      "risks": "A resident model consumes RAM/VRAM and can block other workloads or force another model to spill/offload. Model residency does not guarantee KV-prefix residency.",
+      "cost_and_model_agnosticity": "Low configuration effort and portable across Ollama-served models. Resource cost is high relative to an 8 GB VRAM budget if other GPU jobs are active.",
+      "verification_protocol": "Compare a deliberately cold request (model unloaded) with repeated warm requests at the same model and prompt. Record `load_duration`, client TTFT, GPU/CPU placement and VRAM before/after. Separately inspect cached-token count; do not attribute lower load time to prompt-cache reuse."
+    },
+    {
+      "rank": 3,
+      "approach_and_mechanism": "Tune `num_batch` as a prefill throughput versus memory-pressure parameter on the exact Ollama v0.33.3 runner. Use a small controlled sweep, such as 128, 256, and 512, only if these values are accepted by the deployed model/runtime.",
+      "expected_effect": "Unknown direction and magnitude for Capri. Batching can change prompt processing throughput and temporary memory demand; it does not directly reduce prompt tokens or guarantee lower first-token latency.",
+      "risks": "Larger batches may increase GPU scratch memory and lead to CPU fallback, offload, or OOM; smaller batches may underutilize hardware or slow prefill. Results can change with context, model, and backend.",
+      "cost_and_model_agnosticity": "Low-to-medium operational tuning effort. The option is exposed through Ollama v0.33.3, but optimal value is model- and device-dependent.",
+      "verification_protocol": "With GPU otherwise idle, fix model hash/quantization, context, prompt tokens, warm state, Flash Attention/KV settings, and power mode. For each batch setting collect at least 10 paired repetitions, report median and P95 client TTFT and `prompt_eval_duration`, note effective CPU/GPU layer placement and peak VRAM, and reject settings that change correctness or cause OOM/offload."
+    },
+    {
+      "rank": 4,
+      "approach_and_mechanism": "Check whether Flash Attention is actually active; if KV-cache memory is a limiting factor, compare the default f16 cache with q8_0. Consider q4_0 only after q8_0, since Ollama documents a greater potential quality impact.",
+      "expected_effect": "Documented effect is reduced KV memory (approximately half with q8_0 and approximately one quarter with q4_0 versus f16 according to the versioned FAQ). A TTFT improvement is only a hypothesis if this frees memory for better GPU placement or avoids pressure; no direct latency gain is documented.",
+      "risks": "Feature support varies by backend/device/model; an environment setting may not activate the feature. Quantization can affect output quality, tool arguments, language adherence, or long-context behavior. Ollama environment settings may affect every served model.",
+      "cost_and_model_agnosticity": "Low-to-medium configuration and evaluation cost; Ollama controls are runtime-wide and hardware/backend dependent. Quality validation must be repeated for each model family and context regime.",
+      "verification_protocol": "Use an isolated service configuration. Inspect runner logs for actual Flash Attention activation. Compare f16 and q8_0 with identical prompts/context and controlled cache state; measure peak VRAM, CPU/GPU placement, cached tokens, prompt-evaluation duration, client TTFT, and a fixed tool/memory quality suite. Do not adopt q4_0 without separate quality evidence."
+    },
+    {
+      "rank": 5,
+      "approach_and_mechanism": "If prompt overhead from tool schemas is shown to dominate, evaluate deterministic tool bundles selected by the application before request construction, with stable schema ordering within each bundle. Treat per-turn schema pruning as a cache trade-off, not an automatic win.",
+      "expected_effect": "Hypothesis: fewer uncached schema tokens may lower prefill work. However, a changed schema or earlier prompt content can shorten the shared prefix and reduce reuse. No source or Capri measurement quantifies the net effect.",
+      "risks": "A missing tool can prevent task completion; changing available tools can alter model routing. Avoid letting the model grant itself tools or permissions. Must preserve a safe fallback for ambiguous turns and ensure capability selection is auditable.",
+      "cost_and_model_agnosticity": "Medium-to-high engineering and evaluation effort; broadly runtime-level but requires task routing and tool-call regression testing for every model/profile.",
+      "verification_protocol": "Compare fixed full-schema and deterministic-bundle conditions on matched tasks. Log rendered tokens, prefix-cache counts, tool selection/argument validity/completion, client TTFT, and task success. Include ambiguous requests, all safety/approval cases, Ukrainian and English tasks; use paired randomized runs and reject any bundle that silently removes required capability."
+    },
+    {
+      "rank": 6,
+      "approach_and_mechanism": "For a direct llama.cpp deployment (not assumed equivalent to Ollama), test server `cache_prompt`/slot reuse and its current `-b`/`-ub` options only after recording the exact llama.cpp commit. Do not prioritize speculative decoding for a TTFT-only objective.",
+      "expected_effect": "Current llama.cpp docs describe common-prefix KV reuse; speculative decoding targets generation throughput after prompt processing. No quantitative Capri result is available, and current master documentation may differ from Ollama's vendored revision.",
+      "risks": "Migration changes serving API, template handling, cache/session semantics, and possibly tool behavior. Speculative draft models add memory/compute cost and may not improve generation if token acceptance is poor.",
+      "cost_and_model_agnosticity": "Direct-server experiment is medium-to-high integration effort and less portable than Ollama's API. Speculative decoding is model/backend-specific. Do not migrate solely on undocumented expected speedups.",
+      "verification_protocol": "Pin llama.cpp commit and server flags, test documented `cache_prompt` behavior with fixed and varied prefixes, inspect cache logs, and use the same TTFT/prompt-evaluation measures as the Ollama baseline. For speculative decoding, separately report first-token latency and post-first-token tokens/s with draft model, acceptance statistics, and memory use."
+    }
+  ],
+  "unresolved_questions": [
+    "Which exact llama.cpp upstream commit and build configuration is bundled inside the deployed Ollama v0.33.3 binary, and which cache, batch, and Flash Attention features are active for the specific model architecture?",
+    "Does Capri's exact rendered prompt preserve a stable token prefix across turns, and how many prompt tokens does Ollama report as cached under realistic conversation and tool-use turns?",
+    "What are cold and warm client TTFT, P50/P95 prompt-evaluation duration, peak VRAM, and CPU/GPU placement on the RTX 4060 laptop when no competing GPU workload is active?",
+    "Does q8_0 KV cache permit more model layers to remain on GPU or avoid memory pressure for the chosen small model, and does it preserve tool arguments, Ukrainian language adherence, and long-context evidence use?",
+    "What `num_batch` value gives the best measured prefill/TTFT trade-off for each model and context size without increasing offload, OOM risk, or output errors?",
+    "Would deterministic tool bundles reduce total uncached prefix work, or would schema/prefix changes negate the savings and reduce tool coverage?",
+    "Does the locally deployed Ollama API expose and report cached prompt tokens for all response paths used by Capri, including tool-call turns and streaming completion?"
+  ],
+  "uncertain": [
+    "exact llama.cpp upstream revision bundled in Ollama v0.33.3",
+    "whether Flash Attention is active for Capri's exact model/backend/device combination",
+    "whether and how much prefix KV reuse occurs in Capri's real prompts",
+    "TTFT effect of stable prompt ordering on Capri",
+    "TTFT effect of any num_batch setting on the RTX 4060 laptop",
+    "TTFT and placement effect of q8_0 KV cache on the current model",
+    "net effect of per-turn tool-schema pruning after accounting for cache invalidation and tool coverage",
+    "any numerical latency improvement from the reviewed mechanisms on Capri"
+  ]
+}

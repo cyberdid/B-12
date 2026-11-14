@@ -1,6 +1,6 @@
 ---
 type: index
-updated: 2026-11-12
+updated: 2026-11-14
 status: active
 sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
 tags: [navigation]
@@ -22,6 +22,7 @@ tags: [navigation]
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
 | [Комплексна оцінка Capri, 12.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії через рантайм на злитому `main`: 48 пройдено, 32 провалено, 12 заблоковано обладнанням (60,0%); gemma — 43/80; класифікація «гібридна модель-центрична система», не повний компаньйон |
+| [Deep research поведінки Capri на малих моделях, 14.11.2026](../research/capri-small-model-behavior-2026-11-14/report.md) | Дослідження стислості, TTFT/cache, суперечностей, preferences, initiative, статистики та model continuity; є чернетка відповіді про AIBEVA |
 | [Звіт про роботу, 10–11.11.2026](project/work-report-2026-11-11.md) | Що зроблено в оцінці Capri, довгостроковій пам'яті й git; відкриті питання; PDF-версія |
 | [Звіт про роботу, 12.11.2026](project/work-report-2026-11-12.md) | Оцінка через рантайм (47/80), закрита дірка з мережевими командами, пріоритети цілей, PR готові до злиття; PDF |
 | [Аналіз master brief](project/analysis.md) | Висновки, суперечності й пріоритети |
@@ -78,6 +79,7 @@ tags: [navigation]
 | [Capri запущено на Gemma 12B](sources/gemma12b-desktop-launch-2026-11-09.md) | Постійна конфігурація, API/Qt startup, тестова відповідь і виміряний CPU/GPU offload |
 | [Gemma 12B: експериментальний етап](sources/gemma12b-followup-2026-11-09.md) | 8 exact counts, 12 вибраних task runs і порівняння чотирьох префіксів на CPU |
 | [Deep research: поведінка малої моделі](sources/deep-research-behavior-2026-11-14.md) | Стислість, TTFT, суперечності, вподобання, ініціатива; без посилань — звірено з кодом: Evidence ламає кешований префікс |
+| [Глибоке дослідження поведінки Capri](sources/capri-small-model-behavior-2026-11-14.md) | Повний звіт із першоджерелами, Ollama 0.33.3, локальними eval artifacts, AIBEVA continuity та виправленням статистики повторів |
 | [Академічне оформлення Capri](sources/capri-academic-formatting-2026-11-09.md) | Чотири локальні PDF, авторський шаблон A4/CMU, прописані норми та виправлення верстки |
 | [Наукова редакція Capri, 09.11](sources/capri-scientific-revision-2026-11-09.md) | RQ, матриця доказів, нові CPU-перевірки та межі відтворюваності |
 | [Суміжні джерела препринту](sources/preprint-related-work-2026-11-08.md) | Перевірені abstracts, DOI та межі використання результатів інших робіт |

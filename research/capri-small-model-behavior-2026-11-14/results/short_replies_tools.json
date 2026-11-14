@@ -1,0 +1,147 @@
+{
+  "basic_info": {
+    "title": "Short casual replies without tool-use regression: evidence review and Capri recommendation",
+    "authors_or_maintainer": "Research synthesis by Codex from the owner's prompt, peer-reviewed papers, and Ollama official documentation",
+    "date_and_version": "Research accessed 2026-11-14; Ollama online docs accessed 2026-11-14 but not pinned to installed 0.33.3",
+    "evidence_level": "Mixed: local owner-reported pilot plus peer-reviewed literature and current official documentation; transfer limits are stated per source",
+    "url": "See source array for direct URLs; local prompt: raw/deep-research-prompt-behavior-2026-11-14.md",
+    "claim": "Apply response-length policy after task/tool routing; a global brevity instruction is contraindicated by Capri's reported local negative result and general multi-constraint evidence.",
+    "evidence_and_limits": "The local brief reports 2-5x shorter output but tool-task performance moving 2/2 to 0/2 and one Russian response. This very small, owner-reported pilot is not independently replicated here. Peer-reviewed studies support increased difficulty with more concurrent constraints and demonstrate trained length-control methods, but do not directly test Capri's prompt/model/task combination.",
+    "applicability_to_capri": "Keep tool and authority decisions in the runtime. Apply a short budget only on clearly social final-answer paths; ambiguous or mixed turns must retain the full task path.",
+    "approach_and_mechanism": "Rank 1: two-stage runtime policy—classify/route the turn first, then constrain only final social prose after tools are done; default uncertain turns to task mode.",
+    "expected_effect": "No direct Capri effect size. A token limit can mechanically cap generation when enabled, but expected quality/tool-use impact is unmeasured.",
+    "risks": "Misrouting can suppress needed work; a hard token cap can truncate content or a tool call; online Ollama docs are rolling rather than pinned to 0.33.3.",
+    "cost_and_model_agnosticity": "Medium routing work; highly portable at the runtime layer, but classifier thresholds and token/character mapping require per-model and bilingual validation.",
+    "verification_protocol": "Paired A/B on all 80 scenarios with length, correctness, tool calls, language, truncation, and TTFT recorded; audit every tool-task regression manually and test mixed-intent cases.",
+    "unresolved_questions": "The causal effect and confidence interval for the local 0/2 versus 2/2 result; safe token limit for 300 Ukrainian characters; exact Ollama 0.33.3 request-option behavior; whether conditional social-only prompting prevents regressions."
+  },
+  "source": [
+    {
+      "title": "Short casual replies without tool-use regression: local pilot brief",
+      "authors_or_maintainer": "Project owner; supplied prompt copied unchanged into raw/deep-research-prompt-behavior-2026-11-14.md",
+      "date_and_version": "2026-11-14; local Capri prompt and reported diagnostic runs; exact commit/model hash for this intervention not provided in the brief",
+      "evidence_level": "Owner-reported project experiment; source brief is primary for what was tried, but not independently rerun in this research task",
+      "url": "Local source: raw/deep-research-prompt-behavior-2026-11-14.md"
+    },
+    {
+      "title": "When Instructions Multiply: Measuring and Estimating LLM Capabilities of Multiple Instructions Following",
+      "authors_or_maintainer": "Keno Harada et al.",
+      "date_and_version": "Findings of EMNLP 2025; published November 2025",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2025.findings-emnlp.896/"
+    },
+    {
+      "title": "CCTU: A Benchmark for Tool Use under Complex Constraints",
+      "authors_or_maintainer": "Junjie Ye et al.",
+      "date_and_version": "Findings of IJCNLP-AACL 2026; November 2026",
+      "evidence_level": "Peer-reviewed conference paper; recent result, transfer to Capri's smaller local models is not established",
+      "url": "https://aclanthology.org/2026.findings-aacl.85/"
+    },
+    {
+      "title": "Ruler: A Model-Agnostic Method to Control Generated Length for Large Language Models",
+      "authors_or_maintainer": "Jiaming Li et al.",
+      "date_and_version": "Findings of EMNLP 2024; November 12-16, 2024",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2024.findings-emnlp.172/"
+    },
+    {
+      "title": "Following Length Constraints in Instructions",
+      "authors_or_maintainer": "Weizhe Yuan et al.",
+      "date_and_version": "EMNLP 2025; November 4-9, 2025",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2025.emnlp-main.1233/"
+    },
+    {
+      "title": "LLM Self-Correction with DeCRIM: Decompose, Critique, and Refine for Enhanced Following of Instructions with Multiple Constraints",
+      "authors_or_maintainer": "Thomas Palmeira Ferraz et al.",
+      "date_and_version": "Findings of EMNLP 2024; November 2024",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2024.findings-emnlp.458/"
+    },
+    {
+      "title": "Ollama Modelfile Reference and chat API documentation",
+      "authors_or_maintainer": "Ollama maintainers",
+      "date_and_version": "Current web docs accessed 2026-11-14; docs are rolling and do not pin behavior to the locally reported Ollama 0.33.3 build",
+      "evidence_level": "Official documentation; exact installed-version semantics need a local smoke check before implementation",
+      "url": "https://docs.ollama.com/modelfile and https://docs.ollama.com/api/chat"
+    },
+    {
+      "title": "FollowBench: A Multi-level Fine-grained Constraints Following Benchmark for Large Language Models",
+      "authors_or_maintainer": "Yuxin Jiang et al.",
+      "date_and_version": "ACL 2024",
+      "evidence_level": "Peer-reviewed conference paper",
+      "url": "https://aclanthology.org/2024.acl-long.257/"
+    }
+  ],
+  "findings": {
+    "claim": "The most defensible solution is to make response length a runtime-stage policy applied only after the system has established that no tool work remains, rather than adding a global persona instruction that competes with tool selection.",
+    "evidence_and_limits": "The supplied Capri brief reports a controlled-looking but very small local diagnostic: a global rule requiring 1–3 short sentences and about 300 characters shortened replies by 2–5x, while a file-diagnosis task needing tools fell from 2/2 passes to 0/2, and one response switched to Russian. A follow-up phrase saying brevity applies to text, not work, did not restore tool use. Treat this as a strong warning for this prompt/model setup, not proof that all brevity instructions cause tool failure: only two diagnostic cases are reported, and the exact model hash, commit, seed protocol, and raw traces are absent from the prompt. Independent literature supports the general risk of stacking constraints: ManyIFEval reports decreasing instruction-following performance as concurrent instruction count rises across ten LLMs; CCTU evaluates tool use under complex constraints and reports no tested model above 20% full completion under its strict criterion. Neither paper isolates a brevity instruction on Capri-like 4B models. FollowBench also documents constraint-following weaknesses. Thus instruction competition is a plausible mechanism, not a proven causal explanation for Capri's specific failure.",
+    "applicability_to_capri": "Capri's current request contains a long persona/rules prefix and 17 tool schemas according to the supplied brief. Keep tool eligibility, permission, identity, consent, and approval exclusively in the deterministic control channel. Prefer an explicit runtime mode with conservative fallback to full task handling when intent is mixed or uncertain. Apply any output-token cap only to a user-facing final response after tools are no longer needed. Preserve Ukrainian/English behavior and validate it separately from length."
+  },
+  "approaches": [
+    {
+      "rank": 1,
+      "approach_and_mechanism": "Two-stage runtime policy: determine task/tool mode first, then apply a compact-answer budget only to the final user-facing response for clearly social/no-action turns. On mixed or uncertain turns, choose task mode. If necessary, keep the tool-call generation budget separate from final prose generation; do not put an aggressive cap on a turn that may still need to emit a tool call.",
+      "expected_effect": "No published effect size for Capri. This is the best structural hypothesis because it removes the length objective from the model's tool-selection decision. Measure both output length and task success; do not assume the router is correct.",
+      "risks": "False classification of a mixed turn as social can suppress needed work; an extra planning/model stage can increase TTFT. Do not use generated text to grant permissions. A conservative task-mode fallback limits the risk but may leave some verbose replies.",
+      "cost_and_model_agnosticity": "Medium implementation cost; largely model-agnostic at the orchestration layer. Any language-based classifier needs Ukrainian/English and mixed-intent calibration. Runtime mode must not alter identity, consent, or grants.",
+      "verification_protocol": "A/B across the complete 80-scenario suite and the voice/social prompts. In the treatment, only obvious no-tool social turns receive a short response budget; mixed, technical, memory, and action tasks retain the existing route and budget. Record tool selection/call completion, correctness, language, response tokens/characters, finish reason, TTFT, and whether the response was truncated. Manually audit every tool-task regression."
+    },
+    {
+      "rank": 2,
+      "approach_and_mechanism": "Conditional `num_predict`/per-request output budget as a hard ceiling, activated by the runtime only for the social final-answer path. Ollama's current Modelfile documentation defines `num_predict` as the maximum generated tokens; the chat API exposes request options and optional tools. This is a mechanical ceiling, not a semantic guarantee that the answer remains complete.",
+      "expected_effect": "Hard cap on generated token count when supported and correctly passed. Character count in Ukrainian varies with tokenization, so a 300-character target cannot be inferred from a fixed token cap without local calibration. No measured effect for B-12.",
+      "risks": "An early cap can truncate a reply or a tool-call payload. The current online docs are rolling and do not establish exact behavior for the user's Ollama 0.33.3 build; check its installed API and inspect completion/finish metadata. Keep uncapped or larger budgets for tool rounds and technical answers.",
+      "cost_and_model_agnosticity": "Low code cost and model-agnostic API concept; the correct token/character mapping and supported options are model- and version-sensitive.",
+      "verification_protocol": "On Ollama 0.33.3, send paired chat requests with identical model, prompt, context, and tools but different request-level `num_predict`; verify actual `eval_count`, end reason, tool-call completeness, and response quality. Then integrate only behind the social/no-action route and check all 80 scenarios for truncation and lost tool calls."
+    },
+    {
+      "rank": 3,
+      "approach_and_mechanism": "Keep the persona prompt neutral and concise globally; inject a short, single conditional style cue only after a turn is classified as purely conversational. Use a couple of Ukrainian/English examples rather than a numeric character-count rule, and leave task/tool rules untouched. This is a prompt-only screen, not a guarantee.",
+      "expected_effect": "No reliable effect size for Capri. In the owner's pilot, the global numeric rule shortened outputs 2–5x but coincided with the reported tool and language regressions; do not reuse that global rule as-is. A conditional prompt may reduce cross-task interference, but this is an untested hypothesis.",
+      "risks": "Still adds an instruction competing for limited model capacity; can over-shorten, drift language, or fail to obey. A generated style pass or hidden thought prompt is not proven safer. Prompt changes can alter tool calling even if tool schemas remain identical.",
+      "cost_and_model_agnosticity": "Low cost, nominally model-agnostic, but model and language sensitivity is high; test each deployed model/profile.",
+      "verification_protocol": "Compare baseline, global brevity instruction, and conditional social-only cue on the exact same social prompts plus paired tool-needed diagnostics. Randomize run order and keep schemas, temperature, seed, and runtime fixed. Score tool choice/completion independently from response length; have a bilingual reviewer detect Russian drift and semantic omissions."
+    },
+    {
+      "rank": 4,
+      "approach_and_mechanism": "Use deterministic presentation control for voice or compact UI: preserve the full assistant answer and display/play a concise first sentence or explicitly marked summary, with an expand/continue option. Do not silently delete content or claim the model generated a short answer.",
+      "expected_effect": "Can directly reduce what is spoken/shown in compact mode without changing the model's tool decision or underlying response. It does not reduce generation tokens or solve verbosity in the stored transcript. No B-12 measurement exists.",
+      "risks": "The first sentence may omit a caveat, answer, or status; sentence splitting and Ukrainian punctuation can be imperfect. Compact display may hide information users expect to see.",
+      "cost_and_model_agnosticity": "Low-to-medium UI/TTS work and highly model-agnostic. Requires clear affordance and user preference.",
+      "verification_protocol": "For social and technical turns, compare full rendering with compact preview/audio. Check that the complete answer remains accessible; human review flags cases where the selected sentence changes the meaning or omits a necessary caveat. Measure speech duration separately from inference TTFT."
+    },
+    {
+      "rank": 5,
+      "approach_and_mechanism": "A separate critique-and-refine pass can first complete tools, then edit only final prose against a checklist (answer preserved, no unsupported claims, target length). DeCRIM's decomposition/critique/refine pipeline improved constraint-following on its evaluated Mistral tasks, but it is not specifically a brevity-plus-tool benchmark.",
+      "expected_effect": "DeCRIM reports +7.3 percentage points on RealInstruct and +8.0 on IFEval for Mistral under its own setup. These are not expected effect sizes for Capri or short conversational replies. No Capri result exists.",
+      "risks": "Adds a model call and latency, can remove important details or hallucinate in a rewrite, and small-model critic quality may be weak. Restrict it to post-tool final prose; preserve original output for audit or fallback.",
+      "cost_and_model_agnosticity": "Medium-to-high runtime cost; broadly model-agnostic but critic quality and latency vary by model. A deterministic checker can validate simple length limits but cannot ensure semantic preservation.",
+      "verification_protocol": "First execute tools normally; then run a blinded post-edit comparison on matched responses. Check fact preservation, answer completeness, tool result fidelity, language, length, and added latency. Reject edits that change claims or omit required details."
+    },
+    {
+      "rank": 6,
+      "approach_and_mechanism": "Optional per-model length-control fine-tuning/LoRA using labeled dialogue examples with desired-length and quality preferences. RULER reports results across 2B–8B models including Gemma 2B, but it adds Meta Length Tokens through end-to-end model training; it is not a drop-in prompt macro. LIFT-DPO likewise trains length-aware preference behavior.",
+      "expected_effect": "RULER's paper reports average gains of 27.97 Precise Match and 29.57 Flexible Match at its aggregate level; these are benchmark metric points from its training/evaluation setting, not a predicted Capri gain. LIFT reports fewer length violations and improved win rates in its Llama experiments. Neither establishes that tool calling or multilingual adherence is preserved in a Capri LoRA.",
+      "risks": "Fine-tuning can degrade tool use, factuality, persona, multilingual behavior, or compatibility with later model swaps. RULER requires model training and modifies the serving model/token vocabulary, so it conflicts with the goal of a universal model-swappable runtime unless maintained as separate per-model adapters.",
+      "cost_and_model_agnosticity": "High data/training/evaluation cost; not model-agnostic in the operational sense. RULER is described as model-agnostic in method design but still trains each base model; an adapter is tied to compatible weights and runtime formats.",
+      "verification_protocol": "Only after simpler structural controls fail: train on a distinct set, hold out the 80-scenario suite, compare base versus adapted model on length, tool-use, language, technical completeness, and latency. Report model hash, training data, adapter identity, and regression metrics. Do not merge this behavior into the shared persona without cross-model evaluation."
+    }
+  ],
+  "uncertainty": {
+    "unresolved_questions": [
+      "The local 0/2 versus 2/2 diagnostic is too small to estimate the causal effect or confidence interval; exact commit, model hash, randomization, and raw traces are not included in the supplied prompt.",
+      "No paper found in this scoped review directly tests adding a casual brevity instruction to a 4B tool-calling agent and measuring tool-call regression. The interference explanation remains an informed hypothesis supported by general multi-constraint evidence and the local pilot.",
+      "The current Ollama docs are not version-pinned to 0.33.3. Verify `num_predict`, request overrides, `done_reason`, and tool-call behavior against the installed runtime before relying on them.",
+      "The owner's target of approximately 300 characters needs a language-specific local calibration to output tokens; an output-token cap is not an exact character-count control.",
+      "RULER and LIFT improve length control in their own evaluations but do not show that small-model tool-use accuracy, Ukrainian language adherence, or Capri persona behavior is preserved after fine-tuning."
+    ],
+    "uncertain": [
+      "exact effect of the global brevity rule on Capri tool-use probability",
+      "exact safe output-token cap for 300 Ukrainian characters",
+      "Ollama 0.33.3 request-option and finish-reason behavior for this model build",
+      "transfer of published length-control gains to the current Capri model and tool suite",
+      "whether conditional social-only prompting avoids the observed language/tool regressions"
+    ]
+  }
+}
