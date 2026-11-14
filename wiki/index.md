@@ -77,6 +77,7 @@ tags: [navigation]
 | [Scribe і двомовний препринт](sources/scribe-paper-2026-11-08.md) | Джерело редактора, версія й межі рукописів B-12 / Capri |
 | [Capri запущено на Gemma 12B](sources/gemma12b-desktop-launch-2026-11-09.md) | Постійна конфігурація, API/Qt startup, тестова відповідь і виміряний CPU/GPU offload |
 | [Gemma 12B: експериментальний етап](sources/gemma12b-followup-2026-11-09.md) | 8 exact counts, 12 вибраних task runs і порівняння чотирьох префіксів на CPU |
+| [Deep research: поведінка малої моделі](sources/deep-research-behavior-2026-11-14.md) | Стислість, TTFT, суперечності, вподобання, ініціатива; без посилань — звірено з кодом: Evidence ламає кешований префікс |
 | [Академічне оформлення Capri](sources/capri-academic-formatting-2026-11-09.md) | Чотири локальні PDF, авторський шаблон A4/CMU, прописані норми та виправлення верстки |
 | [Наукова редакція Capri, 09.11](sources/capri-scientific-revision-2026-11-09.md) | RQ, матриця доказів, нові CPU-перевірки та межі відтворюваності |
 | [Суміжні джерела препринту](sources/preprint-related-work-2026-11-08.md) | Перевірені abstracts, DOI та межі використання результатів інших робіт |
