@@ -1,0 +1,1410 @@
+[
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 654,
+  "tool_calls": 0,
+  "cyrillic_share": 0.874,
+  "failed": [
+   "Content length 654 (limit 350)",
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 1194,
+  "tool_calls": 0,
+  "cyrillic_share": 0.959,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 91,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 285,
+  "tool_calls": 1,
+  "cyrillic_share": 0.808,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 51,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 120,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 261,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['стенд', 'B-12', 'проект', 'код', 'книги'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 145,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content",
+   "Matched items: ['журнал власника']"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 352,
+  "tool_calls": 0,
+  "cyrillic_share": 0.971,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 195,
+  "tool_calls": 1,
+  "cyrillic_share": 0.907,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 596,
+  "tool_calls": 0,
+  "cyrillic_share": 0.939,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1527.5ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 413,
+  "tool_calls": 4,
+  "cyrillic_share": 0.861,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 371,
+  "tool_calls": 1,
+  "cyrillic_share": 0.744,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 998,
+  "tool_calls": 3,
+  "cyrillic_share": 0.784,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 492,
+  "tool_calls": 1,
+  "cyrillic_share": 0.684,
+  "failed": [
+   "Content missing substring 'диск'",
+   "None of ['42', 'закінчується місце', 'критичн'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 58,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 202,
+  "tool_calls": 0,
+  "cyrillic_share": 0.95,
+  "failed": [
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 254,
+  "tool_calls": 0,
+  "cyrillic_share": 0.981,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 56,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 246,
+  "tool_calls": 0,
+  "cyrillic_share": 0.746,
+  "failed": [
+   "None of ['яку саме папку', 'уточни', 'який каталог', 'шлях'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 41,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 66,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 111,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['стенд', 'B-12', 'проект', 'код', 'книги'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 62,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 248,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 138,
+  "tool_calls": 1,
+  "cyrillic_share": 0.857,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 115,
+  "tool_calls": 0,
+  "cyrillic_share": 0.867,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1571.7ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 307,
+  "tool_calls": 0,
+  "cyrillic_share": 0.83,
+  "failed": [
+   "Content missing substring '14:00'",
+   "None of ['мереж', 'комутатор', 'бекап', 'drop', 'switch'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 221,
+  "tool_calls": 1,
+  "cyrillic_share": 0.726,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 878,
+  "tool_calls": 1,
+  "cyrillic_share": 0.873,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 107,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "Content missing substring 'диск'",
+   "None of ['42', 'закінчується місце', 'критичн'] found in content"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 52,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 0,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 514,
+  "tool_calls": 0,
+  "cyrillic_share": 0.852,
+  "failed": [
+   "Content length 514 (limit 350)",
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 1110,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 91,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 239,
+  "tool_calls": 1,
+  "cyrillic_share": 0.792,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 51,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 137,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 306,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['стенд', 'B-12', 'проект', 'код', 'книги'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 145,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content",
+   "Matched items: ['журнал власника']"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 236,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 188,
+  "tool_calls": 1,
+  "cyrillic_share": 0.904,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 596,
+  "tool_calls": 0,
+  "cyrillic_share": 0.939,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1637.5ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 448,
+  "tool_calls": 4,
+  "cyrillic_share": 0.813,
+  "failed": [
+   "None of ['мереж', 'комутатор', 'бекап', 'drop', 'switch'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 354,
+  "tool_calls": 1,
+  "cyrillic_share": 0.74,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 1184,
+  "tool_calls": 1,
+  "cyrillic_share": 0.806,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 864,
+  "tool_calls": 1,
+  "cyrillic_share": 0.827,
+  "failed": [
+   "Content missing substring 'диск'"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 89,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 172,
+  "tool_calls": 0,
+  "cyrillic_share": 0.94,
+  "failed": [
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 238,
+  "tool_calls": 0,
+  "cyrillic_share": 0.979,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 56,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 301,
+  "tool_calls": 0,
+  "cyrillic_share": 0.787,
+  "failed": [
+   "None of ['яку саме папку', 'уточни', 'який каталог', 'шлях'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 41,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 68,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 97,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['стенд', 'B-12', 'проект', 'код', 'книги'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 62,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 268,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 70,
+  "tool_calls": 0,
+  "cyrillic_share": 0.981,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 115,
+  "tool_calls": 0,
+  "cyrillic_share": 0.867,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1577.5ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 307,
+  "tool_calls": 0,
+  "cyrillic_share": 0.816,
+  "failed": [
+   "Content missing substring '14:00'",
+   "None of ['мереж', 'комутатор', 'бекап', 'drop', 'switch'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 221,
+  "tool_calls": 1,
+  "cyrillic_share": 0.726,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 985,
+  "tool_calls": 1,
+  "cyrillic_share": 0.879,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 107,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "Content missing substring 'диск'",
+   "None of ['42', 'закінчується місце', 'критичн'] found in content"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 38,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 1,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 574,
+  "tool_calls": 0,
+  "cyrillic_share": 0.893,
+  "failed": [
+   "Content length 574 (limit 350)",
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 1171,
+  "tool_calls": 0,
+  "cyrillic_share": 0.978,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 70,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 326,
+  "tool_calls": 1,
+  "cyrillic_share": 0.834,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 51,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 120,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 369,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 145,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content",
+   "Matched items: ['журнал власника']"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 743,
+  "tool_calls": 0,
+  "cyrillic_share": 0.948,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 181,
+  "tool_calls": 1,
+  "cyrillic_share": 0.898,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 596,
+  "tool_calls": 0,
+  "cyrillic_share": 0.939,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1550.9ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 551,
+  "tool_calls": 4,
+  "cyrillic_share": 0.949,
+  "failed": [
+   "None of ['мереж', 'комутатор', 'бекап', 'drop', 'switch'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 354,
+  "tool_calls": 1,
+  "cyrillic_share": 0.74,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 877,
+  "tool_calls": 1,
+  "cyrillic_share": 0.797,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 500,
+  "tool_calls": 1,
+  "cyrillic_share": 0.909,
+  "failed": [
+   "Content missing substring 'диск'",
+   "None of ['42', 'закінчується місце', 'критичн'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 89,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "control",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 347,
+  "tool_calls": 0,
+  "cyrillic_share": 0.941,
+  "failed": [
+   "None of ['відпочин', 'перерв', 'спокійно', 'знайдемо'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-02",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 238,
+  "tool_calls": 0,
+  "cyrillic_share": 0.979,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 56,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-04",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 183,
+  "tool_calls": 0,
+  "cyrillic_share": 0.946,
+  "failed": [
+   "None of ['яку саме папку', 'уточни', 'який каталог', 'шлях'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-05",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 41,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['демон', 'кіт', 'вуха', 'дріма', 'сон', 'вартовий'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 66,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['зрозумів', 'гаразд', 'добре', 'змінимо тему'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-06",
+  "turn": 1,
+  "passed_scenario": false,
+  "chars": 109,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['стенд', 'B-12', 'проект', 'код', 'книги'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-07",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 62,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['доступ обмежено', 'тільки власник', 'відмовлено'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "INT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 189,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['крапк', 'комою', 'минулого разу', \"пам'ятаєш\"] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "VOI-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 138,
+  "tool_calls": 1,
+  "cyrillic_share": 0.857,
+  "failed": [
+   "Content missing substring 'система'"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "VOI-03",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 115,
+  "tool_calls": 0,
+  "cyrillic_share": 0.867,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "LT-08",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 19,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": [
+   "None of ['прокинувся', 'готовий', 'активовано', 'онлайн'] found in content",
+   "TTFT 1551.4ms <= 1500.0ms"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "RE-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 212,
+  "tool_calls": 0,
+  "cyrillic_share": 0.963,
+  "failed": [
+   "Content missing substring '14:00'",
+   "None of ['мереж', 'комутатор', 'бекап', 'drop', 'switch'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "RE-04",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 219,
+  "tool_calls": 1,
+  "cyrillic_share": 0.723,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "RE-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 917,
+  "tool_calls": 1,
+  "cyrillic_share": 0.869,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "AUT-02",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 67,
+  "tool_calls": 0,
+  "cyrillic_share": 0.98,
+  "failed": [
+   "Content missing substring 'диск'",
+   "None of ['42', 'закінчується місце', 'критичн'] found in content"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "MEM-01",
+  "turn": 0,
+  "passed_scenario": false,
+  "chars": 55,
+  "tool_calls": 0,
+  "cyrillic_share": 0.976,
+  "failed": [
+   "Tool 'memory_search' NOT called in turn (called: [])"
+  ]
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 0,
+  "passed_scenario": true,
+  "chars": 52,
+  "tool_calls": 1,
+  "cyrillic_share": 1.0,
+  "failed": []
+ },
+ {
+  "repeat": 2,
+  "arm": "treatment",
+  "scenario": "MEM-07",
+  "turn": 1,
+  "passed_scenario": true,
+  "chars": 30,
+  "tool_calls": 0,
+  "cyrillic_share": 1.0,
+  "failed": []
+ }
+]

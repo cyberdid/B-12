@@ -1,0 +1,23 @@
+\begin{tikzpicture}
+\begin{axis}[name=a,width=.44\linewidth,height=50mm,xlabel={Turn in session},ylabel={TTFT (s)},
+  ymin=0,ymax=1.6,xtick={1,...,6},ymajorgrids,grid style={gridline},tick label style={font=\small},
+  label style={font=\small},title={(a) Time to first token},title style={font=\small},
+  legend style={font=\scriptsize,draw=none,at={(0.5,0.97)},anchor=north},legend columns=1]
+\addplot[color=series2,mark=square*,mark size=1.6pt,thick] coordinates {(1,0.755) (2,0.993) (3,0.964) (4,0.983) (5,0.987) (6,1.066)};
+\addlegendentry{Evidence in system text}
+\addplot[color=series1,mark=*,mark size=1.6pt,thick] coordinates {(1,0.764) (2,0.808) (3,0.749) (4,0.702) (5,0.736) (6,0.696)};
+\addlegendentry{Evidence after user turn}
+\end{axis}
+\begin{axis}[at={(a.east)},anchor=west,xshift=22mm,width=.44\linewidth,height=50mm,xlabel={Turn in session},
+  ylabel={Prompt tokens},ymin=0,ymax=2700,xtick={1,...,6},ymajorgrids,grid style={gridline},
+  tick label style={font=\small},label style={font=\small},title={(b) Tokens reused from cache},
+  title style={font=\small},legend style={font=\scriptsize,draw=none,at={(0.5,0.03)},anchor=south},legend columns=2,
+  scaled y ticks=false]
+\addplot[color=series2,mark=square*,mark size=1.6pt,thick] coordinates {(1,1806) (2,1404) (3,1404) (4,1404) (5,1404) (6,1404)};
+\addlegendentry{cached, before}
+\addplot[color=series1,mark=*,mark size=1.6pt,thick] coordinates {(1,1925) (2,1943) (3,1986) (4,2048) (5,2074) (6,2115)};
+\addlegendentry{cached, after}
+\addplot[color=inkmuted,dashed] coordinates {(1,2027) (2,2139) (3,2128) (4,2162) (5,2199) (6,2221)};
+\addlegendentry{total, after}
+\end{axis}
+\end{tikzpicture}

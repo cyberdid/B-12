@@ -1,0 +1,20 @@
+\begin{tikzpicture}
+\begin{axis}[name=a,ybar,bar width=9mm,width=.46\linewidth,height=48mm,ymin=0,ymax=400,
+  symbolic x coords={median,mean},xtick=data,enlarge x limits=.55,ylabel={Characters},
+  title={(a) Length of conversational replies},title style={font=\small},
+  tick label style={font=\small},label style={font=\small},ymajorgrids,grid style={gridline},
+  nodes near coords,every node near coord/.append style={font=\scriptsize},
+  legend style={font=\scriptsize,draw=none,at={(0.03,0.97)},anchor=north west}]
+\addplot[fill=series2!80,draw=none] coordinates {(median,188) (mean,337)};
+\addlegendentry{control}
+\addplot[fill=series1!80,draw=none] coordinates {(median,97) (mean,118)};
+\addlegendentry{brevity rule}
+\end{axis}
+\begin{axis}[at={(a.east)},anchor=west,xshift=16mm,ybar,bar width=12mm,width=.40\linewidth,height=48mm,
+  ymin=0,ymax=21,symbolic x coords={control,brevity rule},xtick=data,enlarge x limits=.6,
+  ylabel={Turns with $\geq$1 tool call},title={(b) Tool use on work turns (n=21)},
+  title style={font=\small},tick label style={font=\small},label style={font=\small},
+  ymajorgrids,grid style={gridline},nodes near coords,every node near coord/.append style={font=\scriptsize}]
+\addplot[fill=inkmuted!55,draw=none] coordinates {(control,18) (brevity rule,9)};
+\end{axis}
+\end{tikzpicture}

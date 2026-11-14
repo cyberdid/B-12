@@ -1,0 +1,16 @@
+\begin{tikzpicture}[font=\small,
+  box/.style={draw=inkmuted,rounded corners=2pt,align=center,minimum height=8mm,inner sep=3pt},
+  arr/.style={-{Stealth[length=2mm]},draw=inkmuted}]
+\node[box,text width=27mm] (s1) {Scenario\\(all memories)};
+\node[box,right=6mm of s1,text width=30mm,fill=series2!12] (p1) {Harness-written\\system prompt};
+\node[box,right=6mm of p1,text width=18mm] (m1) {Model};
+\draw[arr] (s1) -- (p1); \draw[arr] (p1) -- (m1);
+\node[anchor=west,font=\small\bfseries] at ([yshift=6mm]s1.north west) {(a) Raw-model harness};
+\node[box,below=14mm of s1,text width=27mm] (s2) {Scenario\\(actors, consent)};
+\node[box,right=6mm of s2,text width=30mm,fill=series1!12] (r2) {B-12 runtime\\grants, recall,\\persona, tools};
+\node[box,right=6mm of r2,text width=18mm] (m2) {Model};
+\node[box,right=6mm of m2,text width=20mm] (t2) {Tool results\\(sandbox)};
+\draw[arr] (s2) -- (r2); \draw[arr] (r2) -- (m2); \draw[arr] (m2) -- (t2);
+\draw[arr] (t2.south) |- ++(0,-5mm) -| (r2.south);
+\node[anchor=west,font=\small\bfseries] at ([yshift=6mm]s2.north west) {(b) Runtime-faithful harness};
+\end{tikzpicture}
