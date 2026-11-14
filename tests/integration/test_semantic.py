@@ -7,6 +7,13 @@ import pytest
 
 from b12.contracts import Actor
 
+
+def system_text(request) -> str:
+    """The system prompt plus the Evidence block (a system message after the user turn)."""
+    messages = request["messages"] if isinstance(request, dict) else request.messages
+    return "\n".join(m["content"] for m in messages if m["role"] == "system")
+
+
 FIXTURES = str(Path(__file__).resolve().parents[1] / "fixtures")
 
 
@@ -79,11 +86,11 @@ async def test_agent_uses_semantic_and_falls_back_to_lexical(scripted_ollama, tm
         grant = runtime.control.issue_grant(actor.id, session, ("time.read",))
         state["script"] = [{"content": "Бублик"}, {"content": "Бублик"}]
         await runtime.agent.turn(session, grant, "нагадай ім'я тварини кота")
-        assert record.id in state["requests"][-1]["messages"][0]["content"]
+        assert record.id in system_text(state["requests"][-1])
         runtime.agent.semantic.embedder.backend = "missing_module:Nothing"
         runtime.agent.semantic.embedder.close()
         result = await runtime.agent.turn(session, grant, "Кота звати як?")
         assert result.state == "completed"  # embedding failure -> lexical recall still works
-        assert record.id in state["requests"][-1]["messages"][0]["content"]
+        assert record.id in system_text(state["requests"][-1])
     finally:
         runtime.close()

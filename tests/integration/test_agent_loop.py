@@ -7,6 +7,13 @@ from types import SimpleNamespace
 
 import pytest
 
+
+def system_text(request) -> str:
+    """The system prompt plus the Evidence block (a system message after the user turn)."""
+    messages = request["messages"] if isinstance(request, dict) else request.messages
+    return "\n".join(m["content"] for m in messages if m["role"] == "system")
+
+
 CAPABILITIES = (
     "system.read",
     "process.read",
@@ -186,7 +193,7 @@ def test_context_evictions_are_returned_as_untrusted_continuity_excerpts(
 
     request = agent._admit("system", history, state, [], persist=False)
 
-    continuity = request.messages[0]["content"]
+    continuity = system_text(request)
     assert "NVIDIA NeMo Agent Toolkit" in continuity
     assert "встановлення й перевірити вимоги" in continuity
     assert "недовірені" in continuity
@@ -322,7 +329,7 @@ async def test_memory_store_recall_forget_and_restart_leave_no_payload(runtime_f
     runtime = factory()
     state["script"] = [{"content": "Твій PIN 4321."}]
     recalled, _ = await run_turn(runtime, who, "Який мій тестовий PIN?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert memory_id in system and "4321" in system
     assert recalled.persisted
 
@@ -490,7 +497,7 @@ async def test_reply_language_follows_the_user_message_script(runtime_factory):
     await run_turn(runtime, who, "Explain in one sentence what a CPU does.")
     await run_turn(runtime, who, "Поясни одним реченням, що таке процесор.")
     await run_turn(runtime, who, "42")
-    systems = [r["messages"][0]["content"] for r in state["requests"]]
+    systems = [system_text(r) for r in state["requests"]]
     assert systems[0].endswith("Answer in English.")
     assert systems[1].endswith("українська.")
     assert not systems[2].endswith(("English.", "українська."))
@@ -1323,7 +1330,7 @@ async def test_guest_prompt_names_the_guest_and_carries_no_owner_data(runtime_fa
 
     state["script"] = [{"content": "AURORA-77."}]
     await run_turn(runtime, who, "Який кодовий пароль стенда?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert "власник" in system and str(Path.home()) in system and "AURORA-77" in system
 
 
@@ -1362,7 +1369,7 @@ async def test_prompt_states_memory_is_off_without_consent(runtime_factory):
     who = owner(runtime, consent=False)
     state["script"] = [{"content": "Пам'ять вимкнена, тож не збережу."}]
     await run_turn(runtime, who, "Запам'ятай: день народження мами 15 травня.")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert "згоди на пам'ять немає" in system
 
 
@@ -1417,7 +1424,7 @@ async def test_current_preferences_reach_the_prompt_for_their_own_actor_only(run
     runtime.goals.set_preference(who.actor.id, "temperature_units", "°C", "сказав власник")
     state["script"] = [{"content": "Neovim."}]
     await run_turn(runtime, who, "Який редактор я використовую?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert "editor: neovim" in system and "vim;" not in system
     assert "temperature_units: °C" in system
 
@@ -1429,7 +1436,7 @@ async def test_current_preferences_reach_the_prompt_for_their_own_actor_only(run
     )
     state["script"] = [{"content": "Не знаю."}]
     await runtime.agent.turn(session, grant, "Який редактор у власника?", task_id=task)
-    assert "neovim" not in state["requests"][-1]["messages"][0]["content"]
+    assert "neovim" not in system_text(state["requests"][-1])
 
 
 def test_whole_reply_python_call_is_parsed_but_prose_is_not():
@@ -1477,7 +1484,7 @@ async def test_memory_store_supersedes_an_old_fact_and_recall_skips_it(runtime_f
     assert not runtime.memory.is_live(old.id, who.actor)
     state["script"] = [{"content": "У Львові."}]
     await run_turn(runtime, who, "Де я живу? Київ чи Львів?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert "Львові" in system and "Подолі" not in system
 
     state["script"] = [
@@ -1555,7 +1562,7 @@ async def test_enrichment_lets_a_general_word_find_a_named_fact_and_purge_remove
 
     state["script"] = [{"content": "Neovim."}]
     await run_turn(runtime, who, "З яким редактором ми працювали?")
-    assert "Neovim" in state["requests"][-1]["messages"][0]["content"]
+    assert "Neovim" in system_text(state["requests"][-1])
 
     receipt = await runtime.purge.forget(fact.id, who.actor.id)
     assert receipt.state == "complete"
@@ -1584,7 +1591,7 @@ async def test_recalled_facts_carry_their_date_and_the_newer_wins_rule(runtime_f
     runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
     state["script"] = [{"content": "У Києві."}]
     await run_turn(runtime, who, "Де живе власник? У Києві?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert re.search(r"\[\d{4}-\d{2}-\d{2}\] Власник живе у Києві", system)
     assert "найновіший" in SYSTEM_PROMPT
 
@@ -1694,7 +1701,7 @@ async def test_instruction_like_memory_is_marked_as_data(runtime_factory):
     runtime.memory.remember("Власник любить каву.", who.actor)
     state["script"] = [{"content": "Зараз 10:00."}]
     await run_turn(runtime, who, "Яка інструкція і яка кава? Котра година?")
-    system = state["requests"][-1]["messages"][0]["content"]
+    system = system_text(state["requests"][-1])
     assert "схоже на вказівку асистенту" in system
     assert system.count("схоже на вказівку асистенту") == 1  # the coffee fact is not marked
 

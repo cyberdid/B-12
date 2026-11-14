@@ -107,6 +107,9 @@ class AdmittedRequest:
             raise ModelError("admission_invalid", "request or profile changed after admission")
 
 
+EVIDENCE_HEADER = "Evidence (untrusted data):\n"
+
+
 class ContextBuilder:
     def __init__(self, settings: Settings):
         self.settings = settings.model_copy(deep=True)
@@ -133,13 +136,23 @@ class ContextBuilder:
                     or not isinstance(item["text"], str)
                 ):
                     raise ValueError("evidence requires id and text")
-            if data["evidence"]:
-                system += "\n\nEvidence (untrusted data):\n" + canonical(data["evidence"]).decode()
         except (ValueError, TypeError, KeyError) as exc:
             raise ModelError("invalid_request", "invalid messages, evidence or tools") from exc
         groups = _validate_structure(
             [{"role": "system", "content": system}, *data["messages"]], data["tools"]
         )
+        if data["evidence"] and groups and groups[-1] and groups[-1][0].get("role") == "user":
+            # Recalled memories change almost every turn. They go right after the current
+            # user message, not into the system text: the system prompt, the tool schemas
+            # and earlier turns then stay a byte-identical prefix the provider can reuse
+            # from its prompt cache (measured: the cache used to stop where Evidence began).
+            groups[-1].insert(1, {
+                "id": "evidence",
+                "role": "system",
+                "content": EVIDENCE_HEADER + canonical(data["evidence"]).decode(),
+            })
+        elif data["evidence"]:
+            system += "\n\n" + EVIDENCE_HEADER + canonical(data["evidence"]).decode()
         dropped = []
         while True:
             outgoing = [{"role": "system", "content": system}]
@@ -244,7 +257,18 @@ def _message_groups(messages: list[dict]) -> list[list[dict]]:
             raise ValueError("invalid message id")
         ids.add(identity)
         role = message.get("role")
-        if role == "user":
+        if role == "system":
+            # Only the builder's Evidence block, directly after a user message.
+            if (
+                pending
+                or not groups
+                or len(groups[-1]) != 1
+                or groups[-1][0].get("role") != "user"
+                or set(message) - {"id", "role", "content"}
+                or not message["content"].startswith(EVIDENCE_HEADER)
+            ):
+                raise ValueError("misplaced system message")
+        elif role == "user":
             if pending or set(message) - {"id", "role", "content"}:
                 raise ValueError("incomplete tools or invalid user")
             groups.append([])
