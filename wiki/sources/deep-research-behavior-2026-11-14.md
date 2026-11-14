@@ -35,5 +35,7 @@ tags: [research, behavior, latency, prompt, memory, initiative]
 
 ## Пов'язане
 
+- [Звіт із першоджерелами на той самий промпт (основний)](capri-small-model-behavior-2026-11-14.md)
+
 - [Оцінка Capri](../project/capri-comprehensive-evaluation.md)
 - [Журнал](../log.md)
