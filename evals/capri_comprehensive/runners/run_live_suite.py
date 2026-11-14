@@ -144,6 +144,10 @@ def merge_into_suite(
         }
         by_id[sid] = data
     batch["reports"] = [by_id[k] for k in sorted(by_id)]
+    # Model replies may quote host paths (e.g. a process's working directory): keep the
+    # owner's home directory out of committed reports.
+    home = str(Path.home())
+    batch = json.loads(json.dumps(batch, ensure_ascii=False).replace(home, "~"))
     counts = {}
     for r in batch["reports"]:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
