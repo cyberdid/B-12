@@ -64,6 +64,12 @@ def summarize(variant: str = "") -> str:
         "of scenarios, so this interval understates scenario-level uncertainty)",
         f"- Stable pass ({n}/{n}): {len(stable_pass)}; stable fail (0/{n}): {len(stable_fail)}; "
         f"flaky: {len(flaky)}",
+        "- Scenario verdicts that differ between pairs of runs: "
+        + ", ".join(
+            f"run{x + 1}–run{y + 1}: {sum(runs[x][i] != runs[y][i] for i in runnable)}"
+            for x in range(n) for y in range(x + 1, n)
+        )
+        + " (the totals hide flips in both directions)",
         "",
         "## Flaky scenarios",
         "",
