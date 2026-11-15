@@ -45,13 +45,20 @@ expected = [
     ", ".join(map(str, r["gemma4-31b"]["per_run"])), ", ".join(map(str, r["bolt-evidence-after-user"]["per_run"])),
     f"{r['bolt']['pooled_percent']}\\%", f"{r['gemma4-26b']['pooled_percent']}\\%",
     f"{len(d['stable_fail_all_three'])}".replace("17", "Seventeen"),
-    f"from {d['brevity_ab']['control']['casual_chars_median']} to {d['brevity_ab']['treatment']['casual_chars_median']} characters",
-    f"from {d['brevity_ab']['control']['work_turns_with_tool']} of 21 to {d['brevity_ab']['treatment']['work_turns_with_tool']} of 21",
+    f"from {d['brevity_ab2']['control']['casual_chars_median']} to {d['brevity_ab2']['treatment']['casual_chars_median']} characters",
+    f"in {d['brevity_ab2']['control']['first_turns_with_tool']} of 48 executions without the rule and in {d['brevity_ab2']['treatment']['first_turns_with_tool']} of 48",
+    f"passed {d['brevity_ab2']['control']['work_passes']} and {d['brevity_ab2']['treatment']['work_passes']} times",
+    f"$p={d['brevity_ab2']['pass_sign_p']}$",
     f"from {int(d['prompt_cache']['baseline']['cached_median'])} to {int(d['prompt_cache']['after']['cached_median'])}",
     f"p={d['evidence_paired']['sign_test_p']}", f"The {d['model_dependent']['n']} model-dependent",
 ]
 expected[-1] = f"the {d['model_dependent']['n']} model-dependent"
 for text in expected:
+    assert text in source, text
+a = d["annotation"]
+for text in (f"& {a['fleiss_kappa']}\\\\", f"{a['unanimous']} of 51",
+             f"{a['final_counts']['genuine_defect']} / {a['final_counts']['correct_in_substance']} / {a['final_counts']['scenario_mismatch']}",
+             f"{d['latency_free_paired']['gemma4-26b']['sign_test_p']:.2f}".replace("0.85", "p=0.85")):
     assert text in source, text
 for sid in d["stable_fail_all_three"]:
     assert sid in source, sid

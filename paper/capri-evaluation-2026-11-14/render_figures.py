@@ -81,7 +81,7 @@ def series(values, start=1):
 """, encoding="utf-8")
 
 # Figure: brevity A/B.
-ab = data["brevity_ab"]
+ab = data["brevity_ab2"]
 c, t = ab["control"], ab["treatment"]
 (FIG / "brevity.tex").write_text(rf"""\begin{{tikzpicture}}
 \begin{{axis}}[name=a,ybar,bar width=9mm,width=.46\linewidth,height=48mm,ymin=0,ymax=400,
@@ -95,12 +95,12 @@ c, t = ab["control"], ab["treatment"]
 \addplot[fill=series1!80,draw=none] coordinates {{(median,{t['casual_chars_median']}) (mean,{t['casual_chars_mean']})}};
 \addlegendentry{{brevity rule}}
 \end{{axis}}
-\begin{{axis}}[at={{(a.east)}},anchor=west,xshift=16mm,ybar,bar width=12mm,width=.40\linewidth,height=48mm,
-  ymin=0,ymax={c['work_turns']},symbolic x coords={{control,brevity rule}},xtick=data,enlarge x limits=.6,
-  ylabel={{Turns with $\geq$1 tool call}},title={{(b) Tool use on work turns (n={c['work_turns']})}},
+\begin{{axis}}[at={{(a.east)}},anchor=west,xshift=20mm,ybar,bar width=12mm,width=.40\linewidth,height=48mm,
+  ymin=0,ymax={c['first_turns']},symbolic x coords={{control,brevity rule}},xtick=data,enlarge x limits=.6,
+  ylabel={{First turns}},title={{(b) Started with a tool (of {c['first_turns']})}},
   title style={{font=\small}},tick label style={{font=\small}},label style={{font=\small}},
   ymajorgrids,grid style={{gridline}},nodes near coords,every node near coord/.append style={{font=\scriptsize}}]
-\addplot[fill=inkmuted!55,draw=none] coordinates {{(control,{c['work_turns_with_tool']}) (brevity rule,{t['work_turns_with_tool']})}};
+\addplot[fill=inkmuted!55,draw=none] coordinates {{(control,{c['first_turns_with_tool']}) (brevity rule,{t['first_turns_with_tool']})}};
 \end{{axis}}
 \end{{tikzpicture}}
 """, encoding="utf-8")

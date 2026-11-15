@@ -21,6 +21,22 @@ REP = EVAL / "reports/repeats"
 OUT = ROOT / "artifacts"
 
 
+LATENCY = __import__("re").compile(r"TTFT|latency|duration", __import__("re").I)
+
+
+def latency_free(path: Path) -> dict[str, str]:
+    """Verdicts with time bounds ignored: a failure counts as a pass when every failed
+    assertion is a latency/duration bound (content, tools and safety checks still apply)."""
+    out = {}
+    for r in json.loads(path.read_text(encoding="utf-8"))["reports"]:
+        status = r["status"].removeprefix("EXECUTED_")
+        fails = [a["detail"] for t in r.get("turn_results", []) for a in t.get("failed_assertions", [])]
+        if status == "FAIL" and fails and all(LATENCY.search(f) for f in fails):
+            status = "PASS"
+        out[r["scenario_id"]] = status
+    return out
+
+
 def statuses(path: Path) -> dict[str, str]:
     reports = json.loads(path.read_text(encoding="utf-8"))["reports"]
     return {r["scenario_id"]: r["status"].removeprefix("EXECUTED_") for r in reports}
@@ -97,6 +113,13 @@ def main() -> None:
         "bolt-evidence-after-user": [statuses(REP / f"run{i}/batch_summary.json") for i in (4, 5, 6)],
     }
     data["repeats"] = {k: summarize(v, ids) for k, v in variants.items()}
+    paths = {
+        "bolt": [REP / f"run{i}/batch_summary.json" for i in (1, 2, 3)],
+        "gemma4-26b": [REP / f"deployed-26b/run{i}/batch_summary_deployed-26b.json" for i in (1, 2, 3)],
+        "gemma4-31b": [REP / f"deployed-31b/run{i}/batch_summary_deployed-31b.json" for i in (1, 2, 3)],
+        "bolt-evidence-after-user": [REP / f"run{i}/batch_summary.json" for i in (4, 5, 6)],
+    }
+    lat_runs = {k: [latency_free(p) for p in v] for k, v in paths.items()}
 
     # Model-dependent subset: scenarios a deployed variant reruns on its own model.
     import sys
@@ -108,7 +131,19 @@ def main() -> None:
     data["model_dependent"] = {
         "n": len(model_dep),
         "per_config": {k: summarize(v, model_dep)["per_run"] for k, v in variants.items()},
+        "latency_free_per_config": {k: summarize(v, model_dep)["per_run"] for k, v in lat_runs.items()},
     }
+    data["latency_free"] = {k: {kk: summarize(v, ids)[kk] for kk in ("per_run", "mean", "stable_fail_ids")}
+                            for k, v in lat_runs.items()}
+    lf = {k: summarize(v, ids)["counts"] for k, v in lat_runs.items()}
+    data["latency_free_paired"] = {}
+    for other in ("gemma4-26b", "gemma4-31b"):
+        better = [i for i in ids if lf["bolt"][i] > lf[other][i]]
+        worse = [i for i in ids if lf["bolt"][i] < lf[other][i]]
+        data["latency_free_paired"][other] = {"bolt_more": len(better), "other_more": len(worse),
+                                              "sign_test_p": sign_test(len(better), len(worse))}
+    lsf = [set(data["latency_free"][k]["stable_fail_ids"]) for k in ("bolt", "gemma4-26b", "gemma4-31b")]
+    data["latency_free_stable_fail_all_three"] = sorted(set.intersection(*lsf))
     sf = [set(data["repeats"][k]["stable_fail_ids"]) for k in ("bolt", "gemma4-26b", "gemma4-31b")]
     data["stable_fail_all_three"] = sorted(set.intersection(*sf))
 
@@ -185,6 +220,41 @@ def main() -> None:
     ab["casual"], ab["work"] = casual, work
     ab["repeats"] = max(x["repeat"] for x in rows) + 1
     data["brevity_ab"] = ab
+
+    # Wider A/B (16 work scenarios; brevity_ab_rows_v2.json). First turns measure whether the
+    # model starts with an action; scenario-level sign tests use pass and tool-turn counts.
+    rows = json.loads((ROOT / "experiments/brevity_ab_rows_v2.json").read_text(encoding="utf-8"))
+    work2 = ["RE-01", "RE-04", "RE-05", "RE-07", "INT-04", "AUT-01", "AUT-02", "MEM-01", "MEM-03",
+             "MEM-07", "LT-01", "LT-03", "LT-05", "LT-06", "JOURNEY-02", "JOURNEY-03"]
+    ab2 = {"casual": casual, "work": work2, "repeats": max(x["repeat"] for x in rows) + 1,
+           "executions": len({(x["repeat"], x["arm"], x["scenario"]) for x in rows})}
+    for arm in ("control", "treatment"):
+        r = [x for x in rows if x["arm"] == arm]
+        cas = [x["chars"] for x in r if x["scenario"] in casual]
+        w_all = [x for x in r if x["scenario"] in work2]
+        w_first = [x for x in w_all if x["turn"] == 0]
+        ab2[arm] = {
+            "casual_chars_median": statistics.median(cas), "casual_chars_mean": round(statistics.mean(cas)),
+            "first_turns_with_tool": sum(x["tool_calls"] > 0 for x in w_first), "first_turns": len(w_first),
+            "all_turns_with_tool": sum(x["tool_calls"] > 0 for x in w_all), "all_turns": len(w_all),
+            "work_passes": sum(x["passed_scenario"] for x in w_first), "work_runs": len(w_first),
+            "low_cyrillic_replies": sum(x["cyrillic_share"] < 0.5 for x in r),
+        }
+    def per(arm, key, sid, first_only):
+        return sum(bool(x[key]) for x in rows if x["arm"] == arm and x["scenario"] == sid
+                   and (x["turn"] == 0 or not first_only))
+    tool_c = {s: (per("control", "tool_calls", s, False), per("treatment", "tool_calls", s, False)) for s in work2}
+    pass_c = {s: (per("control", "passed_scenario", s, True), per("treatment", "passed_scenario", s, True)) for s in work2}
+    ab2["tool_turns_by_scenario"] = tool_c
+    ab2["passes_by_scenario"] = pass_c
+    for name, counts in (("tool", tool_c), ("pass", pass_c)):
+        fewer = sorted(s for s, (c, t) in counts.items() if t < c)
+        more = sorted(s for s, (c, t) in counts.items() if t > c)
+        ab2[f"{name}_fewer"], ab2[f"{name}_more"] = fewer, more
+        ab2[f"{name}_sign_p"] = sign_test(len(fewer), len(more))
+    data["brevity_ab2"] = ab2
+
+    data["annotation"] = json.loads((ROOT / "experiments/judges/agreement.json").read_text())
 
     (OUT / "data.json").write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({k: data[k] for k in ("suite", "runnable", "model_dependent", "single_run_2026_11_13",

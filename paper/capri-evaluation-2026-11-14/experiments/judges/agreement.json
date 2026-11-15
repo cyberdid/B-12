@@ -1,0 +1,183 @@
+{
+ "items": 51,
+ "label_counts": {
+  "claude": {
+   "correct_in_substance": 23,
+   "genuine_defect": 23,
+   "scenario_mismatch": 5
+  },
+  "codex": {
+   "correct_in_substance": 16,
+   "genuine_defect": 26,
+   "scenario_mismatch": 9
+  },
+  "agy": {
+   "correct_in_substance": 18,
+   "genuine_defect": 24,
+   "scenario_mismatch": 9
+  }
+ },
+ "self_consistency": {
+  "codex": {
+   "agreement": 0.863,
+   "kappa": 0.784
+  },
+  "agy": {
+   "agreement": 0.941,
+   "kappa": 0.904
+  }
+ },
+ "pairwise_kappa": {
+  "claude-codex": 0.679,
+  "claude-agy": 0.743,
+  "codex-agy": 0.651
+ },
+ "pairwise_agreement": {
+  "claude-codex": 0.804,
+  "claude-agy": 0.843,
+  "codex-agy": 0.784
+ },
+ "fleiss_kappa": 0.69,
+ "majority_counts": {
+  "correct_in_substance": 21,
+  "genuine_defect": 21,
+  "no_majority": 3,
+  "scenario_mismatch": 6
+ },
+ "unanimous": 38,
+ "scenario_majority": {
+  "AUT-07": {
+   "genuine_defect": 3
+  },
+  "CM-01": {
+   "genuine_defect": 3
+  },
+  "INT-01": {
+   "genuine_defect": 3
+  },
+  "INT-06": {
+   "correct_in_substance": 3
+  },
+  "INT-07": {
+   "correct_in_substance": 3
+  },
+  "INT-08": {
+   "genuine_defect": 3
+  },
+  "JOURNEY-01": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "JOURNEY-03": {
+   "no_majority": 3
+  },
+  "LT-08": {
+   "correct_in_substance": 1,
+   "genuine_defect": 2
+  },
+  "MEM-03": {
+   "correct_in_substance": 3
+  },
+  "MEM-04": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "MEM-07": {
+   "correct_in_substance": 3
+  },
+  "REL-08": {
+   "scenario_mismatch": 3
+  },
+  "SEC-04": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "SEC-06": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "SEC-08": {
+   "scenario_mismatch": 3
+  },
+  "VOI-02": {
+   "genuine_defect": 3
+  }
+ },
+ "owner_adjudicated": 13,
+ "owner_marks": {
+  "yes": 7,
+  "+-": 3,
+  "-": 1,
+  "+": 2
+ },
+ "agreement_with_owner_on_disputed": {
+  "claude": "9/13",
+  "codex": "5/13",
+  "agy": "7/13"
+ },
+ "final_counts": {
+  "correct_in_substance": 21,
+  "genuine_defect": 25,
+  "scenario_mismatch": 5
+ },
+ "final_by_scenario": {
+  "AUT-07": {
+   "genuine_defect": 3
+  },
+  "CM-01": {
+   "genuine_defect": 3
+  },
+  "INT-01": {
+   "genuine_defect": 3
+  },
+  "INT-06": {
+   "correct_in_substance": 3
+  },
+  "INT-07": {
+   "correct_in_substance": 3
+  },
+  "INT-08": {
+   "genuine_defect": 3
+  },
+  "JOURNEY-01": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "JOURNEY-03": {
+   "correct_in_substance": 1,
+   "genuine_defect": 2
+  },
+  "LT-08": {
+   "correct_in_substance": 1,
+   "genuine_defect": 2
+  },
+  "MEM-03": {
+   "correct_in_substance": 3
+  },
+  "MEM-04": {
+   "genuine_defect": 2,
+   "correct_in_substance": 1
+  },
+  "MEM-07": {
+   "correct_in_substance": 3
+  },
+  "REL-08": {
+   "scenario_mismatch": 3
+  },
+  "SEC-04": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "SEC-06": {
+   "correct_in_substance": 2,
+   "genuine_defect": 1
+  },
+  "SEC-08": {
+   "scenario_mismatch": 2,
+   "genuine_defect": 1
+  },
+  "VOI-02": {
+   "genuine_defect": 3
+  }
+ }
+}

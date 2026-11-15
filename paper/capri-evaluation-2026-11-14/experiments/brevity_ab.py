@@ -2,7 +2,7 @@
 
 Same code, model (Bolt), scenarios and seeds; only one persona sentence differs. Runs through
 the real runtime (RuntimeTurnExecutor) and must run inside the bubblewrap sandbox.
-Usage: python brevity_ab.py OUT_DIR REPEATS
+Usage: python brevity_ab.py OUT_DIR REPEATS [ID,ID,...] [ROWS_FILE]
 """
 import json
 import os
@@ -46,7 +46,7 @@ def cyrillic_share(text):
     return sum("а" <= c.lower() <= "я" or c.lower() in "іїєґ" for c in letters) / max(1, len(letters))
 
 
-def main(out, repeats):
+def main(out, repeats, scenarios=SCENARIOS, rows_name="brevity_ab_rows.json"):
     out.mkdir(parents=True, exist_ok=True)
     rows = []
     for rep in range(repeats):
@@ -54,7 +54,7 @@ def main(out, repeats):
             base = Path(tempfile.mkdtemp(prefix=f"ab-{arm}-"))
             runner = ScenarioRunner(artifacts_dir=out / "artifacts" / f"{arm}-{rep}",
                                     turn_executor=ArmExecutor(base, prompt))
-            for sid in SCENARIOS:
+            for sid in scenarios:
                 sc = ScenarioDefinition.from_yaml_file(next(ROOT.glob(f"*/{sid}.yaml")))
                 report = runner.run(sc)
                 for t in report.turn_results:
@@ -67,9 +67,10 @@ def main(out, repeats):
                     })
                 print(rep, arm, sid, "PASS" if report.all_passed else "FAIL", flush=True)
     text = json.dumps(rows, ensure_ascii=False, indent=1).replace(str(Path.home()), "~")
-    (out / "brevity_ab_rows.json").write_text(text, encoding="utf-8")
+    (out / rows_name).write_text(text, encoding="utf-8")
 
 
 if __name__ == "__main__":
     os.environ["B12_EVAL_SANDBOX"] = "1"
-    main(Path(sys.argv[1]), int(sys.argv[2]))
+    chosen = sys.argv[3].split(",") if len(sys.argv) > 3 else SCENARIOS
+    main(Path(sys.argv[1]), int(sys.argv[2]), chosen, sys.argv[4] if len(sys.argv) > 4 else "brevity_ab_rows.json")
