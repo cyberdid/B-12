@@ -1,6 +1,9 @@
 # Measuring a Local AI Companion Through Its Own Runtime (2026-11-14, revised 2026-11-15)
 
-Follow-up to `paper/capri-experimental-2026-11-09`. Same house style (A4, 25 mm margins,
+Published on Zenodo 2026-11-15 as a separate preprint: doi:[10.5281/zenodo.24250625](https://doi.org/10.5281/zenodo.24250625)
+(file `Capri-evaluation-EN-2026-11-15.pdf`, identical to `manuscript.pdf` at commit 05a9758; licence CC BY 4.0).
+
+Follow-up to `paper/capri-experimental-2026-11-09` (doi:10.5281/zenodo.24079168). Same house style (A4, 25 mm margins,
 `article` 11 pt, Computer Modern Unicode, `natbib`/`unsrtnat`, `booktabs`, TikZ/PGFPlots,
 Tectonic 0.17.0); see `paper/capri-academic-2026-11-09/formatting-spec.md`.
 
