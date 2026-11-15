@@ -45,3 +45,12 @@ the paper, and there is no independent replication.
   Fleiss' kappa 0.69. Run `experiments/judges/analyze.py` to recompute.
 - The first paper's DOI (10.5281/zenodo.24079168) is cited; the data availability statement
   says exactly which reply texts are public.
+
+## Second review (2026-11-15)
+
+Point fixes: the paired test is described as an exact two-sided sign test on paired counts
+(McNemar's exact test only for single binary verdicts); the abstract names both the laptop
+and the cloud GPU; the availability statement separates public reply texts and scenario
+results from local execution traces; judge models are named with client versions (Codex CLI
+0.169.0 logging `gpt-6-luna`; Antigravity CLI 1.5.9 default Gemini 4 Argon, medium). The
+injection test of the Evidence placement remains out of scope by the owner's decision.
