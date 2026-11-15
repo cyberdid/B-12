@@ -13,8 +13,8 @@ With scenario IDs, only those handlers run; other reports stay as they are.
 from __future__ import annotations
 
 import json
-import re
 import os
+import re
 import sys
 import time
 from datetime import UTC, datetime
