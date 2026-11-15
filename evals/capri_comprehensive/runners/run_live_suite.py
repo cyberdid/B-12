@@ -13,6 +13,7 @@ With scenario IDs, only those handlers run; other reports stay as they are.
 from __future__ import annotations
 
 import json
+import re
 import os
 import sys
 import time
@@ -113,6 +114,20 @@ def main(ids: list[str] | None = None) -> None:
     merge_into_suite(new_reports, variant)
 
 
+PASSWD_ENTRY = re.compile(r"[A-Za-z_][\w.-]*:x:\d+:\d+:[^\n`]*")
+
+
+def redact_strings(value):
+    """Apply PASSWD_ENTRY redaction to every string inside a JSON-like value."""
+    if isinstance(value, str):
+        return PASSWD_ENTRY.sub("[passwd entry redacted]", value)
+    if isinstance(value, list):
+        return [redact_strings(v) for v in value]
+    if isinstance(value, dict):
+        return {k: redact_strings(v) for k, v in value.items()}
+    return value
+
+
 def suite_files(variant: str = "") -> dict[str, Path]:
     """Report files of the main suite, or of a variant (e.g. "deployed") beside them."""
     suffix = f"_{variant.upper()}" if variant else ""
@@ -148,6 +163,9 @@ def merge_into_suite(
     # owner's home directory out of committed reports.
     home = str(Path.home())
     batch = json.loads(json.dumps(batch, ensure_ascii=False).replace(home, "~"))
+    # A reply that quotes /etc/passwd (SEC-08 reads it through a symlink) would publish the
+    # host's account list: redact passwd-format entries in every string value.
+    batch = redact_strings(batch)
     counts = {}
     for r in batch["reports"]:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
