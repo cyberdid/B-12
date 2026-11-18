@@ -1210,3 +1210,19 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - agy/Gemini (print/plan mode, порожній каталог, без доступу до review Codex) оцінив 60 сімейств v2 за [рубрикою](../reports/unified/oracle-review-v2/rubric.md): 50 ok, 2 minor, 6 major, 2 blocker; сирі вердикти й відповідь автора — [`reports/unified/oracle-review-v2/`](../reports/unified/oracle-review-v2/README.md).
 - Прийнято 9 (C05, C07, C11, C12, C16, C21, M09, M12, M18) → `u2-u3-draft-v3` (джерело `d0948d1928bc43a8ada9f63d17a8c2ac69ef929fc6cce75fd82ec9f37adb1ed8`, manifest `068bb522677f14b40781a428acb6ab982eb3a7025854776faf75e9ed68552b2d`); тест перевіряє, що змінилися саме ці сімейства. Відхилено M30: 197 distractors є в setup, у review-аркуші їх скорочено автором.
 - `evals/unified/run_u2_u3.py`: адаптер → справжній хід агента → сирий запис без доступу до oracle; CLI працює лише в sandbox; `sandboxed_suite.sh` отримав `B12_EVAL_ENTRY=unified-u2u3` зі свіжими tmpfs `/sandbox`, `/actors`. Перевірено на scripted Ollama; реальна модель не запускалась. `tests/unified` 91 passed.
+
+## [2026-11-18] ingest | Self-Improvement Memory / CRSI
+
+- Завантажено незмінений arXiv PDF v1 від 13.11.2026 у `raw/arxiv-2611.18856v1.pdf`; SHA-256 `a8299ba5b16577dd328d602e32f35b914b9393ffb38148d2410f358d4d90ff3d`. Прочитано повний текст і додатки B–F; URL, дата, версія й межі перевірки записані в [картці джерела](sources/self-improvement-memory-2026-11-18.md).
+- **Перевірений висновок:** SIM зберігає досвід оптимізатора виконуваного harness (проблема, edit, prediction, outcome, provenance), а не автобіографію task-agent. У 10 парних coding runs Full SIM була кращою у 9/10, середнє +2.36 абсолютного пункту (95% CI [1.05, 3.68], paired *p*=.003); решта cross-dataset/model порівнянь мають по одному run на умову.
+- **Пропозиція, не рішення:** додати в майбутньому окремий engineering experiment ledger для U2/U3/U8, не змішуючи його з user memory та production runtime. Відкрите Q23 додано. Ні code, ні модельні прогони, ні Capri не запускалися.
+
+## [2026-11-18] lint | Індексування SIM/CRSI дослідження
+
+- Окремий wiki page пояснює відмінність SIM від user memory і model continuity; `index.md`, status та Q23 посилаються на нього. У шести змінених Markdown-документах required frontmatter і всі локальні links/source paths перевірені: 0 нових пропусків. Raw snapshot hash збігається; `git diff --check` чистий. Загальний scan `wiki/log.md` виявив лише раніше зафіксований missing artifact `../artifacts/task15-soak-2026-10-26-run2/events.jsonl`; він не стосується цього ingest. Кодові/model tests не запускалися.
+
+## [2026-11-18] experiment | Перший реальний smoke-прогін U2/U3 на Bolt
+
+- Шлях `setup_adapter` → bubblewrap (`B12_EVAL_ENTRY=unified-u2u3`) → справжній хід агента на `b12-bolt-e4b:q4km` → сирий запис працює наскрізь. Виправлено по дорозі: bwrap 0.9 не може створити `/sandbox` під read-only `/`, тому для цього входу кожен top-level каталог хоста монтується read-only окремо; CLI раннера піднімає loopback-міст до брокера (як `run_networkless_runtime_suite`); записи нормалізуються з read-only mappings у JSON і серіалізуються до створення файла.
+- 14 сценаріїв v3 × 1 повтор, temperature 0, seed 42, 8192 context; TTFT cold 5,54 с, warm median 0,89 с. **Ручна** оцінка автором корпусу (scorer ще немає): 9 PASS, 1 PARTIAL, 4 FAIL — [підсумок і SHA-256 сирих записів](../reports/unified/baseline/u2u3-smoke-2026-11-18.json).
+- **Спостереження (n=1, не статистика):** M18 — Bolt пише «я прочитав настанову» без жодного tool call і цитує застарілий розділ 4.2 (вигадана перевірка); M01/M04 — дата створення запису подана як дата події, бо canonical memory не зберігає `event_time` (очікуване обмеження U3 baseline, аргумент для U4); M08 — evidence присутнє, але модель каже, що не може перевірити; C22 — немає read-back після запису. C10 правильно передав точний каталог, C19 відхилив вбудовану інструкцію.

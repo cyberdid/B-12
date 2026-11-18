@@ -37,7 +37,7 @@
 - [ ] Apply `available_tools`, approval policy and the `sudo_exec` stub from the setup through the control path (now recorded as `tool_policy.applied: false`).
 - [x] `evals/unified/run_u2_u3.py`: adapter seed → real agent turn → raw record (no oracle access); scripted-Ollama tests.
 - [ ] Blind scorer: oracle + raw record → verdict per outcome; unsupported outcomes `NOT_SCORABLE`.
-- [ ] One real smoke run on Bolt (idle GPU) for a few unblocked families to validate the path end to end.
+- [x] Real smoke run on Bolt, 14 scenarios × 1 (`reports/unified/baseline/u2u3-smoke-2026-11-18.json`): path works end to end; manual 9 PASS / 1 PARTIAL / 4 FAIL. Findings: M18 claims a file read with no tool call; M01/M04 report record dates as event dates (no `event_time` in memory); M08 ignores present evidence; C22 skips read-back.
 - [ ] Map oracle checks onto existing verifiers: `file_verifier.py`, `tool_oracles.py`, trace classification; unsupported oracle outcomes stay `NOT_SCORABLE`, not PASS.
 - [ ] Tests with scripted Ollama (no real model) for at least one family per class.
 

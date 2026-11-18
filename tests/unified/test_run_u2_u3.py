@@ -29,6 +29,7 @@ async def test_tool_call_arguments_and_reply_are_recorded(scripted_ollama, tmp_p
     )
 
     assert record["status"] == "EXECUTED"
+    assert json.loads(json.dumps(record)) == record  # plain JSON, no read-only mappings
     assert record["reply"] == "Кодова назва: ЛИСТОПАД-7."
     assert record["tool_calls"][0]["name"] == "file_read"
     assert record["tool_calls"][0]["arguments"] == {"path": str(target)}
@@ -87,4 +88,5 @@ def test_sandbox_script_offers_the_unified_entry_with_fresh_mounts():
     script = (ROOT / "evals/capri_comprehensive/runners/sandboxed_suite.sh").read_text()
     assert "unified-u2u3)" in script
     assert "EXTRA+=(--tmpfs /sandbox --tmpfs /actors)" in script
+    assert 'ROOT_ARGS+=(--ro-bind "$top" "$top")' in script
     assert "ENTRY=(-m evals.unified.run_u2_u3)" in script

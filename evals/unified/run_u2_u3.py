@@ -13,11 +13,21 @@ Real model runs belong inside the bubblewrap worker (`run_u2_u3_sandboxed.sh`), 
 
 import asyncio
 import json
+from collections.abc import Mapping
 from pathlib import Path
 
 from evals.unified.setup_adapter import build_runtime
 
 TURN_TIMEOUT_S = 600.0
+
+
+def _plain(value):
+    """Runtime events hold read-only mappings and tuples; records must be plain JSON."""
+    if isinstance(value, Mapping):
+        return {str(k): _plain(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain(v) for v in value]
+    return value
 
 
 def _load(root, relative):
@@ -101,23 +111,28 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
     real_to_declared = {real: declared for declared, real in report["memory_ids"].items()}
     metrics = list(result.model_metrics)
     ttft = next((m.get("ttft_s") for m in metrics if m.get("ttft_s")), None)
-    return {
-        **record,
-        "status": "EXECUTED",
-        "model": settings.model,
-        "runtime_state": result.state,
-        "error_code": result.error_code,
-        "reply": result.content,
-        "tool_calls": _calls(result),
-        "policy_decisions": [e.data for e in result.events if e.type == "policy_decision"],
-        "evidence_ids": [real_to_declared.get(e, f"runtime:{e}") for e in result.evidence_ids],
-        "pending_operations": list(result.pending_operations),
-        "ttft_ms": round(ttft * 1000, 2) if ttft is not None else None,
-        "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
-        "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
-        "seed_report": {k: report[k] for k in ("dropped_fields", "applied_relations")},
-        "tool_policy": {"declared_available_tools": setup.get("available_tools"), "applied": False},
-    }
+    return _plain(
+        {
+            **record,
+            "status": "EXECUTED",
+            "model": settings.model,
+            "runtime_state": result.state,
+            "error_code": result.error_code,
+            "reply": result.content,
+            "tool_calls": _calls(result),
+            "policy_decisions": [e.data for e in result.events if e.type == "policy_decision"],
+            "evidence_ids": [real_to_declared.get(e, f"runtime:{e}") for e in result.evidence_ids],
+            "pending_operations": list(result.pending_operations),
+            "ttft_ms": round(ttft * 1000, 2) if ttft is not None else None,
+            "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
+            "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
+            "seed_report": {k: report[k] for k in ("dropped_fields", "applied_relations")},
+            "tool_policy": {
+                "declared_available_tools": setup.get("available_tools"),
+                "applied": False,
+            },
+        }
+    )
 
 
 def settings_for_setup(template, setup, state_dir):
@@ -163,13 +178,25 @@ def main(argv=None):
     template = model_templates(work / "template", args.variant)[args.model_alias]
     setup = _load(root, row["setup_fixture"])["harness_setup"] if row.get("setup_fixture") else {}
     settings = settings_for_setup(template, setup, work / "state")
-    record = run_scenario(row, root, settings, work, files_root=Path("/"), existing_files_root=True)
+    socket_value = os.environ.get("B12_EVAL_BROKER_SOCKET")
+    if not socket_value or not Path(socket_value).is_socket():
+        parser.exit(2, "model broker socket is unavailable\n")
+    if os.environ.get("B12_EVAL_OLLAMA_URL") != "http://127.0.0.1:11434":
+        parser.exit(2, "runtime model URL must point to the isolated loopback bridge\n")
+    from evals.socket_bridge import SocketBridge
+
+    # Inside the network namespace the only model route is this loopback relay to the
+    # host-side allowlist broker (same as run_networkless_runtime_suite).
+    with SocketBridge(Path(socket_value), host="127.0.0.1", port=11434):
+        record = run_scenario(
+            row, root, settings, work, files_root=Path("/"), existing_files_root=True
+        )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     out = args.out_dir / f"{args.scenario_id}.json"
+    text = json.dumps(record, ensure_ascii=False, indent=1) + "\n"  # fail before creating
     fd = os.open(out, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
-        json.dump(record, handle, ensure_ascii=False, indent=1)
-        handle.write("\n")
+        handle.write(text)
     print(f"{args.scenario_id}: {record['status']}", file=sys.stderr)
 
 

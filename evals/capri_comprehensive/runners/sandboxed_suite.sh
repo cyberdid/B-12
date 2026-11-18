@@ -84,16 +84,29 @@ done
 # Entry point: the comprehensive suite (default) or one unified U2/U3 scenario. The latter
 # gets fresh empty tmpfs mounts at /sandbox and /actors for its synthetic files.
 ENTRY=(-m evals.capri_comprehensive.runners.run_networkless_runtime_suite)
+ROOT_ARGS=(--ro-bind / /)
 case "${B12_EVAL_ENTRY:-suite}" in
   suite) ;;
   unified-u2u3)
     ENTRY=(-m evals.unified.run_u2_u3)
+    # bwrap 0.9 cannot create /sandbox under a read-only bind of /, so bind each top-level
+    # host entry read-only (symlinks recreated) over the fresh root instead; the mount
+    # points /sandbox and /actors then become empty writable tmpfs.
+    ROOT_ARGS=()
+    for top in /*; do
+      case "${top#/}" in sandbox|actors|proc|dev|lost+found) continue ;; esac
+      if [ -L "$top" ]; then
+        ROOT_ARGS+=(--symlink "$(readlink "$top")" "$top")
+      elif [ -d "$top" ]; then
+        ROOT_ARGS+=(--ro-bind "$top" "$top")
+      fi
+    done
     EXTRA+=(--tmpfs /sandbox --tmpfs /actors)
     ;;
   *) echo "unsupported B12_EVAL_ENTRY: ${B12_EVAL_ENTRY}" >&2; exit 2 ;;
 esac
 bwrap \
-  --ro-bind / / \
+  "${ROOT_ARGS[@]}" \
   --dev /dev --proc /proc \
   --tmpfs /tmp --tmpfs /var/tmp --tmpfs /home --tmpfs /media --tmpfs /mnt --tmpfs /run \
   --dir "$HOME" \
