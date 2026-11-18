@@ -161,3 +161,21 @@ def test_rejects_accepted_decisions_without_expected_decision(tmp_path):
         builder.build_set(
             [case], root=root, fixture_rel_dir="fixtures/demo", manifest_rel_path="sets/demo.json"
         )
+
+
+def test_split_is_taken_from_the_case_and_validated(tmp_path):
+    builder = load_module(BUILDER_PATH, "scenario_draft_builder_split")
+    root = tmp_path / "repo"
+    root.mkdir()
+    case = sample_case()
+    case["split"] = "locked_test"
+    manifest = builder.build_set(
+        [case], root=root, fixture_rel_dir="fixtures/demo", manifest_rel_path="sets/demo.json"
+    )
+    assert {row["split"] for row in manifest["scenarios"]} == {"locked_test"}
+    bad = sample_case()
+    bad["split"] = "train"
+    with pytest.raises(ValueError, match="split"):
+        builder.build_set(
+            [bad], root=root, fixture_rel_dir="fixtures/bad", manifest_rel_path="sets/bad.json"
+        )

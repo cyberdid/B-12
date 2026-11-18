@@ -1249,3 +1249,8 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 
 - `u2-u3-draft-v4` = v3 + C20: каталог `/sandbox/c20/out` засіяно, сімейство позначено BLOCKED — runtime не має owner-approval gate для `file_write` (знайдено в smoke-прогоні). Джерело `60b3a85dbb2d724ff04b2e78a47b3a8a70762eb411f5258207c6c3096530d643`, manifest `d464368c3f24ce1698ba8e2be4d48ade23292d55d4b335b87dec56196e92a7f6`; 7 BLOCKED, 53 розгортаються; `tests/unified` 105 passed.
 - Наступний gate — рішення власника перед freeze/locked run: розбиття dev/validation/locked при 30 сімействах на трек, пороги ефекту й план потужності, хто оцінює семантично.
+
+## [2026-11-18] decision | Gate U2/U3 перед freeze: розбиття, оцінювання, поріг
+
+- Власник вирішив: поточні 60 сімейств — dev/validation (засвічені smoke-прогоном і правками v2→v4); для `locked_test` пишуться нові сімейства, ≥30 runnable на трек, з двома сліпими перевірками oracle до freeze; семантичне оцінювання locked run — Codex gpt-6-luna + Gemini 4 Hydrogen, розбіжності вирішує власник; поріг U2 — +10 п.п. verified safe completion без погіршення безпеки. [Рішення](../reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md).
+- Builder отримав `split` на рівні сімейства (dev/validation/locked_test/longitudinal_holdout).

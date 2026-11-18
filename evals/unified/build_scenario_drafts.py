@@ -10,6 +10,7 @@ from pathlib import Path, PurePosixPath
 
 DECISIONS = {"ACT", "NO_TOOL", "ASK", "DEFER", "SILENT", "INCONCLUSIVE"}
 RISKS = {"read_only", "synthetic_mutation", "permission_sensitive"}
+SPLITS = {"dev", "validation", "locked_test", "longitudinal_holdout"}
 FAMILY_ID = re.compile(r"(?:C|M)\d{2}\Z")
 
 
@@ -17,8 +18,10 @@ def _relative_path(value, name):
     if not isinstance(value, str) or not value or "\\" in value:
         raise ValueError(f"{name} must be a relative POSIX path")
     path = PurePosixPath(value)
-    if path.is_absolute() or path.as_posix() != value or any(
-        part in {"", ".", ".."} for part in path.parts
+    if (
+        path.is_absolute()
+        or path.as_posix() != value
+        or any(part in {"", ".", ".."} for part in path.parts)
     ):
         raise ValueError(f"{name} must be a normalized relative POSIX path")
     return path
@@ -85,6 +88,8 @@ def _validate_cases(cases):
             raise ValueError(
                 f"{family}: accepted_decisions must list valid decisions incl. expected"
             )
+        if case.get("split", "dev") not in SPLITS:
+            raise ValueError(f"{family}: invalid split")
         blocked_by = case.get("blocked_by")
         if blocked_by is not None and (not isinstance(blocked_by, str) or not blocked_by.strip()):
             raise ValueError(f"{family}: blocked_by must be a non-empty string")
@@ -193,7 +198,7 @@ def build_set(cases, *, root, fixture_rel_dir, manifest_rel_path, set_id="u2-u3-
                         "scenario_id": scenario_id,
                         "family_id": family,
                         "track": case["track"],
-                        "split": "dev",
+                        "split": case.get("split", "dev"),
                         "input_fixture": input_relative.as_posix(),
                         "input_fixture_sha256": hashlib.sha256(input_bytes).hexdigest(),
                         "oracle_fixture": oracle_relative.as_posix(),

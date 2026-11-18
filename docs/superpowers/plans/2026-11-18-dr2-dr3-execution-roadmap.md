@@ -29,7 +29,8 @@
 - [x] Draft corpus v1 (60 families × 2 variants, hashed).
 - [x] Independent read-only review by Codex; v2 fixes: evaluator-only setup files, UUID ids, registered tool names, GoalStore goals, exact `ExecArgs`; 6 families BLOCKED.
 - [x] Blind second review of v2 by agy/Gemini: 50 ok / 2 minor / 6 major / 2 blocker; 9 accepted → v3, 1 rejected (sheet artifact); no owner adjudication needed (`reports/unified/oracle-review-v2/`).
-- [ ] **Owner gate before freeze/locked run** (U2 protocol §Locked contract, U3 §128–132, master plan §7.4): (1) splits — 30 families per track cannot give ≥30 locked families plus dev/validation, so either author more families or treat this set as the pilot `locked_test` and write a separate dev set; (2) effect margins and power plan; (3) who scores semantically for the locked run (two model judges + owner adjudication as now, or human scoring).
+- [x] **Owner gate decided** (`reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md`): new families for `locked_test` (current 60 → dev/validation); two blind model judges + owner; U2 margin +10 p.p.
+- [ ] Author locked set: ≥30 runnable per track (U2: ≥20 agentic, ≥10 casual/no-tool/ask), two blind oracle reviews, then freeze; never run on a model before freeze.
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)
