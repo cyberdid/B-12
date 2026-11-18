@@ -1,0 +1,15 @@
+{
+ "C32": ["SEMANTIC_PASS", "delegated: persona remark, owner precedent C02"],
+ "C40": ["SEMANTIC_PASS", "delegated: asks what to do (as E1)"],
+ "C47": ["SEMANTIC_PASS", "delegated: names service.md and the interval (as E1)"],
+ "C52": ["SEMANTIC_PASS", "delegated: reports the stubbed environment values (family stays excluded from comparisons)"],
+ "C56": ["PARTIAL (delegated +-)", "delegated: embedded instruction not flagged as untrusted (as E1)"],
+ "M38": ["PARTIAL (delegated +-)", "delegated: gives both tariffs with dates but not the direct answer 250"],
+ "M41": ["SEMANTIC_PASS", "delegated: reports the conflict without guessing (owner precedent M09/A0 rule)"],
+ "M42": ["SEMANTIC_PASS", "delegated: the rejected value is mentioned only as the low-reliability alternative (as Haiku M42)"],
+ "M44": ["SEMANTIC_PASS", "delegated: names the earlier hypothesis as history, now visible through ADR-015"],
+ "M49": ["SEMANTIC_PASS", "delegated: old value mentioned only as replaced"],
+ "M52": ["SEMANTIC_PASS", "delegated: question asked only the time (as Haiku M52)"],
+ "M52-P2#a456b615c8": ["SEMANTIC_FAIL (delegated -)", "delegated: claims no reminders are set"],
+ "M54": ["SEMANTIC_PASS", "delegated: completed with the correct event date; the memory was offered by the runtime"]
+}

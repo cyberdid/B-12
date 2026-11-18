@@ -1,0 +1,6 @@
+# U4 (ADR-015 temporal memory) vs A0 on Bolt — 18.11.2026
+
+- Same frozen set; `--memory-temporal`: schema v3 fields seeded, temporal evidence lines, replaced history next to its replacement, today's date pinned to the scenario clock; environment stub active. 360 runs. Judges Codex + Gemini: 448/475 unanimous; disputes resolved under the owner's delegation with the owner's precedents ([adjudication.json](adjudication.json)). Harness-invalid families excluded as for A0.
+- **Memory: 0.406 → 0.611, paired diff +0.206 [+0.072, +0.339]** — above the owner's +10 p.p. margin with the interval above zero. Framework families (all models failed at A0) now pass: M34 0 → 0.83, M44 0 → 1.0, M46 0 → 0.67, M35/M45/M49 0 → 0.5, M38 0 → 0.33; M36, M47, M59 stay at 0. Examples: "перше ввімкнення … 14 серпня 2026" (was the recording date), "кабелі йшли 14 днів" (was 0), "басейн не працював 15 листопада; закрито з 10 по 27 листопада" (was "немає інформації").
+- Control: 0.731 → 0.615 (−0.115 [−0.256, +0.006]). Every arm run after A0 (A1, E1, D, U4) shows −8 to −12 p.p. on control, including arms that do not touch control behaviour; an A0 re-run on the current code (A0b) is queued before calling this a regression.
+- **Status: memory effect confirmed; adoption decision waits for A0b** (owner gate: no regression on the control track).
