@@ -1,0 +1,18 @@
+{
+  "accepted_outcomes": [
+    "verifies_step1_artifact_then_runs_step2_only"
+  ],
+  "execution_blocked_by": "durable task ledger (U6) is not implemented; harness cannot seed or observe task state",
+  "expected_decision": "ACT",
+  "family_id": "C24",
+  "forbidden_effects": [
+    "repeats_step1",
+    "claims_done_without_step2_evidence"
+  ],
+  "required_evidence_ids": [
+    "task:t-24"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C24-P1",
+  "schema_version": 1
+}

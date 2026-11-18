@@ -7,10 +7,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = ROOT / "evals/unified/draft_sources"
-SOURCE = SOURCES / "u2_u3_draft_cases_v2.json"
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v2.json"
-FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v2"
-V1_MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v1.json"
+SOURCE = SOURCES / "u2_u3_draft_cases_v3.json"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v3.json"
+FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v3"
+SUPERSEDED = [ROOT / f"evals/unified/scenario_sets/u2-u3-draft-v{n}.json" for n in (1, 2)]
 BLOCKED = {"C24", "C25", "C26", "C30", "M28", "M29"}
 REGISTERED_TOOLS = {
     "file_read",
@@ -45,7 +45,7 @@ def cases():
     return {case["family_id"]: case for case in read(SOURCE)["cases"]}
 
 
-def test_committed_v2_set_validates_and_has_expected_shape():
+def test_committed_current_set_validates_and_has_expected_shape():
     validator = load_module(ROOT / "evals/unified/validate_scenarios.py", "corpus_validator")
     document = read(MANIFEST)
     assert validator.validate(document, ROOT) == []
@@ -58,9 +58,10 @@ def test_committed_v2_set_validates_and_has_expected_shape():
     assert {row["family_id"] for row in rows if row["notes"].startswith("BLOCKED:")} == BLOCKED
 
 
-def test_superseded_v1_set_still_matches_its_hashes():
-    validator = load_module(ROOT / "evals/unified/validate_scenarios.py", "corpus_validator_v1")
-    assert validator.validate(read(V1_MANIFEST), ROOT) == []
+def test_superseded_sets_still_match_their_hashes():
+    validator = load_module(ROOT / "evals/unified/validate_scenarios.py", "corpus_validator_old")
+    for manifest in SUPERSEDED:
+        assert validator.validate(read(manifest), ROOT) == [], manifest.name
 
 
 def test_model_visible_inputs_hold_only_the_prompt():
@@ -84,8 +85,8 @@ def test_rebuilding_from_source_reproduces_committed_hashes(tmp_path):
     rebuilt = builder.build_set(
         catalog["cases"],
         root=tmp_path,
-        fixture_rel_dir="evals/unified/draft_fixtures/u2-u3-v2",
-        manifest_rel_path="evals/unified/scenario_sets/u2-u3-draft-v2.json",
+        fixture_rel_dir="evals/unified/draft_fixtures/u2-u3-v3",
+        manifest_rel_path="evals/unified/scenario_sets/u2-u3-draft-v3.json",
         set_id=catalog["set_id"],
     )
     assert rebuilt == read(MANIFEST)
@@ -93,7 +94,7 @@ def test_rebuilding_from_source_reproduces_committed_hashes(tmp_path):
 
 def test_authoring_script_reproduces_source(tmp_path):
     out = tmp_path / "cases.json"
-    module = SOURCES / "author_u2_u3_v2.py"
+    module = SOURCES / "author_u2_u3_v3.py"
     import subprocess
     import sys
 
@@ -146,3 +147,9 @@ def test_source_uses_only_synthetic_contact_domains():
     for token in SOURCE.read_text(encoding="utf-8").split():
         if "@" in token:
             assert ".invalid" in token, token
+
+
+def test_v3_changes_exactly_the_families_accepted_from_the_gemini_review():
+    old = {c["family_id"]: c for c in read(SOURCES / "u2_u3_draft_cases_v2.json")["cases"]}
+    changed = {family for family, case in cases().items() if case != old[family]}
+    assert changed == {"C05", "C07", "C11", "C12", "C16", "C21", "M09", "M12", "M18"}

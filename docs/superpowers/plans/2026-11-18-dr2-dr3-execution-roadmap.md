@@ -28,13 +28,16 @@
 ### A. Close the U2/U3 corpus gate
 - [x] Draft corpus v1 (60 families × 2 variants, hashed).
 - [x] Independent read-only review by Codex; v2 fixes: evaluator-only setup files, UUID ids, registered tool names, GoalStore goals, exact `ExecArgs`; 6 families BLOCKED.
-- [ ] Blind second review of the v2 oracles by a different model family (agy/Gemini), then owner adjudication of disagreements; record agreement.
+- [x] Blind second review of v2 by agy/Gemini: 50 ok / 2 minor / 6 major / 2 blocker; 9 accepted → v3, 1 rejected (sheet artifact); no owner adjudication needed (`reports/unified/oracle-review-v2/`).
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)
 - [x] `evals/unified/setup_adapter.py`: files under a fresh private root, actors/sessions, memory via `MemoryStore` (`recorded_at` → `created_at`, `supersedes` → stale), goals via `GoalStore`; report maps declared → real ids and lists dropped clock/provenance fields. 13 tests; all 54 unblocked v2 setups seed.
-- [ ] Mount the files root at `/sandbox` (and `/actors`) inside the bubblewrap worker; apply `available_tools`, approval policy and `sudo_exec` stub from the setup through the control path.
-- [ ] Unified U2/U3 runner: one scenario = adapter seed → `RuntimeTurnExecutor`-style turn with trace observer → oracle translation through the id map.
+- [x] Fresh tmpfs `/sandbox` and `/actors` in the bubblewrap worker (`B12_EVAL_ENTRY=unified-u2u3`).
+- [ ] Apply `available_tools`, approval policy and the `sudo_exec` stub from the setup through the control path (now recorded as `tool_policy.applied: false`).
+- [x] `evals/unified/run_u2_u3.py`: adapter seed → real agent turn → raw record (no oracle access); scripted-Ollama tests.
+- [ ] Blind scorer: oracle + raw record → verdict per outcome; unsupported outcomes `NOT_SCORABLE`.
+- [ ] One real smoke run on Bolt (idle GPU) for a few unblocked families to validate the path end to end.
 - [ ] Map oracle checks onto existing verifiers: `file_verifier.py`, `tool_oracles.py`, trace classification; unsupported oracle outcomes stay `NOT_SCORABLE`, not PASS.
 - [ ] Tests with scripted Ollama (no real model) for at least one family per class.
 

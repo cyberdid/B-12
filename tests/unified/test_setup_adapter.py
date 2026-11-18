@@ -10,8 +10,8 @@ from b12.runtime import open_runtime
 
 ROOT = Path(__file__).resolve().parents[2]
 PATH = ROOT / "evals/unified/setup_adapter.py"
-FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v2"
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v2.json"
+FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v3"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v3.json"
 
 
 @pytest.fixture
@@ -128,7 +128,7 @@ def test_goal_statuses_follow_goalstore(adapter, tmp_path, profile_settings):
         runtime.close()
 
 
-def test_every_unblocked_v2_setup_seeds_without_error(adapter, tmp_path, profile_settings):
+def test_every_unblocked_current_setup_seeds_without_error(adapter, tmp_path, profile_settings):
     rows = json.loads(MANIFEST.read_text(encoding="utf-8"))["scenarios"]
     seeded = 0
     for row in rows:
