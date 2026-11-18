@@ -42,12 +42,20 @@ def bootstrap(values, *, draws=2000, seed=7):
     return [round(stats[int(0.025 * draws)], 3), round(stats[int(0.975 * draws) - 1], 3)]
 
 
-def analyze(rows, records, semantic=None):
+# Families whose setup needs a synthetic environment (disk, uptime, local services) that the
+# harness does not stub yet: tool output is the real sandbox, so the oracle is unreachable for
+# every model. Excluded from rates until the environment stub exists (found 18.11.2026).
+HARNESS_INVALID = {"C51", "C52", "C53", "C54", "C11", "C12"}
+
+
+def analyze(rows, records, semantic=None, exclude=HARNESS_INVALID):
     """rows: manifest scenarios; records: {(repeat, scenario_id): (record, oracle)}."""
     semantic = semantic or {}
     family_of = {r["scenario_id"]: (r["family_id"], r["track"]) for r in rows}
     per_family = defaultdict(lambda: defaultdict(int))
     for (repeat, sid), (record, oracle) in records.items():
+        if family_of[sid][0] in exclude:
+            continue
         verdict = score(record, oracle)["verdict"]
         result = outcome(verdict, semantic.get((repeat, sid)))
         per_family[family_of[sid]][result] += 1
@@ -69,7 +77,12 @@ def analyze(rows, records, semantic=None):
         for track, rates in sorted(tracks.items())
     }
     pending = sum(f["pending"] for f in families.values())
-    return {"families": families, "tracks": summary, "pending_records": pending}
+    return {
+        "families": families,
+        "tracks": summary,
+        "pending_records": pending,
+        "excluded_families": sorted(exclude & {f for f, _ in family_of.values()}),
+    }
 
 
 def load(manifest, out_dir, root):
