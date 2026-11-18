@@ -55,6 +55,7 @@ SCHEMA = {
     },
 }
 ALLOWED_CODEX_ITEMS = {"agent_message", "error", "reasoning"}
+MAX_ATTEMPTS = 3  # rounds discarded because Codex used its own environment are re-asked
 PREAMBLE = (
     "You are the language model inside an assistant runtime called B-12/Capri. You have NO "
     "native tools in this session: any direct tool call fails. The runtime, not you, executes "
@@ -244,14 +245,27 @@ def bridge_app(upstream, backend, model, *, timeout=200):
     async def chat(request: Request):
         body = await request.json()
         started = time.monotonic()
-        try:
-            structured, (prompt_tokens, completion_tokens) = await ask_backend(
-                backend, model, body, timeout=timeout
+        rejected, message, usage = [], None, (0, 0)
+        for _attempt in range(MAX_ATTEMPTS):
+            try:
+                structured, usage = await ask_backend(backend, model, body, timeout=timeout)
+                message = to_ollama_message(structured)
+                break
+            except InvalidRound as exc:
+                # A round in which Codex touched its own environment is discarded and asked
+                # again (up to MAX_ATTEMPTS); any other failure is final.
+                rejected.append(str(exc)[:200])
+                if "own environment" not in str(exc):
+                    break
+            except (json.JSONDecodeError, KeyError) as exc:
+                rejected.append(str(exc)[:200])
+                break
+        if message is None:
+            log.append({"ok": False, "rejected_attempts": rejected})
+            return JSONResponse(
+                {"error": f"subscription_bridge_invalid: {rejected[-1]}"}, status_code=502
             )
-            message = to_ollama_message(structured)
-        except (InvalidRound, json.JSONDecodeError, KeyError) as exc:
-            log.append({"ok": False, "error": str(exc)[:300]})
-            return JSONResponse({"error": f"subscription_bridge_invalid: {exc}"}, status_code=502)
+        prompt_tokens, completion_tokens = usage
         elapsed = time.monotonic() - started
         log.append(
             {
@@ -263,6 +277,7 @@ def bridge_app(upstream, backend, model, *, timeout=200):
                 ),
                 "prompt_tokens": prompt_tokens,
                 "completion_tokens": completion_tokens,
+                "rejected_attempts": rejected,
             }
         )
         final = {
