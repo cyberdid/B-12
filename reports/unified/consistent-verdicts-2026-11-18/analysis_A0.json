@@ -336,8 +336,8 @@
   "M42": {
    "track": "memory",
    "pass": 0,
-   "partial": 0,
-   "fail": 6,
+   "partial": 2,
+   "fail": 4,
    "pending": 0,
    "blocked": 0,
    "acceptable_rate": 0.0
@@ -425,12 +425,12 @@
   },
   "M52": {
    "track": "memory",
-   "pass": 6,
-   "partial": 0,
+   "pass": 5,
+   "partial": 1,
    "fail": 0,
    "pending": 0,
    "blocked": 0,
-   "acceptable_rate": 1.0
+   "acceptable_rate": 0.8333333333333334
   },
   "M53": {
    "track": "memory",
@@ -516,10 +516,10 @@
   },
   "memory": {
    "families_fully_decided": 30,
-   "mean_family_acceptable_rate": 0.406,
+   "mean_family_acceptable_rate": 0.4,
    "cluster_bootstrap_95ci": [
-    0.239,
-    0.572
+    0.233,
+    0.567
    ]
   }
  },
