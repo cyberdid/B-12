@@ -174,6 +174,9 @@ def run_scenario(
         )
     )
     runtime.agent.system_prompt = apply_arm(runtime.agent.system_prompt, arm)
+    from evals.unified.env_stub import stub_environment
+
+    environment_stub = stub_environment(runtime.registry, setup.get("synthetic_environment"))
     if setup.get("synthetic_clock"):
         # The scenario's "today" (used only by temporal memory, ADR-015).
         pinned = datetime.fromisoformat(setup["synthetic_clock"])
@@ -206,6 +209,7 @@ def run_scenario(
             "status": "EXECUTED",
             "u2_arm": arm,
             "memory_temporal": memory_temporal,
+            "environment_stub": environment_stub,
             "action_claim_pattern": "broad (arm D)" if arm == "D" else "runtime default",
             "system_prompt_sha256": prompt_sha,
             "model": settings.model,

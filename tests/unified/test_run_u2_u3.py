@@ -207,3 +207,17 @@ async def test_memory_temporal_arm_seeds_metadata_and_pins_the_scenario_clock(
     request = json.dumps(state["requests"][0], ensure_ascii=False)
     assert "подія 2026-10-02" in request
     assert "Сьогодні: 2026-12-01." in request
+
+
+async def test_synthetic_environment_is_stubbed_for_the_run(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [
+        {"tool_calls": [("run_command", {"command": "free -h", "cwd": "/"})]},
+        {"content": "Доступно 12.4 ГіБ."},
+    ]
+    record = await asyncio.to_thread(
+        run_scenario, row("C11-P1"), ROOT, base, tmp_path / "w", files_root=tmp_path / "fs"
+    )
+    assert set(record["environment_stub"]) == {"system_info", "run_command"}
+    tool_message = next(m for m in state["requests"][1]["messages"] if m["role"] == "tool")
+    assert "12.4Gi" in tool_message["content"]
