@@ -1,14 +1,14 @@
 ---
 type: decision
 updated: 2026-11-18
-status: proposed_awaiting_owner_review
+status: accepted_by_delegation_implementation_behind_flag
 sources: [raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/semantic-judge-locked-pilot-2026-11-18/README.md, src/b12/migrations.py, src/b12/memory.py, src/b12/agent.py]
 tags: [adr, U4, memory, temporal, provenance]
 ---
 
 # ADR-015 — Temporal memory: event time, validity, source reliability, superseded history (U4)
 
-**Status: proposal.** The owner approved writing this ADR on 18.11.2026; schema code starts only after the owner reviews it. Master plan §10 U4: backward-compatible, feature-flagged, lossless migration, rollback, purge/restore non-resurrection, measured with and without the change on the same cases.
+**Status: accepted by delegation.** The owner approved writing this ADR, then delegated the decisions («роби все як вважаєш за потрібне», 18.11.2026). Implementation proceeds behind the `memory_temporal` flag, default off; enabling it by default needs the measurement below. Master plan §10 U4: backward-compatible, feature-flagged, lossless migration, rollback, purge/restore non-resurrection, measured with and without the change on the same cases.
 
 ## Problem (measured, not assumed)
 
@@ -51,3 +51,9 @@ These failures do not depend on the model: the needed information never reaches 
 1. Superseded history: offer old records only together with their replacement (proposed), or also on their own when the user asks about the past?
 2. May the model fill `event_time`/`valid_*` from conversation (stored as model-extracted), or only the owner/explicit statements?
 3. Reliability vocabulary `high/normal/low/unverified` — enough?
+
+## Answers (Claude, under the owner's delegation, 18.11.2026)
+
+1. Superseded history is offered **only together with its replacement**, marked `замінено <date>`; never alone, so an old fact is never presented as current.
+2. The model **may** fill `event_time` / `valid_*` from conversation; such values are stored with `temporal_source='conversation'` and rendered with `(з розмови)`, distinct from owner statements or documents.
+3. Reliability vocabulary `high / normal / low / unverified` is kept.
