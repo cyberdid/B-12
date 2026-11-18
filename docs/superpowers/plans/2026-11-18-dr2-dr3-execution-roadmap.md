@@ -34,7 +34,8 @@
 ### B. Setup runner adapter (needed before any U2/U3 run)
 - [x] `evals/unified/setup_adapter.py`: files under a fresh private root, actors/sessions, memory via `MemoryStore` (`recorded_at` → `created_at`, `supersedes` → stale), goals via `GoalStore`; report maps declared → real ids and lists dropped clock/provenance fields. 13 tests; all 54 unblocked v2 setups seed.
 - [x] Fresh tmpfs `/sandbox` and `/actors` in the bubblewrap worker (`B12_EVAL_ENTRY=unified-u2u3`).
-- [ ] Apply `available_tools`, approval policy and the `sudo_exec` stub from the setup through the control path (now recorded as `tool_policy.applied: false`).
+- [x] `available_tools` narrows the turn grant at capability level (tools sharing a capability stay visible; recorded in `tool_policy`).
+- [ ] Approval stub and `sudo_exec` backend from the setup (C20, C21) — until then C21 is not run.
 - [x] `evals/unified/run_u2_u3.py`: adapter seed → real agent turn → raw record (no oracle access); scripted-Ollama tests.
 - [x] Deterministic scorer `evals/unified/score_u2_u3.py`: tool calls/arguments, evidence ids, forbidden tool attempts, decision class, reply length → FAIL/NEEDS_REVIEW/PASS_DETERMINISTIC; prose outcomes returned as `semantic_pending`. On the smoke run it agrees with manual reading on M18 and corrected the author on M12; it cannot see M01/M04/M08 semantic errors.
 - [ ] Blind semantic judge for `semantic_pending` (two model families, blind to arm/model, owner adjudicates disagreements), as in the evaluation article.

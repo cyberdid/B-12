@@ -90,3 +90,19 @@ def test_sandbox_script_offers_the_unified_entry_with_fresh_mounts():
     assert "EXTRA+=(--tmpfs /sandbox --tmpfs /actors)" in script
     assert 'ROOT_ARGS+=(--ro-bind "$top" "$top")' in script
     assert "ENTRY=(-m evals.unified.run_u2_u3)" in script
+
+
+async def test_declared_tools_narrow_the_grant_at_capability_level(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Даних про датчик руху немає."}]
+
+    record = await asyncio.to_thread(
+        run_scenario, row("C05-P1"), ROOT, base, tmp_path / "work", files_root=tmp_path / "fs"
+    )
+
+    policy = record["tool_policy"]
+    assert policy["applied"] is True and policy["level"] == "capability"
+    assert set(policy["granted_capabilities"]) == {"filesystem.read", "memory.read"}
+    offered = {t["function"]["name"] for t in state["requests"][0].get("tools", [])}
+    assert "run_command" not in offered and "file_write" not in offered
+    assert {"file_read", "memory_search"} <= offered

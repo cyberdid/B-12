@@ -34,7 +34,12 @@ def _load(root, relative):
     return json.loads((Path(root) / relative).read_text(encoding="utf-8"))
 
 
-def _grant(runtime, actor, session):
+def _grant(runtime, actor, session, declared_tools=None):
+    """Issue the turn grant as RuntimeTurnExecutor does, narrowed to the declared tools.
+
+    The control path checks capabilities, not tool names, so the narrowing is the union of
+    the declared tools' capabilities: tools sharing a capability stay visible.
+    """
     from b12.auth import GUEST_CAPABILITIES, owner_capabilities
 
     task = runtime.control.create_task(session)
@@ -43,6 +48,20 @@ def _grant(runtime, actor, session):
         full = runtime.settings.host_access == "full"
     else:
         capabilities, full = tuple(sorted(GUEST_CAPABILITIES)), False
+    policy = {"declared_available_tools": declared_tools, "applied": False}
+    if declared_tools is not None:
+        tools = runtime.registry._tools  # name -> registered tool with its capability
+        wanted = {tools[name].capability for name in declared_tools if name in tools}
+        capabilities = tuple(c for c in capabilities if c in wanted)
+        policy = {
+            "declared_available_tools": declared_tools,
+            "applied": True,
+            "level": "capability",
+            "granted_capabilities": list(capabilities),
+            "visible_tools": sorted(
+                name for name, tool in tools.items() if tool.capability in capabilities
+            ),
+        }
     grant = runtime.control.issue_grant(
         actor.id,
         session,
@@ -51,7 +70,7 @@ def _grant(runtime, actor, session):
         ttl_s=TURN_TIMEOUT_S + 3600,
         full_execution=full,
     )
-    return grant, task
+    return grant, task, policy
 
 
 def _calls(result):
@@ -101,7 +120,7 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
         speaker = report["speaking_actor"]
         actor = runtime.control.resolve_actor(report["actors"][speaker])
         session = report["sessions"][speaker]
-        grant, task = _grant(runtime, actor, session)
+        grant, task, tool_policy = _grant(runtime, actor, session, setup.get("available_tools"))
         result = loop.run_until_complete(
             runtime.agent.turn(session, grant, prompt, task_id=task, timeout_s=TURN_TIMEOUT_S)
         )
@@ -127,10 +146,7 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
             "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
             "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
             "seed_report": {k: report[k] for k in ("dropped_fields", "applied_relations")},
-            "tool_policy": {
-                "declared_available_tools": setup.get("available_tools"),
-                "applied": False,
-            },
+            "tool_policy": tool_policy,
         }
     )
 
