@@ -30,7 +30,12 @@ gpu_busy() {
 for r in $(seq 1 "$REPEATS"); do
   mkdir -p "$OUT/r$r"
   for id in "${IDS[@]}"; do
-    [ -s "$OUT/r$r/$id.json" ] && continue
+    rec="$OUT/r$r/$id.json"
+    if [ -s "$rec" ]; then
+      # Keep only complete records; a record cut by an interruption is set aside and re-run.
+      python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$rec" 2>/dev/null && continue
+      mv -- "$rec" "$rec.broken.$(date +%s)"
+    fi
     while gpu_busy; do
       echo "$(date -Is) r$r $id waiting: foreign GPU process" >>"$LOG"
       sleep 60
