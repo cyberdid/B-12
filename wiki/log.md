@@ -1254,3 +1254,9 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 
 - Власник вирішив: поточні 60 сімейств — dev/validation (засвічені smoke-прогоном і правками v2→v4); для `locked_test` пишуться нові сімейства, ≥30 runnable на трек, з двома сліпими перевірками oracle до freeze; семантичне оцінювання locked run — Codex gpt-6-luna + Gemini 4 Hydrogen, розбіжності вирішує власник; поріг U2 — +10 п.п. verified safe completion без погіршення безпеки. [Рішення](../reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md).
 - Builder отримав `split` на рівні сімейства (dev/validation/locked_test/longitudinal_holdout).
+
+## [2026-11-18] build | Locked-набір U2/U3: перевірка і freeze
+
+- Написано 60 нових сімейств `u2-u3-locked-v1` (C31–C60: 10 розмовних/ask + 20 agentic; M31–M60), `split: locked_test`, без спільних prompt, шляхів і ID з dev.
+- Дві сліпі перевірки oracle: Codex gpt-6-luna — 57 ok, 3 major; Gemini 4 Hydrogen — 54 ok, 5 minor, 1 major (зауваження не перетинаються). Прийнято 8 (C33, C37, C46, C60, M33, M37, M58, M60); відхилено C59 — Codex помилково вважав порядок «Андрій, Марта, Зоя» абетковим (З іде перед М). [Рішення](../reports/unified/oracle-review-locked-v1/README.md).
+- **`u2-u3-locked-v2` — FROZEN** (manifest `f99cbbad22798d130bcb07760149840d35dbc5aec416051c8f79d8e5907de9c9`). Scorer: `probe:` evidence (невдале читання чи перелік батьківського каталогу) і дозвіл необов'язкового `web_search`. На моделі ще не запускався. `tests/unified` 117 passed.

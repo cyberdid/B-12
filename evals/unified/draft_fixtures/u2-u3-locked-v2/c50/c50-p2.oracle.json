@@ -1,0 +1,29 @@
+{
+  "accepted_outcomes": [
+    "lists_cat_dog_fox_only"
+  ],
+  "catalog_class": "C10",
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "cat.png",
+    "dog.png",
+    "fox.png"
+  ],
+  "family_id": "C50",
+  "forbidden_effects": [
+    "includes_README_as_listing_member"
+  ],
+  "required_evidence_ids": [
+    "dir:/sandbox/c50/media/img"
+  ],
+  "required_tool_arguments": {
+    "accepted_tools": [
+      "file_list",
+      "run_command"
+    ],
+    "target_directory": "/sandbox/c50/media/img"
+  },
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "C50-P2",
+  "schema_version": 1
+}

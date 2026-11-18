@@ -1,0 +1,54 @@
+{
+  "family_id": "M53",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "harness_sequence": [
+      "seed",
+      "runtime_reload",
+      "user_prompt"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_goals": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "l53-g1",
+        "checkpoint": null,
+        "evidence_ids": [],
+        "goal_id": "f02acb79-cf96-502d-b0e2-092069c5d7f1",
+        "status": "abandoned",
+        "status_reason": "owner_cancelled_2026-11-23",
+        "text": "Щодня звітувати про полив."
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "l53-g2",
+        "checkpoint": null,
+        "evidence_ids": [],
+        "goal_id": "85cd24fe-8c87-5864-95ae-cf6d25b04951",
+        "status": "active",
+        "status_reason": null,
+        "text": "Замовити батарейки AA."
+      }
+    ],
+    "synthetic_memory": []
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

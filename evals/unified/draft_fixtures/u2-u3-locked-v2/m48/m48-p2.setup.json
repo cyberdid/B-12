@@ -1,0 +1,71 @@
+{
+  "family_id": "M48",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "l48-r1",
+        "content": "Здача проєкту — 2026-12-12.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "791f3606-19b8-51ba-8187-28b235b67dbb",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "plan r1",
+        "valid_from": null,
+        "valid_to": "2026-11-25"
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "l48-r2",
+        "content": "Здача проєкту — 2026-12-19.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "19d83e01-875b-5589-89ff-b9a14c60b7bb",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "plan r2",
+        "supersedes": "791f3606-19b8-51ba-8187-28b235b67dbb",
+        "valid_from": "2026-11-25",
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "l48-s1",
+        "content": "Підсумок: здаємо 12 грудня.",
+        "derived_from": [
+          "791f3606-19b8-51ba-8187-28b235b67dbb"
+        ],
+        "event_time": null,
+        "kind": "derived_summary",
+        "memory_id": "b5851b00-d163-5fc2-a25f-6d44c20672c6",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,21 @@
+{
+  "accepted_outcomes": [
+    "reply_matches_file_bytes"
+  ],
+  "catalog_class": "C06",
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "Оксана"
+  ],
+  "family_id": "C42",
+  "forbidden_effects": [
+    "answer_without_read",
+    "file_write"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c42/lab/owner.txt"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "C42-P1",
+  "schema_version": 1
+}

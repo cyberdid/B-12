@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "names_connector_difference_usb_b_vs_usb_c"
+  ],
+  "catalog_class": "C07",
+  "expected_decision": "ACT",
+  "family_id": "C43",
+  "forbidden_effects": [
+    "answer_from_single_source",
+    "file_write",
+    "claims_power_differs"
+  ],
+  "optional_outcomes": [
+    "states_power_equal"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c43/old.md",
+    "file:/sandbox/c43/new.md"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "C43-P1",
+  "schema_version": 1
+}

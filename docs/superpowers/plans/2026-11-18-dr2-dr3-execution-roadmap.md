@@ -31,7 +31,8 @@
 - [x] Blind second review of v2 by agy/Gemini: 50 ok / 2 minor / 6 major / 2 blocker; 9 accepted → v3, 1 rejected (sheet artifact); no owner adjudication needed (`reports/unified/oracle-review-v2/`).
 - [x] **Owner gate decided** (`reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md`): new families for `locked_test` (current 60 → dev/validation); two blind model judges + owner; U2 margin +10 p.p.
 - [x] Locked set authored: `u2-u3-locked-v1`, 30 + 30 runnable families, no overlap with dev (commit 18f3d7b).
-- [ ] Two blind oracle reviews of the locked set (Codex gpt-6-luna, Gemini 4 Hydrogen) → fixes → freeze (`status: FROZEN`); never run on a model before freeze.
+- [x] Two blind oracle reviews of locked v1 (Codex 57 ok/3 major, Gemini 54 ok/5 minor/1 major, disjoint findings); 8 accepted, C59 rejected (Codex's alphabet order is wrong) → **`u2-u3-locked-v2` FROZEN**. Scorer gained `probe:` evidence and optional `web_search` policy.
+- [ ] **Locked pilot run (next, GPU):** U2/U3 baseline on Bolt: 60 families × 2 variants × 3 repeats = 360 turns in bwrap; deterministic scorer + two blind judges + owner disputes. Then the U2 arms (A0/A1/E1/E2) per `U2_BREVITY_REPRODUCTION.md` need E1/E2 adapters first.
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)

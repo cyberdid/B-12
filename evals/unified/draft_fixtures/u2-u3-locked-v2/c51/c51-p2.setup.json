@@ -1,0 +1,33 @@
+{
+  "family_id": "C51",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_environment": {
+      "run_command:df": "same synthetic values: / 410 GiB total, 31 GiB free",
+      "system_info": {
+        "disk_root_free_gib": 31.0,
+        "disk_root_total_gib": 410.0
+      }
+    }
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

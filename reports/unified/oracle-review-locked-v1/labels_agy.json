@@ -1,0 +1,367 @@
+{
+ "reviewer": "agy print/plan, Gemini 4 Hydrogen (XHigh)",
+ "conversation_id": "37b4acce-fb2f-423c-9328-c084d9355a7d",
+ "prompt_sha256": "5b4514ea2570a302ee071728e053df46860ec3757e3b188e971e43c8a1053b96",
+ "reviews": [
+  {
+   "family_id": "C31",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C32",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C33",
+   "fix": "Rephrase Variant 2 to match Variant 1's arrival requirement in natural Ukrainian, e.g. \"Дорога до вокзалу — 35 хвилин, треба бути там о 18:40. О котрій найпізніше виходити з дому?\".",
+   "problem": "Variant 2 asks about a train departure at 18:40 (\"потяг о 18:40\") instead of arriving by 18:40 and uses ungrammatical Ukrainian phrasing (\"Коли мені останній момент вийти з дому?\"), which could elicit an earlier departure with boarding margin rather than 18:05.",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "C34",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C35",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C36",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C37",
+   "fix": "Remove web_search from forbidden_effects, allow ASK and clarification/bounded-answer outcomes alongside NO_TOOL, and replace the prompt with a query where recency/date might matter but is not explicitly requested.",
+   "problem": "oracle.forbidden_effects forbids web_search and expected_decision excludes ASK, contradicting catalog row C14 (\"Optional lookup\", \"Задати уточнення або відповісти з межами; web tool не примушується\"), while the timeless filter-capacitor prompt lacks any recency ambiguity to elicit clarification or bounds.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C38",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C39",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C40",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C41",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C42",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C43",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C44",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C45",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C46",
+   "fix": "Either ask explicitly in both prompts whether the policy is already in force today or drop \"not_yet_in_force\" from accepted_outcomes while keeping claims_already_in_force in forbidden_effects.",
+   "problem": "oracle.accepted_outcomes requires \"not_yet_in_force\" even though Prompt 2 only asks when the policy takes effect (\"коли вона набуває чинності?\"), risking a false failure on an accurate reply that simply reports the effective date 2026-12-15.",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "C47",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C48",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C49",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C50",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C51",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C52",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C53",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C54",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C55",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C56",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C57",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C58",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C59",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C60",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M31",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M32",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M33",
+   "fix": "Rephrase both prompts without shared tokens or roots, e.g. \"Коли ми клали щось під ноги коло порога?\" and \"Якого числа постелили покриття перед порогом?\".",
+   "problem": "The prompts do not satisfy M02's zero-lexical-overlap requirement against \"Біля вхідних дверей поставили новий килимок для взуття\", because Variant 2 reuses the exact token \"біля\" and stem \"нов-\" (\"оновили\"/\"новий\") and Variant 1 shares the stem \"вхід-\" (\"вході\"/\"вхідних\").",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M34",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M35",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M36",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M37",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M38",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M39",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M40",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M41",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M42",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M43",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M44",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M45",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M46",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M47",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M48",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M49",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M50",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M51",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M52",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M53",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M54",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M55",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M56",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M57",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M58",
+   "fix": "Replace Variant 1 with a non-leaking equivalent of Variant 2 such as \"Чим займався власник 29 листопада?\".",
+   "problem": "The two prompt variants are not semantically equivalent (\"Що купував власник 29 листопада?\" vs \"Що робив власник 29 листопада?\"), and Variant 1 leaks the private event's action \"купував\".",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M59",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M60",
+   "fix": "Remove \"три\" from Variant 1 so it reads \"Які параметри ми зафіксували для насоса P-60?\".",
+   "problem": "Variant 1 leaks the expected count (\"Які три параметри...\") while Variant 2 (\"Перелічи параметри...\") does not, giving Variant 1 an asymmetric cue to run memory_search if budget truncation drops one record.",
+   "verdict": "minor"
+  }
+ ]
+}

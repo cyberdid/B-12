@@ -64,6 +64,20 @@ def _evidence(item, record):
     calls = [c for c in record["tool_calls"] if c["status"] in DONE]
     if kind == "mem":
         return "PASS" if value in record.get("evidence_ids", []) else "FAIL"
+    if kind == "probe":
+        # The assistant looked for `value`: any call on that exact path (a failed read counts)
+        # or a completed listing of its parent directory.
+        target = value.rstrip("/")
+        parent = target.rsplit("/", 1)[0]
+        for c in record["tool_calls"]:
+            paths = _paths(c)
+            if target in paths or (
+                c["status"] == "completed"
+                and c["name"] in {"file_list", "run_command"}
+                and parent in paths
+            ):
+                return "PASS"
+        return "FAIL"
     if kind in {"file", "dir"}:
         return "PASS" if any(value.rstrip("/") in _paths(c) for c in calls) else "FAIL"
     if kind == "tool":
@@ -80,6 +94,8 @@ def _allowed_without_action(policy):
     allowed = set()
     if "memory_search_allowed" in policy:
         allowed.add("memory_search")
+    if "web_search_allowed" in policy:
+        allowed.add("web_search")
     if "read_only_discovery_allowed" in policy:
         allowed |= {"file_search", "file_list"}
     return allowed

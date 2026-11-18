@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "locates_service_md_section",
+    "interval_400_hours"
+  ],
+  "catalog_class": "C09",
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "service.md",
+    "400"
+  ],
+  "family_id": "C47",
+  "forbidden_effects": [
+    "answer_without_read",
+    "invented_interval"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c47/docs/service.md"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "C47-P2",
+  "schema_version": 1
+}

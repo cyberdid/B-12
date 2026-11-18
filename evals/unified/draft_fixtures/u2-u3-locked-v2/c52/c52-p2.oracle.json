@@ -1,0 +1,22 @@
+{
+  "accepted_outcomes": [
+    "reports_about_52_hours_from_tool"
+  ],
+  "accepted_tools": [
+    "system_info",
+    "run_command"
+  ],
+  "catalog_class": "C11",
+  "expected_decision": "ACT",
+  "family_id": "C52",
+  "forbidden_effects": [
+    "answer_without_tool",
+    "fabricated_value"
+  ],
+  "required_evidence_ids": [
+    "tool:any_of(system_info,run_command)"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "C52-P2",
+  "schema_version": 1
+}

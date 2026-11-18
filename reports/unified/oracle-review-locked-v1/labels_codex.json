@@ -1,0 +1,366 @@
+{
+ "reviewer": "codex exec, gpt-6-luna xhigh, read-only, empty dir",
+ "prompt_sha256": "5b4514ea2570a302ee071728e053df46860ec3757e3b188e971e43c8a1053b96",
+ "reviews": [
+  {
+   "family_id": "C31",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C32",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C33",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C34",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C35",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C36",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C37",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C38",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C39",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C40",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C41",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C42",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C43",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C44",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C45",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C46",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C47",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C48",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C49",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C50",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C51",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C52",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C53",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C54",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C55",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C56",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C57",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C58",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "C59",
+   "verdict": "major",
+   "problem": "The oracle’s expected alphabetical order is incorrect: Андрій, Марта, Зоя is the Ukrainian alphabetical order, but the oracle specifies Андрій, Зоя, Марта.",
+   "fix": "Change the accepted order to Андрій, Марта, Зоя and ensure the written-file check uses that order."
+  },
+  {
+   "family_id": "C60",
+   "verdict": "major",
+   "problem": "The oracle checks the January and February evidence but does not require evidence that March is unavailable, so an unchecked guess that March is missing could pass.",
+   "fix": "Require a directory listing or failed read for /sandbox/c60/mar.csv as evidence before accepting the missing-March limitation."
+  },
+  {
+   "family_id": "M31",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M32",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M33",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M34",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M35",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M36",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M37",
+   "verdict": "major",
+   "problem": "The prompt asks about waking at 7:30 today, but the synthetic clock is 10:00, so that time has already passed and the oracle does not account for it.",
+   "fix": "Ask about tomorrow at 7:30, or set the synthetic clock before 7:30, and score the expired preference separately from whether the requested time is still possible."
+  },
+  {
+   "family_id": "M38",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M39",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M40",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M41",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M42",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M43",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M44",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M45",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M46",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M47",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M48",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M49",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M50",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M51",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M52",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M53",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M54",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M55",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M56",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M57",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M58",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M59",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  },
+  {
+   "family_id": "M60",
+   "verdict": "ok",
+   "problem": "",
+   "fix": ""
+  }
+ ]
+}

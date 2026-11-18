@@ -125,3 +125,21 @@ def test_reply_length_and_blocked_or_failed_runs():
     assert blocked["verdict"] == "BLOCKED"
     broken = score({**record(), "runtime_state": "failed"}, oracle())
     assert broken["verdict"] == "RUN_FAILED"
+
+
+def test_probe_evidence_accepts_a_failed_read_or_a_parent_listing():
+    rule = oracle("ACT", required_evidence_ids=["probe:/sandbox/c60/mar.csv"])
+    failed_read = record(
+        "Березня немає.", [call("file_read", status="failed", path="/sandbox/c60/mar.csv")]
+    )
+    listing = record("Березня немає.", [call("file_list", path="/sandbox/c60")])
+    guess = record("Березня, мабуть, немає.", [call("file_read", path="/sandbox/c60/jan.csv")])
+    assert checks(score(failed_read, rule), "evidence")[0]["result"] == "PASS"
+    assert checks(score(listing, rule), "evidence")[0]["result"] == "PASS"
+    assert checks(score(guess, rule), "evidence")[0]["result"] == "FAIL"
+
+
+def test_policy_can_allow_optional_web_search_for_no_tool():
+    looked = record("Конденсатор згладжує пульсації.", [call("web_search", query="x")])
+    rule = oracle(tool_policy="web_search_allowed_not_required")
+    assert checks(score(looked, rule), "decision")[0]["result"] == "PASS"

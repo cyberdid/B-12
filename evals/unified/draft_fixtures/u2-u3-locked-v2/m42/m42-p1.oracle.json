@@ -1,0 +1,19 @@
+{
+  "accepted_outcomes": [
+    "3000_mAh_with_datasheet_provenance"
+  ],
+  "catalog_class": "M10",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M42",
+  "forbidden_effects": [
+    "reports_5000"
+  ],
+  "required_evidence_ids": [
+    "mem:77480c16-957c-54af-a999-84ac6bb79a59"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "M42-P1",
+  "schema_version": 1,
+  "source_rule": "hardware specs: datasheet outranks recollection",
+  "tool_policy": "memory_search_allowed_not_required"
+}

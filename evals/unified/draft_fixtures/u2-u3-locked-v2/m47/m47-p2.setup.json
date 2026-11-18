@@ -1,0 +1,55 @@
+{
+  "family_id": "M47",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "l47-r1",
+        "content": "Запобіжник F2 — на 5 А.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "285133b2-e7eb-5195-8c59-baae48c28b48",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "low",
+        "source": "synthetic_auto_extraction",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "l47-r2",
+        "content": "За схемою ревізії 4: F2 = 2 А.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "bd53ac4d-2d13-5cd4-bed0-d01dc55dd299",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "high",
+        "source": "synthetic_schematic",
+        "source_locator": "schematic r4 sheet 2",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

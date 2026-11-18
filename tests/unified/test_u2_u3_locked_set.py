@@ -10,8 +10,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = ROOT / "evals/unified/draft_sources"
-SOURCE = SOURCES / "u2_u3_locked_cases_v1.json"
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-locked-v1.json"
+SOURCE = SOURCES / "u2_u3_locked_cases_v2.json"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-locked-v2.json"
+V1_MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-locked-v1.json"
 DEV_SOURCE = SOURCES / "u2_u3_draft_cases_v4.json"
 CASUAL_CLASSES = {"C01", "C02", "C03", "C04", "C05", "C13", "C14", "C15", "C16", "C17"}
 UNRUNNABLE_CLASSES = {"C20", "C24", "C25", "C26", "C27", "C28", "C29", "C30", "M28", "M29"}
@@ -37,6 +38,8 @@ def test_manifest_is_valid_and_entirely_locked_test():
     assert len(rows) == 120
     assert {row["split"] for row in rows} == {"locked_test"}
     assert not [row for row in rows if row["notes"].startswith("BLOCKED:")]
+    assert {row["status"] for row in rows} == {"FROZEN"}
+    assert validator.validate(read(V1_MANIFEST), ROOT) == []
 
 
 def test_counts_meet_the_protocol_minimums():
@@ -64,7 +67,7 @@ def test_family_ids_do_not_collide_with_dev():
 
 def test_paraphrase_family_has_no_shared_word_stems():
     def stems(text):
-        return {w[:5] for w in re.findall(r"[а-яіїєґ']+", text.lower()) if len(w) >= 5}
+        return {w[:4] for w in re.findall(r"[а-яіїєґ']+", text.lower()) if len(w) >= 4}
 
     case = next(c for c in cases() if c["oracle"]["catalog_class"] == "M02")
     record = stems(case["input"]["synthetic_memory"][0]["content"])
@@ -75,8 +78,19 @@ def test_paraphrase_family_has_no_shared_word_stems():
 def test_authoring_script_reproduces_source(tmp_path):
     out = tmp_path / "cases.json"
     subprocess.run(
-        [sys.executable, "-I", str(SOURCES / "author_u2_u3_locked_v1.py"), str(out)],
+        [sys.executable, "-I", str(SOURCES / "author_u2_u3_locked_v2.py"), str(out)],
         check=True,
         capture_output=True,
     )
     assert out.read_bytes() == SOURCE.read_bytes()
+
+
+def test_v2_changes_only_the_families_accepted_from_the_reviews():
+    old = {c["family_id"]: c for c in read(SOURCES / "u2_u3_locked_cases_v1.json")["cases"]}
+    changed = {c["family_id"] for c in cases() if c != old[c["family_id"]]}
+    assert changed == {"C33", "C37", "C46", "C60", "M33", "M37", "M58", "M60"}
+
+
+def test_frozen_oracles_record_the_review():
+    for path in (ROOT / "evals/unified/draft_fixtures/u2-u3-locked-v2").rglob("*.oracle.json"):
+        assert read(path)["review_status"].startswith("REVIEWED 2026-11-18")

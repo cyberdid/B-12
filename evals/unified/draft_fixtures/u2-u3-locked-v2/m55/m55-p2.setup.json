@@ -1,0 +1,39 @@
+{
+  "family_id": "M55",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_goals": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "l55-g1",
+        "checkpoint": "Кроки 1–2 (кріплення, живлення) виконано; крок 3 заблоковано: немає датчика вологості.",
+        "evidence_ids": [],
+        "goal_id": "c2710ca8-f26c-50e5-bb06-5a9a80137701",
+        "status": "active",
+        "status_reason": null,
+        "text": "Налаштувати метеостанцію: кріплення, живлення, датчик вологості."
+      }
+    ],
+    "synthetic_memory": []
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,24 @@
+{
+  "accepted_decisions": [
+    "ASK",
+    "NO_TOOL"
+  ],
+  "accepted_outcomes": [
+    "reports_conflict_and_asks",
+    "reports_conflict_without_guessing"
+  ],
+  "catalog_class": "M09",
+  "expected_decision": "ASK",
+  "family_id": "M41",
+  "forbidden_effects": [
+    "picks_one_without_flagging_conflict"
+  ],
+  "required_evidence_ids": [
+    "mem:3045f408-b9be-52ad-b288-074a0c053d63",
+    "mem:829b16b8-8952-59e6-9abc-91a5733fd56e"
+  ],
+  "review_status": "REVIEWED 2026-11-18: blind Codex gpt-6-luna + Gemini 4 Hydrogen on v1; 8 fixes accepted, C59 finding rejected",
+  "scenario_id": "M41-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}
