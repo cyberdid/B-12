@@ -19,7 +19,7 @@
 |---|---|---|---|
 | U0 freeze/audit/contracts | partial | `reports/unified/U0_BASELINE_AUDIT.md`, `THREAT_MODEL.md`, schemas, environment manifest, historical repeats ledger | full store inventory, frozen scenario schema, locked splits |
 | U1 telemetry | partial | `evals/unified/trace.py`, `tool_oracles.py`, `on_policy_decision` in `ToolRegistry`, runtime trace observer | classification proposal and typed retrieval evidence per step; trace correlation across approval resume |
-| U2 control pilot | protocol + draft corpus | `U2_BREVITY_REPRODUCTION.md`, `u2-u3-draft-v2` (C01–C30) | oracle review, setup runner adapter, frozen arms, runs, keep/rollback report |
+| U2 control pilot | protocol + draft corpus v2 + setup adapter | `U2_BREVITY_REPRODUCTION.md`, `u2-u3-draft-v2` (C01–C30) | oracle review, setup runner adapter, frozen arms, runs, keep/rollback report |
 | U3 memory baseline | protocol + draft corpus | `U3_MEMORY_BASELINE_PROTOCOL.md`, `u2-u3-draft-v2` (M01–M30), `runtime_snapshot.py` | store coverage audit, setup adapter seeding memory and goals, runs, report |
 | U4–U10 | not started | — | per master plan §10 |
 
@@ -32,7 +32,9 @@
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)
-- [ ] Adapter that reads `*.setup.json` and builds a disposable synthetic runtime: files under a temporary sandbox root mapped to `/sandbox/...`, memory rows through `MemoryStore` with the given UUIDs and clocks, goals through `GoalStore`, tool availability and approval policy through the control path.
+- [x] `evals/unified/setup_adapter.py`: files under a fresh private root, actors/sessions, memory via `MemoryStore` (`recorded_at` → `created_at`, `supersedes` → stale), goals via `GoalStore`; report maps declared → real ids and lists dropped clock/provenance fields. 13 tests; all 54 unblocked v2 setups seed.
+- [ ] Mount the files root at `/sandbox` (and `/actors`) inside the bubblewrap worker; apply `available_tools`, approval policy and `sudo_exec` stub from the setup through the control path.
+- [ ] Unified U2/U3 runner: one scenario = adapter seed → `RuntimeTurnExecutor`-style turn with trace observer → oracle translation through the id map.
 - [ ] Map oracle checks onto existing verifiers: `file_verifier.py`, `tool_oracles.py`, trace classification; unsupported oracle outcomes stay `NOT_SCORABLE`, not PASS.
 - [ ] Tests with scripted Ollama (no real model) for at least one family per class.
 
@@ -52,4 +54,4 @@
 ## Handoff log
 
 - 18.11 Codex: U0/U1 artifacts, real Bolt smoke runs, plan `2026-11-18-u2-u3-draft-corpus.md` Task 1 (builder). Paused on the 5-hour limit.
-- 18.11 Claude: Tasks 2–4 of that plan (v1), Codex review, v2 fixes, this roadmap.
+- 18.11 Claude: Tasks 2–4 of that plan (v1), Codex review, v2 fixes, this roadmap (commit f41df73); setup adapter (B1); blind agy/Gemini review of v2 started (A3).
