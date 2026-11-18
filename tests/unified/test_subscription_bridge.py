@@ -63,6 +63,6 @@ def test_every_configured_mcp_server_is_disabled(tmp_path):
         encoding="utf-8",
     )
     args = codex_overrides(config)
-    assert 'mcp_servers."android".enabled=false' in args
-    assert 'mcp_servers."ida-pro-mcp".enabled=false' in args
+    assert "mcp_servers.android.enabled=false" in args
+    assert "mcp_servers.ida-pro-mcp.enabled=false" in args
     assert args[:2] == ["--disable", "apps"]

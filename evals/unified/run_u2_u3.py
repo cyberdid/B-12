@@ -220,6 +220,9 @@ def main(argv=None):
     parser.add_argument(
         "--num-ctx", type=int, default=None, help="override the context window (cloud models)"
     )
+    parser.add_argument(
+        "--output-tokens", type=int, default=None, help="override the reply budget (cloud models)"
+    )
     args = parser.parse_args(argv)
     if os.environ.get("B12_EVAL_SANDBOX") != "1":
         parser.exit(
@@ -240,6 +243,8 @@ def main(argv=None):
     settings = settings_for_setup(template, setup, work / "state")
     if args.model_timeout:
         settings = settings.model_copy(update={"model_timeout_s": args.model_timeout})
+    if args.output_tokens:
+        settings = settings.model_copy(update={"output_tokens": args.output_tokens})
     if args.num_ctx:
         # Cloud models behind the subscription bridge have windows far beyond 8192; the owner
         # lifted the local context limit for them so admission never trims their context.

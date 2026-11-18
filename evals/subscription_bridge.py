@@ -18,12 +18,15 @@ tokenizer and also sees its CLI's own system prompt, so its prompt count cannot 
 with the runtime's admitted budget: the bridge reports `prompt_eval_count: 0` (the runtime
 then only logs a mismatch) and puts the backend's real usage in `bridge_usage` and the bridge
 log. Owner decision 18.11.2026: the local 8192 context limit does not apply to cloud models;
-bridged runs pass `--num-ctx 200000` so the runtime never trims their context. Latency includes CLI start-up and is not comparable to local models.
+bridged runs pass `--num-ctx 200000` (and `--output-tokens 16384`, since the CLIs count
+reasoning as output) so the runtime never trims them. Latency includes CLI start-up and is not
+comparable to local models.
 """
 
 import argparse
 import asyncio
 import json
+import re
 import tempfile
 import time
 import tomllib
@@ -113,13 +116,20 @@ def codex_events_ok(events_text):
 
 
 def codex_overrides(config_path):
+    """Disable apps, the browser and every configured MCP server for one codex call.
+
+    Server names go into the dotted path unquoted: a quoted segment makes codex create a new,
+    invalid server entry instead of overriding the configured one.
+    """
     args = ["--disable", "apps", "--disable", "browser_use", "--disable", "browser_use_external"]
     try:
         config = tomllib.loads(Path(config_path).read_text(encoding="utf-8"))
     except (OSError, tomllib.TOMLDecodeError):
         config = {}
     for name in config.get("mcp_servers", {}):
-        args += ["-c", f'mcp_servers."{name}".enabled=false']
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+            raise InvalidRound(f"cannot disable MCP server with name {name!r}")
+        args += ["-c", f"mcp_servers.{name}.enabled=false"]
     return args
 
 
