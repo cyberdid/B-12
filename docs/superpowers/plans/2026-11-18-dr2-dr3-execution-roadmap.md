@@ -82,3 +82,5 @@
 - [x] Framework fixes behind flags (all default off): ADR-015 `memory_temporal` (schema v3, temporal evidence, today's date, history with replacement, temporal memory_store); `verify_writes` (runtime read-back); `goals_in_context` (goal state in context). Harness: synthetic-environment stub (C11, C12, C51–C54).
 - [ ] Runs queued on Bolt: U4 (temporal), D2 (narrow claimed-check), F (temporal + verify_writes + goals); judge each, compare with A0 (+10 p.p. margin).
 - [ ] Next set version: separate `required` from `any_of` in oracles (C35, C36, C39, C40); re-run harness-invalid families with the stub.
+- [x] U4 measured: memory +20.6 p.p. [+7.2, +33.9] on Bolt; control −7.7 p.p. (CI includes 0) after verdict alignment; A0b queued to separate drift.
+- [ ] Open (security, postponed by the owner): no per-actor file scope — an owner-run model can read a guest's private files on disk (C55 in U4). Needs a permissions design, not a prompt fix.
