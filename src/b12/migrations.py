@@ -3,6 +3,9 @@
 v1: спогади з evidence на спогади. v2: типізовані джерела (`memory_sources`: спогад або
 документ KnowledgeIndex з ревізією) і статус спогаду (`active` / `stale`). Оновлення v1→v2
 починається з перевіреної резервної копії і не втрачає жодного спогаду чи зв'язку.
+v3 (ADR-015): лише додаткові nullable-колонки — час події, інтервал чинності, надійність
+джерела, локатор, походження часових полів і заміна (`superseded_by`). Невідомі значення
+лишаються NULL; жоден наявний рядок не змінюється.
 """
 
 import os
@@ -10,7 +13,7 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 _SCHEMA_V1 = (
     """CREATE TABLE memories (
@@ -106,9 +109,25 @@ _UPGRADE_V1_TO_V2 = (
 )
 
 
+RELIABILITY = ("high", "normal", "low", "unverified")
+TEMPORAL_SOURCES = ("owner", "conversation", "document")
+
+_UPGRADE_V2_TO_V3 = (
+    "ALTER TABLE memories ADD COLUMN event_time TEXT",
+    "ALTER TABLE memories ADD COLUMN valid_from TEXT",
+    "ALTER TABLE memories ADD COLUMN valid_to TEXT",
+    "ALTER TABLE memories ADD COLUMN reliability TEXT CHECK(reliability IS NULL OR reliability IN "
+    "('high', 'normal', 'low', 'unverified'))",
+    "ALTER TABLE memories ADD COLUMN source_locator TEXT",
+    "ALTER TABLE memories ADD COLUMN temporal_source TEXT CHECK(temporal_source IS NULL OR "
+    "temporal_source IN ('owner', 'conversation', 'document'))",
+    "ALTER TABLE memories ADD COLUMN superseded_by TEXT",
+)
+
+
 def check_schema(connection: sqlite3.Connection) -> int:
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version not in (0, 1, SCHEMA_VERSION):
+    if version not in (0, 1, 2, SCHEMA_VERSION):
         raise RuntimeError(f"unsupported memory schema version: {version}")
     return version
 
@@ -165,7 +184,14 @@ def migrate(connection: sqlite3.Connection) -> None:
             ).fetchone()[0]
             if moved != before["evidence"]:
                 raise RuntimeError("evidence migration lost links; rolled back")
-            connection.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
+            version = 2
+        if version == 2:
+            before = connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+            for statement in _UPGRADE_V2_TO_V3:
+                connection.execute(statement)
+            if connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0] != before:
+                raise RuntimeError("v3 migration changed the number of memories; rolled back")
+        connection.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
         connection.commit()
     except BaseException:
         connection.rollback()

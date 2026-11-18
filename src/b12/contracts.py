@@ -79,6 +79,14 @@ class MemoryRecord(_Contract):
     sources: tuple[dict, ...] = ()
     status: Literal["active", "stale"] = "active"
     status_reason: str = ""
+    # ADR-015 (schema v3). Unknown stays None; nothing is inferred from created_at.
+    event_time: str | None = None
+    valid_from: str | None = None
+    valid_to: str | None = None
+    reliability: Literal["high", "normal", "low", "unverified"] | None = None
+    source_locator: str | None = None
+    temporal_source: Literal["owner", "conversation", "document"] | None = None
+    superseded_by: str | None = None
 
     _validate_id = field_validator("id")(_uuid)
     _validate_identifiers = field_validator("owner_id", "kind", "source")(_identifier)

@@ -229,6 +229,62 @@ def _forms(term: str) -> tuple[str, ...]:
     return tuple(sorted(forms, key=lambda f: (f != term, f)))[:48]
 
 
+_TEMPORAL_COLUMNS = (
+    "event_time",
+    "valid_from",
+    "valid_to",
+    "reliability",
+    "source_locator",
+    "temporal_source",
+    "superseded_by",
+)
+
+
+def _iso_day_or_time(value, name):
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{name} must be an ISO date or datetime")
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        raise ValueError(f"{name} must be an ISO date or datetime") from None
+    return value, parsed
+
+
+def _temporal_fields(event_time, valid_from, valid_to, reliability, locator, temporal_source):
+    """Validate ADR-015 fields before anything is written; unknown values stay None."""
+    from b12.migrations import RELIABILITY, TEMPORAL_SOURCES
+
+    checked = {}
+    for name, value in (
+        ("event_time", event_time),
+        ("valid_from", valid_from),
+        ("valid_to", valid_to),
+    ):
+        result = _iso_day_or_time(value, name)
+        checked[name] = result
+    start, end = checked["valid_from"], checked["valid_to"]
+    if start and end and end[1].replace(tzinfo=None) < start[1].replace(tzinfo=None):
+        raise ValueError("valid_to must not be before valid_from")
+    if reliability is not None and reliability not in RELIABILITY:
+        raise ValueError(f"reliability must be one of {RELIABILITY}")
+    if temporal_source is not None and temporal_source not in TEMPORAL_SOURCES:
+        raise ValueError(f"temporal_source must be one of {TEMPORAL_SOURCES}")
+    if locator is not None and (
+        not isinstance(locator, str) or not locator.strip() or len(locator) > 200
+    ):
+        raise ValueError("source_locator must be a short nonblank string")
+    return {
+        "event_time": event_time,
+        "valid_from": valid_from,
+        "valid_to": valid_to,
+        "reliability": reliability,
+        "source_locator": locator,
+        "temporal_source": temporal_source,
+    }
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -252,9 +308,9 @@ def _private_directory(path: Path) -> None:
             raise
 
 
-
 class DiskSpaceLow(OSError):
     """The state disk is below the configured reserve: the write is refused unchanged."""
+
 
 class MemoryStore:
     """Thread-safe connection; independent stores serialize mutations in SQLite.
@@ -472,8 +528,17 @@ class MemoryStore:
         evidence_ids: tuple[str, ...] = (),
         documents: tuple[str, ...] = (),
         expected_deletion_revision: int | None = None,
+        event_time: str | None = None,
+        valid_from: str | None = None,
+        valid_to: str | None = None,
+        reliability: str | None = None,
+        source_locator: str | None = None,
+        temporal_source: str | None = None,
     ) -> MemoryRecord:
         self._consent(actor)
+        temporal = _temporal_fields(
+            event_time, valid_from, valid_to, reliability, source_locator, temporal_source
+        )
         if expected_deletion_revision is not None and (
             type(expected_deletion_revision) is not int or expected_deletion_revision < 0
         ):
@@ -523,9 +588,11 @@ class MemoryStore:
                 cited_documents.append((document_id, ref.revision))
             created = _now()
             self._connection.execute(
-                """INSERT INTO memories(id, actor_id, kind, text, source, created_at)
-                   VALUES (?,?,?,?,?,?)""",
-                (record_id, actor.id, kind, text, source, created),
+                """INSERT INTO memories(id, actor_id, kind, text, source, created_at,
+                       event_time, valid_from, valid_to, reliability, source_locator,
+                       temporal_source)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (record_id, actor.id, kind, text, source, created, *temporal.values()),
             )
             links = [(record_id, "memory", item, "", i) for i, item in enumerate(evidence_ids)]
             links += [
@@ -553,6 +620,7 @@ class MemoryStore:
                     for item, revision in cited_documents
                 ]
             ),
+            **temporal,
         )
 
     def mark_stale_for_documents(self, actor: Actor, evidence_ids) -> list[str]:
@@ -586,7 +654,7 @@ class MemoryStore:
                 self._audit(actor, "stale", memory_id=row["id"])
         return [row["id"] for row in rows]
 
-    def supersede(self, memory_id: str, actor: Actor) -> bool:
+    def supersede(self, memory_id: str, actor: Actor, *, replaced_by: str | None = None) -> bool:
         """Retire an older fact that a newer one replaces (a new address, a new editor).
 
         The record stays (the owner can see and forget it) but is no longer live, like a
@@ -600,12 +668,43 @@ class MemoryStore:
             ).fetchone()
             if row is None:
                 return False
+            if replaced_by is not None and (
+                replaced_by == memory_id
+                or not self._connection.execute(
+                    """SELECT 1 FROM memories m WHERE id=? AND actor_id=? AND status='active'
+                       AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                    (replaced_by, actor.id),
+                ).fetchone()
+            ):
+                raise ValueError("replacement must be another live memory of the same actor")
             self._connection.execute(
-                "UPDATE memories SET status='stale', status_reason='superseded' WHERE id=?",
-                (memory_id,),
+                "UPDATE memories SET status='stale', status_reason='superseded', superseded_by=?"
+                " WHERE id=?",
+                (replaced_by, memory_id),
             )
             self._audit(actor, "stale", memory_id=memory_id)
         return True
+
+    def superseded_by_records(self, ids, actor: Actor) -> dict[str, list[MemoryRecord]]:
+        """Records retired in favour of each of `ids` (ADR-015: history is shown only together
+        with its replacement). Forgotten records never come back."""
+        self._consent(actor)
+        ids = list(dict.fromkeys(ids))
+        if not ids:
+            return {}
+        marks = ",".join("?" for _ in ids)
+        with self._transaction():
+            rows = self._connection.execute(
+                f"""SELECT m.* FROM memories m WHERE actor_id=? AND status='stale'
+                    AND superseded_by IN ({marks})
+                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
+                    ORDER BY created_at""",
+                (actor.id, *ids),
+            ).fetchall()
+            result: dict[str, list[MemoryRecord]] = {}
+            for row in rows:
+                result.setdefault(row["superseded_by"], []).append(self._record(row))
+            return result
 
     def get(self, memory_id: str, actor: Actor) -> MemoryRecord | None:
         self._consent(actor)
@@ -667,6 +766,7 @@ class MemoryStore:
             sources=sources,
             status=row["status"],
             status_reason=row["status_reason"],
+            **{key: row[key] for key in _TEMPORAL_COLUMNS},
         )
 
     def search(self, query: str, actor: Actor, *, limit: int = 8) -> list[MemoryRecord]:
