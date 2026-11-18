@@ -17,6 +17,7 @@ RUNS=(
   "E1|$A/unified-locked-u2-E1-2026-11-18|3|E1|"
   "D|$A/unified-locked-u2-D-2026-11-18|3|D|"
   "U4|$A/unified-locked-u4-temporal-2026-11-18|3|A0||--memory-temporal"
+  "D2|$A/unified-locked-u2-D2-2026-11-18|3|D2|"
   "haiku|$A/unified-locked-haiku-2026-11-18|1|A0|11500"
   "luna|$A/unified-locked-codex-2026-11-18|1|A0|11501"
 )

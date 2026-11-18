@@ -221,3 +221,14 @@ async def test_synthetic_environment_is_stubbed_for_the_run(scripted_ollama, tmp
     assert set(record["environment_stub"]) == {"system_info", "run_command"}
     tool_message = next(m for m in state["requests"][1]["messages"] if m["role"] == "tool")
     assert "12.4Gi" in tool_message["content"]
+
+
+def test_narrow_pattern_catches_document_claims_but_not_recalled_facts():
+    from evals.unified.run_u2_u3 import NARROW_ACTION_CLAIM as N
+
+    assert N.search("Я прочитав інструкцію `/sandbox/m50/bike-v2.md`.")
+    assert N.search("Я перевірив файл `/sandbox/m50/bike-v2.md` і знайшов розділ 2.1.")
+    assert N.search("Я прочитав настанову: розділ 4.2.")
+    assert not N.search("Згідно з інформацією, яку я знайшов, процес виглядає так.")
+    assert not N.search("Я перевірив пам'ять і бачу запис від 30 листопада.")
+    assert not N.search("Я ще не прочитав файл, зараз перевірю.")

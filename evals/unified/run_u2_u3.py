@@ -37,7 +37,7 @@ E1_INSTRUCTION = (
     "приблизно до 300 символів, без списків і заголовків. Складні технічні відповіді та звіти "
     "подавай точно й повно."
 )
-ARMS = ("A0", "A1", "E1", "D")
+ARMS = ("A0", "A1", "E1", "D", "D2")
 
 # Arm D (U2 control arm "deterministic completion verifier"; owner approved 18.11.2026 as an
 # experiment). The runtime already re-asks once when a turn with no tool result claims a check
@@ -47,6 +47,16 @@ ARMS = ("A0", "A1", "E1", "D")
 BROAD_ACTION_CLAIM = re.compile(
     r"(?<!не )\b(?:я\s+)?(?:перевіри(?:в|ла|ли)|перегляну(?:в|ла|ли)|прочита(?:в|ла|ли)|"
     r"проаналізува(?:в|ла|ли)|подиви(?:вся|лася|лись)|відкри(?:в|ла|ли)|знай(?:шов|шла|шли))\b",
+    re.IGNORECASE,
+)
+
+# Arm D2 (18.11.2026, after D's false positives): the same verbs, but only with a document,
+# file, log or system object; "знайшов" and anything about recalled memories are left alone.
+NARROW_ACTION_CLAIM = re.compile(
+    r"(?<!не )\b(?:я\s+)?(?:перевіри(?:в|ла|ли)|перегляну(?:в|ла|ли)|прочита(?:в|ла|ли)|"
+    r"відкри(?:в|ла|ли)|проаналізува(?:в|ла|ли))\s+(?:\S+\s+)?"
+    r"(?:файл\w*|настанов\w*|інструкці\w*|документ\w*|журнал\w*|лог\w*|конфіг\w*|"
+    r"каталог\w*|тек\w*|протокол\w*|специфікаці\w*|систем\w*|`)",
     re.IGNORECASE,
 )
 
@@ -61,7 +71,7 @@ def apply_arm(system_prompt, arm):
         return system_prompt.replace(A0_SENTENCE, A1_SENTENCE)
     if arm == "E1":
         return f"{system_prompt.rstrip()} {E1_INSTRUCTION}"
-    return system_prompt  # A0 and D share the baseline prompt
+    return system_prompt  # A0, D and D2 share the baseline prompt
 
 
 def _plain(value):
@@ -186,6 +196,8 @@ def run_scenario(
     default_claim = agent_module._ACTION_CLAIM
     if arm == "D":
         agent_module._ACTION_CLAIM = BROAD_ACTION_CLAIM
+    elif arm == "D2":
+        agent_module._ACTION_CLAIM = NARROW_ACTION_CLAIM
     prompt_sha = hashlib.sha256(runtime.agent.system_prompt.encode()).hexdigest()
     loop = asyncio.new_event_loop()
     try:
@@ -210,7 +222,9 @@ def run_scenario(
             "u2_arm": arm,
             "memory_temporal": memory_temporal,
             "environment_stub": environment_stub,
-            "action_claim_pattern": "broad (arm D)" if arm == "D" else "runtime default",
+            "action_claim_pattern": {"D": "broad (arm D)", "D2": "narrow (arm D2)"}.get(
+                arm, "runtime default"
+            ),
             "system_prompt_sha256": prompt_sha,
             "model": settings.model,
             "runtime_state": result.state,
