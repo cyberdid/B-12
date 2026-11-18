@@ -17,8 +17,8 @@ as {content, tool_calls[{name, arguments_json}]}. The backend counts tokens with
 tokenizer and also sees its CLI's own system prompt, so its prompt count cannot be compared
 with the runtime's admitted budget: the bridge reports `prompt_eval_count: 0` (the runtime
 then only logs a mismatch) and puts the backend's real usage in `bridge_usage` and the bridge
-log. Context admission is therefore not enforced for bridged models (their windows are far
-larger than 8192). Latency includes CLI start-up and is not comparable to local models.
+log. Owner decision 18.11.2026: the local 8192 context limit does not apply to cloud models;
+bridged runs pass `--num-ctx 200000` so the runtime never trims their context. Latency includes CLI start-up and is not comparable to local models.
 """
 
 import argparse

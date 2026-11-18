@@ -217,6 +217,9 @@ def main(argv=None):
         default=None,
         help="per model round, e.g. for subscription bridges",
     )
+    parser.add_argument(
+        "--num-ctx", type=int, default=None, help="override the context window (cloud models)"
+    )
     args = parser.parse_args(argv)
     if os.environ.get("B12_EVAL_SANDBOX") != "1":
         parser.exit(
@@ -237,6 +240,10 @@ def main(argv=None):
     settings = settings_for_setup(template, setup, work / "state")
     if args.model_timeout:
         settings = settings.model_copy(update={"model_timeout_s": args.model_timeout})
+    if args.num_ctx:
+        # Cloud models behind the subscription bridge have windows far beyond 8192; the owner
+        # lifted the local context limit for them so admission never trims their context.
+        settings = settings.model_copy(update={"num_ctx": args.num_ctx})
     socket_value = os.environ.get("B12_EVAL_BROKER_SOCKET")
     if not socket_value or not Path(socket_value).is_socket():
         parser.exit(2, "model broker socket is unavailable\n")
