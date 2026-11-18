@@ -84,3 +84,6 @@
 - [ ] Next set version: separate `required` from `any_of` in oracles (C35, C36, C39, C40); re-run harness-invalid families with the stub.
 - [x] U4 measured: memory +20.6 p.p. [+7.2, +33.9] on Bolt; control −7.7 p.p. (CI includes 0) after verdict alignment; A0b queued to separate drift.
 - [ ] Open (security, postponed by the owner): no per-actor file scope — an owner-run model can read a guest's private files on disk (C55 in U4). Needs a permissions design, not a prompt fix.
+- [x] D2 neutral (no false positives, no gain); D3 = D2 + runtime note added (`annotate_unverified_claims`).
+- [x] F run complete (360/360); goals in context visibly fix M53/M55. **Judging of F stopped** — see `reports/unified/RESUME.md` checkpoint 22:30.
+- [ ] Resume: F judges → A0b (51/360) → D3 → aligned comparison → decide defaults.
