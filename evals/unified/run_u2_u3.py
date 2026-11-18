@@ -211,6 +211,12 @@ def main(argv=None):
     )
     parser.add_argument("--variant", default="")
     parser.add_argument("--arm", choices=ARMS, default="A0", help="U2 style arm")
+    parser.add_argument(
+        "--model-timeout",
+        type=float,
+        default=None,
+        help="per model round, e.g. for subscription bridges",
+    )
     args = parser.parse_args(argv)
     if os.environ.get("B12_EVAL_SANDBOX") != "1":
         parser.exit(
@@ -229,6 +235,8 @@ def main(argv=None):
     template = model_templates(work / "template", args.variant)[args.model_alias]
     setup = _load(root, row["setup_fixture"])["harness_setup"] if row.get("setup_fixture") else {}
     settings = settings_for_setup(template, setup, work / "state")
+    if args.model_timeout:
+        settings = settings.model_copy(update={"model_timeout_s": args.model_timeout})
     socket_value = os.environ.get("B12_EVAL_BROKER_SOCKET")
     if not socket_value or not Path(socket_value).is_socket():
         parser.exit(2, "model broker socket is unavailable\n")

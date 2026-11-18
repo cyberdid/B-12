@@ -1260,3 +1260,9 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - Написано 60 нових сімейств `u2-u3-locked-v1` (C31–C60: 10 розмовних/ask + 20 agentic; M31–M60), `split: locked_test`, без спільних prompt, шляхів і ID з dev.
 - Дві сліпі перевірки oracle: Codex gpt-6-luna — 57 ok, 3 major; Gemini 4 Hydrogen — 54 ok, 5 minor, 1 major (зауваження не перетинаються). Прийнято 8 (C33, C37, C46, C60, M33, M37, M58, M60); відхилено C59 — Codex помилково вважав порядок «Андрій, Марта, Зоя» абетковим (З іде перед М). [Рішення](../reports/unified/oracle-review-locked-v1/README.md).
 - **`u2-u3-locked-v2` — FROZEN** (manifest `f99cbbad22798d130bcb07760149840d35dbc5aec416051c8f79d8e5907de9c9`). Scorer: `probe:` evidence (невдале читання чи перелік батьківського каталогу) і дозвіл необов'язкового `web_search`. На моделі ще не запускався. `tests/unified` 117 passed.
+
+## [2026-11-18] experiment | Locked-пілот U2/U3 на Bolt: базова лінія A0
+
+- `u2-u3-locked-v2` (FROZEN), 360 прогонів (60 сімейств × 2 × 3) у bubblewrap, без помилок. Механічний scorer + сліпі судді Codex gpt-6-luna і Gemini 4 Hydrogen: 348/360 критеріїв одностайно; власник вирішив C39 (PASS), M37 (`+-`), M46 (`-`), M57 (`+-`).
+- **Базова лінія (частка прийнятних на рівні сімейства, 95% CI кластерного bootstrap):** поведінка 0.650 [0.483, 0.800]; пам'ять 0.406 [0.239, 0.572]. [Звіт](../reports/unified/semantic-judge-locked-pilot-2026-11-18/README.md).
+- Виявлено ваду дизайну oracle: `accepted_outcomes` змішує обов'язкові критерії й альтернативи (C36, C39); frozen набір не змінюється, наступна версія має розділити `required` і `any_of`.
