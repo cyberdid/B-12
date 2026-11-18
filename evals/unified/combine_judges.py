@@ -9,7 +9,7 @@ hash suffix; such a label is mapped to the only unlabelled item with the same sc
 criterion, and every correction is recorded. Without --adjudication the disputes are printed
 for a human. The adjudication file maps a family (e.g. "C39") to [verdict, reason]; the
 verdict replaces every item of that family that has a disputed criterion (the adjudicator
-judges the whole reply).
+judges the whole reply). A full item id as key overrides its family for that item.
 """
 
 import argparse
@@ -59,10 +59,10 @@ def finalize(sheet, labels_by_judge, adjudication=None):
     if adjudication is not None:
         adjudicated = []
         for item in sorted({d["item_id"] for d in result["disputed"]}):
-            family = item[:3]
-            if family not in adjudication:
-                raise ValueError(f"no adjudication for disputed family {family}")
-            verdict, reason = adjudication[family]
+            key = item if item in adjudication else item[:3]
+            if key not in adjudication:
+                raise ValueError(f"no adjudication for disputed family {item[:3]}")
+            verdict, reason = adjudication[key]
             adjudicated.append(
                 {"item_id": item, "before": final[item], "verdict": verdict, "by": reason}
             )

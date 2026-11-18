@@ -40,3 +40,16 @@ def test_adjudication_sets_every_item_with_a_dispute():
     result = finalize(SHEET, disputed, adjudication={"C39": ["PARTIAL (owner +-)", "precedent"]})
     assert result["final_verdicts"]["C39-P1#aaa"] == "PARTIAL (owner +-)"
     assert result["adjudicated"][0]["before"] == "NEEDS_OWNER"
+
+
+def test_item_id_key_overrides_the_family():
+    disputed = {"a": labels(), "b": labels(i1={"label": "not_met"})}
+    result = finalize(
+        SHEET,
+        disputed,
+        adjudication={
+            "C39": ["SEMANTIC_PASS", "family"],
+            "C39-P1#aaa": ["SEMANTIC_FAIL (-)", "item"],
+        },
+    )
+    assert result["final_verdicts"]["C39-P1#aaa"] == "SEMANTIC_FAIL (-)"
