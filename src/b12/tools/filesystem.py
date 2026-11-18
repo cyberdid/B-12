@@ -553,7 +553,7 @@ async def file_search(args, guard):
         return failure(exc)
 
 
-async def file_write(args, guard, backups):
+async def file_write(args, guard, backups, verify=False):
     parent_fd = source_fd = temp_fd = None
     temp_name = stage_id = None
     started = replaced = False
@@ -703,8 +703,11 @@ async def file_write(args, guard, backups):
         os.fsync(parent_fd)
         if not cleanup_temp():
             return uncertain("cleanup_failed")
+        content = {"bytes_written": len(raw), "backup_id": artifact}
+        if verify:
+            content["verification"] = _read_back(parent_fd, path.name, raw)
         return HandlerOutcome(
-            content={"bytes_written": len(raw), "backup_id": artifact},
+            content=content,
             side_effects=(
                 SideEffect(
                     kind="file_write",
@@ -728,7 +731,26 @@ async def file_write(args, guard, backups):
                 os.close(fd)
 
 
-def register(registry, backups):
+def _read_back(parent_fd, name, raw):
+    """Runtime read-back of a finished write (settings.verify_writes): the model gets the
+    verified size, hash and opening of what is on disk instead of having to trust itself."""
+    try:
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent_fd)
+        with os.fdopen(fd, "rb") as handle:
+            data = handle.read(len(raw) + 1)
+    except OSError as exc:
+        return {"read_back": False, "error": type(exc).__name__}
+    preview = data[:300].decode("utf-8", "replace")
+    return {
+        "read_back": True,
+        "matches_written": data == raw,
+        "bytes_on_disk": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+        "preview": preview,
+    }
+
+
+def register(registry, backups, *, verify_writes=False):
     registry.register(
         "file_list", "List bounded directory entries", ListArgs, file_list, "filesystem.read"
     )
@@ -748,7 +770,7 @@ def register(registry, backups):
     )
 
     async def write(args, guard):
-        return await file_write(args, guard, backups)
+        return await file_write(args, guard, backups, verify=verify_writes)
 
     registry.register(
         "file_write",

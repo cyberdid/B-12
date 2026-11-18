@@ -12,6 +12,7 @@ def register_host_tools(
     sudo=False,
     sudo_path=None,
     memory_temporal=False,
+    verify_writes=False,
 ):
     """Register all 13 concrete host tools; caller owns/closes injected stores.
 
@@ -22,7 +23,7 @@ def register_host_tools(
     from b12.tools import filesystem, network, notes, process
     from b12.tools import memory as memory_tools
 
-    filesystem.register(registry, backups)
+    filesystem.register(registry, backups, verify_writes=verify_writes)
     notes.register(registry)
     process.register(registry)
     if sudo or sudo_path:

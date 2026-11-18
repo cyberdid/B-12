@@ -138,6 +138,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "forget_requires_approval": True,
         "memory_enrichment": True,
         "memory_temporal": False,
+        "verify_writes": False,
         "sudo_access": "off",
         "network_allow": (),
         "tool_result_bytes": 4096,

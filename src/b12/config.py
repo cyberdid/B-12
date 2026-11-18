@@ -44,6 +44,9 @@ class Settings(BaseModel):
     # ADR-015: evidence shows event time, validity, reliability and replaced history, and the
     # model is told today's date. Off until the U4 measurement passes.
     memory_temporal: bool = False
+    # Runtime read-back after every successful file_write: size, hash, match and opening go
+    # back to the model (unverified writes failed for every model, 18.11.2026). Off by default.
+    verify_writes: bool = False
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"
     # http_fetch destinations: exact hosts, "*.suffix" (subdomains) or "*" (all); empty denies all.
@@ -159,7 +162,12 @@ class Settings(BaseModel):
                 value = float(value)
             elif field == "network_allow":
                 value = tuple(item.strip() for item in value.split(",") if item.strip())
-            elif field in ("forget_requires_approval", "memory_enrichment", "memory_temporal"):
+            elif field in (
+                "forget_requires_approval",
+                "memory_enrichment",
+                "memory_temporal",
+                "verify_writes",
+            ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")
             elif field in {
                 "tool_timeout_s",
