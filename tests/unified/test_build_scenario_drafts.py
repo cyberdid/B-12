@@ -179,3 +179,29 @@ def test_split_is_taken_from_the_case_and_validated(tmp_path):
         builder.build_set(
             [bad], root=root, fixture_rel_dir="fixtures/bad", manifest_rel_path="sets/bad.json"
         )
+
+
+def test_frozen_set_requires_reviewed_oracles_and_records_the_review(tmp_path):
+    builder = load_module(BUILDER_PATH, "scenario_draft_builder_frozen")
+    root = tmp_path / "repo"
+    root.mkdir()
+    with pytest.raises(ValueError, match="reviewed"):
+        builder.build_set(
+            [sample_case()],
+            root=root,
+            fixture_rel_dir="f/a",
+            manifest_rel_path="s/a.json",
+            status="FROZEN",
+        )
+    manifest = builder.build_set(
+        [sample_case()],
+        root=root,
+        fixture_rel_dir="f/b",
+        manifest_rel_path="s/b.json",
+        status="FROZEN",
+        review_status="REVIEWED: codex+gemini, author fixes",
+    )
+    for row in manifest["scenarios"]:
+        assert row["status"] == "FROZEN"
+        oracle = json.loads((root / row["oracle_fixture"]).read_text(encoding="utf-8"))
+        assert oracle["review_status"] == "REVIEWED: codex+gemini, author fixes"

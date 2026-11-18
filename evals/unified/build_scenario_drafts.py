@@ -112,15 +112,31 @@ def _json_bytes(document):
     )
 
 
-def build_set(cases, *, root, fixture_rel_dir, manifest_rel_path, set_id="u2-u3-draft-v1"):
+def build_set(
+    cases,
+    *,
+    root,
+    fixture_rel_dir,
+    manifest_rel_path,
+    set_id="u2-u3-draft-v1",
+    status="DRAFT",
+    review_status="UNREVIEWED",
+):
     """Write isolated input/setup/oracle fixtures for two variants per family and a v2 manifest.
 
     The input fixture is the only model-visible file: it carries the user prompt and IDs.
     The setup fixture describes evaluator-side synthetic state; the oracle stays separate.
 
-    All generated scenarios are deliberately marked dev/DRAFT. This builder does not
-    establish semantic correctness, oracle independence, or runner compatibility.
+    Scenarios are DRAFT unless `status="FROZEN"`, which requires a `review_status` naming
+    the completed oracle reviews. Freezing records a decision; it does not by itself
+    establish semantic correctness or runner compatibility.
     """
+    if status not in {"DRAFT", "FROZEN"}:
+        raise ValueError("status must be DRAFT or FROZEN")
+    if not isinstance(review_status, str) or not review_status.strip():
+        raise ValueError("review_status must be a non-empty string")
+    if status == "FROZEN" and review_status == "UNREVIEWED":
+        raise ValueError("a FROZEN set needs reviewed oracles")
     _validate_cases(cases)
     root = Path(root).resolve()
     if not root.is_dir():
@@ -173,7 +189,7 @@ def build_set(cases, *, root, fixture_rel_dir, manifest_rel_path, set_id="u2-u3-
                     "family_id": family,
                     "expected_decision": case["expected_decision"],
                     **case["oracle"],
-                    "review_status": "UNREVIEWED",
+                    "review_status": review_status,
                 }
                 if case.get("blocked_by"):
                     oracle_document["execution_blocked_by"] = case["blocked_by"]
@@ -190,7 +206,11 @@ def build_set(cases, *, root, fixture_rel_dir, manifest_rel_path, set_id="u2-u3-
                     path = root.joinpath(*relative.parts)
                     _write_new(path, content)
                     written.append(path)
-                notes = "Synthetic draft; not independently reviewed or runner-validated."
+                notes = (
+                    f"Synthetic; frozen after oracle review ({review_status})."
+                    if status == "FROZEN"
+                    else "Synthetic draft; not independently reviewed or runner-validated."
+                )
                 if case.get("blocked_by"):
                     notes = f"BLOCKED: {case['blocked_by']}. " + notes
                 scenarios.append(
@@ -207,7 +227,7 @@ def build_set(cases, *, root, fixture_rel_dir, manifest_rel_path, set_id="u2-u3-
                         "setup_fixture_sha256": hashlib.sha256(setup_bytes).hexdigest(),
                         "expected_decision": case["expected_decision"],
                         "risk": case["risk"],
-                        "status": "DRAFT",
+                        "status": status,
                         "notes": notes,
                     }
                 )
@@ -239,10 +259,13 @@ def main():
             fixture_rel_dir=args.fixture_rel_dir,
             manifest_rel_path=args.manifest_rel_path,
             set_id=catalog.get("set_id", "u2-u3-draft-v1"),
+            status=catalog.get("status", "DRAFT"),
+            review_status=catalog.get("review_status", "UNREVIEWED"),
         )
     except (KeyError, OSError, ValueError) as exc:
         parser.exit(2, f"Cannot build draft scenario set: {exc}\n")
-    print(f"Wrote {len(manifest['scenarios'])} DRAFT scenarios in {manifest['set_id']}")
+    status = manifest["scenarios"][0]["status"]
+    print(f"Wrote {len(manifest['scenarios'])} {status} scenarios in {manifest['set_id']}")
 
 
 if __name__ == "__main__":
