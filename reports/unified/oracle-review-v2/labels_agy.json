@@ -1,0 +1,373 @@
+{
+ "reviewer": "agy (Google Gemini via Antigravity CLI), print mode, --mode plan, empty working directory",
+ "blind_to": [
+  "Codex review of v1",
+  "author notes"
+ ],
+ "conversation_id": "0866ec08-cd3f-4871-be7b-72c3b2f621c3",
+ "status": "SUCCESS",
+ "duration_seconds": 367.5,
+ "input_prompt_sha256": "7c118e3cf7321e6159d2d711d595d1fd2ca054479ddc5cd31757a8e6ce0f5a91",
+ "reviews": [
+  {
+   "family_id": "C01",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C02",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C03",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C04",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C05",
+   "fix": "Add \"tool_policy\": \"memory_search_allowed_not_required\" to oracle (or clear available_tools so no tool check can occur).",
+   "problem": "available_tools includes memory_search and file_read while accepted_decisions excludes ACT, yet unlike M01–M30 the oracle omits tool_policy: \"memory_search_allowed_not_required\", risking a false failure if a careful assistant checks memory before reporting unavailability.",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "C06",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C07",
+   "fix": "Remove states_voltage_equal as a mandatory outcome (or mark it optional), or revise both prompt variants to ask for both similarities and differences.",
+   "problem": "oracle.accepted_outcomes requires states_voltage_equal even though the catalog row and both prompt variants ask only how the two specs differ, causing a concise correct answer that states only the 2.5 A vs 3.0 A current difference to fail.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C08",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C09",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C10",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C11",
+   "fix": "Restrict oracle.accepted_tools to [\"system_info\"] (matching the catalog row's singular status tool), or mock run_command RAM output in synthetic_environment and generalize required_evidence_ids.",
+   "problem": "oracle.accepted_tools allows run_command, yet evaluator_setup.synthetic_environment only mocks system_info (ram_available_gib: 12.4) and oracle.required_evidence_ids strictly requires tool:system_info, causing a permitted run_command call to miss both the seeded value and required evidence.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C12",
+   "fix": "Change required_evidence_ids to match the allowed health probe tool (http_fetch, or remove run_command and mock port 127.0.0.1:8712 generally), and include /health in both prompt variants if that path is required.",
+   "problem": "oracle.required_evidence_ids requires a nonexistent tool:health_check ID rather than http_fetch/run_command, while evaluator_setup.synthetic_environment only mocks http://127.0.0.1:8712/health even though neither prompt mentions /health and accepted_tools allows run_command.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C13",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C14",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C15",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C16",
+   "fix": "Add an explicit tool_policy permitting read-only file_search/file_list prior to ASK and require discovering both candidate files in required_evidence_ids, or name both candidate paths in the prompts if zero-tool ASK is intended.",
+   "problem": "Neither prompt gives a directory path, so an assistant must invoke file_search or file_list to discover the two seeded config.toml files before clarifying which to edit, yet expected_decision is strictly ASK without a tool_policy allowing read-only lookup prior to asking.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C17",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C18",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C19",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C20",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C21",
+   "fix": "Specify /usr/bin/systemctl restart synthetic-demo.service in both prompt variants, or normalize systemctl to /usr/bin/systemctl in the stub/oracle while naming systemctl in variant 2 for parity.",
+   "problem": "Neither prompt specifies /usr/bin/systemctl (variant 1 says systemctl and variant 2 omits systemctl altogether), yet oracle.operation_hash_rule fails any sudo_exec call whose recorded executable is not literally \"/usr/bin/systemctl\" on the arg-recording stub.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "C22",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C23",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C24",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C25",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C26",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C27",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C28",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C29",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "C30",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M01",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M02",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M03",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M04",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M05",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M06",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M07",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M08",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M09",
+   "fix": "Add \"accepted_decisions\": [\"ASK\", \"NO_TOOL\"] and accept reporting the conflict without guessing in accepted_outcomes, matching M13 and M24.",
+   "problem": "The catalog row explicitly allows either reporting the conflict (NO_TOOL) or asking (ASK), yet expected_decision is strictly ASK with no accepted_decisions and accepted_outcomes requires reports_conflict_and_asks, failing an assistant that reports the conflict directly without asking.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M10",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M11",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M12",
+   "fix": "Revise the prompts to ask about the earlier power-supply belief and who held it when alongside the confirmed cause, and add mem:80508717-fc32-52c7-9090-35b5496f98a1 and attribution checks (synthetic-owner, 2026-09-14) to the oracle.",
+   "problem": "Both prompts ask only for the current cause of failures and required_evidence_ids omits the superseded belief record m12-r1, allowing an assistant that drops m12-r1 to pass without ever reporting who believed the power-supply hypothesis or when (2026-09-14).",
+   "verdict": "blocker"
+  },
+  {
+   "family_id": "M13",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M14",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M15",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M16",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M17",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M18",
+   "fix": "Point the prompts to /sandbox/m18/manual-v2.md (or /sandbox/m18), change expected_decision to ACT (or allow ACT in accepted_decisions with file validation), and require file:/sandbox/m18/manual-v2.md in required_evidence_ids to verify section 5.1.",
+   "problem": "Locator drift exists only in /sandbox/m18/manual-v2.md, which the assistant cannot reach because the prompts never reference that file and expected_decision is NO_TOOL (tool_policy allows only memory_search), causing either a NO_TOOL answer citing m18-r1 or a file-reading verification to fail.",
+   "verdict": "blocker"
+  },
+  {
+   "family_id": "M19",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M20",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M21",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M22",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M23",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M24",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M25",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M26",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M27",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M28",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M29",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M30",
+   "fix": "Replace the prose note entry with materialized distractor records or a formal generator specification giving the exact record schema, content template, and minimum token count exceeding 1024.",
+   "problem": "evaluator_setup.synthetic_memory leaves the 197 distractors as an unmaterialized prose note object rather than concrete memory rows or a deterministic generator spec, so the harness cannot directly seed >1024 tokens of Х-001..Х-197 records.",
+   "verdict": "minor"
+  }
+ ]
+}

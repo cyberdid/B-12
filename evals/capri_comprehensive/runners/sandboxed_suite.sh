@@ -81,6 +81,17 @@ esac
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do
   [ -d "$path" ] || { echo "missing $path" >&2; exit 1; }
 done
+# Entry point: the comprehensive suite (default) or one unified U2/U3 scenario. The latter
+# gets fresh empty tmpfs mounts at /sandbox and /actors for its synthetic files.
+ENTRY=(-m evals.capri_comprehensive.runners.run_networkless_runtime_suite)
+case "${B12_EVAL_ENTRY:-suite}" in
+  suite) ;;
+  unified-u2u3)
+    ENTRY=(-m evals.unified.run_u2_u3)
+    EXTRA+=(--tmpfs /sandbox --tmpfs /actors)
+    ;;
+  *) echo "unsupported B12_EVAL_ENTRY: ${B12_EVAL_ENTRY}" >&2; exit 2 ;;
+esac
 bwrap \
   --ro-bind / / \
   --dev /dev --proc /proc \
@@ -103,4 +114,4 @@ bwrap \
   --unsetenv B12_STATE_DIR --unsetenv B12_MODEL --unsetenv B12_MODEL_PROFILE \
   --unsetenv B12_TOKENIZER_DIR \
   --chdir "$REPO" \
-  "$VENV/bin/python" -m evals.capri_comprehensive.runners.run_networkless_runtime_suite "$@"
+  "$VENV/bin/python" "${ENTRY[@]}" "$@"

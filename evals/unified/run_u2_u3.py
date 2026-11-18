@@ -1,0 +1,177 @@
+"""Run one U2/U3 draft scenario through the real B-12 agent turn and record raw output.
+
+The runner never reads the oracle: scoring is a separate, blind step. It seeds a fresh
+runtime with `setup_adapter.build_runtime`, opens it with the evaluation model settings,
+issues the speaking actor a grant exactly as `RuntimeTurnExecutor` does, runs one turn
+with the model-visible `user_prompt`, and writes a JSON record with the reply, every tool
+call (name, arguments, status), policy decisions, evidence translated back to declared
+fixture ids, latency and the adapter report.
+
+Real model runs belong inside the bubblewrap worker (`run_u2_u3_sandboxed.sh`), where
+/sandbox and /actors are fresh tmpfs mounts. BLOCKED scenarios are recorded, not run.
+"""
+
+import asyncio
+import json
+from pathlib import Path
+
+from evals.unified.setup_adapter import build_runtime
+
+TURN_TIMEOUT_S = 600.0
+
+
+def _load(root, relative):
+    return json.loads((Path(root) / relative).read_text(encoding="utf-8"))
+
+
+def _grant(runtime, actor, session):
+    from b12.auth import GUEST_CAPABILITIES, owner_capabilities
+
+    task = runtime.control.create_task(session)
+    if actor.owner:
+        capabilities = owner_capabilities(runtime.settings)
+        full = runtime.settings.host_access == "full"
+    else:
+        capabilities, full = tuple(sorted(GUEST_CAPABILITIES)), False
+    grant = runtime.control.issue_grant(
+        actor.id,
+        session,
+        capabilities,
+        task_id=task,
+        ttl_s=TURN_TIMEOUT_S + 3600,
+        full_execution=full,
+    )
+    return grant, task
+
+
+def _calls(result):
+    started = {
+        e.data["call_id"]: {"name": e.data.get("name"), "arguments": e.data.get("arguments")}
+        for e in result.events
+        if e.type == "tool_started" and e.data.get("call_id")
+    }
+    calls = []
+    for r in result.tool_results:
+        call = started.pop(r.call_id, {"name": r.name, "arguments": None})
+        calls.append({**call, "status": r.status, "error_code": r.error_code})
+    for e in result.events:
+        if e.type == "approval_pending" and e.data.get("call_id") in started:
+            call = started.pop(e.data["call_id"])
+            calls.append({**call, "status": "approval_pending", "error_code": None})
+    calls.extend({**call, "status": "no_result", "error_code": None} for call in started.values())
+    return calls
+
+
+def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_root=False):
+    """Run one manifest row; return the raw record (no scoring)."""
+    record = {
+        "scenario_id": row["scenario_id"],
+        "family_id": row["family_id"],
+        "track": row["track"],
+        "input_fixture_sha256": row["input_fixture_sha256"],
+        "setup_fixture_sha256": row.get("setup_fixture_sha256"),
+    }
+    if row.get("notes", "").startswith("BLOCKED:"):
+        return {**record, "status": "BLOCKED", "reason": row["notes"]}
+    prompt = _load(root, row["input_fixture"])["user_prompt"]
+    setup = _load(root, row["setup_fixture"])["harness_setup"]
+    work_dir = Path(work_dir)
+    report = build_runtime(
+        setup,
+        work_dir / "state",
+        settings,
+        files_root=files_root,
+        existing_files_root=existing_files_root,
+    )
+    from b12.runtime import open_runtime
+
+    runtime = open_runtime(settings.model_copy(update={"state_dir": work_dir / "state"}))
+    loop = asyncio.new_event_loop()
+    try:
+        speaker = report["speaking_actor"]
+        actor = runtime.control.resolve_actor(report["actors"][speaker])
+        session = report["sessions"][speaker]
+        grant, task = _grant(runtime, actor, session)
+        result = loop.run_until_complete(
+            runtime.agent.turn(session, grant, prompt, task_id=task, timeout_s=TURN_TIMEOUT_S)
+        )
+    finally:
+        runtime.close()
+        loop.close()
+    real_to_declared = {real: declared for declared, real in report["memory_ids"].items()}
+    metrics = list(result.model_metrics)
+    ttft = next((m.get("ttft_s") for m in metrics if m.get("ttft_s")), None)
+    return {
+        **record,
+        "status": "EXECUTED",
+        "model": settings.model,
+        "runtime_state": result.state,
+        "error_code": result.error_code,
+        "reply": result.content,
+        "tool_calls": _calls(result),
+        "policy_decisions": [e.data for e in result.events if e.type == "policy_decision"],
+        "evidence_ids": [real_to_declared.get(e, f"runtime:{e}") for e in result.evidence_ids],
+        "pending_operations": list(result.pending_operations),
+        "ttft_ms": round(ttft * 1000, 2) if ttft is not None else None,
+        "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
+        "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
+        "seed_report": {k: report[k] for k in ("dropped_fields", "applied_relations")},
+        "tool_policy": {"declared_available_tools": setup.get("available_tools"), "applied": False},
+    }
+
+
+def settings_for_setup(template, setup, state_dir):
+    """Evaluation settings for one scenario: quiet hours off, sudo per the setup."""
+    return template.model_copy(
+        update={
+            "state_dir": Path(state_dir),
+            "quiet_start": "00:00",
+            "quiet_end": "00:00",
+            "sudo_access": "approval" if setup.get("sudo_access") == "approval" else "off",
+        }
+    )
+
+
+def main(argv=None):
+    import argparse
+    import os
+    import sys
+
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("manifest", type=Path)
+    parser.add_argument("scenario_id")
+    parser.add_argument("out_dir", type=Path)
+    parser.add_argument(
+        "--model-alias", choices=("pinned_primary", "any_swappable"), default="pinned_primary"
+    )
+    parser.add_argument("--variant", default="")
+    args = parser.parse_args(argv)
+    if os.environ.get("B12_EVAL_SANDBOX") != "1":
+        parser.exit(
+            2,
+            "run_u2_u3 seeds files at /sandbox and gives the model host tools; "
+            "run it only through run_u2_u3_sandboxed.sh\n",
+        )
+    from evals.capri_comprehensive.runners.runtime_executor import model_templates
+
+    root = Path.cwd()
+    rows = json.loads(args.manifest.read_text(encoding="utf-8"))["scenarios"]
+    row = next((r for r in rows if r["scenario_id"] == args.scenario_id), None)
+    if row is None:
+        parser.exit(2, f"unknown scenario {args.scenario_id}\n")
+    work = Path("/tmp/u2u3-work")
+    template = model_templates(work / "template", args.variant)[args.model_alias]
+    setup = _load(root, row["setup_fixture"])["harness_setup"] if row.get("setup_fixture") else {}
+    settings = settings_for_setup(template, setup, work / "state")
+    record = run_scenario(row, root, settings, work, files_root=Path("/"), existing_files_root=True)
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    out = args.out_dir / f"{args.scenario_id}.json"
+    fd = os.open(out, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        json.dump(record, handle, ensure_ascii=False, indent=1)
+        handle.write("\n")
+    print(f"{args.scenario_id}: {record['status']}", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

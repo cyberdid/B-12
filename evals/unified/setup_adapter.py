@@ -51,7 +51,7 @@ def _private_dirs(root, parts):
     return current
 
 
-def materialize_files(setup, root):
+def materialize_files(setup, root, *, existing_root=False):
     """Create a fresh directory tree for `synthetic_files`/`synthetic_dirs`.
 
     Virtual paths such as /sandbox/c22/in/m1.txt map to <root>/sandbox/c22/in/m1.txt.
@@ -61,7 +61,14 @@ def materialize_files(setup, root):
     dirs = setup.get("synthetic_dirs", []) or []
     planned = {path: _virtual_path(path) for path in [*files, *dirs]}
     root = Path(root)
-    root.mkdir(mode=0o700, parents=True, exist_ok=False)
+    if existing_root:
+        # Inside the bubblewrap worker the roots are fresh tmpfs mounts at /sandbox, /actors.
+        for name in ALLOWED_ROOTS:
+            mount = root / name
+            if mount.is_symlink() or (mount.exists() and any(mount.iterdir())):
+                raise FileExistsError(f"{mount} is not an empty synthetic root")
+    else:
+        root.mkdir(mode=0o700, parents=True, exist_ok=False)
     result = {}
     for virtual in dirs:
         result[virtual] = _private_dirs(root, planned[virtual])
@@ -152,7 +159,7 @@ def _seed_goals(runtime, setup, actors, sessions, report):
             )
 
 
-def build_runtime(setup, state_dir, settings, *, files_root=None):
+def build_runtime(setup, state_dir, settings, *, files_root=None, existing_files_root=False):
     """Open a fresh runtime at `state_dir`, seed actors, memory and goals, then close it.
 
     Returns a JSON-serializable report with real actor/session/memory/goal ids.
@@ -171,7 +178,8 @@ def build_runtime(setup, state_dir, settings, *, files_root=None):
         "speaking_actor": setup.get("speaking_actor", OWNER),
     }
     if files_root is not None:
-        report["files"] = {k: str(v) for k, v in materialize_files(setup, files_root).items()}
+        written = materialize_files(setup, files_root, existing_root=existing_files_root)
+        report["files"] = {k: str(v) for k, v in written.items()}
     state_dir.mkdir(mode=0o700, parents=True)
     runtime = open_runtime(
         settings.model_copy(
