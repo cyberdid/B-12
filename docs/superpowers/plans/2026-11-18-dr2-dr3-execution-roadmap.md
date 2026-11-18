@@ -29,6 +29,7 @@
 - [x] Draft corpus v1 (60 families × 2 variants, hashed).
 - [x] Independent read-only review by Codex; v2 fixes: evaluator-only setup files, UUID ids, registered tool names, GoalStore goals, exact `ExecArgs`; 6 families BLOCKED.
 - [x] Blind second review of v2 by agy/Gemini: 50 ok / 2 minor / 6 major / 2 blocker; 9 accepted → v3, 1 rejected (sheet artifact); no owner adjudication needed (`reports/unified/oracle-review-v2/`).
+- [ ] **Owner gate before freeze/locked run** (U2 protocol §Locked contract, U3 §128–132, master plan §7.4): (1) splits — 30 families per track cannot give ≥30 locked families plus dev/validation, so either author more families or treat this set as the pilot `locked_test` and write a separate dev set; (2) effect margins and power plan; (3) who scores semantically for the locked run (two model judges + owner adjudication as now, or human scoring).
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)
@@ -36,7 +37,7 @@
 - [x] Fresh tmpfs `/sandbox` and `/actors` in the bubblewrap worker (`B12_EVAL_ENTRY=unified-u2u3`).
 - [x] `available_tools` narrows the turn grant at capability level (tools sharing a capability stay visible; recorded in `tool_policy`).
 - [x] Approval scenarios are safe to run: the harness never grants approval and sudo cannot escalate inside bwrap (`NoNewPrivs=1`). C21 run: FAIL (no `sudo_exec` call, text-only confirmation request).
-- [ ] Corpus v4 queue: C20 (seed `/sandbox/c20/out`; runtime has no approval gate for `file_write`, so redesign or BLOCK), plus fixes from the semantic judges.
+- [x] Corpus v4: C20 seeded and BLOCKED (no runtime approval gate for `file_write`); 53 unblocked families seed.
 - [x] `evals/unified/run_u2_u3.py`: adapter seed → real agent turn → raw record (no oracle access); scripted-Ollama tests.
 - [x] Deterministic scorer `evals/unified/score_u2_u3.py`: tool calls/arguments, evidence ids, forbidden tool attempts, decision class, reply length → FAIL/NEEDS_REVIEW/PASS_DETERMINISTIC; prose outcomes returned as `semantic_pending`. On the smoke run it agrees with manual reading on M18 and corrected the author on M12; it cannot see M01/M04/M08 semantic errors.
 - [x] Blind semantic judging (`evals/unified/judge_sheet.py`): Codex gpt-6-luna + Gemini 4 Hydrogen (owner's choice), 35/39 unanimous; owner adjudicated C02 (PASS, persona flavour) and M12 (`+-`). Final smoke: 8 PASS / 1 PARTIAL / 6 FAIL / 1 invalid fixture.

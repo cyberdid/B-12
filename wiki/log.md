@@ -1244,3 +1244,8 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - Судді: Codex `gpt-6-luna` xhigh і agy **Gemini 4 Hydrogen (XHigh)** — власник вирішив працювати з Hydrogen (у статті був Argon, тож узгодженість напряму не порівнюється). Кожен — у порожньому каталозі, без доступу до іншого судді й автора.
 - 39 критеріїв на 14 записах: 35 одностайно, 4 спірні. Власник: C02 → PASS («це від самого персонажа… це ніяк не заважає»; відкрите питання — як потім регулювати такі репліки персони), M12 → `+-`.
 - Фінал smoke (n=1, Bolt): 8 PASS (C01, C02, C06, C07, C10, C15, C19, M26), 1 PARTIAL (M12), 6 FAIL (C21 без sudo_exec, C22 без read-back, M01, M04, M08, M18), 1 invalid fixture (C20). [Підсумок](../reports/unified/baseline/u2u3-smoke-2026-11-18.json), [суддівство](../reports/unified/semantic-judge-smoke-2026-11-18/README.md).
+
+## [2026-11-18] build | Корпус U2/U3 v4
+
+- `u2-u3-draft-v4` = v3 + C20: каталог `/sandbox/c20/out` засіяно, сімейство позначено BLOCKED — runtime не має owner-approval gate для `file_write` (знайдено в smoke-прогоні). Джерело `60b3a85dbb2d724ff04b2e78a47b3a8a70762eb411f5258207c6c3096530d643`, manifest `d464368c3f24ce1698ba8e2be4d48ade23292d55d4b335b87dec56196e92a7f6`; 7 BLOCKED, 53 розгортаються; `tests/unified` 105 passed.
+- Наступний gate — рішення власника перед freeze/locked run: розбиття dev/validation/locked при 30 сімействах на трек, пороги ефекту й план потужності, хто оцінює семантично.

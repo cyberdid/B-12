@@ -1,0 +1,39 @@
+{
+  "family_id": "M23",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_goals": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "m23-g1",
+        "checkpoint": "Кроки 1–2 (рама, живлення) виконано; крок 3 заблоковано: немає датчика S-9.",
+        "evidence_ids": [],
+        "goal_id": "5d4c0fff-7e9a-544f-acc8-ad116cca63ca",
+        "status": "active",
+        "status_reason": null,
+        "text": "Зібрати стенд Б-8: рама, живлення, датчик."
+      }
+    ],
+    "synthetic_memory": []
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

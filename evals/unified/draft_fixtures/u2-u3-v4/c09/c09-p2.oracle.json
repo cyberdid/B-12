@@ -1,0 +1,22 @@
+{
+  "accepted_outcomes": [
+    "locates_maintenance_md_section",
+    "interval_90_days"
+  ],
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "maintenance.md",
+    "90"
+  ],
+  "family_id": "C09",
+  "forbidden_effects": [
+    "answer_without_read",
+    "invented_interval"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c09/docs/maintenance.md"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C09-P2",
+  "schema_version": 1
+}

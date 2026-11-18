@@ -2,7 +2,7 @@
 type: index
 updated: 2026-11-18
 status: active
-sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md, wiki/sources/capri-dr2-dr3-master-plan-2026-11-15.md, raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md]
+sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md, wiki/sources/capri-dr2-dr3-master-plan-2026-11-15.md, raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md, wiki/sources/self-improvement-memory-2026-11-18.md, wiki/topics/engineering-improvement-memory.md]
 tags: [navigation]
 ---
 # Індекс знань Capri / B-12 runtime
@@ -23,7 +23,7 @@ tags: [navigation]
 | [U2: cognitive control і brevity protocol](../reports/unified/U2_BREVITY_REPRODUCTION.md) | Історичний A/B, точні arms A0/A1/E1/E2, окремі A–E контроли, метрики та блокери нового запуску |
 | [U3: memory baseline protocol](../reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md) | Synthetic paired arms, evidence retrieval/application, temporal conflicts, forgetting і межі поточного snapshot |
 | [Каталог U2/U3 сценаріїв](../reports/unified/U2_U3_SCENARIO_CATALOG.md) | 60 сімейств для майбутніх fixtures; це ще не runnable/locked корпус |
-| [Чернетковий корпус U2/U3 v3](../evals/unified/scenario_sets/u2-u3-draft-v3.json) | 120 hashed DRAFT сценаріїв зі [синтетичного джерела v3](../evals/unified/draft_sources/u2_u3_draft_cases_v3.json); окремий evaluator-only setup; 6 BLOCKED; оракули переглянуті Codex (v1) і наосліп Gemini ([review](../reports/unified/oracle-review-v2/README.md)). [v2](../evals/unified/scenario_sets/u2-u3-draft-v2.json), [v1](../evals/unified/scenario_sets/u2-u3-draft-v1.json) superseded |
+| [Чернетковий корпус U2/U3 v4](../evals/unified/scenario_sets/u2-u3-draft-v4.json) | 120 hashed DRAFT сценаріїв зі [синтетичного джерела v4](../evals/unified/draft_sources/u2_u3_draft_cases_v4.json); окремий evaluator-only setup; 7 BLOCKED; [v3](../evals/unified/scenario_sets/u2-u3-draft-v3.json) superseded; оракули переглянуті Codex (v1) і наосліп Gemini ([review](../reports/unified/oracle-review-v2/README.md)). [v2](../evals/unified/scenario_sets/u2-u3-draft-v2.json), [v1](../evals/unified/scenario_sets/u2-u3-draft-v1.json) superseded |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
 | [Комплексна оцінка Capri, 12.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії через рантайм на злитому `main`: 48 пройдено, 32 провалено, 12 заблоковано обладнанням (60,0%); gemma — 43/80; класифікація «гібридна модель-центрична система», не повний компаньйон |
@@ -60,6 +60,7 @@ tags: [navigation]
 | [Agent loop і глобальне забуття](topics/agent-loop.md) | Model→tools→results, events, sessions/provenance, PurgeCoordinator, реальний Bolt |
 | [Експлуатація: snapshots, soak, ріст](topics/operations.md) | Backup/restore, deletion replay, сервіс, знайдені деградації, long-horizon драйвер |
 | [Eval: корпус і результати](topics/evals.md) | 109 сценаріїв, runner, результати Bolt і знайдені дефекти |
+| [Пам'ять про покращення агента](topics/engineering-improvement-memory.md) | SIM/CRSI: зовнішня пам'ять оптимізатора harness, її зв'язок і відмінність від user memory та model continuity |
 | [Моделі й benchmark](topics/models.md) | Кандидати, оцінювання, ризик TTFT |
 | [Reachy і Jetson](topics/hardware.md) | Варіанти обладнання, transport і deployment |
 
@@ -71,6 +72,7 @@ tags: [navigation]
 | [Lifecycle hooks для coding agents](sources/agent-hooks-2026-11-08.md) | Офіційні hooks Claude Code, Codex та Antigravity; schema boundaries і межі інтеграції |
 | [Master brief](sources/master-brief.md) | Походження, контрольна сума, охоплення документа |
 | [Unified master plan DR2/DR3](sources/capri-dr2-dr3-master-plan-2026-11-15.md) | Власницький план U0–U10; розмежування proposed roadmap і перевірених артефактів |
+| [Self-Improvement Memory / CRSI (2026)](sources/self-improvement-memory-2026-11-18.md) | Аудит arXiv:2611.18856v1: метод, результати, межі та відповідність до U2/U3/U8 |
 | [LLM Wiki](sources/llm-wiki.md) | Метод ведення й адаптація до проєкту |
 | [Перевірка зовнішніх джерел](sources/external-checks.md) | Що прочитано незалежно, що залишилось неперевіреним |
 | [Аудит локальної системи](sources/system-audit-2026-10-24.md) | Сирі докази hardware/tools та межі перевірки |

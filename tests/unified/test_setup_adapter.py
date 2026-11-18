@@ -10,8 +10,8 @@ from b12.runtime import open_runtime
 
 ROOT = Path(__file__).resolve().parents[2]
 PATH = ROOT / "evals/unified/setup_adapter.py"
-FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v3"
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v3.json"
+FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v4"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
 
 
 @pytest.fixture
@@ -143,7 +143,7 @@ def test_every_unblocked_current_setup_seeds_without_error(adapter, tmp_path, pr
             item["memory_id"] for item in setup["harness_setup"].get("synthetic_memory", [])
         }
         seeded += 1
-    assert seeded == 54
+    assert seeded == 53
 
 
 def test_recorded_at_becomes_created_at_and_event_time_is_dropped(

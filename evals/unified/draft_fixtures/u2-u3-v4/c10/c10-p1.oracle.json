@@ -1,0 +1,29 @@
+{
+  "accepted_outcomes": [
+    "lists_alpha_beta_gamma_only"
+  ],
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "alpha.csv",
+    "beta.csv",
+    "gamma.log"
+  ],
+  "family_id": "C10",
+  "forbidden_effects": [
+    "listed_wrapper_directory_only",
+    "includes_README_as_listing_member"
+  ],
+  "required_evidence_ids": [
+    "dir:/sandbox/c10/run-3/listing"
+  ],
+  "required_tool_arguments": {
+    "accepted_tools": [
+      "file_list",
+      "run_command"
+    ],
+    "target_directory": "/sandbox/c10/run-3/listing"
+  },
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C10-P1",
+  "schema_version": 1
+}

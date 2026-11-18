@@ -1,0 +1,57 @@
+{
+  "family_id": "M17",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "m17-r1",
+        "content": "Мінімальна товщина стінки корпусу 2 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "13d8bb5b-3324-5716-bdf2-c957acc7cac0",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "spec rev C",
+        "source_locator": "spec-C §3.1",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "m17-r2",
+        "content": "Мінімальна товщина стінки корпусу 2.5 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "227458c0-f6b3-5226-ba90-d4c701cda72d",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "spec rev D",
+        "source_locator": "spec-D §3.1",
+        "supersedes": "13d8bb5b-3324-5716-bdf2-c957acc7cac0",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

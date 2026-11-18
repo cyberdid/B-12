@@ -7,7 +7,7 @@ from pathlib import Path
 from evals.unified.run_u2_u3 import run_scenario
 
 ROOT = Path(__file__).resolve().parents[2]
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v3.json"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
 
 
 def row(scenario_id):

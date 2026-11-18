@@ -7,11 +7,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCES = ROOT / "evals/unified/draft_sources"
-SOURCE = SOURCES / "u2_u3_draft_cases_v3.json"
-MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v3.json"
-FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v3"
-SUPERSEDED = [ROOT / f"evals/unified/scenario_sets/u2-u3-draft-v{n}.json" for n in (1, 2)]
-BLOCKED = {"C24", "C25", "C26", "C30", "M28", "M29"}
+SOURCE = SOURCES / "u2_u3_draft_cases_v4.json"
+MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
+FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v4"
+SUPERSEDED = [ROOT / f"evals/unified/scenario_sets/u2-u3-draft-v{n}.json" for n in (1, 2, 3)]
+BLOCKED = {"C20", "C24", "C25", "C26", "C30", "M28", "M29"}
 REGISTERED_TOOLS = {
     "file_read",
     "file_list",
@@ -85,8 +85,8 @@ def test_rebuilding_from_source_reproduces_committed_hashes(tmp_path):
     rebuilt = builder.build_set(
         catalog["cases"],
         root=tmp_path,
-        fixture_rel_dir="evals/unified/draft_fixtures/u2-u3-v3",
-        manifest_rel_path="evals/unified/scenario_sets/u2-u3-draft-v3.json",
+        fixture_rel_dir="evals/unified/draft_fixtures/u2-u3-v4",
+        manifest_rel_path="evals/unified/scenario_sets/u2-u3-draft-v4.json",
         set_id=catalog["set_id"],
     )
     assert rebuilt == read(MANIFEST)
@@ -94,7 +94,7 @@ def test_rebuilding_from_source_reproduces_committed_hashes(tmp_path):
 
 def test_authoring_script_reproduces_source(tmp_path):
     out = tmp_path / "cases.json"
-    module = SOURCES / "author_u2_u3_v3.py"
+    module = SOURCES / "author_u2_u3_v4.py"
     import subprocess
     import sys
 
@@ -149,7 +149,16 @@ def test_source_uses_only_synthetic_contact_domains():
             assert ".invalid" in token, token
 
 
+def changed_families(old_name, new_name):
+    old = {c["family_id"]: c for c in read(SOURCES / old_name)["cases"]}
+    new = {c["family_id"]: c for c in read(SOURCES / new_name)["cases"]}
+    return {family for family in new if new[family] != old[family]}
+
+
+def test_v4_changes_only_c20_after_the_smoke_run():
+    assert changed_families("u2_u3_draft_cases_v3.json", "u2_u3_draft_cases_v4.json") == {"C20"}
+
+
 def test_v3_changes_exactly_the_families_accepted_from_the_gemini_review():
-    old = {c["family_id"]: c for c in read(SOURCES / "u2_u3_draft_cases_v2.json")["cases"]}
-    changed = {family for family, case in cases().items() if case != old[family]}
+    changed = changed_families("u2_u3_draft_cases_v2.json", "u2_u3_draft_cases_v3.json")
     assert changed == {"C05", "C07", "C11", "C12", "C16", "C21", "M09", "M12", "M18"}
