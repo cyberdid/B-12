@@ -13,9 +13,12 @@ is answered by one non-interactive CLI call:
   round INVALID and the bridge returns an error instead of the model's answer.
 
 The model sees Capri's own context and tool schemas and must return the next assistant message
-as {content, tool_calls[{name, arguments_json}]}. The CLIs report no token counts, so the
-bridge reports none; every response names the backend. Latency includes CLI start-up and is
-not comparable to local models.
+as {content, tool_calls[{name, arguments_json}]}. The backend counts tokens with its own
+tokenizer and also sees its CLI's own system prompt, so its prompt count cannot be compared
+with the runtime's admitted budget: the bridge reports `prompt_eval_count: 0` (the runtime
+then only logs a mismatch) and puts the backend's real usage in `bridge_usage` and the bridge
+log. Context admission is therefore not enforced for bridged models (their windows are far
+larger than 8192). Latency includes CLI start-up and is not comparable to local models.
 """
 
 import argparse
@@ -50,11 +53,14 @@ SCHEMA = {
 }
 ALLOWED_CODEX_ITEMS = {"agent_message", "error", "reasoning"}
 PREAMBLE = (
-    "You are the language model inside an assistant runtime called B-12/Capri. The runtime, "
-    "not you, executes tools: to use a tool, put it in tool_calls with its arguments as a JSON "
-    "string; the runtime will run it and give you the result in a later round. Never claim a "
-    "tool ran unless its result appears in the conversation below. Do not run any commands or "
-    "use any tools of your own environment. Return only the next assistant message."
+    "You are the language model inside an assistant runtime called B-12/Capri. You have NO "
+    "native tools in this session: any direct tool call fails. The runtime, not you, executes "
+    "the tools listed below. To use one, put it in the tool_calls array of your JSON answer "
+    'with its arguments as a JSON string (for example {"name": "file_read", '
+    '"arguments_json": "{\\"path\\": \\"/sandbox/a.txt\\"}"}); the runtime '
+    "runs it and returns the result as a tool message in the next round. Never claim a tool ran "
+    "or failed unless its result appears in the conversation below. Do not run commands of your "
+    "own environment. Return only the next assistant message."
 )
 
 
@@ -167,7 +173,15 @@ async def ask_backend(backend, model, body, *, timeout=200, codex_config=None):
             result = json.loads(out)
             if result.get("is_error") or not isinstance(result.get("structured_output"), dict):
                 raise InvalidRound("claude returned no structured output")
-            return result["structured_output"]
+            usage = result.get("usage") or {}
+            prompt_tokens = sum(
+                int(usage.get(k) or 0)
+                for k in ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")
+            )
+            return result["structured_output"], (
+                prompt_tokens,
+                int(usage.get("output_tokens") or 0),
+            )
         if backend == "codex":
             (tmp / "schema.json").write_text(json.dumps(SCHEMA))
             prompt = f"SYSTEM MESSAGE OF THE RUNTIME:\n{system}\n\n{text}"
@@ -194,7 +208,18 @@ async def ask_backend(backend, model, body, *, timeout=200, codex_config=None):
                 timeout,
             )
             codex_events_ok(events)
-            return json.loads((tmp / "out.json").read_text(encoding="utf-8"))
+            prompt_tokens = completion_tokens = 0
+            for line in events.splitlines():
+                try:
+                    event = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if event.get("type") == "turn.completed":
+                    usage = event.get("usage") or {}
+                    prompt_tokens = int(usage.get("input_tokens") or 0)
+                    completion_tokens = int(usage.get("output_tokens") or 0)
+            structured = json.loads((tmp / "out.json").read_text(encoding="utf-8"))
+            return structured, (prompt_tokens, completion_tokens)
     raise ValueError(f"unknown backend {backend!r}")
 
 
@@ -210,7 +235,9 @@ def bridge_app(upstream, backend, model, *, timeout=200):
         body = await request.json()
         started = time.monotonic()
         try:
-            structured = await ask_backend(backend, model, body, timeout=timeout)
+            structured, (prompt_tokens, completion_tokens) = await ask_backend(
+                backend, model, body, timeout=timeout
+            )
             message = to_ollama_message(structured)
         except (InvalidRound, json.JSONDecodeError, KeyError) as exc:
             log.append({"ok": False, "error": str(exc)[:300]})
@@ -221,6 +248,11 @@ def bridge_app(upstream, backend, model, *, timeout=200):
                 "ok": True,
                 "seconds": round(elapsed, 2),
                 "tool_calls": len(message.get("tool_calls", [])),
+                "offered_tools": sorted(
+                    (t.get("function") or {}).get("name", "?") for t in body.get("tools", [])
+                ),
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
             }
         )
         final = {
@@ -229,6 +261,12 @@ def bridge_app(upstream, backend, model, *, timeout=200):
             "done": True,
             "done_reason": "stop",
             "total_duration": int(elapsed * 1e9),
+            "prompt_eval_count": 0,
+            "eval_count": completion_tokens,
+            "bridge_usage": {
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+            },
             "bridge_backend": f"{backend}:{model}",
         }
         if body.get("stream", True) is False:
@@ -250,6 +288,12 @@ def bridge_app(upstream, backend, model, *, timeout=200):
             )
 
         return StreamingResponse(frames(), media_type="application/x-ndjson")
+
+    @app.post("/api/generate")
+    async def generate(request: Request):
+        # Only keep_alive=0 unloads reach here; never unload the shared local model, which a
+        # concurrent local run may be using.
+        return JSONResponse({"done": True, "done_reason": "unload"})
 
     @app.get("/bridge/log")
     async def bridge_log():
