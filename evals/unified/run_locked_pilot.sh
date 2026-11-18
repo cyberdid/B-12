@@ -3,11 +3,12 @@
 # worker per scenario, waiting whenever a foreign process uses the GPU (the owner games on
 # it). Raw records: <out>/rN/<scenario>.json; existing records are kept (resumable).
 #
-#   evals/unified/run_locked_pilot.sh <manifest> <out_dir> [repeats=3]
+#   evals/unified/run_locked_pilot.sh <manifest> <out_dir> [repeats=3] [arm=A0]
 set -uo pipefail
 MANIFEST="${1:?manifest}"
 OUT="${2:?out dir}"
 REPEATS="${3:-3}"
+ARM="${4:-A0}"
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO"
 mkdir -p "$OUT"
@@ -30,7 +31,7 @@ for r in $(seq 1 "$REPEATS"); do
     done
     start=$(date +%s)
     if B12_EVAL_ENTRY=unified-u2u3 timeout 900 \
-        evals/capri_comprehensive/runners/sandboxed_suite.sh "$MANIFEST" "$id" "$OUT/r$r" \
+        evals/capri_comprehensive/runners/sandboxed_suite.sh "$MANIFEST" "$id" "$OUT/r$r" --arm "$ARM" \
         >>"$LOG" 2>&1; then
       echo "$(date -Is) r$r $id ok $(( $(date +%s) - start ))s" >>"$LOG"
     else

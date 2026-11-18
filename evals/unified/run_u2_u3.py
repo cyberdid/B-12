@@ -12,6 +12,7 @@ Real model runs belong inside the bubblewrap worker (`run_u2_u3_sandboxed.sh`), 
 """
 
 import asyncio
+import hashlib
 import json
 from collections.abc import Mapping
 from pathlib import Path
@@ -19,6 +20,35 @@ from pathlib import Path
 from evals.unified.setup_adapter import build_runtime
 
 TURN_TIMEOUT_S = 600.0
+
+# U2 style arms (reports/unified/U2_BREVITY_REPRODUCTION.md), exact wording.
+A0_SENTENCE = "У побуті будь лаконічною; складні й технічні відповіді давай точно та повно."
+A1_SENTENCE = (
+    "У побуті будь лаконічною: на привітання, питання про тебе, втому чи емоції відповідай 1–3 "
+    "короткими реченнями (до ~300 символів), без списків і заголовків. Складні й технічні "
+    "відповіді, звіти та аналіз давай точно та повно."
+)
+E1_INSTRUCTION = (
+    "Це правило стосується лише фінального повідомлення користувачу після завершення роботи. "
+    "Воно не змінює вибір інструментів, аргументи, порядок перевірок, повноту аналізу, критерії "
+    "завершення або фактичний статус задачі. Для побутових відповідей пиши 1–3 короткі речення, "
+    "приблизно до 300 символів, без списків і заголовків. Складні технічні відповіді та звіти "
+    "подавай точно й повно."
+)
+ARMS = ("A0", "A1", "E1")
+
+
+def apply_arm(system_prompt, arm):
+    """Return the system prompt for a U2 style arm; A0 is the unchanged baseline."""
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm {arm!r}")
+    if system_prompt.count(A0_SENTENCE) != 1:
+        raise ValueError("baseline prompt must contain the A0 sentence exactly once")
+    if arm == "A1":
+        return system_prompt.replace(A0_SENTENCE, A1_SENTENCE)
+    if arm == "E1":
+        return f"{system_prompt.rstrip()} {E1_INSTRUCTION}"
+    return system_prompt
 
 
 def _plain(value):
@@ -91,7 +121,7 @@ def _calls(result):
     return calls
 
 
-def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_root=False):
+def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_root=False, arm="A0"):
     """Run one manifest row; return the raw record (no scoring)."""
     record = {
         "scenario_id": row["scenario_id"],
@@ -115,6 +145,8 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
     from b12.runtime import open_runtime
 
     runtime = open_runtime(settings.model_copy(update={"state_dir": work_dir / "state"}))
+    runtime.agent.system_prompt = apply_arm(runtime.agent.system_prompt, arm)
+    prompt_sha = hashlib.sha256(runtime.agent.system_prompt.encode()).hexdigest()
     loop = asyncio.new_event_loop()
     try:
         speaker = report["speaking_actor"]
@@ -134,6 +166,8 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
         {
             **record,
             "status": "EXECUTED",
+            "u2_arm": arm,
+            "system_prompt_sha256": prompt_sha,
             "model": settings.model,
             "runtime_state": result.state,
             "error_code": result.error_code,
@@ -176,6 +210,7 @@ def main(argv=None):
         "--model-alias", choices=("pinned_primary", "any_swappable"), default="pinned_primary"
     )
     parser.add_argument("--variant", default="")
+    parser.add_argument("--arm", choices=ARMS, default="A0", help="U2 style arm")
     args = parser.parse_args(argv)
     if os.environ.get("B12_EVAL_SANDBOX") != "1":
         parser.exit(
@@ -205,7 +240,13 @@ def main(argv=None):
     # host-side allowlist broker (same as run_networkless_runtime_suite).
     with SocketBridge(Path(socket_value), host="127.0.0.1", port=11434):
         record = run_scenario(
-            row, root, settings, work, files_root=Path("/"), existing_files_root=True
+            row,
+            root,
+            settings,
+            work,
+            files_root=Path("/"),
+            existing_files_root=True,
+            arm=args.arm,
         )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     out = args.out_dir / f"{args.scenario_id}.json"

@@ -106,3 +106,41 @@ async def test_declared_tools_narrow_the_grant_at_capability_level(scripted_olla
     offered = {t["function"]["name"] for t in state["requests"][0].get("tools", [])}
     assert "run_command" not in offered and "file_write" not in offered
     assert {"file_read", "memory_search"} <= offered
+
+
+def test_style_arms_change_only_the_declared_sentence():
+    import pytest
+
+    from evals.unified.run_u2_u3 import A0_SENTENCE, A1_SENTENCE, E1_INSTRUCTION, apply_arm
+
+    base = f"Персона. {A0_SENTENCE} Інше правило."
+    assert apply_arm(base, "A0") == base
+    assert apply_arm(base, "A1") == f"Персона. {A1_SENTENCE} Інше правило."
+    assert apply_arm(base, "E1") == f"{base} {E1_INSTRUCTION}"
+    with pytest.raises(ValueError):
+        apply_arm("no baseline sentence", "A1")
+    with pytest.raises(ValueError):
+        apply_arm(base, "E2")
+
+
+def test_real_runtime_prompt_contains_the_a0_sentence_once():
+    from b12.agent import SYSTEM_PROMPT
+    from evals.unified.run_u2_u3 import A0_SENTENCE
+
+    assert SYSTEM_PROMPT.count(A0_SENTENCE) == 1
+
+
+async def test_record_carries_the_arm_and_prompt_hash(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Привіт!"}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C01-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        arm="A1",
+    )
+    assert record["u2_arm"] == "A1"
+    assert "1–3" in state["requests"][0]["messages"][0]["content"]
