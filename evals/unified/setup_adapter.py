@@ -107,18 +107,38 @@ def _store_clock(stamp):
         memory_module._now = real_now
 
 
-def _seed_memory(runtime, setup, actors, report):
+TEMPORAL_FIELDS = ("event_time", "valid_from", "valid_to", "reliability", "source_locator")
+DOCUMENT_SOURCES = ("datasheet", "bom", "schematic", "log", "spec", "plan", "doc", "rules")
+
+
+def _temporal_seed(row):
+    """ADR-015 fields for a fixture row (schema v3); the origin is the owner or a document."""
+    values = {k: row[k] for k in TEMPORAL_FIELDS if row.get(k)}
+    if values:
+        source = str(row.get("source", "")).lower()
+        values["temporal_source"] = (
+            "document" if any(word in source for word in DOCUMENT_SOURCES) else "owner"
+        )
+    return values
+
+
+def _seed_memory(runtime, setup, actors, report, temporal=False):
     rows = setup.get("synthetic_memory", []) or []
     by_alias = {}
+    stored = STORED_MEMORY_FIELDS | (set(TEMPORAL_FIELDS) if temporal else set())
     for row in rows:
         actor = actors[row["actor"]]
         with _store_clock(row.get("recorded_at")):
             record = runtime.memory.remember(
-                row["content"], actor, kind=row["kind"], source=row["source"]
+                row["content"],
+                actor,
+                kind=row["kind"],
+                source=row["source"],
+                **(_temporal_seed(row) if temporal else {}),
             )
         report["memory_ids"][row["memory_id"]] = record.id
         by_alias[row["alias"]] = (row, record.id, actor)
-        dropped = sorted(k for k, v in row.items() if k not in STORED_MEMORY_FIELDS and v)
+        dropped = sorted(k for k, v in row.items() if k not in stored and v)
         if dropped:
             report["dropped_fields"][row["alias"]] = dropped
     declared_to_alias = {row["memory_id"]: row["alias"] for row in rows}
@@ -128,7 +148,9 @@ def _seed_memory(runtime, setup, actors, report):
             continue
         old_alias = declared_to_alias[old]
         _, old_id, actor = by_alias[old_alias]
-        if not runtime.memory.supersede(old_id, actor):
+        new_id = by_alias[row["alias"]][1]
+        replaced_by = new_id if temporal else None
+        if not runtime.memory.supersede(old_id, actor, replaced_by=replaced_by):
             raise ValueError(f"cannot supersede {old_alias}")
         report["applied_relations"].append({"supersedes": old_alias, "by": row["alias"]})
 
@@ -159,7 +181,9 @@ def _seed_goals(runtime, setup, actors, sessions, report):
             )
 
 
-def build_runtime(setup, state_dir, settings, *, files_root=None, existing_files_root=False):
+def build_runtime(
+    setup, state_dir, settings, *, files_root=None, existing_files_root=False, temporal=False
+):
     """Open a fresh runtime at `state_dir`, seed actors, memory and goals, then close it.
 
     Returns a JSON-serializable report with real actor/session/memory/goal ids.
@@ -198,7 +222,7 @@ def build_runtime(setup, state_dir, settings, *, files_root=None, existing_files
         }
         report["actors"] = {name: actor.id for name, actor in actors.items()}
         report["sessions"] = dict(sessions)
-        _seed_memory(runtime, setup, actors, report)
+        _seed_memory(runtime, setup, actors, report, temporal=temporal)
         _seed_goals(runtime, setup, actors, sessions, report)
     finally:
         runtime.close()

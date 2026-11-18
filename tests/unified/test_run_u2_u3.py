@@ -186,3 +186,24 @@ async def test_arm_d_makes_the_runtime_re_ask_after_a_claimed_read(scripted_olla
     from evals.unified.run_u2_u3 import BROAD_ACTION_CLAIM
 
     assert _ACTION_CLAIM is not BROAD_ACTION_CLAIM  # restored after the run
+
+
+async def test_memory_temporal_arm_seeds_metadata_and_pins_the_scenario_clock(
+    scripted_ollama, tmp_path
+):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "2 жовтня."}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("M04-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        memory_temporal=True,
+    )
+    assert record["memory_temporal"] is True
+    assert "event_time" not in record["seed_report"]["dropped_fields"].get("m04-r1", [])
+    request = json.dumps(state["requests"][0], ensure_ascii=False)
+    assert "подія 2026-10-02" in request
+    assert "Сьогодні: 2026-12-01." in request

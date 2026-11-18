@@ -16,6 +16,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 
 from evals.unified.setup_adapter import build_runtime
@@ -133,7 +134,17 @@ def _calls(result):
     return calls
 
 
-def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_root=False, arm="A0"):
+def run_scenario(
+    row,
+    root,
+    settings,
+    work_dir,
+    *,
+    files_root,
+    existing_files_root=False,
+    arm="A0",
+    memory_temporal=False,
+):
     """Run one manifest row; return the raw record (no scoring)."""
     record = {
         "scenario_id": row["scenario_id"],
@@ -153,11 +164,20 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
         settings,
         files_root=files_root,
         existing_files_root=existing_files_root,
+        temporal=memory_temporal,
     )
     from b12.runtime import open_runtime
 
-    runtime = open_runtime(settings.model_copy(update={"state_dir": work_dir / "state"}))
+    runtime = open_runtime(
+        settings.model_copy(
+            update={"state_dir": work_dir / "state", "memory_temporal": memory_temporal}
+        )
+    )
     runtime.agent.system_prompt = apply_arm(runtime.agent.system_prompt, arm)
+    if setup.get("synthetic_clock"):
+        # The scenario's "today" (used only by temporal memory, ADR-015).
+        pinned = datetime.fromisoformat(setup["synthetic_clock"])
+        runtime.agent.clock = lambda: pinned
     import b12.agent as agent_module
 
     default_claim = agent_module._ACTION_CLAIM
@@ -185,6 +205,7 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
             **record,
             "status": "EXECUTED",
             "u2_arm": arm,
+            "memory_temporal": memory_temporal,
             "action_claim_pattern": "broad (arm D)" if arm == "D" else "runtime default",
             "system_prompt_sha256": prompt_sha,
             "model": settings.model,
@@ -230,6 +251,9 @@ def main(argv=None):
     )
     parser.add_argument("--variant", default="")
     parser.add_argument("--arm", choices=ARMS, default="A0", help="U2 style arm")
+    parser.add_argument(
+        "--memory-temporal", action="store_true", help="ADR-015 temporal memory (U4 arm)"
+    )
     parser.add_argument(
         "--model-timeout",
         type=float,
@@ -286,6 +310,7 @@ def main(argv=None):
             files_root=Path("/"),
             existing_files_root=True,
             arm=args.arm,
+            memory_temporal=args.memory_temporal,
         )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     out = args.out_dir / f"{args.scenario_id}.json"
