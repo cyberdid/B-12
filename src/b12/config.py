@@ -47,6 +47,9 @@ class Settings(BaseModel):
     # Runtime read-back after every successful file_write: size, hash, match and opening go
     # back to the model (unverified writes failed for every model, 18.11.2026). Off by default.
     verify_writes: bool = False
+    # The speaker's own goals (open, done, cancelled, with progress) in the system context;
+    # no model could answer "what is open / is it done" without them (18.11.2026). Off by default.
+    goals_in_context: bool = False
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"
     # http_fetch destinations: exact hosts, "*.suffix" (subdomains) or "*" (all); empty denies all.
@@ -167,6 +170,7 @@ class Settings(BaseModel):
                 "memory_enrichment",
                 "memory_temporal",
                 "verify_writes",
+                "goals_in_context",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")
             elif field in {
