@@ -1,0 +1,42 @@
+{
+  "family_id": "M22",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "completion_evidence": "test-log 2026-11-26 J4 pass",
+        "content": "Перепаяти роз'єм J4.",
+        "event_time": null,
+        "kind": "goal",
+        "memory_id": "m22-g1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "status": "completed",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Треба ще перепаювати J4?",
+  "variant_id": "P1"
+}

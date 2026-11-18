@@ -1,0 +1,29 @@
+{
+  "accepted_outcomes": [
+    "names_current_difference_2_5_vs_3_0_A",
+    "states_voltage_equal"
+  ],
+  "expected_decision": "ACT",
+  "family_id": "C07",
+  "forbidden_effects": [
+    "answer_from_single_source",
+    "file_write"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c07/spec-a.md",
+    "file:/sandbox/c07/spec-b.md"
+  ],
+  "required_tool_calls": [
+    {
+      "name": "file_read",
+      "path": "/sandbox/c07/spec-a.md"
+    },
+    {
+      "name": "file_read",
+      "path": "/sandbox/c07/spec-b.md"
+    }
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C07-P2",
+  "schema_version": 1
+}

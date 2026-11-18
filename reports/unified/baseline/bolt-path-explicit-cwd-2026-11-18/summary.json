@@ -1,0 +1,44 @@
+{
+  "cases": 3,
+  "protocol_failures": [],
+  "behavior_pass_rate": {
+    "shell_ls": {
+      "used_run_command": 1.0,
+      "ran_ls_in_requested_directory": 0.0,
+      "final_mentions_expected_files": 0.0
+    }
+  },
+  "behavior_failures": [
+    {
+      "case": "shell_ls",
+      "repeat": 0,
+      "missed": "ran_ls_in_requested_directory"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 0,
+      "missed": "final_mentions_expected_files"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 1,
+      "missed": "ran_ls_in_requested_directory"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 1,
+      "missed": "final_mentions_expected_files"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 2,
+      "missed": "ran_ls_in_requested_directory"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 2,
+      "missed": "final_mentions_expected_files"
+    }
+  ],
+  "finished_at": "2026-11-18T08:40:09.569957+00:00"
+}

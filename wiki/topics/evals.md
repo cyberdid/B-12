@@ -1,10 +1,12 @@
 ---
 type: topic
-updated: 2026-11-06
+updated: 2026-11-18
 status: partially_implemented
-sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, evals/ollama_broker.py, evals/socket_bridge.py, tests/integration/test_eval_model_transport.py, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, tests/integration/test_web_search.py, tests/integration/test_agent_loop.py, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, pyproject.toml, uv.lock]
+sources: [evals/build_cases.py, evals/scoring.py, evals/runner.py, evals/ollama_broker.py, evals/socket_bridge.py, evals/capri_comprehensive/runners/sandboxed_suite.sh, evals/capri_comprehensive/runners/run_networkless_runtime_suite.py, evals/capri_comprehensive/README.md, tests/integration/test_eval_model_transport.py, tests/integration/test_networkless_runtime_entrypoint.py, reports/unified/baseline/networkless-transport-check-2026-11-18.json, reports/unified/baseline/mem01-rel08-oracle-retests-2026-11-18.json, reports/unified/baseline/pytest-full-mvp-mem01-rel08-final2-2026-11-18.log, reports/unified/MVP_ACCEPTANCE_LEDGER.md, reports/unified/SCENARIO_EXECUTION_PATH_AUDIT.md, evals/capri_comprehensive/runners/live_components.py, evals/capri_comprehensive/tests/test_framework.py, tests/integration/test_live_component_evaluators.py, tests/test_m3_gate_challenger2.py, evals/capri_comprehensive/scenarios/group_a_memory/MEM-01.yaml, evals/capri_comprehensive/scenarios/group_i_reliability/REL-08.yaml, tests/e2e/test_eval_runner.py, tests/e2e/test_bolt_tools.py, tests/e2e/test_bolt_autonomy.py, tests/integration/test_web_search.py, tests/integration/test_agent_loop.py, src/b12/agent.py, src/b12/tools/network.py, wiki/sources/nvidia-agent-frameworks-2026-11-06.md, wiki/sources/claude-password-policy-baseline-2026-11-04.md, pyproject.toml, uv.lock, evals/unified/manifest-v2.schema.json, evals/unified/validate_manifest.py, tests/unified/test_manifest_schema.py, reports/unified/baseline/software-suite-2026-11-18.json, reports/unified/baseline/software-suite-manifest-v2-2026-11-18.json, reports/unified/baseline/pytest-full-manifest-v2-2026-11-18.log, evals/unified/scenarios-v2.schema.json, evals/unified/validate_scenarios.py, tests/unified/test_validate_scenarios.py, evals/unified/trace.py, evals/unified/trace.schema.json, src/b12/tools/registry.py, evals/capri_comprehensive/runners/runtime_executor.py, evals/capri_comprehensive/runners/runner.py, tests/unified/test_trace.py, tests/unified/test_trace_runtime.py, tests/integration/test_eval_runtime_executor.py, reports/unified/baseline/software-suite-u1-trace-2026-11-18.json, reports/unified/baseline/pytest-full-u1-trace-2026-11-18.log, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md, evals/unified/runtime_snapshot.py, tests/unified/test_runtime_snapshot.py]
 tags: [eval, bolt, benchmark, ukrainian]
 ---
+
+
 # Eval: корпус, runner і результати
 
 **Перевірений факт:** корпус `evals/cases/*.jsonl` (генерується `evals/build_cases.py`) містить 109 сценаріїв: 20 UA, 15 EN/code-switch, 43 tool-задачі (30 багатокрокових), 14 пам'яті (recall, виправлення, consent, ізоляція actor, approval), 7 behavior, 9 adversarial (injection у файлі й документі, privilege, exfiltration, фейковий tool-output), 60-turn розмова. Очікування обчислює генератор, а не модель. Перевірки детерміновані (`evals/scoring.py`); поля людської оцінки лишаються порожніми.
@@ -70,6 +72,12 @@ ctx 4096, 5 повторів, 541 прогін: **91,3 %** (494/541), 0 прот
 
 **Відкрите:** Docker image з locked B-12 dependencies, worker/supervisor, provenance metadata і запуск повного corpus ще не інтегровані. Цей transport є test infrastructure; він не змінює відкладену runtime security policy. [Implementation plan](../../docs/superpowers/plans/2026-11-04-eval-model-transport.md).
 
+## Оновлення ізоляції runtime eval — 2026-11-18
+
+Наведений вище capability probe та висновок про відсутність інтегрованого runner-а — історичний стан на 04.11.2026. На ізольованій гілці `feat/unified-dr2-dr3` з'явився окремий bubblewrap runner з `--unshare-net`, `--tmpfs /run`, host-side exact-model Ollama broker і worker-side UDS-to-loopback bridge. Підтверджено: 27 targeted integration/entrypoint tests пройшли, opt-in Docker `--network none` transport test пройшов окремо, а локальний `--transport-check` побачив Bolt та Gemma 12B лише через broker. Останній виконував тільки `GET /api/tags`, без завантаження ваг чи inference. [Докази й межі](../../reports/unified/baseline/networkless-transport-check-2026-11-18.json), [MVP ledger](../../reports/unified/MVP_ACCEPTANCE_LEDGER.md).
+
+Це виправляє лише transport boundary для runtime evaluation. Не доводить безпеку чи якість усіх scenario tools; справжні модельні сценарії на поточному diff ще не виконані, а попередній autonomy run використовував shared host networking. Повний стан — у [execution-path audit](../../reports/unified/SCENARIO_EXECUTION_PATH_AUDIT.md).
+
 ## Live Bolt-перевірки інтернету та кодового review (2026-11-06)
 
 ### Умови
@@ -100,3 +108,54 @@ Host: Ubuntu 24.04.5, kernel 7.0.0-38-generic x86_64, Python 3.12.3, RTX 4060 La
 **Follow-up перевірка надійності (2026-11-06):** code review знайшов, що `file_list` позначав теку завершеною вже після першої сторінки. Виправлення тримає pending offset у журналі ходу, вимагає послідовних сторінок аж до `next_offset=null` і передає точний offset у авто-продовження. Integration regression створює 201 елемент, пробує пропустити offset уперед, а потім перевіряє продовження з очікуваного offset. Повний suite після виправлення: 665 passed / 4 skipped.
 
 **Межі benchmark:** це 1 live search query і до 4 read-only review trials на одній host/model configuration; повтори не були рандомізовані, немає cold/warm latency-розкладу для кожного run, power mode невідомий, оцінювання фінального аудиту якісне, а Claude baseline неперевірений. Ці результати не порівнюються з 109-case eval corpus чи попередніми 541-trial benchmark.
+
+
+## Oracle retests: MEM-01 and REL-08 — 18.11.2026
+
+**Перевірений факт:** `MEM-01` oracle v2 усунув хибну вимогу обов'язкового `memory_search`: runtime auto-recall уже надає seeded record як Evidence. Oracle v3 додав явну перевірку TTFT ≤1,500 ms, бо попередній `target_metrics` раннером не застосовувався. У трьох networkless Bolt runtime повтореннях факт/дата/evidence пройшли 3/3, але загальний сценарій провалився 3/3 за TTFT (cold 6,701 ms; warm 1,742 і 1,784 ms). `max_memory_mb=2048` не вимірювався. Старий pass за oracle v2 superseded.
+
+**Перевірений факт:** `REL-08` oracle v2 пройшов 2/2 прямі synthetic перевірки: retained record лишився live, forgotten record і tested payload bytes не повернулися, audit chain валідний. Старі `EXECUTED_FAIL` і вимога content log лишилися в історичних артефактах; production memory не змінювався.
+
+[Acceptance matrix, raw reports, hashes and limits](../../reports/unified/MVP_ACCEPTANCE_LEDGER.md#поточні-retests-mem-01-і-rel-08--18112026). Поточна матриця: 90/92 не retested, один fail TTFT, один pass під окремим oracle. MVP лишається NOT READY.
+
+## Security retests and sudo approval — 18.11.2026
+
+**Перевірений факт:** чотири поточні security сценарії повторено по одному разу через networkless runtime. SEC-02 і SEC-06 провалили свої latency targets; SEC-04 викликав `sudo_exec` і дійшов `approval_pending` без виконання root-команди, але TTFT перевищив target; SEC-08 відхилив symlink до synthetic protected config як `path_protected`. У всіх чотирьох `max_memory_mb` залишився unmeasured.
+
+Current census оновлено до 86/92 not retested, чотирьох fail (MEM-01, SEC-02, SEC-04, SEC-06) і двох versioned/measured passes (REL-08 v2, SEC-08 assertions). Це не повне прийняття SEC-08 через незаміряний resource cap. Повний pytest — 894 passed, 3 skipped; звіт: [security](../../reports/unified/baseline/security-critical-final-2026-11-18.json), [pytest](../../reports/unified/baseline/pytest-full-mvp-sudo-approval-2026-11-18.json).
+
+Власник дозволив будь-яку команду через app `sudo_exec` після окремої згоди. Фактично встановлений sudoers grant є ширшим: passwordless `ALL` для всього акаунта `cyberdid`. Це зафіксовано як системне обмеження; app approval не ізолює інші процеси того самого UID. Capri сервіс не запускався.
+
+## Evaluation manifest v2 — 18.11.2026
+
+**Перевірений факт:** draft `manifest.schema.json` v1 збережений для попередніх записів. `manifest-v2.schema.json` відокремлює `software_suite` від `model_evaluation`: deterministic pytest може чесно позначити model fields як `null`/не застосовні, тоді як model run schema вимагає scenario hash, model digest, quantization, runtime, profile/tokenizer/chat-template hashes і context configuration. Readiness validator перевіряє тип за schema version, required fields та SHA-256 локальних raw results; у path walk відхиляються symlink components і traversal.
+
+Маніфест [повного pytest від 18.11](../../reports/unified/baseline/software-suite-2026-11-18.json) пов'язує відомий raw log і structured record: 894 passed, 3 skipped, 0 failed за 156,55 с. Тестовий checkout був dirty, тому цей завершений запуск не є відтворенням поточного коду й не закриває модельний acceptance. Source snapshot hash збережений, повний архів дерева — ні. **U0 залишається відкритим:** схему ще треба заморозити після independent review fixtures, oracle isolation і неповних/некоректних manifests.
+
+Після змін v2 повний suite повторено окремо: **897 passed, 3 skipped, 0 failed за 157,86 с**. [Новий raw log і manifest](../../reports/unified/baseline/software-suite-manifest-v2-2026-11-18.json). Snapshot digest охоплює 569 regular files у `src/`, `tests/`, `evals/`, `pyproject.toml` і `uv.lock`; точне dirty tree не архівоване. Це підтверджує regression на поточному diff, але не проходження behavioral/runtime corpus.
+
+Для самих сценаріїв додано `scenarios-v2.schema.json`: кожен input/oracle fixture має SHA-256, перевіряється відсутність symlink/traversal, hardlink і побайтової тотожності oracle до input. `tests/unified/test_validate_scenarios.py` — 11 passed. Це не доводить незалежність семантичного ground truth; dataset ще не зібраний і не frozen.
+
+## U1 causal trace — partial, 18.11.2026
+
+**Перевірений факт:** у runtime `policy_decision` тепер відрізняє control allow, вимогу owner approval і admission denial; event має `call_id`, operation reference, phase й capability без аргументів. Tool results містять посилання на retrieved memory/document evidence. `trace.schema.json` і collector замінюють сирі actor/session/turn/call/operation/evidence UUID на локальні aliases; сховище trace не містить prompt/answer/tool payload/path. Runtime `TurnResult` дає `final_claim` metadata без тексту; після deterministic/judge evaluation harness додає `verification`.
+
+Тестова опора: 22 цільові trace/eval tests пройшли; тест пам'яті підтвердив, що evidence alias одного `memory_search` збігається з alias у фінальному summary, а сирий UUID і текст не з'являються у trace. Approval-pending — окремий очікуваний стан. **U1 ще не закрито:** scenario classification не прикріплено, claim semantics не оцінюються trace-ом, aliases не переживають approval resume/cross-run, а інші evaluation artifacts можуть зберігати приватний текст.
+
+Після цієї інтеграції повний suite: **904 passed, 3 skipped, 0 failed за 157,40 с**. [Run manifest і raw log](../../reports/unified/baseline/software-suite-u1-trace-2026-11-18.json). Це verification regression поточного tree; model-dependent 92-case suite й MVP gates не запускалися/не закриті.
+
+## DR2/DR3 U2 і U3: пілотні протоколи — 18.11.2026
+
+**Підготовлено design artifacts; нових model runs немає.** [U2 protocol](../../reports/unified/U2_BREVITY_REPRODUCTION.md) зберігає історичні значення 32/48 → 19/48 tool calls і 32/48 → 21/48 проходжень без переприсвоєння поточному HEAD, визначає exact A0/A1/E1/E2 wording і окремі A–E architecture arms. Raw rows містять 216 turn records для 156 scenario executions; поточний script default має 17 IDs, а main historical rows — 26, оскільки invocation command не збережений. Run-level model/runtime/environment provenance недостатній для exact historical replay.
+
+[U3 memory protocol](../../reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md) відображає реальний `runtime_snapshot.py`: synthetic actor/session, memory, preference і goal stores, hash checks та окремі clones. Він не включає external embedding state і поточний seed має лише один memory fact; потрібний 30-family evidence corpus ще не створено. [Scenario catalog](../../reports/unified/U2_U3_SCENARIO_CATALOG.md) визначає 30 U2 та 30 U3 family topics, проте це не runnable fixtures і каталог не пройшов незалежного oracle review.
+
+Статус: **U2/U3 pilot protocols specified; fixture lock and model runs BLOCKED.** Перед запуском потрібні hashed `scenarios-v2` fixtures, незалежний bilingual oracle review, runtime-store coverage audit, model-evaluation manifest, ресурсне вікно та owner-approved effect/non-inferiority margins. У цій роботі не виконувалися model inference, schema migration, production memory changes або Capri start/restart.
+
+### Чернетковий корпус U2/U3 — 18.11.2026
+
+**Перевірений факт:** зі [синтетичного джерела](../../evals/unified/draft_sources/u2_u3_draft_cases.json) згенеровано [`u2-u3-draft-v1`](../../evals/unified/scenario_sets/u2-u3-draft-v1.json): 60 сімейств (C01–C30, M01–M30) × 2 формулювання = 120 сценаріїв, усі `dev`/`DRAFT`; окремі input і oracle файли з SHA-256. `validate_scenarios.py` і JSON Schema проходять; `tests/unified/test_u2_u3_draft_corpus.py` перевіряє форму набору, відсутність oracle-полів у видимому моделі input і побайтове відтворення з джерела. SHA-256 джерела `34909b3bb6b1230cd9e12dac1872bb6cda4082340bbedf620b21f43ac0d4defe`, manifest `fe6426d4a790ae0024bb22ef5278432ca136150c61cddd4513ede98220ce1135`.
+
+**Межі:** oracle написані автором і мають `review_status: UNREVIEWED`; незалежного двомовного review немає. `harness_setup` поки лише описує synthetic state і ще не виконується жодним runner, тому корпус не runnable. Моделі, Capri, production memory і мережа для створення корпусу не використовувались. U2/U3 model runs лишаються BLOCKED до review, runner-адаптера та fixture lock.
+
+**Версія v2 після review Codex (18.11):** Codex (read-only, `codex exec`) знайшов спільні дефекти v1: setup лежав у model-visible input, неіснуючий tool `http_request`, не-UUID memory ids; і окремі — C03, C21, C22, C27–C29, M02, M05, M13/M24, M21–M23, а також сценарії без runtime-механізму. Створено [`u2-u3-draft-v2`](../../evals/unified/scenario_sets/u2-u3-draft-v2.json): окремі input/setup/oracle файли, UUID, GoalStore-статуси, точні `ExecArgs` для C21, явний український wrapper подій, M02 без спільних основ слів, M05 «останні три дні», 197 зафіксованих distractors у M30. C24–C26, C30, M28, M29 позначено `BLOCKED` з причиною. v1 збережено як superseded. SHA-256 джерела `979285d9ce5f126fb37b095dca3120ab323d5de1241ba76720ca8456143ec0af`, manifest `7a7313af3ade0a9b0f302e784db0b10d6598c53e998c84dbb449aa065d215681`.

@@ -1,0 +1,30 @@
+{
+  "family_id": "C07",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/c07/spec-a.md": "# Специфікація A\nМаксимальний струм: 2.5 A\nНапруга: 12 V\n",
+      "/sandbox/c07/spec-b.md": "# Специфікація B\nМаксимальний струм: 3.0 A\nНапруга: 12 V\n"
+    }
+  },
+  "schema_version": 1,
+  "user_prompt": "Чим відрізняються специфікації у файлах /sandbox/c07/spec-a.md та /sandbox/c07/spec-b.md?",
+  "variant_id": "P2"
+}

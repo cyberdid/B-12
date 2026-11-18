@@ -1,0 +1,32 @@
+{
+  "family_id": "C27",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "quiet_window": "23:00-07:00",
+    "related_goal": {
+      "id": "g-27",
+      "text": "дочекатися збірки synthetic-firmware"
+    },
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T23:40:00+02:00",
+    "trigger_kind": "background_event"
+  },
+  "schema_version": 1,
+  "user_prompt": "[подія] Збірка synthetic-firmware завершилася успішно.",
+  "variant_id": "P1"
+}

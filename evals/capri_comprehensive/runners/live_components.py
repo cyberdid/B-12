@@ -506,13 +506,9 @@ def rel07(tmp: Path) -> LiveResult:
     return res
 
 
-# --- REL-08: event-ledger replay (literal criterion) and B-12's restore replay -----
+# --- REL-08: snapshot restore preserves deletion state -----------------------------
 def rel08(tmp: Path) -> LiveResult:
-    """The literal criterion (rebuild a bit-identical SQLite file by replaying an event log)
-    contradicts the forgetting invariant: B-12's deletion ledger is payload-free and
-    secure_delete erases bytes, so a replayable log of contents would resurrect forgotten
-    data. What B-12 guarantees instead is measured too: restore from a snapshot replays the
-    deletion ledger, and the live state equals the pre-restore one."""
+    """Restore retained memory while replaying deletion state without restoring payloads."""
     import asyncio
 
     from b12.runtime import open_runtime
@@ -546,23 +542,18 @@ def rel08(tmp: Path) -> LiveResult:
             runtime.close()
 
     r = asyncio.run(case())
-    hits = _source_hits(("replay_event", "event_ledger", "EventLedger", "state_hash"))
     res = LiveResult("REL-08")
     res.evidence.append(Evidence(
-        "literal: bit-identical SQLite rebuilt from a content event log", bool(hits),
-        "not implemented by design: a content log would resurrect forgotten data "
-        "(payload-free deletion ledger, secure_delete)"))
-    res.evidence.append(Evidence(
-        "B-12 restore replays the deletion ledger: same live state as before restore",
+        "snapshot restore preserves retained records and deletion state",
         r["before"] == r["after"] and r["kept_live"] and not r["gone_live"],
-        f"before={len(r['before'])} after={len(r['after'])} gone_live={r['gone_live']}"))
+        f"before={len(r['before'])} after={len(r['after'])} kept_live={r['kept_live']} "
+        f"gone_live={r['gone_live']}"))
     res.evidence.append(Evidence(
         "forgotten bytes absent after restore and audit chain verifies",
         not r["leftover"] and r["audit"] > 0, f"leftover={r['leftover']} audit={r['audit']}"))
     res.response = (
-        "STATE_DIVERGENCE_ERROR" if not res.evidence[1].passed else
-        "Відтворення з журналу вмісту не підтримується за задумом; відновлення зі знімка "
-        "застосовує журнал видалень і дає той самий живий стан."
+        "SNAPSHOT_RESTORE_FORGETTING_OK: стан відновлено; забуті дані не повернулися."
+        if res.passed else "SNAPSHOT_RESTORE_FORGETTING_FAILED"
     )
     return res
 

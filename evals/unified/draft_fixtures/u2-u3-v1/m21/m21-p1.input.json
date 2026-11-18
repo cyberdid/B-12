@@ -1,0 +1,55 @@
+{
+  "family_id": "M21",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "cancelled_at": "2026-11-20",
+        "content": "Щотижня надсилати звіт про стенд.",
+        "event_time": null,
+        "kind": "goal",
+        "memory_id": "m21-g1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "status": "cancelled",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Замовити кабелі USB-C.",
+        "event_time": null,
+        "kind": "goal",
+        "memory_id": "m21-g2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "status": "active",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Які в нас зараз активні задачі?",
+  "variant_id": "P1"
+}

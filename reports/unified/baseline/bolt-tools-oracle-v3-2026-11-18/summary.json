@@ -1,0 +1,37 @@
+{
+  "cases": 12,
+  "protocol_failures": [],
+  "behavior_pass_rate": {
+    "write_read": {
+      "wrote_expected_text": 1.0,
+      "used_file_read": 1.0,
+      "final_mentions_text": 1.0
+    },
+    "system_info": {
+      "used_system_info": 1.0,
+      "final_mentions_cpu_count": 1.0
+    },
+    "shell_ls": {
+      "used_run_command": 1.0,
+      "ran_ls_in_requested_directory": 0.6666666666666666,
+      "final_mentions_expected_files": 0.6666666666666666
+    },
+    "memory_recall": {
+      "stored_memory": 1.0,
+      "recalled_after_restart": 1.0
+    }
+  },
+  "behavior_failures": [
+    {
+      "case": "shell_ls",
+      "repeat": 2,
+      "missed": "ran_ls_in_requested_directory"
+    },
+    {
+      "case": "shell_ls",
+      "repeat": 2,
+      "missed": "final_mentions_expected_files"
+    }
+  ],
+  "finished_at": "2026-11-18T08:37:58.407647+00:00"
+}

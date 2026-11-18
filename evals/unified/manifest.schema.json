@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b12.local/schemas/unified-manifest-v1.json",
+  "title": "Unified evaluation manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "status",
+    "commit",
+    "dirty",
+    "scenario_set_sha256",
+    "environment",
+    "model",
+    "configuration",
+    "raw_results"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "status": {
+      "enum": [
+        "PLANNED",
+        "RUNNING",
+        "COMPLETED",
+        "FAILED",
+        "BLOCKED",
+        "NOT_EXECUTED"
+      ]
+    },
+    "commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "dirty": {
+      "type": "boolean"
+    },
+    "scenario_set_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host",
+        "os",
+        "python",
+        "cpu",
+        "gpu",
+        "vram_bytes",
+        "ram_bytes",
+        "power_mode"
+      ],
+      "properties": {
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "os": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "python": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "cpu": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gpu": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vram_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "ram_bytes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "power_mode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "digest",
+        "quantization",
+        "runtime_version",
+        "profile_sha256",
+        "tokenizer_sha256",
+        "chat_template_sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "quantization": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "runtime_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "profile_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tokenizer_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "chat_template_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_tokens",
+        "output_tokens",
+        "cache_state",
+        "repeats",
+        "snapshot_sha256"
+      ],
+      "properties": {
+        "context_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "output_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "cache_state": {
+          "enum": [
+            "cold",
+            "warm",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "repeats": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "snapshot_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "raw_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

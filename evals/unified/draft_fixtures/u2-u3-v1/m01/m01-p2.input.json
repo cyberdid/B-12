@@ -1,0 +1,41 @@
+{
+  "family_id": "M01",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Стенд Б-3 відкалібрували; похибка після калібрування 0.4%.",
+        "event_time": "2026-11-20",
+        "kind": "episode",
+        "memory_id": "m01-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_lab_log",
+        "source_locator": "lab-log/2026-11-20#3",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Нагадай дату калібрування стенда Б-3 та отриману похибку.",
+  "variant_id": "P2"
+}

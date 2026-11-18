@@ -1,0 +1,63 @@
+{
+  "requests": 15,
+  "alias_parameters_unchanged": true,
+  "residency": {
+    "models": [
+      {
+        "name": "b12-bolt-e4b:q4km",
+        "model": "b12-bolt-e4b:q4km",
+        "size": 3323010743,
+        "digest": "7eaa0c0553b856cf4f02f9bf1ccf580c859ec7d51d31e75a0f0e71efefd5ad09",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma4",
+          "families": [
+            "gemma4"
+          ],
+          "parameter_size": "7.5B",
+          "quantization_level": "Q4_K_M"
+        },
+        "expires_at": "2026-11-18T10:23:48.397318924+02:00",
+        "size_vram": 3323010743,
+        "context_length": 4096
+      }
+    ]
+  },
+  "gpu_after": {
+    "returncode": 0,
+    "stdout": "NVIDIA GeForce RTX 4060 Laptop GPU, 3627 MiB, 38.19 W, P0"
+  },
+  "cases": {
+    "ua_emoji": {
+      "n": 3,
+      "ttft_p50_s": 0.6392627320001338,
+      "ttft_p95_nearest_rank_s": 8.841433808000147,
+      "all_boundaries_passed": true
+    },
+    "schema_heavy": {
+      "n": 3,
+      "ttft_p50_s": 0.6216318389997468,
+      "ttft_p95_nearest_rank_s": 0.8516072090001217,
+      "all_boundaries_passed": true
+    },
+    "multi_round": {
+      "n": 3,
+      "ttft_p50_s": 0.5752550249999331,
+      "ttft_p95_nearest_rank_s": 0.6533623049999733,
+      "all_boundaries_passed": true
+    },
+    "boundary": {
+      "n": 3,
+      "ttft_p50_s": 0.5712894069997674,
+      "ttft_p95_nearest_rank_s": 1.696253349000017,
+      "all_boundaries_passed": true
+    },
+    "native_tool": {
+      "n": 3,
+      "ttft_p50_s": null,
+      "ttft_p95_nearest_rank_s": null,
+      "all_boundaries_passed": true
+    }
+  }
+}

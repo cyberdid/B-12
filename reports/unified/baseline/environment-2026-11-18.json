@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "run_id": "u0-baseline-2026-11-18",
+  "status": "NOT_EXECUTED",
+  "commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "dirty": true,
+  "scenario_set_sha256": null,
+  "environment": {
+    "host": null,
+    "os": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu": "Intel(R) Core(TM) i9-14900HX",
+    "gpu": null,
+    "vram_bytes": null,
+    "ram_bytes": 33330786304,
+    "power_mode": null
+  },
+  "model": {
+    "name": null,
+    "digest": null,
+    "quantization": null,
+    "runtime_version": null,
+    "profile_sha256": null,
+    "tokenizer_sha256": null,
+    "chat_template_sha256": null
+  },
+  "configuration": {
+    "context_tokens": null,
+    "output_tokens": null,
+    "cache_state": "unknown",
+    "repeats": null,
+    "snapshot_sha256": null
+  },
+  "raw_results": [],
+  "limitations": [
+    "No model evaluation run. Fields not measured are null; host identifier omitted. OS, CPU and RAM read locally.",
+    "Separate deterministic pytest subsets are described in U0_BASELINE_AUDIT.md; this manifest is not their run record.",
+    "Dirty state denotes untracked U0 files in this worktree at manifest creation."
+  ]
+}

@@ -1379,6 +1379,18 @@ def test_system_prompt_forbids_offering_workarounds_for_unavailable_tools():
     assert "не пропонуй обхід" in SYSTEM_PROMPT
 
 
+def test_access_control_boundary_is_high_priority_and_confirmation_cannot_grant_access():
+    from b12.agent import SYSTEM_PROMPT
+
+    system = SYSTEM_PROMPT.casefold()
+    assert system.index("підтвердження користувача не створює дозволу") < system.index(
+        "стисло й чесно"
+    )
+    assert "не пропонуй обхід" in system
+    assert "не проси переформулювати ту саму заборонену дію" in system
+    assert "викликай саме цей інструмент" in system
+
+
 def test_system_prompt_asks_to_retry_memory_search_with_specific_names():
     from b12.agent import SYSTEM_PROMPT
 

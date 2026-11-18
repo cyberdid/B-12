@@ -17,6 +17,8 @@ import argparse
 import contextlib
 import json
 import logging
+import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -30,6 +32,7 @@ from evals.capri_comprehensive.evaluators.judge import LLMJudgeHarness
 from evals.capri_comprehensive.evaluators.sandboxed_env import SandboxedEnvironment
 from evals.capri_comprehensive.evaluators.schema import (
     AssertionOutcome,
+    EvaluationRule,
     ExecutionMode,
     ExecutionReport,
     ExecutionStatus,
@@ -42,6 +45,7 @@ from evals.capri_comprehensive.evaluators.tools import (
 )
 
 logger = logging.getLogger("evals.runner")
+SANDBOX_MARKER = "B12_EVAL_SANDBOX"
 
 
 class ScenarioRunner:
@@ -253,11 +257,47 @@ class ScenarioRunner:
                 turn_metrics = {
                     "ttft_ms": ttft_ms,
                     "total_duration_ms": turn_duration_ms,
+                    "turn_index": turn_idx,
                 }
+
+                # Scenario target metrics are acceptance criteria, not documentation-only
+                # hints. Apply declared latency budgets to every turn unless that turn
+                # already specifies an explicit equivalent rule.
+                expected_rules = list(turn.expected_behaviors)
+                rule_types = {rule.type.lower().strip() for rule in expected_rules}
+                targets = scenario.ground_truth.target_metrics
+                if targets.ttft_s_max is not None and "max_ttft_ms" not in rule_types:
+                    expected_rules.append(
+                        EvaluationRule(type="max_ttft_ms", threshold_ms=targets.ttft_s_max * 1000)
+                    )
+                if targets.total_latency_s_max is not None and not rule_types.intersection(
+                    {"max_latency_ms", "max_latency"}
+                ):
+                    expected_rules.append(
+                        EvaluationRule(
+                            type="max_latency_ms",
+                            threshold_ms=targets.total_latency_s_max * 1000,
+                        )
+                    )
+                measured_memory_mb = raw_turn_output.get("memory_mb")
+                unmeasured_target_metrics = []
+                if targets.max_memory_mb is not None:
+                    if isinstance(measured_memory_mb, (int, float)) and not isinstance(
+                        measured_memory_mb, bool
+                    ):
+                        turn_metrics["memory_mb"] = float(measured_memory_mb)
+                        if "max_memory_mb" not in rule_types:
+                            expected_rules.append(
+                                EvaluationRule(type="max_memory_mb", value=targets.max_memory_mb)
+                            )
+                    else:
+                        # A declared resource budget without a measurement is visible in
+                        # the artifact, but is not silently treated as an achieved target.
+                        unmeasured_target_metrics.append("max_memory_mb")
 
                 # Evaluate deterministic rules
                 passed, passed_assertions, failed_assertions = evaluate_turn_rules(
-                    expected_rules=turn.expected_behaviors,
+                    expected_rules=expected_rules,
                     forbidden_rules=turn.forbidden_behaviors,
                     response_content=content,
                     tool_calls=tool_calls,
@@ -295,8 +335,32 @@ class ScenarioRunner:
                     if not judge_res.get("passed", False):
                         passed = False
 
+                record_verification = getattr(self.turn_executor, "record_verification", None)
+                if record_verification is not None:
+                    criteria = sorted(
+                        {
+                            re.sub(r"[^a-z0-9_]+", "_", str(item.rule_type).lower()).strip("_")[:64]
+                            for item in (*passed_assertions, *failed_assertions)
+                        }
+                    )
+                    criteria = [criterion for criterion in criteria if criterion]
+                    record_verification(
+                        turn_idx,
+                        passed,
+                        scenario.evaluation.method,
+                        criteria,
+                        inconclusive=bool(unmeasured_target_metrics),
+                    )
+
                 if not passed:
                     all_passed = False
+
+                state_snapshot = {}
+                for key in ("runtime_state", "seeded_memory_evidence_count"):
+                    if key in raw_turn_output:
+                        state_snapshot[key] = raw_turn_output[key]
+                if unmeasured_target_metrics:
+                    state_snapshot["unmeasured_target_metrics"] = unmeasured_target_metrics
 
                 turn_results.append(
                     TurnExecutionResult(
@@ -311,6 +375,7 @@ class ScenarioRunner:
                         failed_assertions=failed_assertions,
                         tokens_prompt=raw_turn_output.get("tokens_prompt", 0),
                         tokens_completion=raw_turn_output.get("tokens_completion", 0),
+                        state_snapshot=state_snapshot,
                     )
                 )
 
@@ -417,8 +482,8 @@ class ScenarioRunner:
             if init_state and getattr(init_state, "memories", None):
                 mem_texts = [m.text for m in init_state.memories if getattr(m, "text", None)]
                 if mem_texts:
-                    sys_prompt += (
-                        "\n\nКонтекст пам'яті B-12:\n" + "\n".join(f"- {m}" for m in mem_texts)
+                    sys_prompt += "\n\nКонтекст пам'яті B-12:\n" + "\n".join(
+                        f"- {m}" for m in mem_texts
                     )
 
         messages.append({"role": "system", "content": sys_prompt})
@@ -556,10 +621,14 @@ def main() -> None:
     parser.add_argument("scenario_path", help="Path to scenario YAML file")
     parser.add_argument("--artifacts", default=None, help="Directory to save execution artifacts")
     parser.add_argument(
-        "--runtime-dir", default=None,
+        "--runtime-dir",
+        default=None,
         help="Run turns through the real B-12 runtime with state under this directory",
     )
     args = parser.parse_args()
+
+    if args.runtime_dir and os.environ.get(SANDBOX_MARKER) != "1":
+        raise SystemExit("refusing to run host tools outside the sandbox: use sandboxed_suite.sh")
 
     executor = None
     if args.runtime_dir:

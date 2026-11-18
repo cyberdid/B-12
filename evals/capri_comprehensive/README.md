@@ -1,6 +1,6 @@
 # Capri Comprehensive Evaluation Framework (`evals/capri_comprehensive`)
 
-The **Capri Comprehensive Evaluation Framework** is a modular, reproducible, and statistically rigorous evaluation engine designed to evaluate the **B-12 / Capri AI Companion**. Its central research objective is to empirically determine whether Capri acts as a genuine autonomous, persistent, and adaptable AI companion or an ephemeral tool-calling language model.
+The **Capri Comprehensive Evaluation Framework** evaluates B-12 / Capri across memory, interaction, tools, autonomy, security, voice, reliability, and hardware-dependent scenarios. Its scenarios are project-authored; results describe the tested code, model, configuration, and harness rather than establishing general autonomy.
 
 ---
 
@@ -34,7 +34,11 @@ evals/capri_comprehensive/
 ├── runners/                       # Execution orchestrators
 │   ├── runner.py                  # Single scenario runner with latency and token telemetry
 │   ├── suite_runner.py            # Batch scenario runner across groups (parallel/sequential, JUnit XML)
-│   └── ablation_runner.py         # 5-dimension ablation orchestrator (Memory, Context, Gating, Tools, Model)
+│   ├── ablation_runner.py         # 5-dimension ablation orchestrator (Memory, Context, Gating, Tools, Model)
+│   ├── runtime_executor.py        # Executes scenario turns through the B-12 runtime
+│   ├── run_runtime_suite.py       # Runtime-backed scenario entry point
+│   ├── run_networkless_runtime_suite.py # UDS model bridge and runtime suite entry point
+│   └── sandboxed_suite.sh         # Bubblewrap filesystem/network boundary + Ollama broker
 ├── statistical_analysis/          # Statistical measurement engines
 │   ├── metrics.py                 # Wilson score binomial CIs and bootstrap latency percentiles
 │   └── aggregator.py              # Aggregates execution reports into 15-column CSV & Markdown
@@ -59,6 +63,20 @@ To execute a single scenario YAML specification:
 ```bash
 uv run python -m evals.capri_comprehensive.runners.runner \
     evals/capri_comprehensive/scenarios/group_a_memory/MEM-01.yaml
+```
+
+Without `--runtime-dir`, this command uses the runner's model-call path; it does not exercise
+the complete B-12 runtime. The `ScenarioRunner` creates temporary scenario state, but that alone
+does not isolate host processes or files. To execute a scenario through the real runtime, use
+the sandboxed entry point below. Direct `runner.py --runtime-dir ...` invocations are refused
+unless the sandbox marker is set by the wrapper.
+
+```bash
+# Run one runtime-backed scenario inside bubblewrap
+evals/capri_comprehensive/runners/sandboxed_suite.sh MEM-01
+
+# Check the isolated Ollama route and required model availability without inference
+evals/capri_comprehensive/runners/sandboxed_suite.sh --transport-check
 ```
 
 Output:
@@ -129,8 +147,11 @@ agg.generate_markdown_summary('evals/capri_comprehensive/reports/CAPRI_COMPREHEN
    - The evaluated model is strictly forbidden from acting as its own evaluator (`judge.py`).
    - If `b12-bolt-e4b:q4km` is evaluated, an independent model (e.g. `gemma4:12b` or `qwen3.5:27b`) or deterministic rules must serve as the judge.
 3. **Sandbox Isolation Invariant:**
-   - All tests execute in disposable temp directories (`SandboxedEnvironment`).
-   - Host secrets (`~/.ssh`, `~/.gnupg`, `~/.local/state/b12/secrets`) are strictly forbidden from read or write access (`is_path_safe`).
+   - `SandboxedEnvironment` prepares disposable scenario fixtures; it is not, by itself, an OS process or filesystem sandbox.
+   - Runtime-backed scenarios grant the model runtime host tools. Run them only with `runners/sandboxed_suite.sh`: bubblewrap makes the repository read-only except declared artifact/report directories, masks `/home`, `/media`, `/mnt`, `/run`, `/tmp`, and `/var/tmp`, and creates a separate network namespace.
+   - Ollama is reachable only through a host-side broker over a private Unix socket. The broker accepts an exact model allowlist and a bounded set of inference routes; `SocketBridge` exposes that socket on worker loopback. The model worker cannot directly reach host loopback or external networks.
+   - `--transport-check` requests only `/api/tags` through the isolated bridge and verifies the configured Bolt and swappable models are available; it does not load weights or run inference.
+   - `is_path_safe` path checks and `B12_EVAL_SANDBOX` are application-level guards, not the OS security boundary. The boundary is bubblewrap namespaces, mounts, and the scoped broker. Do not enable host `/proc` or share host `/run` in this wrapper.
 4. **Statistical Rigor:**
    - Binomial pass rates include Wilson score 95% confidence intervals.
    - Latencies (P50, P90, P95) include non-parametric bootstrap confidence intervals (1,000 resamples).

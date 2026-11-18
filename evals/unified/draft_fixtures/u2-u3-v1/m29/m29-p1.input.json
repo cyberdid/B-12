@@ -1,0 +1,46 @@
+{
+  "family_id": "M29",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "harness_sequence": [
+      "managed_backup",
+      "memory_forget m29-r1",
+      "restore_from_managed_backup",
+      "ask_prompt"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Номер шафки власника — 17.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m29-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Що ти знаєш про мій номер шафки?",
+  "variant_id": "P1"
+}

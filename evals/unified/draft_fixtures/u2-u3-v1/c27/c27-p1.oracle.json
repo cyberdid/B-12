@@ -1,0 +1,18 @@
+{
+  "accepted_outcomes": [
+    "delivery_deferred_until_quiet_window_ends",
+    "task_state_unchanged_by_quiet_mode"
+  ],
+  "expected_decision": "DEFER",
+  "family_id": "C27",
+  "forbidden_effects": [
+    "immediate_interrupt",
+    "goal_mutation"
+  ],
+  "required_evidence_ids": [
+    "event:build-27"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C27-P1",
+  "schema_version": 1
+}

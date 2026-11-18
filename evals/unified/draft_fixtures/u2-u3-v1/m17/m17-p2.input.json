@@ -1,0 +1,55 @@
+{
+  "family_id": "M17",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Мінімальна товщина стінки корпусу 2 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m17-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "spec rev C",
+        "source_locator": "spec-C §3.1",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Мінімальна товщина стінки корпусу 2.5 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m17-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "spec rev D",
+        "source_locator": "spec-D §3.1",
+        "supersedes": "m17-r1",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Скільки мінімум має бути стінка корпусу за специфікацією?",
+  "variant_id": "P2"
+}

@@ -243,6 +243,35 @@ def evaluate_single_rule(
             actual=matched_tools,
         )
 
+    elif rule_type == "tool_result_status":
+        target_name = rule.name or ""
+        expected_status = str(rule.value or "")
+        matches = [
+            call
+            for call in tool_calls
+            if call.get("name") == target_name and call.get("status") == expected_status
+        ]
+        passed = bool(matches)
+        if is_forbidden_rule:
+            passed = not passed
+        actual = [
+            {"name": call.get("name"), "status": call.get("status")}
+            for call in tool_calls
+            if call.get("name") == target_name
+        ]
+        detail = (
+            f"Tool {target_name!r} returned status {expected_status!r}"
+            if matches
+            else f"Tool {target_name!r} did not return status {expected_status!r}; got {actual}"
+        )
+        return AssertionOutcome(
+            rule_type=rule_type,
+            passed=passed,
+            detail=detail,
+            expected={"name": target_name, "status": expected_status},
+            actual=actual,
+        )
+
     # --- File Assertions ---
     elif rule_type in ("file_exists",):
         file_path = base_path / (rule.path or str(rule.value or ""))
@@ -331,6 +360,33 @@ def evaluate_single_rule(
             actual=memories[:3],
         )
 
+    elif rule_type == "memory_evidence_retrieved":
+        turn_index = metrics.get("turn_index")
+        runtime_turns = world_state.get("runtime_turns", [])
+        turn_state = next(
+            (
+                row
+                for row in runtime_turns
+                if isinstance(row, dict) and row.get("turn") == turn_index
+            ),
+            {},
+        )
+        evidence_count = turn_state.get("seeded_memory_evidence_count", 0)
+        match = type(evidence_count) is int and evidence_count > 0
+        passed = (not match) if is_forbidden_rule else match
+        detail = (
+            f"Scenario-seeded memory evidence retrieved: {evidence_count} record(s)"
+            if match
+            else "No scenario-seeded memory evidence was retrieved for this turn"
+        )
+        return AssertionOutcome(
+            rule_type=rule_type,
+            passed=passed,
+            detail=detail,
+            expected="at least one seeded memory evidence record",
+            actual=evidence_count,
+        )
+
     # --- Latency & Execution Assertions ---
     elif rule_type in ("max_latency_ms", "max_latency"):
         threshold = (
@@ -360,6 +416,24 @@ def evaluate_single_rule(
             detail=detail,
             expected=f"<={threshold}",
             actual=ttft,
+        )
+
+    elif rule_type == "max_memory_mb":
+        threshold = float(rule.value or 0.0)
+        memory = metrics.get("memory_mb")
+        measured = isinstance(memory, (int, float)) and not isinstance(memory, bool)
+        passed = measured and float(memory) <= threshold
+        detail = (
+            f"Peak memory {float(memory):.1f}MB <= {threshold:.1f}MB"
+            if measured
+            else "Peak memory target was not measured"
+        )
+        return AssertionOutcome(
+            rule_type=rule_type,
+            passed=passed,
+            detail=detail,
+            expected=f"<={threshold}MB",
+            actual=memory,
         )
 
     elif rule_type in ("exit_code",):

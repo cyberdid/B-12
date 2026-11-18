@@ -1,0 +1,53 @@
+{
+  "case": "ua_emoji",
+  "repeat": 2,
+  "request": {
+    "model": "b12-bolt-e4b:q4km",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Ти B-12. Виконуй інструкцію користувача буквально."
+      },
+      {
+        "role": "user",
+        "content": "Українська ї є ґ 🤖🌍. Відповідай лише: ГОТОВО"
+      }
+    ],
+    "tools": [],
+    "stream": true,
+    "think": false,
+    "options": {
+      "num_ctx": 4096,
+      "num_predict": 128,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 42,
+      "draft_num_predict": 0
+    }
+  },
+  "fingerprint": "ec8fc689066d2649f96a0371559be2511ee3e399c689381cfdd7ddbf673753c1",
+  "input_tokens": 51,
+  "input_upper_bound": 67,
+  "output_reserve": 128,
+  "reply": {
+    "schema_version": 1,
+    "content": "ГОТОВО",
+    "tool_calls": [],
+    "metrics": {
+      "prompt_eval_duration": 37119000,
+      "prompt_eval_cached_count": 46,
+      "load_duration": 737964,
+      "prompt_eval_count": 51,
+      "eval_count": 4,
+      "total_duration": 92207007,
+      "eval_duration": 51702000,
+      "ttft_s": 0.5775011629998517,
+      "elapsed_s": 0.62905293599988
+    },
+    "finish_reason": "stop"
+  },
+  "public_deltas_match_reply": true,
+  "expected": "ГОТОВО",
+  "boundary_instruction_passed": true,
+  "count_matches": true
+}

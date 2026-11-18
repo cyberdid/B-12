@@ -1,0 +1,44 @@
+{
+  "family_id": "C24",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "task_ledger": {
+      "checkpoint_at": "2026-11-30T18:00:00+02:00",
+      "goal": "оновити індекс документів у /sandbox/c24",
+      "steps": [
+        {
+          "action": "зібрати перелік файлів",
+          "artifact": "/sandbox/c24/step1.done",
+          "id": 1,
+          "status": "done"
+        },
+        {
+          "action": "перебудувати index.json",
+          "id": 2,
+          "status": "pending"
+        }
+      ],
+      "task_id": "t-24"
+    }
+  },
+  "schema_version": 1,
+  "user_prompt": "Продовж задачу з оновлення індексу, на якій ми зупинилися.",
+  "variant_id": "P1"
+}

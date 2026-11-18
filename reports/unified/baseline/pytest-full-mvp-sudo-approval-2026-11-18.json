@@ -1,0 +1,16 @@
+{
+  "record_type": "full_test_suite_verification",
+  "date": "2026-11-18",
+  "base_commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "branch": "feat/unified-dr2-dr3",
+  "working_tree": "uncommitted changes present",
+  "tested_workspace_snapshot_sha256": "95b66880a4571d48799b908c02cb2817c2e93ba48fb3ee449477469181416411",
+  "command": "B12_DOCKER_TEST=1 .venv/bin/pytest -q",
+  "exit_code": 0,
+  "result": {"passed": 894, "skipped": 3, "failed": 0, "duration_seconds": 156.55},
+  "environment": {"python": "3.12.3", "test_dependency_added": "jsonschema>=4.23,<5 in the dev extra", "lockfile_updated": true},
+  "raw_console_log": "reports/unified/baseline/pytest-full-mvp-sudo-approval-final-2026-11-18.log",
+  "raw_console_log_sha256": "02e7d91a07c43304494a2c6efbfc15adf9740070eaa5cacfa9d379fcd11c661f",
+  "repeat_note": "Full suite repeated after a formatting-only change in one test file; the tested workspace snapshot hash above corresponds to this run.",
+  "scope_note": "Three skipped tests are opt-in checks and are not acceptance passes. Full pytest success does not substitute for the incomplete runtime, historical, voice, hardware, or longitudinal MVP gates."
+}

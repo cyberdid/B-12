@@ -1,0 +1,57 @@
+{
+  "schema_version": 2,
+  "run_id": "pytest-full-u1-trace-2026-11-18",
+  "run_type": "software_suite",
+  "status": "COMPLETED",
+  "commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "dirty": true,
+  "scenario_set_sha256": null,
+  "environment": {
+    "host": null,
+    "os": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu": "Intel(R) Core(TM) i9-14900HX",
+    "gpu": "not_applicable",
+    "vram_bytes": 0,
+    "ram_bytes": 33330786304,
+    "power_mode": "unknown-not-recorded"
+  },
+  "model": {
+    "name": null,
+    "digest": null,
+    "quantization": null,
+    "runtime_version": null,
+    "profile_sha256": null,
+    "tokenizer_sha256": null,
+    "chat_template_sha256": null
+  },
+  "configuration": {
+    "context_tokens": null,
+    "output_tokens": null,
+    "cache_state": "not_applicable",
+    "repeats": 1,
+    "snapshot_sha256": "3ca98eb6fb5fc55a2bbd87995ca46de1bf09652a8c0513d3ea0d9aaf189df0be"
+  },
+  "suite": {
+    "name": "B-12 full pytest suite after U1 trace integration",
+    "command": "B12_DOCKER_TEST=1 .venv/bin/pytest -q",
+    "test_roots": ["tests"],
+    "source_snapshot_sha256": "3ca98eb6fb5fc55a2bbd87995ca46de1bf09652a8c0513d3ea0d9aaf189df0be",
+    "passed": 904,
+    "skipped": 3,
+    "failed": 0,
+    "duration_seconds": 157.4
+  },
+  "raw_results": [
+    {
+      "path": "reports/unified/baseline/pytest-full-u1-trace-2026-11-18.log",
+      "sha256": "5fccfbf4a71c682047337d264bc48c3ae48e26f87e239b90c09143d742df1733"
+    }
+  ],
+  "limitations": [
+    "Three real-model opt-in tests were skipped; this deterministic suite is not the 92-scenario runtime acceptance corpus.",
+    "The checkout was dirty. Source snapshot v1 hashes sorted relative-path NUL file-SHA256 LF entries over src/, tests/, evals/, pyproject.toml and uv.lock; excludes .pytest_cache, __pycache__, .mypy_cache, .ruff_cache and .venv. Exact source archive is not included, so this records evidence and does not claim replay from the current checkout.",
+    "After the test run, evals/unified/README.md received a documentation-only paragraph linking this run; the source snapshot hash identifies the tree as it existed during the run.",
+    "A completed software suite is distinct from MVP acceptance."
+  ]
+}

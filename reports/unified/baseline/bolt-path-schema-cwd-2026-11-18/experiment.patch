@@ -1,0 +1,11 @@
+diff --git a/src/b12/tools/process.py b/src/b12/tools/process.py
+--- a/src/b12/tools/process.py
++++ b/src/b12/tools/process.py
+@@
+-    cwd: AbsolutePath = Field(description="Absolute working directory, e.g. /home/cyberdid")
++    cwd: AbsolutePath = Field(
++        description=(
++            "Absolute directory to run the command in. To list /path/to/dir with ls, "
++            "set cwd=/path/to/dir and command=ls; do not use its parent directory."
++        )
++    )

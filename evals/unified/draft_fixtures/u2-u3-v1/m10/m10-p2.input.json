@@ -1,0 +1,53 @@
+{
+  "family_id": "M10",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Вхід сенсора S-9 витримує до 3.3 В.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m10-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "high",
+        "source": "synthetic_datasheet",
+        "source_locator": "S-9 ds rev B p.4",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Здається, вхід S-9 тримає 5 В.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m10-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "low",
+        "source": "synthetic_owner_recollection",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Скільки вольт можна подавати на вхід S-9 максимум?",
+  "variant_id": "P2"
+}

@@ -1,0 +1,10 @@
+Baseline execution: 2026-11-18
+Commit: 36d557d83ce2f44f694cea5d19939031c630a471
+Worktree: feat/unified-dr2-dr3; untracked U0/U1 artifacts present
+Command: /home/cyberdid/Projects/B-12/.venv/bin/python -m pytest -q --ignore=tests/unified
+Result: 1 failed, 771 passed, 8 skipped in 153.04s
+Failure: tests/e2e/test_cli.py::test_desktop_command_is_optional_and_server_owned
+Expected owner_token_missing, observed desktop_extra_missing.
+Static follow-up: PySide6 unavailable in this Python environment; desktop optional extra lists PySide6-Essentials and Pillow. CLI imports desktop components before checking owner token. This is an environment-dependent pre-existing baseline failure, not proof that it would pass with desktop extras installed.
+Scope: existing tests only; tests/unified excluded because system jsonschema is absent from this venv. No new model benchmark was run. Full raw stdout was not saved; this record reproduces the terminal summary and failure.
+Repeat of the single failing test: failed again with the same actual and expected codes in 0.06s.

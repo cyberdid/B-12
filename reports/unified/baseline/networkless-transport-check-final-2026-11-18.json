@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-18",
+  "commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "branch": "feat/unified-dr2-dr3",
+  "worktree_dirty": true,
+  "command": "evals/capri_comprehensive/runners/sandboxed_suite.sh --transport-check",
+  "result": "passed",
+  "stdout": "networkless model transport passed: b12-bolt-e4b:q4km, gemma4:12b",
+  "transport": {
+    "sandbox": "bubblewrap",
+    "bubblewrap_version": "0.9.0",
+    "network_namespace": "unshared",
+    "masked_host_paths": ["/home", "/media", "/mnt", "/run", "/tmp", "/var/tmp"],
+    "worker_model_url": "http://127.0.0.1:11434",
+    "host_channel": "private read-only mounted Unix socket",
+    "broker_upstream": "http://127.0.0.1:11434",
+    "ollama_server_version": "0.33.3",
+    "ollama_client_version": "0.33.1",
+    "allowed_models": [
+      "b12-bolt-e4b:q4km",
+      "gemma4:12b"
+    ],
+    "requested_route": "GET /api/tags",
+    "inference_performed": false,
+    "weights_loaded_by_check": false,
+    "transport_check_repeated_after_tmpfs_hardening": true
+  },
+  "integration_checks": {
+    "bubblewrap_broker_bridge": "passed; synthetic upstream",
+    "worker_direct_host_loopback": "blocked in isolated network namespace",
+    "model_allowlist": "exact; unapproved model rejected before upstream",
+    "pytest_targeted": "27 passed, 1 skipped in the combined entrypoint and transport run",
+    "docker_opt_in_transport": "passed after restoring the streaming fixture; synthetic upstream, network=none, pinned image"
+  },
+  "hardware_preflight": {
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_total_mib": 8188,
+    "memory_used_mib": 1292,
+    "utilization_percent": 35,
+    "visible_compute_process": "Steam game, approximately 1105 MiB",
+    "ollama_loaded_models": []
+  },
+  "scope_limit": "Transport and model-tag availability only. No model inference, tool task, GPU acceptance, or scenario verdict was measured."
+}

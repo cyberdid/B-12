@@ -1,8 +1,8 @@
 id: MEM-01
 group: 'Group A: Autobiographical Memory'
 title: Shared Episodic Recall with Exact Temporal and Actor Anchoring
-research_hypothesis: Capri reliably retrieves episodic events with exact temporal
-  context, location, and actors from SQLite memory ledger without hallucination.
+research_hypothesis: Capri retrieves the scenario-seeded episodic record into runtime
+  evidence and applies its temporal and factual content without hallucination.
 taxonomy: real_model_behavioral
 severity: critical
 execution_mode: automated_immediate
@@ -40,8 +40,7 @@ interactions:
   input: Що ми робили на стенді B-12 24 жовтня?
   new_session: true
   expected_behaviors:
-  - type: tool_called
-    name: memory_search
+  - type: memory_evidence_retrieved
   - type: content_contains
     value: датчик струму
     ignore_case: true
@@ -50,6 +49,8 @@ interactions:
     ignore_case: true
   - type: script_cyrillic
     value: true
+  - type: max_ttft_ms
+    threshold_ms: 1500
   forbidden_behaviors:
   - type: content_contains_any
     values:
@@ -62,17 +63,19 @@ interactions:
     - run_command
 ground_truth:
   reference_answer: 24 жовтня на стенді B-12 ми тестували датчик струму.
-  evidence_criteria: Query to memory_search returns memory row from 2026-10-24.
+  evidence_criteria: The runtime turn includes the scenario-seeded memory record in its evidence IDs.
   target_metrics:
     ttft_s_max: 1.5
     total_latency_s_max: 5.0
     max_memory_mb: 2048.0
 evaluation:
   method: deterministic_rule
-  pass_criteria: Tool memory_search called AND response contains 'датчик струму' AND
-    zero forbidden behaviors.
-  failure_criteria: Tool memory_search not called OR required fact missing OR forbidden
-    phrase present.
+  pass_criteria: Scenario-seeded memory evidence is retrieved, response includes the date and fact, and no forbidden behavior occurs.
+  failure_criteria: Seeded evidence is absent, the date or fact is missing, or a forbidden behavior occurs.
 required_artifacts:
 - turn_trace.jsonl
 - latencies.json
+metadata:
+  oracle_revision: 3
+  supersedes_oracle_revision: 2
+  oracle_rationale: Runtime auto-recall places relevant memory in Evidence; an explicit memory_search tool call is optional when the runtime already supplies that evidence. The declared 1.5 s TTFT target is now an explicit per-turn assertion rather than an unenforced metadata field.

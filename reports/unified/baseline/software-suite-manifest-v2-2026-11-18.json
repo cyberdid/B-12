@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "run_id": "pytest-full-manifest-v2-2026-11-18",
+  "run_type": "software_suite",
+  "status": "COMPLETED",
+  "commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "dirty": true,
+  "scenario_set_sha256": null,
+  "environment": {
+    "host": null,
+    "os": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu": "Intel(R) Core(TM) i9-14900HX",
+    "gpu": "not_applicable",
+    "vram_bytes": 0,
+    "ram_bytes": 33330786304,
+    "power_mode": "unknown-not-recorded"
+  },
+  "model": {
+    "name": null,
+    "digest": null,
+    "quantization": null,
+    "runtime_version": null,
+    "profile_sha256": null,
+    "tokenizer_sha256": null,
+    "chat_template_sha256": null
+  },
+  "configuration": {
+    "context_tokens": null,
+    "output_tokens": null,
+    "cache_state": "not_applicable",
+    "repeats": 1,
+    "snapshot_sha256": "a8422801d8ada692227b0def1e6ba9488da18b39e246917fb0086828a80c5864"
+  },
+  "suite": {
+    "name": "B-12 full pytest suite",
+    "command": "B12_DOCKER_TEST=1 .venv/bin/pytest -q",
+    "test_roots": ["tests"],
+    "source_snapshot_sha256": "a8422801d8ada692227b0def1e6ba9488da18b39e246917fb0086828a80c5864",
+    "passed": 897,
+    "skipped": 3,
+    "failed": 0,
+    "duration_seconds": 157.86
+  },
+  "raw_results": [
+    {
+      "path": "reports/unified/baseline/pytest-full-manifest-v2-2026-11-18.log",
+      "sha256": "28a6e70ec7092ca01b4bbb357d581afd66a1a08fce546f6fdcf370daa3444495"
+    }
+  ],
+  "limitations": [
+    "Three real-model opt-in tests were skipped; the software suite is not the 92-scenario runtime acceptance corpus.",
+    "The checkout was dirty. Source snapshot v1 hashes sorted relative-path NUL file-SHA256 LF entries over src/, tests/, evals/, pyproject.toml and uv.lock; excludes .pytest_cache, __pycache__, .mypy_cache, .ruff_cache and .venv. Exact source archive is not included, so this records evidence and does not claim replay from the current checkout.",
+    "A completed software suite is distinct from MVP acceptance."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "repeat": 1,
+  "goal_outcomes": [
+    {
+      "goal_id": "3181a882-08c6-4d2e-9738-0700edd1c017",
+      "state": "completed",
+      "error_code": null,
+      "status": "achieved",
+      "proposal_id": "f7c10bce-bef0-4ee0-a901-2026bb0eda2d",
+      "delivered": true
+    }
+  ],
+  "goal_status": "achieved",
+  "consumed_turns": 1,
+  "checkpoint": "[completed] Я записав рядок 'температура=21' у файл `/tmp/pytest-of-cyberdid/pytest-0/test_real_bolt_bounded_experim0/1/sandbox/experiment.txt`. Перевірю існування та вміст. Далі — перевірка вмісту.",
+  "file_on_disk": "температура=21",
+  "check_passes_independently": true,
+  "reflection": {
+    "state": "recorded",
+    "memory_id": "79b1f805-924a-4e7c-a285-1f062d81f1d0",
+    "evidence_ids": [
+      "e64e66b0-300e-4ee6-99fe-ab2fc88782f8",
+      "8194dbde-5caa-4db8-8d83-f76e053b2c8c"
+    ]
+  },
+  "reflection_record": {
+    "text": "Власник активно моніторить роботу сервера та має вимоги до формату звітності.",
+    "evidence_ids": [
+      "e64e66b0-300e-4ee6-99fe-ab2fc88782f8",
+      "8194dbde-5caa-4db8-8d83-f76e053b2c8c"
+    ]
+  },
+  "proposals": [
+    {
+      "id": "f7c10bce-bef0-4ee0-a901-2026bb0eda2d",
+      "goal_id": "3181a882-08c6-4d2e-9738-0700edd1c017",
+      "text": "Ціль «Синтетичний експеримент: запиши у файл /tmp/pytest-of-cyberdid/pytest-0/test_rea»: Я записав рядок 'температура=21' у файл `/tmp/pytest-of-cyberdid/pytest-0/test_real_bolt_bounded_experim0/1/sandbox/experiment.txt`. Перевірю існування та вміст. Далі — перевірка вмісту.",
+      "created_at": "2026-11-18T08:21:33.484563+00:00",
+      "delivered": 1,
+      "reason": "allowed",
+      "attention_id": "c033397d-b2e0-4b6b-895d-ef75b69d8912"
+    }
+  ]
+}

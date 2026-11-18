@@ -21,6 +21,7 @@ import pytest
 
 from b12.config import Settings
 from b12.runtime import open_runtime
+from evals.unified.tool_oracles import score_command_listing
 
 pytestmark = [
     pytest.mark.real_model,
@@ -171,19 +172,35 @@ async def case_shell_ls(base, repeat):
         (sandbox / name).write_text("synthetic")
     runtime = open_runtime(settings_for(base / "state"))
     try:
+        prompt_variant = os.environ.get("B12_EVAL_PROMPT_VARIANT", "natural")
+        if prompt_variant == "explicit_cwd":
+            prompt = (
+                f"Виконай `ls` інструментом `run_command`. У полі `cwd` передай точно "
+                f"цей абсолютний шлях: {sandbox}. Не передавай батьківський каталог. "
+                "Перелічи імена файлів, які реально поверне команда."
+            )
+        elif prompt_variant == "natural":
+            prompt = (
+                f"Виконай команду ls саме в каталозі {sandbox} через доступний інструмент "
+                "командного рядка та перелічи файли, які там є."
+            )
+        else:
+            raise ValueError("unsupported B12_EVAL_PROMPT_VARIANT")
         _, row = await turn(
             runtime,
             owner(runtime),
-            f"Виконай команду ls у каталозі {sandbox} через інструмент shell_exec "
-            "і перелічи файли, які там є.",
+            prompt,
         )
     finally:
         runtime.close()
     row["effects"] = {"unchanged_listing": sorted(p.name for p in sandbox.iterdir())}
-    row["behavior"] = {
-        "used_shell_exec": completed(row, "shell_exec"),
-        "final_mentions_both": all(n in row["content"] for n in ("alpha.txt", "beta.txt")),
-    }
+    row["behavior"] = score_command_listing(
+        requested_directory=str(sandbox),
+        expected_names=("alpha.txt", "beta.txt"),
+        calls=row["calls"],
+        results=row["results"],
+        answer=row["content"],
+    )
     return row
 
 
@@ -225,27 +242,46 @@ async def test_real_bolt_agent_tool_tasks(tmp_path):
     root = Path(__file__).resolve().parents[2]
     run = Path(os.environ["B12_EVAL_DIR"])
     run.mkdir(parents=True, exist_ok=False)
+    case_names = tuple(
+        name for name in os.environ.get("B12_EVAL_CASES", ",".join(CASES)).split(",") if name
+    )
+    if not case_names or any(name not in CASES for name in case_names):
+        raise ValueError("B12_EVAL_CASES must name one or more registered cases")
+    prompt_variant = os.environ.get("B12_EVAL_PROMPT_VARIANT", "natural")
+    if prompt_variant not in {"natural", "explicit_cwd"}:
+        raise ValueError("unsupported B12_EVAL_PROMPT_VARIANT")
     settings = settings_for(tmp_path / "probe")
     async with httpx.AsyncClient(trust_env=False) as client:
         show = (
             await client.post(settings.ollama_url + "/api/show", json={"model": settings.model})
         ).json()
         version = (await client.get(settings.ollama_url + "/api/version")).json()
+    git_commit = os.environ.get("B12_EVAL_GIT_COMMIT")
+    if git_commit is None:
+        git_commit = command("git", "rev-parse", "HEAD")["stdout"]
+    dirty_diff_sha256 = os.environ.get("B12_EVAL_DIRTY_DIFF_SHA256")
+    if dirty_diff_sha256 is None:
+        dirty_diff_sha256 = hashlib.sha256(
+            subprocess.run(["git", "diff"], capture_output=True, check=True).stdout
+        ).hexdigest()
     metadata = {
         "started_at": datetime.now(UTC).isoformat(),
         "host": platform.node(),
         "os": platform.platform(),
         "python": platform.python_version(),
         "runtime": version,
-        "git": command("git", "rev-parse", "HEAD"),
-        "dirty_diff_sha256": hashlib.sha256(
-            subprocess.run(["git", "diff"], capture_output=True, check=True).stdout
-        ).hexdigest(),
+        "git": {"returncode": 0, "stdout": git_commit},
+        "dirty_diff_sha256": dirty_diff_sha256,
         "code_sha256": {
             str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(
                 list((root / "src/b12").rglob("*.py"))
-                + [Path(__file__).resolve(), root / "uv.lock", root / "pyproject.toml"]
+                + [
+                    Path(__file__).resolve(),
+                    root / "evals/unified/tool_oracles.py",
+                    root / "uv.lock",
+                    root / "pyproject.toml",
+                ]
             )
             if "_vendor" not in p.parts
         },
@@ -260,12 +296,15 @@ async def test_real_bolt_agent_tool_tasks(tmp_path):
         "power_mode": command("powerprofilesctl", "get"),
         "cache_state": "not cleared; first request cold, later warm/mixed prefix cache",
         "repeats": REPEATS,
+        "cases": case_names,
+        "prompt_variant": prompt_variant,
         "tool_effects_executed": "temp sandbox files and harmless ls only",
         "reasoning_persisted": False,
     }
     (run / "metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     rows = []
-    for name, case in CASES.items():
+    for name in case_names:
+        case = CASES[name]
         for repeat in range(REPEATS):
             base = tmp_path / f"{name}-{repeat}"
             base.mkdir()
@@ -293,7 +332,7 @@ async def test_real_bolt_agent_tool_tasks(tmp_path):
                 key: sum(r["behavior"][key] for r in rows if r["case"] == name) / REPEATS
                 for key in next(r for r in rows if r["case"] == name)["behavior"]
             }
-            for name in CASES
+            for name in case_names
         },
         "behavior_failures": [
             {"case": r["case"], "repeat": r["repeat"], "missed": k}
@@ -316,6 +355,7 @@ async def test_real_bolt_agent_tool_tasks(tmp_path):
         + "\n"
     )
     assert summary["protocol_failures"] == []
+    assert summary["behavior_failures"] == [], summary["behavior_failures"]
     for row in rows:
         if row["case"] == "write_read":
             assert row["effects"]["disk_matches_last_completed_write"]

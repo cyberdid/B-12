@@ -1,0 +1,53 @@
+{
+  "family_id": "M15",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Резистор R12 має номінал 10 кОм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m15-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "low",
+        "source": "synthetic_auto_extraction",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "За BOM ревізії 3: R12 = 4.7 кОм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m15-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "high",
+        "source": "synthetic_bom",
+        "source_locator": "BOM r3 line 12",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Який номінал резистора R12?",
+  "variant_id": "P1"
+}

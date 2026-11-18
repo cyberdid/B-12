@@ -1,0 +1,52 @@
+{
+  "family_id": "M09",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Зустріч із постачальником у вівторок.",
+        "event_time": null,
+        "kind": "episode",
+        "memory_id": "m09-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_chat_a",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Зустріч із постачальником у середу.",
+        "event_time": null,
+        "kind": "episode",
+        "memory_id": "m09-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_chat_b",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Якого дня зустрічаємося з постачальником?",
+  "variant_id": "P2"
+}

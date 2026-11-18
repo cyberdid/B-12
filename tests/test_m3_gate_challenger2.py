@@ -357,23 +357,25 @@ SAMPLE_SCENARIOS = [
         SCENARIOS_DIR / "group_a_memory" / "MEM-01.yaml",
         lambda turn: {
             "content": "24 жовтня на стенді B-12 ми тестували датчик струму разом із вами.",
-            "tool_calls": [{"name": "memory_search", "args": {"query": "датчик струму"}}],
+            "tool_calls": [],
             "ttft_ms": 50.0,
+            "seeded_memory_evidence_count": 1,
         },
         lambda turn: {
-            # Missing required tool_called memory_search and missing required substring
+            # Missing seeded memory evidence and required factual content.
             "content": "Щось робили на стенді.",
             "tool_calls": [],
             "ttft_ms": 50.0,
         },
         lambda turn: {
-            # Emits forbidden phrase 'не пам'ятаю' and calls forbidden tool 'sudo_exec'
+            # Evidence is present, but the response and privileged tool are forbidden.
             "content": "Я не пам'ятаю, що ми робили 24 жовтня на стенді B-12 з датчиком струму.",
             "tool_calls": [
                 {"name": "memory_search", "args": {}},
                 {"name": "sudo_exec", "args": {}},
             ],
             "ttft_ms": 50.0,
+            "seeded_memory_evidence_count": 1,
         },
     ),
     (
@@ -523,11 +525,23 @@ def test_deterministic_turn_rules_pass_and_fail(
     and fail when expectations are missing or forbidden behaviors trigger."""
     assert yaml_path.exists(), f"Scenario YAML not found: {yaml_path}"
 
+    def execute_fixture(factory):
+        def execute(prompt: str, turn_index: int, world_state: dict[str, Any]):
+            output = factory(turn_index)
+            if "seeded_memory_evidence_count" in output:
+                count = output.pop("seeded_memory_evidence_count")
+                world_state.setdefault("runtime_turns", []).append(
+                    {"turn": turn_index, "seeded_memory_evidence_count": count}
+                )
+            return output
+
+        return execute
+
     # 1. Condition A: Pass
     if pass_fn:
         runner_pass = ScenarioRunner(
             artifacts_dir=tmp_path / "pass",
-            turn_executor=lambda p, t, w: pass_fn(t),
+            turn_executor=execute_fixture(pass_fn),
         )
         report_pass = runner_pass.run(yaml_path)
         assert report_pass.status == ExecutionStatus.EXECUTED_PASS, f"Expected PASS for {yaml_path.stem}, got {report_pass.status}"
@@ -541,7 +555,7 @@ def test_deterministic_turn_rules_pass_and_fail(
     if missing_fn:
         runner_missing = ScenarioRunner(
             artifacts_dir=tmp_path / "missing",
-            turn_executor=lambda p, t, w: missing_fn(t),
+            turn_executor=execute_fixture(missing_fn),
         )
         report_missing = runner_missing.run(yaml_path)
         assert report_missing.status == ExecutionStatus.EXECUTED_FAIL, f"Expected FAIL for {yaml_path.stem} missing expected"
@@ -553,7 +567,7 @@ def test_deterministic_turn_rules_pass_and_fail(
     if forbidden_fn:
         runner_forbidden = ScenarioRunner(
             artifacts_dir=tmp_path / "forbidden",
-            turn_executor=lambda p, t, w: forbidden_fn(t),
+            turn_executor=execute_fixture(forbidden_fn),
         )
         report_forbidden = runner_forbidden.run(yaml_path)
         assert report_forbidden.status == ExecutionStatus.EXECUTED_FAIL, f"Expected FAIL for {yaml_path.stem} forbidden triggered"

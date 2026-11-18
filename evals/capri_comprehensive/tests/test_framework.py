@@ -162,6 +162,35 @@ def test_deterministic_tool_assertions() -> None:
     assert res_bad.passed is False
 
 
+def test_deterministic_memory_evidence_retrieval_rule() -> None:
+    rule = EvaluationRule(type="memory_evidence_retrieved")
+    world = {
+        "runtime_turns": [
+            {"turn": 0, "seeded_memory_evidence_count": 1, "runtime_state": "completed"}
+        ]
+    }
+    present = evaluate_single_rule(
+        rule, "24 жовтня тестували датчик.", [], world, {"turn_index": 0}
+    )
+    absent = evaluate_single_rule(
+        rule,
+        "Не пам'ятаю.",
+        [],
+        {"runtime_turns": [{"turn": 0, "seeded_memory_evidence_count": 0}]},
+        {"turn_index": 0},
+    )
+    wrong_turn = evaluate_single_rule(
+        rule,
+        "24 жовтня тестували датчик.",
+        [],
+        {"runtime_turns": [{"turn": 1, "seeded_memory_evidence_count": 1}]},
+        {"turn_index": 0},
+    )
+    assert present.passed is True
+    assert absent.passed is False
+    assert wrong_turn.passed is False
+
+
 def test_deterministic_script_cyrillic() -> None:
     assert check_script_cyrillic("Привіт, я Capri!") is True
     assert check_script_cyrillic("Hello, I am Capri!") is False
@@ -175,6 +204,39 @@ def test_deterministic_latency_rule() -> None:
 
     res_slow = evaluate_single_rule(rule, "", [], {}, {"total_duration_ms": 1250.0})
     assert res_slow.passed is False
+
+
+def test_deterministic_peak_memory_rule_requires_measured_value() -> None:
+    rule = EvaluationRule(type="max_memory_mb", value=2048.0)
+    within = evaluate_single_rule(rule, "", [], {}, {"memory_mb": 1800.0})
+    over = evaluate_single_rule(rule, "", [], {}, {"memory_mb": 2200.0})
+    missing = evaluate_single_rule(rule, "", [], {}, {})
+
+    assert within.passed is True
+    assert over.passed is False
+    assert missing.passed is False
+    assert missing.detail == "Peak memory target was not measured"
+
+
+def test_tool_result_status_rule_checks_the_runtime_result_state() -> None:
+    rule = EvaluationRule(type="tool_result_status", name="sudo_exec", value="approval_pending")
+    pending = evaluate_single_rule(
+        rule,
+        "",
+        [{"name": "sudo_exec", "status": "approval_pending"}],
+        {},
+        {},
+    )
+    completed = evaluate_single_rule(
+        rule,
+        "",
+        [{"name": "sudo_exec", "status": "completed"}],
+        {},
+        {},
+    )
+
+    assert pending.passed is True
+    assert completed.passed is False
 
 
 # ---------------------------------------------------------------------------
@@ -252,6 +314,22 @@ def test_bootstrap_percentiles() -> None:
 # ---------------------------------------------------------------------------
 
 
+def test_mem01_enforces_its_declared_ttft_target() -> None:
+    scenario_path = (
+        Path(__file__).resolve().parents[1] / "scenarios" / "group_a_memory" / "MEM-01.yaml"
+    )
+    scenario = ScenarioDefinition.from_yaml_file(scenario_path)
+    ttft_rules = [
+        rule
+        for turn in scenario.interactions
+        for rule in turn.expected_behaviors
+        if rule.type == "max_ttft_ms"
+    ]
+
+    assert len(ttft_rules) == 1
+    assert ttft_rules[0].threshold_ms == 1500
+
+
 def test_scenario_runner_pass() -> None:
     yaml_text = """
 id: "MEM-01"
@@ -312,7 +390,9 @@ interactions: []
 """
     sc = ScenarioDefinition.from_yaml_str(yaml_text)
 
-    def never_called(user_input: str, turn_index: int, world_state: dict[str, Any]) -> dict[str, Any]:
+    def never_called(
+        user_input: str, turn_index: int, world_state: dict[str, Any]
+    ) -> dict[str, Any]:
         raise AssertionError("turn executor must not run for an empty scenario")
 
     with tempfile.TemporaryDirectory() as art_dir:
@@ -444,6 +524,7 @@ def test_suite_runner_and_aggregator() -> None:
         csv_path = agg.write_scenario_matrix_csv(reports_dir / "CAPRI_SCENARIO_MATRIX.csv")
         assert csv_path.exists()
         import csv
+
         with open(csv_path, encoding="utf-8") as cf:
             reader = csv.DictReader(cf)
             expected_headers = [

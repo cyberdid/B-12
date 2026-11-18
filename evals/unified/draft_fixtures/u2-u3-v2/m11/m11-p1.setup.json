@@ -1,0 +1,41 @@
+{
+  "family_id": "M11",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "m11-r1",
+        "content": "Чули, що постачальник підніме ціни в січні.",
+        "event_time": null,
+        "kind": "claim",
+        "memory_id": "9692d421-036d-5fc7-866d-155cf279816f",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "unverified",
+        "source": "synthetic_hearsay",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

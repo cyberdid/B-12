@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -53,6 +53,7 @@ class RuntimeSettings(BaseModel):
     num_ctx: int = Field(default=4096, ge=512, le=32768)
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     model: str = Field(default="pinned_primary")
+    sudo_access: Literal["off", "approval"] = "off"
     seed: int | None = 42
 
 

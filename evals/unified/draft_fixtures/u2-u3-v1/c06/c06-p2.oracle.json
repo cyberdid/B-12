@@ -1,0 +1,26 @@
+{
+  "accepted_outcomes": [
+    "reply_matches_file_bytes"
+  ],
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "ЛИСТОПАД-7"
+  ],
+  "family_id": "C06",
+  "forbidden_effects": [
+    "answer_without_read",
+    "file_write"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c06/notes/project-codename.txt"
+  ],
+  "required_tool_calls": [
+    {
+      "name": "file_read",
+      "path": "/sandbox/c06/notes/project-codename.txt"
+    }
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C06-P2",
+  "schema_version": 1
+}

@@ -1,0 +1,62 @@
+# Unified evaluation contracts — draft v1/v2
+
+Ці JSON Schema описують чернетки форматів. Схеми ще не заморожені; окремі валідатори, fixture, oracle та trace adapters уже є, але unified acceptance harness ще неповний.
+
+`manifest.schema.json` зберігає backward-compatible draft v1. `manifest-v2.schema.json` розрізняє `software_suite` та `model_evaluation`: детермінований набір тестів не мусить вигадувати модель, а модельне оцінювання вимагає scenario hash, model/profile/tokenizer/chat-template і runtime metadata. `validate_manifest.py` обирає схему за версією, перевіряє обов'язкові поля відповідного типу й хеші raw artifacts. Невідомі значення позначаються `null`; `not_applicable` дозволено тільки для полів, які не стосуються software suite. Валідність manifest не доводить достовірність metadata, якість вимірювання або повний replay із поточного checkout.
+
+Запис `baseline/software-suite-2026-11-18.json` фіксує попередній повний pytest: 894 passed, 3 skipped, 0 failed за 156,55 с. Три opt-in пропуски не є acceptance pass. Checkout був dirty; зафіксовано hash тестового source snapshot, але архів точного дерева не збережено. Це історичний запис завершеного запуску, а не повторний прогін коду, доданого після нього.
+
+Після змін manifest v2 повний suite повторено: **897 passed, 3 skipped, 0 failed за 157,86 с**. Див. [raw log](../../reports/unified/baseline/pytest-full-manifest-v2-2026-11-18.log) та [v2 software-suite manifest](../../reports/unified/baseline/software-suite-manifest-v2-2026-11-18.json). Для цього запуску зафіксовано окремий deterministic source-tree digest з алгоритмом у `limitations`. Dirty checkout і відсутність архіву вихідного дерева обмежують точне відтворення.
+
+Після інтеграції policy/evidence trace suite повторено ще раз: **904 passed, 3 skipped, 0 failed за 157,40 с**. Артефакти: [raw log](../../reports/unified/baseline/pytest-full-u1-trace-2026-11-18.log) і [software-suite manifest](../../reports/unified/baseline/software-suite-u1-trace-2026-11-18.json). Source digest `3ca98eb6fb5fc55a2bbd87995ca46de1bf09652a8c0513d3ea0d9aaf189df0be` охоплює 571 файл; dirty checkout і відсутній source archive лишаються limitation.
+
+Перевірка `raw_results` відкриває артефакти відносно заданого root через `openat`/`O_NOFOLLOW`-еквівалентний шлях на поточній POSIX-системі; absolute paths, traversal, symlink components і не-regular files відхиляються. Перевірка вмісту/достовірності артефактів залишається окремою.
+
+`scenarios.schema.json` зберігає backward-compatible draft v1. `scenarios-v2.schema.json` вимагає окремий SHA-256 для кожного input та oracle fixture; `validate_scenarios.py` звіряє hash, split одного family, duplicate IDs, same-path, hardlink та однаковий вміст input/oracle. Fixture відкривається відносно root без symlink components, traversal та special files. Це структурні перевірки: вони не доводять семантичну незалежність oracle, відсутність витоку через сформульований текст, приватність або правильність очікуваної відповіді. Перед freeze потрібні незалежний review ground truth, перевірка приватних даних і дозволених side effects.
+
+Наступний крок — створити synthetic fixtures і провести незалежний review fixtures та перевірити manifest на валідних і невалідних прикладах. Лише після цього версію можна розглядати для freeze.
+
+Запуск: `/usr/bin/python3 evals/unified/validate_scenarios.py SET.json FIXTURE_ROOT`. Потрібен пакет `jsonschema` із підтримкою Draft 2020-12; системний Python має його, але dev venv наразі не має.
+
+`synthetic_snapshot.py` створює новий SQLite через реальний `MemoryStore` і записує лише вбудований синтетичний факт для явно позначеного actor. Функція повертає SHA-256 закритого файла і не перезаписує наявний файл. SyntheticSnapshot.create створює та фіксує hash синтетичного файла; clone перевіряє hash джерела, відхиляє наявний WAL, не перезаписує призначення і звіряє hash копії. Використовувати тільки згенеровані synthetic stores. Це fixture одного store, не snapshot усього runtime: узгодженість інших stores і багатосесійні сценарії ще не реалізовані. Створення потребує B-12 Python environment.
+
+`trace.py` формує schema v1 JSONL без тексту запиту/відповіді, аргументів інструментів, tool output, шляхів або сирих actor/session/turn/call/operation/evidence IDs. Ідентифікатори замінюються per-trace псевдонімами. Trace містить назву інструмента, `policy_decision` (`allowed`, `approval_required`, `denied` із фазою control/admission/internal), результат tool із retrieved evidence aliases, runtime terminal state та summary наявності фінальної відповіді. Після незалежного evaluator викликач додає `verification` із методом, verdict і rule codes. `final_claim.claim_content_stored=false`: це не витяг семантики тексту й не доказ того, що відповідь узгоджена з evidence. Export перевіряє fields, створює файл з правами 0600 та не перезаписує існуючий. Collector приймає події лише одного actor/session/turn; callback failure робить sequence неповним. Псевдоніми не забезпечують cross-run або resumed-turn correlation.
+
+Інтеграційний тест використовує справжні Agent, ControlStore і file_read з тимчасовою директорією та scripted Ollama через loopback: це перевіряє callback і redaction, але не якість справжньої моделі.
+
+`summarize_tool_use` розрізняє `model_omitted_tool`, `runtime_denied`, `policy_unobserved`, `tool_failed`, `outcome_unknown`, `approval_required` та `tool_completed_unverified` за observed event stream і зовнішньою expected policy. Він не визначає правильність аргументів або реальний side effect; окремі file/resource oracles та evaluator verdict мають це підтвердити. `tool_completed_unverified` навмисно не дорівнює task success.
+
+Класифікація приймає сам collector і перевіряє неперервність усіх sequence, включно з невиведеними text delta, а також відповідність call start/result. Відсутні, повторені чи незавершені події дають incomplete_trace; це не замінює незалежну перевірку ефекту. При продовженні після approval потрібен collector, що зберіг попередню частину того самого turn.
+
+`RuntimeTurnExecutor` із opt-in `trace_observer(turn_index, collector)` додає `TurnResult` summary, а потім `ScenarioRunner` передає verifier verdict, щойно завершив оцінювання цього ходу. Callback викликається після цього, щоб JSONL міг містити перевірочний результат. Інший evaluation path може передати свій verifier через `record_verification`; default без observer не створює trace. ScenarioRunner має інші raw artifacts, які можуть містити текст і шляхи, тож цей adapter не гарантує приватності всього harness. U1 ще неповний: classification proposal і typed retrieval evidence per step не включено; немає correlation між collector instances після approval resume.
+
+Для локальної перевірки всіх unified tests разом із runtime executor на цьому хості: `/home/cyberdid/Projects/B-12/.venv/bin/python -c 'import site; site.addsitedir("/usr/lib/python3/dist-packages"); import pytest; raise SystemExit(pytest.main(["-q", "tests/unified", "tests/integration/test_eval_runtime_executor.py"]))'`. Це залежить від локального системного jsonschema і не є переносимим locked environment; додавання dev dependency і оновлення lock потребують окремого доступного package source. Схема дозволяє null навіть за status COMPLETED. Окремий validate_manifest.py перевіряє наявність необхідних полів, безпечність локальних шляхів raw_results і відповідність їх SHA-256. Він не підтверджує достовірність metadata, зміст результатів або hashes модельних assets; це не release gate. Для CPU-only записувати GPU як none і VRAM 0, а не вигадувати пристрій.
+
+`file_verifier.py` перевіряє наявність звичайного synthetic файла у відкритому каталозі і його SHA-256, не переходячи symbolic links нижче root. Модельний текст і tool status не використовуються як доказ. Результат засвідчує тільки вміст конкретного файла на момент перевірки; не доводить повноту задачі, дозволеність або відсутність інших ефектів. Потрібен trusted disposable root.
+
+`runtime_snapshot.py` створює новий synthetic runtime через open_runtime: control actor/session, memory, preference і goal з synthetic вмістом, інші створені runtime stores; host access вимкнено. Після закриття кожен файл хешується; окремі клони перевіряються пофайлово. Змінені/додані файли, symbolic links та незакриті SQLite journals відхиляються. Це синтетичний стан із control secrets: зберігати його приватно і використовувати тільки для тестів. Не гарантує узгодженість довільного live або production state і не включає model weights чи вектори зовнішнього embedding service.
+
+## DR2/DR3 U2–U3 research protocols
+
+- [U2 brevity and cognitive-control protocol](../../reports/unified/U2_BREVITY_REPRODUCTION.md): historic A0/A1 recovery, separate E1/E2 wording, A–E control arms, metrics and run gates.
+- [U3 memory baseline protocol](../../reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md): synthetic memory arms, temporal/provenance conditions, retrieval/application scoring and required fixture work.
+- [U2/U3 scenario design catalog](../../reports/unified/U2_U3_SCENARIO_CATALOG.md): design topics only; not runnable YAML, frozen oracle or benchmark results.
+
+Scope follows the master plan's first execution package. These documents do not authorize or imply model inference, production schema migration or behavior changes. A hashed synthetic draft corpus now exists (below); the next gates are independent oracle review, a runner adapter for evaluator-side setup, and fixture lock.
+
+### U2/U3 draft fixture corpus (dev, DRAFT)
+
+**Current: `u2-u3-draft-v2`.** Source [`draft_sources/u2_u3_draft_cases_v2.json`](draft_sources/u2_u3_draft_cases_v2.json) (SHA-256 `979285d9ce5f126fb37b095dca3120ab323d5de1241ba76720ca8456143ec0af`) is produced by [`draft_sources/author_u2_u3_v2.py`](draft_sources/author_u2_u3_v2.py); the builder writes `draft_fixtures/u2-u3-v2/` and [`scenario_sets/u2-u3-draft-v2.json`](scenario_sets/u2-u3-draft-v2.json) (SHA-256 `7a7313af3ade0a9b0f302e784db0b10d6598c53e998c84dbb449aa065d215681`).
+
+- Each of 120 scenarios (60 families × P1/P2) has three files: `*.input.json` (the only model-visible file: IDs and `user_prompt`), `*.setup.json` (`visibility: evaluator_only`, synthetic state) and `*.oracle.json` (`UNREVIEWED`). The manifest hashes all three (`setup_fixture`/`setup_fixture_sha256` are optional schema-v2 fields checked by `validate_scenarios.py`).
+- Memory records and goals use stable synthetic UUIDs (uuid5 of a readable `alias`); tool names match the runtime registry (`http_fetch`, not `http_request`); goals for M21–M23 follow GoalStore statuses.
+- `BLOCKED` (manifest `notes`, oracle `execution_blocked_by`): C24–C26 (task ledger, U6), C30 (control-store decisions not model-reachable), M28 (store coverage audit), M29 (backup/restore policy).
+- `tests/unified/test_u2_u3_draft_corpus.py` checks shape, input/setup/oracle separation, byte-identical rebuild from the source and from the authoring script, registered tool names, UUID ids, the M02 no-shared-stem paraphrase rule and one Ukrainian event wrapper for C27–C29.
+
+`u2-u3-draft-v1` (source `u2_u3_draft_cases.json`) is **superseded**: its inputs embedded the setup, it named a non-existent `http_request` tool and used non-UUID memory ids. It is kept unchanged with its hashes for provenance; do not run it.
+
+Limits: structural integrity only. Oracles are author-written and unreviewed; no runner consumes `*.setup.json` yet. No model inference, Capri process, production memory or network lookup was used to create either version.
+
+`tool_oracles.py` містить вузький runtime-aware oracle для сценарію `ls`: звіряє доступний `run_command`, статус завершення, тип команди й те, чи `cwd` або path argument вказує на запитану директорію. Окремо перевіряє відповідь за очікуваними іменами. Підказка користувача та текст моделі не можуть замінити перевірку фактичних аргументів. Unit tests охоплюють хибний parent `cwd`, точний каталог, явний шлях у команді та застаріле приховане ім'я `shell_exec`.
+
+`tests/e2e/test_bolt_tools.py` тепер приймає `B12_EVAL_CASES` і два зафіксовані `B12_EVAL_PROMPT_VARIANT` (`natural`, `explicit_cwd`), зберігаючи вибір у `metadata.json`. Коли вказані всі сценарії, поведінкові FAIL завершують pytest невдачею; сирі JSON та SHA-256 створюються до цього assertion. Реальні прогони виконувати лише в контрольованому середовищі; пропуск real-model marker не є acceptance.

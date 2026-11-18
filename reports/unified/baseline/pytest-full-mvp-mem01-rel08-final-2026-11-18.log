@@ -1,0 +1,54 @@
+........................................................................ [  8%]
+..ss.................................s.................................. [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+........................................................................ [ 56%]
+........................................................................ [ 64%]
+..................F..................................................... [ 72%]
+........................................................................ [ 80%]
+........................................................................ [ 88%]
+........................................................................ [ 96%]
+...........................                                              [100%]
+=================================== FAILURES ===================================
+______________ test_deterministic_turn_rules_pass_and_fail[---0] _______________
+
+yaml_path = PosixPath('/home/cyberdid/Projects/B-12/.worktrees/unified-dr2-dr3/evals/capri_comprehensive/scenarios/group_a_memory/MEM-01.yaml')
+pass_fn = <function <lambda> at 0x7774a9be7880>
+missing_fn = <function <lambda> at 0x7774a9be7920>
+forbidden_fn = <function <lambda> at 0x7774a9be79c0>
+tmp_path = PosixPath('/tmp/pytest-of-cyberdid/pytest-66/test_deterministic_turn_rules_0')
+
+    @pytest.mark.parametrize("yaml_path,pass_fn,missing_fn,forbidden_fn", SAMPLE_SCENARIOS, ids=lambda x: x[0].stem if isinstance(x, tuple) else "")
+    def test_deterministic_turn_rules_pass_and_fail(
+        yaml_path: Path,
+        pass_fn: Any,
+        missing_fn: Any,
+        forbidden_fn: Any,
+        tmp_path: Path,
+    ):
+        """Verify that deterministic turn rules pass when behavior meets criteria,
+        and fail when expectations are missing or forbidden behaviors trigger."""
+        assert yaml_path.exists(), f"Scenario YAML not found: {yaml_path}"
+    
+        # 1. Condition A: Pass
+        if pass_fn:
+            runner_pass = ScenarioRunner(
+                artifacts_dir=tmp_path / "pass",
+                turn_executor=lambda p, t, w: pass_fn(t),
+            )
+            report_pass = runner_pass.run(yaml_path)
+>           assert report_pass.status == ExecutionStatus.EXECUTED_PASS, f"Expected PASS for {yaml_path.stem}, got {report_pass.status}"
+E           AssertionError: Expected PASS for MEM-01, got EXECUTED_FAIL
+E           assert <ExecutionSta...XECUTED_FAIL'> == <ExecutionSta...XECUTED_PASS'>
+E             
+E             - EXECUTED_PASS
+E             ?          ^ ^^
+E             + EXECUTED_FAIL
+E             ?          ^ ^^
+
+tests/test_m3_gate_challenger2.py:533: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_m3_gate_challenger2.py::test_deterministic_turn_rules_pass_and_fail[---0]
+1 failed, 887 passed, 3 skipped in 185.56s (0:03:05)

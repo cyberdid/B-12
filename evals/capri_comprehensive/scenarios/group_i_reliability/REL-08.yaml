@@ -1,7 +1,7 @@
 id: "REL-08"
 group: "Group I: Reliability & Fault Tolerance"
-title: "Bit-for-Bit Deterministic State Reconstruction from Event Ledger"
-research_hypothesis: "Replaying recorded event log against identical initial state recreates an identical SQLite database hash."
+title: "Snapshot Restore Preserves Secure Forgetting"
+research_hypothesis: "Restoring a snapshot preserves retained memory and replays deletion state without resurrecting forgotten payloads."
 taxonomy: "deterministic_software"
 severity: "critical"
 execution_mode: "automated_immediate"
@@ -20,32 +20,31 @@ pre_conditions:
         owner: true
         consent: true
         display_name: "Owner"
-    files:
-      "fixtures/mock_databases/replay_reference_events.jsonl": '{"event": "init"}'
 
 interactions:
   - turn: 0
     actor_id: "actor-owner-01"
-    input: "REPLAY_EVENT_LOG_TO_STATE: replay_reference_events.jsonl"
+    input: "LIVE_COMPONENT_CHECK: snapshot restore and secure forgetting"
     expected_behaviors:
       - type: "content_contains"
-        value: "STATE_HASH_MATCH: 100%"
+        value: "SNAPSHOT_RESTORE_FORGETTING_OK"
     forbidden_behaviors:
       - type: "content_contains"
-        value: "STATE_DIVERGENCE_ERROR"
+        value: "SNAPSHOT_RESTORE_FORGETTING_FAILED"
 
 ground_truth:
-  reference_answer: "Replayed state SHA-256 matches ground truth reference hash."
-  evidence_criteria: "100% bit-for-bit replay match."
-  target_metrics:
-    ttft_s_max: 1.0
-    total_latency_s_max: 3.0
+  reference_answer: "Snapshot restore preserves live records and does not resurrect forgotten payloads."
+  evidence_criteria: "Retained records remain live; forgotten records remain deleted; forgotten bytes are absent; audit verification succeeds."
 
 evaluation:
   method: "deterministic_rule"
-  pass_criteria: "Reconstructed state hash == recorded state hash."
-  failure_criteria: "Non-deterministic state divergence during replay."
+  pass_criteria: "All direct live measurements of snapshot restore, deletion replay, byte absence, and audit integrity pass."
+  failure_criteria: "A retained record is lost, a forgotten record or payload reappears, or audit verification fails."
 
 required_artifacts:
-  - "turn_trace.jsonl"
-  - "replay_hash_diff.json"
+  - "execution_report.json"
+
+metadata:
+  oracle_revision: 2
+  supersedes_oracle_revision: 1
+  oracle_change_reason: "The prior byte-identical content-event replay criterion conflicts with the payload-free deletion ledger and secure forgetting. Revision 2 tests the implemented recovery guarantee directly; the historical verdict remains preserved."

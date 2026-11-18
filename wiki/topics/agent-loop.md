@@ -1,8 +1,8 @@
 ---
 type: topic
-updated: 2026-11-06
+updated: 2026-11-18
 status: partially_implemented
-sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/agent.py, src/b12/sessions.py, src/b12/purge.py, src/b12/evidence.py, src/b12/runtime.py, tests/integration/test_agent_loop.py, tests/unit/test_sessions.py, tests/e2e/test_bolt_tools.py]
+sources: [docs/superpowers/specs/2026-10-24-b12-system-design.md, src/b12/agent.py, src/b12/sessions.py, src/b12/purge.py, src/b12/evidence.py, src/b12/runtime.py, tests/integration/test_agent_loop.py, tests/unit/test_sessions.py, tests/e2e/test_bolt_tools.py, evals/unified/tool_oracles.py, reports/unified/MVP_ACCEPTANCE_LEDGER.md]
 tags: [agent, sessions, purge, evidence, tools]
 ---
 # Agent loop, сесії та глобальне забуття
@@ -34,6 +34,8 @@ tags: [agent, sessions, purge, evidence, tools]
 ## Реальний Bolt
 
 **Перевірений факт:** run1 (`9b4f31a`) — 12/12 `context_mismatch`. Причина — `anyOf` у схемі `process_list`: Ollama рендерить на 6 токенів більше, ніж pinned template. Exact admission спрацював fail-closed. Registry тепер відхиляє anyOf/oneOf/allOf/$ref/$defs/not. Run2/run3 (`2d6ee36`/`740629a`, clean tree, Ollama 0.33.3, ctx 4096, T=0, seed 42): 0 protocol failures; write→read із незалежною перевіркою файла, system_info і memory recall після restart — по 3/3. shell_exec: модель дублює програму в argv й обрізає cwd, тому команда падає, і модель чесно повідомляє про невдачу. Це поведінковий дефект для корпусу Task 14. Сирі результати — у `artifacts/task7-bolt-tools-2026-10-26-run{1,2,3}`. Turn warm — приблизно 2–6 с; це не voice SLO.
+
+**Повтор 18.11.2026 із актуальним schema oracle:** старий `shell_exec` критерій було замінено на фактично видимий `run_command`, а оцінювач перевіряє `cwd` незалежно від фінального тексту. У 12 синтетичних повтореннях є 0 protocol failures; write/read, system info та memory restart — по 3/3. Команда `ls` із natural prompt — 2/3. У невдалому повторі модель передала правильний `ls`, але `cwd` був на один рівень вище; runtime коректно виконав цей аргумент. Точніша інструкція `cwd` дала 0/3, тимчасовий опис аргумента в schema — 1/3; runtime зміна повернута. Якість path argument лишається відкритою. [Повний реєстр умов, сирі результати й hashes](../../reports/unified/MVP_ACCEPTANCE_LEDGER.md#повтор-із-перевіреним-oracle-для-шляху-ls--18112026).
 
 Review: coordinator self-review і 10 мутацій ключових гарантій (кожну спіймали тести). Окремого незалежного агента не було.
 

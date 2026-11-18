@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b12.local/schemas/unified-scenarios-v1.json",
+  "title": "Unified evaluation scenario set v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "set_id", "scenarios"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "set_id": {"type": "string", "minLength": 1},
+    "scenarios": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/scenario"}}
+  },
+  "$defs": {
+    "scenario": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scenario_id", "family_id", "track", "split", "input_fixture", "oracle_fixture", "expected_decision", "risk", "status"],
+      "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "family_id": {"type": "string", "minLength": 1},
+        "track": {"enum": ["memory", "control", "integration"]},
+        "split": {"enum": ["dev", "validation", "locked_test", "longitudinal_holdout"]},
+        "input_fixture": {"type": "string", "minLength": 1},
+        "oracle_fixture": {"type": "string", "minLength": 1},
+        "expected_decision": {"enum": ["ACT", "NO_TOOL", "ASK", "DEFER", "SILENT", "INCONCLUSIVE"]},
+        "risk": {"enum": ["read_only", "synthetic_mutation", "permission_sensitive"]},
+        "status": {"enum": ["DRAFT", "FROZEN", "RETIRED"]},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

@@ -2,8 +2,10 @@
 
 import json
 import os
+import shutil
 import socket
 import subprocess
+import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -38,7 +40,8 @@ def upstream():
             if behavior.get("invalid_metadata"):
                 self.wfile.write(b"[]")
                 return
-            self.wfile.write(json.dumps({"models": [{"name": MODEL}, {"name": "other"}]}).encode())
+            models = behavior.get("models", [{"name": MODEL}, {"name": "other"}])
+            self.wfile.write(json.dumps({"models": models}).encode())
 
         def do_POST(self):
             data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
@@ -58,6 +61,9 @@ def upstream():
                     pass
                 return
             if self.path == "/api/chat":
+                if behavior.get("immediate_chat"):
+                    self.wfile.write(b'{"message":{"content":"ok"}}\n{"done":true}\n')
+                    return
                 self.wfile.write(b'{"message":{"content":"first"}}\n')
                 self.wfile.flush()
                 self.connection.settimeout(0.02)
@@ -102,6 +108,26 @@ def test_metadata_filters_unrelated_models_and_forwards_pinned_show(broker):
     with client(broker) as c:
         assert c.get("/api/tags").json() == {"models": [{"name": MODEL}]}
         assert c.post("/api/show", json={"model": MODEL}).json() == {"ok": True}
+
+
+def test_broker_supports_an_exact_allowlist_of_local_models(tmp_path, upstream):
+    from evals.ollama_broker import ModelBroker
+
+    second = "gemma4:12b"
+    upstream[5]["models"] = [
+        {"name": MODEL},
+        {"name": second},
+        {"name": "unapproved-model"},
+    ]
+    with ModelBroker(tmp_path / "models.sock", upstream[0], [MODEL, second]) as running:
+        with client(running) as c:
+            assert c.get("/api/tags").json() == {"models": [{"name": MODEL}, {"name": second}]}
+            assert c.post("/api/show", json={"model": second}).status_code == 200
+            assert c.post("/api/chat", json={"model": "unapproved-model"}).status_code == 403
+    assert upstream[1] == [
+        ("GET", "/api/tags", None),
+        ("POST", "/api/show", {"model": second}),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -338,3 +364,61 @@ print('container metadata, route denial, streaming: passed')
             assert [call[1] for call in upstream[1]] == ["/api/tags", "/api/chat"]
         finally:
             subprocess.run(["docker", "rm", "-f", name], capture_output=True, timeout=5)
+
+
+def test_networkless_bubblewrap_worker_reaches_only_model_broker(tmp_path, upstream):
+    from evals.ollama_broker import ModelBroker
+
+    bwrap = shutil.which("bwrap")
+    if bwrap is None:
+        pytest.skip("bubblewrap is not installed")
+    channel = tmp_path / "channel"
+    channel.mkdir(mode=0o700)
+    upstream[5]["immediate_chat"] = True
+    repo = Path(__file__).resolve().parents[2]
+    script = """
+import socket
+from pathlib import Path
+import httpx
+from evals.socket_bridge import SocketBridge
+with SocketBridge(Path('/tmp/model-broker/model.sock')):
+    with httpx.Client(base_url='http://127.0.0.1:11434', timeout=2) as client:
+        assert client.get('/api/tags').json() == {'models': [{'name': 'b12-test:pinned'}]}
+        assert client.post('/api/chat', json={'model': 'b12-test:pinned'}).status_code == 200
+try:
+    socket.create_connection(('127.0.0.1', UPSTREAM_PORT), timeout=0.25)
+except OSError:
+    pass
+else:
+    raise SystemExit('host loopback is reachable from the isolated network namespace')
+print('isolated worker reached only the model broker')
+""".replace("UPSTREAM_PORT", upstream[0].rsplit(":", 1)[1])
+    command = [
+        bwrap,
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--dir",
+        "/tmp/model-broker",
+        "--ro-bind",
+        str(channel),
+        "/tmp/model-broker",
+        "--unshare-net",
+        "--die-with-parent",
+        "--new-session",
+        "--chdir",
+        str(repo),
+        sys.executable,
+        "-c",
+        script,
+    ]
+    with ModelBroker(channel / "model.sock", upstream[0], MODEL):
+        result = subprocess.run(command, capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr
+    assert "isolated worker reached only the model broker" in result.stdout

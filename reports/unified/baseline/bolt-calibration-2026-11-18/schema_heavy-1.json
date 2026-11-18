@@ -1,0 +1,318 @@
+{
+  "case": "schema_heavy",
+  "repeat": 1,
+  "request": {
+    "model": "b12-bolt-e4b:q4km",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Не викликай інструменти. Відповідай лише словом ПЕРЕВІРЕНО."
+      },
+      {
+        "role": "user",
+        "content": "Підтверди одним словом."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_0",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_1",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_2",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_3",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_4",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_5",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_6",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_7",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_8",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_9",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_10",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "synthetic_11",
+          "description": "Синтетична схема. опис опис опис опис опис опис опис опис опис опис ",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      }
+    ],
+    "stream": true,
+    "think": false,
+    "options": {
+      "num_ctx": 4096,
+      "num_predict": 128,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 42,
+      "draft_num_predict": 0
+    }
+  },
+  "fingerprint": "a672fae026daccaab8598e9af4e5a02b73ab1990590f0a4d2b6b4b1012f5e5d0",
+  "input_tokens": 968,
+  "input_upper_bound": 984,
+  "output_reserve": 128,
+  "reply": {
+    "schema_version": 1,
+    "content": "ПЕРЕВІРЕНО",
+    "tool_calls": [],
+    "metrics": {
+      "prompt_eval_duration": 25840000,
+      "prompt_eval_cached_count": 967,
+      "load_duration": 576035,
+      "prompt_eval_count": 968,
+      "eval_count": 7,
+      "total_duration": 129013262,
+      "eval_duration": 97859000,
+      "ttft_s": 0.567822815999989,
+      "elapsed_s": 0.6658604369999921
+    },
+    "finish_reason": "stop"
+  },
+  "public_deltas_match_reply": true,
+  "expected": "ПЕРЕВІРЕНО",
+  "boundary_instruction_passed": true,
+  "count_matches": true
+}

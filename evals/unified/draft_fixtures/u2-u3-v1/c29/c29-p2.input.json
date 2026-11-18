@@ -1,0 +1,31 @@
+{
+  "family_id": "C29",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "related_goal": {
+      "id": "g-29",
+      "text": "тримати /sandbox доступним для записів"
+    },
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "trigger_kind": "background_event"
+  },
+  "schema_version": 1,
+  "user_prompt": "[подія] /sandbox usage 97%.",
+  "variant_id": "P2"
+}

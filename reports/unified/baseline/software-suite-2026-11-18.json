@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "run_id": "pytest-full-2026-11-18-final",
+  "run_type": "software_suite",
+  "status": "COMPLETED",
+  "commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "dirty": true,
+  "scenario_set_sha256": null,
+  "environment": {
+    "host": null,
+    "os": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu": "Intel(R) Core(TM) i9-14900HX",
+    "gpu": "not_applicable",
+    "vram_bytes": 0,
+    "ram_bytes": 33330786304,
+    "power_mode": "unknown-not-recorded"
+  },
+  "model": {
+    "name": null,
+    "digest": null,
+    "quantization": null,
+    "runtime_version": null,
+    "profile_sha256": null,
+    "tokenizer_sha256": null,
+    "chat_template_sha256": null
+  },
+  "configuration": {
+    "context_tokens": null,
+    "output_tokens": null,
+    "cache_state": "not_applicable",
+    "repeats": 1,
+    "snapshot_sha256": "95b66880a4571d48799b908c02cb2817c2e93ba48fb3ee449477469181416411"
+  },
+  "suite": {
+    "name": "B-12 full pytest suite",
+    "command": "B12_DOCKER_TEST=1 .venv/bin/pytest -q",
+    "test_roots": ["tests"],
+    "source_snapshot_sha256": "95b66880a4571d48799b908c02cb2817c2e93ba48fb3ee449477469181416411",
+    "passed": 894,
+    "skipped": 3,
+    "failed": 0,
+    "duration_seconds": 156.55
+  },
+  "raw_results": [
+    {
+      "path": "reports/unified/baseline/pytest-full-mvp-sudo-approval-final-2026-11-18.log",
+      "sha256": "02e7d91a07c43304494a2c6efbfc15adf9740070eaa5cacfa9d379fcd11c661f"
+    },
+    {
+      "path": "reports/unified/baseline/pytest-full-mvp-sudo-approval-2026-11-18.json",
+      "sha256": "70ac269fb8bf4c0fe628f57f07fb10787f624d2486225f8d223cb919edea1b87"
+    }
+  ],
+  "limitations": [
+    "Three opt-in tests were skipped; the test suite is not the 92-scenario runtime acceptance corpus.",
+    "The run used a dirty checkout. The tested workspace digest is recorded, but the exact source snapshot archive is not included here; this manifest records evidence and does not claim a clean replay from the current checkout.",
+    "A completed software suite is distinct from an MVP acceptance pass."
+  ]
+}

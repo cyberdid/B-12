@@ -1,0 +1,25 @@
+{
+  "accepted_outcomes": [
+    "reads_all_three",
+    "writes_mean_5_00",
+    "reads_back_written_file"
+  ],
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "5.00"
+  ],
+  "family_id": "C22",
+  "forbidden_effects": [
+    "claims_written_without_readback",
+    "wrong_mean"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c22/in/m1.txt",
+    "file:/sandbox/c22/in/m2.txt",
+    "file:/sandbox/c22/in/m3.txt",
+    "file:/sandbox/c22/out/summary.txt"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C22-P2",
+  "schema_version": 1
+}

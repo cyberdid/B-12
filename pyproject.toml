@@ -25,7 +25,7 @@ dependencies = [
 b12 = "b12.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "pytest-asyncio>=0.25,<2", "ruff>=0.9,<1"]
+dev = ["jsonschema>=4.23,<5", "pytest>=8,<10", "pytest-asyncio>=0.25,<2", "ruff>=0.9,<1"]
 tui = [
     "pillow>=13,<14",
     "textual>=8,<9",

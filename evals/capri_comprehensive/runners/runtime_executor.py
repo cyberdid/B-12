@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import os
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -44,9 +44,7 @@ def model_templates(state_dir: Path, variant: str = "") -> dict[str, Any]:
     if variant.startswith("deployed"):
         from evals.capri_comprehensive.runners.live_components import SEMANTIC_PYTHON
 
-        gemma = _model_settings(state_dir).model_copy(
-            update={"embedding_python": SEMANTIC_PYTHON}
-        )
+        gemma = _model_settings(state_dir).model_copy(update={"embedding_python": SEMANTIC_PYTHON})
         return {"pinned_primary": gemma, "any_swappable": gemma}
     return {
         # Capri's own defaults for Bolt (Settings: 8192 context, 1024 output tokens).
@@ -64,7 +62,10 @@ def settings_for(scenario, state_dir: Path, templates: dict[str, Any] | None = N
     alias = "any_swappable" if runtime.model == "any_swappable" else "pinned_primary"
     settings = templates[alias]
     update: dict[str, Any] = {
-        "state_dir": Path(state_dir), "quiet_start": "00:00", "quiet_end": "00:00",
+        "state_dir": Path(state_dir),
+        "quiet_start": "00:00",
+        "quiet_end": "00:00",
+        "sudo_access": runtime.sudo_access,
     }
     if runtime.num_ctx:
         # Never below the deployment's own context: the scenario sizes were written for a
@@ -81,9 +82,14 @@ class RuntimeTurnExecutor:
     """Scenario-aware turn executor backed by `b12.runtime.open_runtime`."""
 
     def __init__(
-        self, base_dir: Path, templates: dict[str, Any] | None = None, variant: str = ""
+        self,
+        base_dir: Path,
+        templates: dict[str, Any] | None = None,
+        variant: str = "",
+        trace_observer: Callable | None = None,
     ):
         self.base_dir = Path(base_dir)
+        self.trace_observer = trace_observer
         self.templates = templates or model_templates(self.base_dir / "template", variant)
         if variant.startswith("deployed"):
             # The scenario sandbox replaces HOME; the embedding bridge must still find the
@@ -93,8 +99,10 @@ class RuntimeTurnExecutor:
         self.loop: asyncio.AbstractEventLoop | None = None
         self.actors: dict[str, Any] = {}
         self.sessions: dict[str, str] = {}
+        self.seeded_memory_ids: set[str] = set()
         self.workspace: Path | None = None
         self.model: str | None = None
+        self._trace_collectors = {}
 
     @contextlib.contextmanager
     def scenario(self, scenario, workspace: Path) -> Iterator[None]:
@@ -105,18 +113,24 @@ class RuntimeTurnExecutor:
         state_dir.parent.mkdir(parents=True, exist_ok=True)
         settings = settings_for(scenario, state_dir, self.templates)
         self.model = settings.model
-        # One event loop for all turns of the scenario: the embedding bridge process and
-        # its lock belong to the loop that started them.
-        self.loop = asyncio.new_event_loop()
-        self.runtime = open_runtime(settings)
         self.workspace = Path(workspace)
         # The scenario's files are the owner's files: the agent tells the model its home
-        # directory (Path.home()), so home is the workspace that holds them.
+        # directory (Path.home()), so home is the workspace that holds them. Set HOME and
+        # XDG_CONFIG_HOME before open_runtime: its protected-path policy is resolved during
+        # construction and must cover this scenario's config root, not the host's.
         previous_home = os.environ.get("HOME")
+        previous_xdg_config_home = os.environ.get("XDG_CONFIG_HOME")
         os.environ["HOME"] = str(self.workspace)
+        os.environ["XDG_CONFIG_HOME"] = str(self.workspace / ".config")
         self.actors, self.sessions = {}, {}
+        self.seeded_memory_ids = set()
+        self._trace_collectors = {}
         state = scenario.pre_conditions.initial_state
         try:
+            # One event loop for all turns of the scenario: the embedding bridge process
+            # and its lock belong to the loop that started them.
+            self.loop = asyncio.new_event_loop()
+            self.runtime = open_runtime(settings)
             specs = {a.id: a for a in state.actors}
             for actor_id in {"actor-owner-01", *specs, *(m.actor_id for m in state.memories)}:
                 spec = specs.get(actor_id)
@@ -132,7 +146,8 @@ class RuntimeTurnExecutor:
                     if not actor.consent:
                         continue  # no consent, no memory: the store would refuse it anyway
                     memory_module._now = _warped_now(memory.timestamp)
-                    self.runtime.memory.remember(memory.text, actor)
+                    record = self.runtime.memory.remember(memory.text, actor)
+                    self.seeded_memory_ids.add(record.id)
             finally:
                 memory_module._now = real_now
             for pref in state.preferences:
@@ -141,20 +156,24 @@ class RuntimeTurnExecutor:
                 )
             yield
         finally:
-            if previous_home is None:
-                os.environ.pop("HOME", None)
-            else:
-                os.environ["HOME"] = previous_home
-            self.runtime.close()
-            self.runtime = None
-            self.loop.close()
-            self.loop = None
+            for key, previous in (
+                ("HOME", previous_home),
+                ("XDG_CONFIG_HOME", previous_xdg_config_home),
+            ):
+                if previous is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = previous
+            if self.runtime is not None:
+                self.runtime.close()
+                self.runtime = None
+            if self.loop is not None:
+                self.loop.close()
+                self.loop = None
 
     def _session(self, actor_id: str, new_session: bool) -> str:
         if new_session or actor_id not in self.sessions:
-            self.sessions[actor_id] = self.runtime.control.create_session(
-                self.actors[actor_id].id
-            )
+            self.sessions[actor_id] = self.runtime.control.create_session(self.actors[actor_id].id)
         return self.sessions[actor_id]
 
     def _grant(self, actor, session: str) -> tuple[str, str]:
@@ -169,8 +188,12 @@ class RuntimeTurnExecutor:
             capabilities = tuple(sorted(GUEST_CAPABILITIES))
             full = False
         grant = control.issue_grant(
-            actor.id, session, capabilities, task_id=task,
-            ttl_s=TURN_TIMEOUT_S + 3600, full_execution=full,
+            actor.id,
+            session,
+            capabilities,
+            task_id=task,
+            ttl_s=TURN_TIMEOUT_S + 3600,
+            full_execution=full,
         )
         return grant, task
 
@@ -185,32 +208,69 @@ class RuntimeTurnExecutor:
         cwd = Path.cwd()
         os.chdir(self.workspace)  # relative paths in prompts name files of the scenario
         try:
-            result = self.loop.run_until_complete(self.runtime.agent.turn(
-                session, grant, turn.input, task_id=task, timeout_s=TURN_TIMEOUT_S
-            ))
+            result = self.loop.run_until_complete(
+                self.runtime.agent.turn(
+                    session, grant, turn.input, task_id=task, timeout_s=TURN_TIMEOUT_S
+                )
+            )
         finally:
             os.chdir(cwd)
+        if self.trace_observer is not None:
+            from evals.unified.trace import TraceCollector
+
+            collector = TraceCollector()
+            for event in result.events:
+                collector.record(event)
+            collector.record_turn_result(result)
+            self._trace_collectors[turn_index] = collector
         metrics = list(result.model_metrics)
         ttft = next((m.get("ttft_s") for m in metrics if m.get("ttft_s")), None)
         content = result.content
+        seeded_memory_evidence_count = len(self.seeded_memory_ids.intersection(result.evidence_ids))
+        reported_tool_calls = [
+            {"name": r.name, "status": r.status, "error_code": r.error_code}
+            for r in result.tool_results
+        ]
+        reported_tool_calls.extend(
+            {
+                "name": event.data.get("name"),
+                "status": "approval_pending",
+                "error_code": None,
+            }
+            for event in result.events
+            if event.type == "approval_pending" and event.data.get("name")
+        )
         if result.state != "completed" and not content:
             content = f"[{result.state}: {result.error_code or 'no error code'}]"
-        world_state.setdefault("runtime_turns", []).append({
-            "turn": turn_index, "state": result.state, "error_code": result.error_code,
-            "pending_operations": list(result.pending_operations),
-            "evidence_ids": list(result.evidence_ids), "model": self.model,
-        })
+        world_state.setdefault("runtime_turns", []).append(
+            {
+                "turn": turn_index,
+                "state": result.state,
+                "error_code": result.error_code,
+                "pending_operations": list(result.pending_operations),
+                "evidence_ids": list(result.evidence_ids),
+                "seeded_memory_evidence_count": seeded_memory_evidence_count,
+                "model": self.model,
+            }
+        )
         return {
             "content": content,
-            "tool_calls": [
-                {"name": r.name, "status": r.status, "error_code": r.error_code}
-                for r in result.tool_results
-            ],
+            "tool_calls": reported_tool_calls,
             "ttft_ms": round(ttft * 1000, 2) if ttft is not None else None,
             "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
             "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
             "runtime_state": result.state,
+            "seeded_memory_evidence_count": seeded_memory_evidence_count,
         }
+
+    def record_verification(self, turn_index, passed, method, criteria, *, inconclusive=False):
+        """Finalize the captured trace with the evaluator verdict, without storing its text."""
+        collector = self._trace_collectors.pop(turn_index, None)
+        if collector is None:
+            return
+        status = "inconclusive" if inconclusive else "pass" if passed else "fail"
+        collector.record_verification(status, method, criteria)
+        self.trace_observer(turn_index, collector)
 
 
 __all__ = ["LONG_MODEL", "RuntimeTurnExecutor", "settings_for"]

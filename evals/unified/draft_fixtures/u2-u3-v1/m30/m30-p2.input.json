@@ -1,0 +1,70 @@
+{
+  "family_id": "M30",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "distractor_generator": {
+      "count": 197,
+      "pattern": "synthetic unrelated device facts",
+      "seed": 30
+    },
+    "evidence_token_budget": 1024,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Двигун M-30: номінальні оберти 3000 об/хв.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m30-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Двигун M-30: номінальний струм 1.8 A.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m30-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Двигун M-30: максимальна температура 85 °C.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m30-r3",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Перелічи параметри двигуна M-30, які є в пам'яті.",
+  "variant_id": "P2"
+}

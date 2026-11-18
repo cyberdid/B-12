@@ -1,0 +1,94 @@
+{
+  "case": "native_tool",
+  "repeat": 2,
+  "request": {
+    "model": "b12-bolt-e4b:q4km",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Виклич calculate_product з a=17 і b=23. Не обчислюй самостійно."
+      },
+      {
+        "role": "user",
+        "content": "Знайди добуток через інструмент."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_product",
+          "description": "Добуток двох цілих чисел.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      }
+    ],
+    "stream": true,
+    "think": false,
+    "options": {
+      "num_ctx": 4096,
+      "num_predict": 128,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 42,
+      "draft_num_predict": 0
+    }
+  },
+  "fingerprint": "4bdbddd2a9f086402b896fca4292e8a6caca07cc0b522d17c9341b3ba984a0b2",
+  "input_tokens": 108,
+  "input_upper_bound": 124,
+  "output_reserve": 128,
+  "reply": {
+    "schema_version": 1,
+    "content": "",
+    "tool_calls": [
+      {
+        "schema_version": 1,
+        "id": "call_eyghtpxz",
+        "name": "calculate_product",
+        "arguments": {
+          "a": 17,
+          "b": 23
+        },
+        "turn_id": null,
+        "task_id": null
+      }
+    ],
+    "metrics": {
+      "prompt_eval_duration": 37263000,
+      "prompt_eval_cached_count": 103,
+      "load_duration": 645925,
+      "prompt_eval_count": 108,
+      "eval_count": 19,
+      "total_duration": 330821198,
+      "eval_duration": 290859000,
+      "ttft_s": null,
+      "elapsed_s": 0.8658295939999334
+    },
+    "finish_reason": "stop"
+  },
+  "public_deltas_match_reply": true,
+  "expected": {
+    "name": "calculate_product",
+    "arguments": {
+      "a": 17,
+      "b": 23
+    }
+  },
+  "boundary_instruction_passed": true,
+  "count_matches": true
+}

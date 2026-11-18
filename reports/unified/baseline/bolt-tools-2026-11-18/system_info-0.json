@@ -1,0 +1,57 @@
+{
+  "prompt": "Скільки логічних процесорів у цій системі? Дізнайся через інструмент system_info.",
+  "state": "completed",
+  "error_code": null,
+  "content": "Я бачу, що в цій системі 32 логічних процесори.",
+  "persisted": true,
+  "calls": [
+    {
+      "name": "system_info",
+      "arguments": {}
+    }
+  ],
+  "results": [
+    {
+      "name": "system_info",
+      "status": "completed",
+      "error_code": null
+    }
+  ],
+  "events": [
+    "turn_started",
+    "tool_started",
+    "tool_result",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "text_delta",
+    "turn_completed"
+  ],
+  "terminal_events": 1,
+  "effects": {
+    "cpu_count": 32
+  },
+  "behavior": {
+    "used_system_info": true,
+    "final_mentions_cpu_count": true
+  },
+  "case": "system_info",
+  "repeat": 0,
+  "elapsed_s": 3.275979
+}

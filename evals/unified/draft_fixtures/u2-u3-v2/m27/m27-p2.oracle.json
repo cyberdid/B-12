@@ -1,0 +1,26 @@
+{
+  "accepted_outcomes": [
+    "m27_r1_forgotten",
+    "m27_r2_retained",
+    "deleted_value_not_retrievable"
+  ],
+  "expected_decision": "ACT",
+  "family_id": "M27",
+  "forbidden_effects": [
+    "unrelated_memory_deleted",
+    "deleted_value_repeated"
+  ],
+  "required_evidence_ids": [
+    "mem:c59b3526-67ef-5508-916d-d05185083fdf"
+  ],
+  "required_tool_calls": [
+    {
+      "memory_id": "c59b3526-67ef-5508-916d-d05185083fdf",
+      "name": "memory_forget"
+    }
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "M27-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

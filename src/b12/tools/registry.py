@@ -171,7 +171,14 @@ class ToolRegistry:
             "function": {"name": name, "description": description, "parameters": parameters},
         }
         self._tools[name] = _Tool(
-            name, description, argument_model, handler, capability, risk, schema, timeout_s,
+            name,
+            description,
+            argument_model,
+            handler,
+            capability,
+            risk,
+            schema,
+            timeout_s,
             approval_when,
         )
 
@@ -202,7 +209,12 @@ class ToolRegistry:
         return result
 
     async def execute(
-        self, call: ToolCall, context: ExecutionContext, *, cancel: asyncio.Event | None = None
+        self,
+        call: ToolCall,
+        context: ExecutionContext,
+        *,
+        cancel: asyncio.Event | None = None,
+        on_policy_decision: Callable[[dict], Awaitable[None]] | None = None,
     ) -> ToolResult:
         start = time.monotonic()
         operation = None
@@ -210,6 +222,26 @@ class ToolRegistry:
         allowed_fields = None
         unknown = False
         task = None
+        tool = None
+        policy_decision_reported = False
+
+        async def report_policy(decision, phase, *, capability=None, error_code=None):
+            nonlocal policy_decision_reported
+            if on_policy_decision is None:
+                return
+            policy_decision_reported = True
+            event = {"decision": decision, "phase": phase}
+            if capability:
+                event["capability"] = capability
+            if operation:
+                event["operation_id"] = operation
+            if error_code:
+                event["error_code"] = error_code
+            try:
+                await on_policy_decision(event)
+            except Exception:
+                # Telemetry must not alter tool authorization or execution.
+                return
 
         def result(status, code=None, content=None, *, uncertain=False, outcome=None):
             return ToolResult(
@@ -275,6 +307,11 @@ class ToolRegistry:
                 )
                 or (tool.approval_when is not None and bool(tool.approval_when(raw))),
             )
+            await report_policy(
+                "approval_required" if state == "approval_pending" else "allowed",
+                "control_prepare",
+                capability=tool.capability,
+            )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})
             deadline = min(context.deadline, start + (tool.timeout_s or self.timeout_s))
@@ -323,6 +360,13 @@ class ToolRegistry:
                 self.control.finish(operation, "unknown", "cancelled")
             raise
         except ControlError as exc:
+            if not policy_decision_reported:
+                await report_policy(
+                    "denied",
+                    "admission",
+                    capability=tool.capability if tool is not None else None,
+                    error_code=exc.code,
+                )
             if operation:
                 unknown = True
                 self.control.finish(operation, "unknown", exc.code)

@@ -1,0 +1,122 @@
+{
+  "case": "multi_round",
+  "repeat": 0,
+  "request": {
+    "model": "b12-bolt-e4b:q4km",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Використовуй надані результати. Поверни тільки кінцеве число."
+      },
+      {
+        "role": "user",
+        "content": "Помнож 17 на 23, потім результат на 2."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "round1",
+            "type": "function",
+            "function": {
+              "name": "calculate_product",
+              "arguments": {
+                "a": 17,
+                "b": 23
+              }
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_name": "calculate_product",
+        "tool_call_id": "round1",
+        "content": "{\"product\":391}"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "round2",
+            "type": "function",
+            "function": {
+              "name": "calculate_product",
+              "arguments": {
+                "a": 391,
+                "b": 2
+              }
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_name": "calculate_product",
+        "tool_call_id": "round2",
+        "content": "{\"product\":782}"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "calculate_product",
+          "description": "Добуток двох цілих чисел.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "a": {
+                "type": "integer"
+              },
+              "b": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      }
+    ],
+    "stream": true,
+    "think": false,
+    "options": {
+      "num_ctx": 4096,
+      "num_predict": 128,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "seed": 42,
+      "draft_num_predict": 0
+    }
+  },
+  "fingerprint": "aa8188cb0951a0d6be2cfc79c871ba7bea4cb7d1d95680c0f820ff157da73bf2",
+  "input_tokens": 183,
+  "input_upper_bound": 199,
+  "output_reserve": 128,
+  "reply": {
+    "schema_version": 1,
+    "content": "782",
+    "tool_calls": [],
+    "metrics": {
+      "prompt_eval_duration": 82324000,
+      "prompt_eval_cached_count": 0,
+      "load_duration": 875820,
+      "prompt_eval_count": 183,
+      "eval_count": 4,
+      "total_duration": 163448260,
+      "eval_duration": 52579000,
+      "ttft_s": 0.6533623049999733,
+      "elapsed_s": 0.7058633040001041
+    },
+    "finish_reason": "stop"
+  },
+  "public_deltas_match_reply": true,
+  "expected": "782",
+  "boundary_instruction_passed": true,
+  "count_matches": true
+}

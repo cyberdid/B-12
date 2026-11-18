@@ -1,0 +1,44 @@
+{
+  "family_id": "M18",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/m18/manual-v2.md": "## 4.2 Збирання\n...\n## 5.1 Кріплення\nМомент затягування: 0.6 Н·м\n"
+    },
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Момент затягування гвинтів 0.6 Н·м (настанова, розділ 4.2).",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "m18-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "source_locator": "manual v1 §4.2",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Підкажи момент затягування гвинтів і розділ настанови, де він.",
+  "variant_id": "P2"
+}

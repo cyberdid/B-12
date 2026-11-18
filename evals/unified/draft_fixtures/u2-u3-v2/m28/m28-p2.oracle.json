@@ -1,0 +1,20 @@
+{
+  "accepted_outcomes": [
+    "m28_r1_and_s1_and_dependent_store_entries_invalidated",
+    "m28_r2_retained"
+  ],
+  "execution_blocked_by": "runtime store coverage audit (U3 prerequisite): derived and index stores are not enumerated",
+  "expected_decision": "ACT",
+  "family_id": "M28",
+  "forbidden_effects": [
+    "derived_summary_survives"
+  ],
+  "required_evidence_ids": [
+    "mem:85ec71bf-df7b-5f4c-aabd-f120b7b35669",
+    "mem:3b4e2393-2269-5a61-b625-5e22cbc228a8"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "M28-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

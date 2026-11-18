@@ -1,0 +1,28 @@
+{
+  "scenario_id": "REL-08",
+  "tested_at": "2026-11-18",
+  "git_commit": "36d557d83ce2f44f694cea5d19939031c630a471",
+  "git_branch": "feat/unified-dr2-dr3",
+  "executor": "run_live deterministic handler, no LLM call",
+  "synthetic_state_only": true,
+  "code_sha256": "3188feacb2f0b223dd79687809da991d7db68b48833de54d248c1f60fe3c18da",
+  "response": "Відтворення з журналу вмісту не підтримується за задумом; відновлення зі знімка застосовує журнал видалень і дає той самий живий стан.",
+  "evidence": [
+    {
+      "name": "literal: bit-identical SQLite rebuilt from a content event log",
+      "passed": false,
+      "detail": "not implemented by design: a content log would resurrect forgotten data (payload-free deletion ledger, secure_delete)"
+    },
+    {
+      "name": "B-12 restore replays the deletion ledger: same live state as before restore",
+      "passed": true,
+      "detail": "before=1 after=1 gone_live=False"
+    },
+    {
+      "name": "forgotten bytes absent after restore and audit chain verifies",
+      "passed": true,
+      "detail": "leftover=False audit=5"
+    }
+  ],
+  "interpretation": "The literal content-event-log requirement fails by design; snapshot restore and forgetting safety are independently checked in the same run."
+}

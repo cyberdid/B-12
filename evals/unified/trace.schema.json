@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b12.local/schemas/unified-trace-v1.json",
+  "title": "Unified privacy-minimized trace event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "type", "sequence", "actor_ref", "session_ref", "turn_ref"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "type": {"enum": ["turn_started", "tool_started", "policy_decision", "tool_result", "approval_pending", "turn_completed", "turn_failed", "turn_cancelled"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "actor_ref": {"type": "string", "pattern": "^actor_[1-9][0-9]*$"},
+    "session_ref": {"type": "string", "pattern": "^session_[1-9][0-9]*$"},
+    "turn_ref": {"type": "string", "pattern": "^turn_[1-9][0-9]*$"},
+    "call_ref": {"type": "string", "pattern": "^call_[1-9][0-9]*$"},
+    "operation_ref": {"type": "string", "pattern": "^operation_[1-9][0-9]*$"},
+    "tool": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,64}$"},
+    "decision": {"enum": ["allowed", "approval_required", "denied"]},
+    "phase": {"enum": ["control_prepare", "admission", "agent_preflight", "agent_internal"]},
+    "capability": {"type": "string", "pattern": "^[A-Za-z0-9_.-]{1,64}$"},
+    "status": {"enum": ["completed", "failed", "denied", "unknown", "approval_pending", "unrecognized"]},
+    "outcome_unknown": {"type": "boolean"},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^evidence_[1-9][0-9]*$"}},
+    "error_code": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$"},
+    "final_claim": {"$ref": "#/$defs/final_claim"},
+    "verification": {"$ref": "#/$defs/verification"}
+  },
+  "$defs": {
+    "final_claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["response_present", "claim_content_stored", "runtime_state", "persisted", "evidence_refs"],
+      "properties": {
+        "response_present": {"type": "boolean"},
+        "claim_content_stored": {"const": false},
+        "runtime_state": {"enum": ["completed", "failed", "cancelled", "awaiting_approval"]},
+        "persisted": {"type": "boolean"},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "pattern": "^evidence_[1-9][0-9]*$"}},
+        "error_code": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$"}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "method", "criteria"],
+      "properties": {
+        "status": {"enum": ["pass", "fail", "inconclusive", "not_run"]},
+        "method": {"enum": ["deterministic_rule", "frozen_broker_judge", "manual_oracle", "unclassified"]},
+        "criteria": {"type": "array", "maxItems": 64, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$"}}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"type": {"const": "policy_decision"}}, "required": ["type"]}, "then": {"required": ["call_ref", "decision", "phase"]}},
+    {"if": {"properties": {"type": {"const": "tool_started"}}, "required": ["type"]}, "then": {"required": ["call_ref", "tool"]}},
+    {"if": {"properties": {"type": {"const": "tool_result"}}, "required": ["type"]}, "then": {"required": ["call_ref", "status", "outcome_unknown"]}},
+    {"if": {"properties": {"type": {"const": "approval_pending"}}, "required": ["type"]}, "then": {"required": ["call_ref", "operation_ref", "final_claim"]}},
+    {"if": {"properties": {"type": {"enum": ["turn_completed", "turn_failed", "turn_cancelled"]}}, "required": ["type"]}, "then": {"required": ["final_claim"], "properties": {"final_claim": {"$ref": "#/$defs/final_claim"}, "verification": {"$ref": "#/$defs/verification"}}}},
+    {"if": {"properties": {"type": {"const": "approval_pending"}}, "required": ["type"]}, "then": {"properties": {"final_claim": {"$ref": "#/$defs/final_claim"}, "verification": {"$ref": "#/$defs/verification"}}}}
+  ]
+}

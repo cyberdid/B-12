@@ -1,0 +1,34 @@
+{
+  "family_id": "C22",
+  "harness_setup": {
+    "approval_policy": {
+      "file_write": "auto_allowed_in_sandbox"
+    },
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/c22/in/m1.txt": "4.98\n",
+      "/sandbox/c22/in/m2.txt": "5.02\n",
+      "/sandbox/c22/in/m3.txt": "5.00\n"
+    }
+  },
+  "schema_version": 1,
+  "user_prompt": "Прочитай вимірювання в /sandbox/c22/in, порахуй середнє і запиши його у /sandbox/c22/out/summary.txt.",
+  "variant_id": "P1"
+}

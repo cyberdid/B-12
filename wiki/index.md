@@ -1,8 +1,8 @@
 ---
 type: index
-updated: 2026-11-14
+updated: 2026-11-18
 status: active
-sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md]
+sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md, wiki/sources/capri-dr2-dr3-master-plan-2026-11-15.md, raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md]
 tags: [navigation]
 ---
 # Індекс знань Capri / B-12 runtime
@@ -19,6 +19,11 @@ tags: [navigation]
 | [Capri persona та brand](../docs/superpowers/plans/2026-11-08-capri-persona-brand.md) | Базовий характер Capri, desktop profile context і межа сумісності `b12` |
 | [Реалізація повної системи](project/implementation.md) | Авторизований scope, повний plan/spec, worktree та execution ledger |
 | [План тестування](project/test-plan.md) | Рівні перевірки для CLI/TUI, агента, моделі та релізу |
+| [Execution paths сценаріїв](../reports/unified/SCENARIO_EXECUTION_PATH_AUDIT.md) | 92 YAML, handler/runtime маршрути та пріоритет повторного запуску 24 історичних провалів |
+| [U2: cognitive control і brevity protocol](../reports/unified/U2_BREVITY_REPRODUCTION.md) | Історичний A/B, точні arms A0/A1/E1/E2, окремі A–E контроли, метрики та блокери нового запуску |
+| [U3: memory baseline protocol](../reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md) | Synthetic paired arms, evidence retrieval/application, temporal conflicts, forgetting і межі поточного snapshot |
+| [Каталог U2/U3 сценаріїв](../reports/unified/U2_U3_SCENARIO_CATALOG.md) | 60 сімейств для майбутніх fixtures; це ще не runnable/locked корпус |
+| [Чернетковий корпус U2/U3 v2](../evals/unified/scenario_sets/u2-u3-draft-v2.json) | 120 hashed DRAFT сценаріїв зі [синтетичного джерела v2](../evals/unified/draft_sources/u2_u3_draft_cases_v2.json); окремий evaluator-only setup; 6 BLOCKED; oracle не reviewed. [v1](../evals/unified/scenario_sets/u2-u3-draft-v1.json) superseded |
 | [Готовність до тесту Bolt](project/model-test-readiness.md) | Перевірена система, tools, точний GGUF та план першого запуску |
 | [Перший тест Bolt](project/bolt-first-test.md) | Власні latency/VRAM/поведінкові спостереження та ризик обрізання контексту |
 | [Комплексна оцінка Capri, 12.11.2026](project/capri-comprehensive-evaluation.md) | 92 сценарії через рантайм на злитому `main`: 48 пройдено, 32 провалено, 12 заблоковано обладнанням (60,0%); gemma — 43/80; класифікація «гібридна модель-центрична система», не повний компаньйон |
@@ -65,6 +70,7 @@ tags: [navigation]
 | [Огляд Capri-подібних desktop companions](sources/capri-desktop-companions-2026-11-07.md) | Чотири pinned репозиторії, придатні ідеї та ліцензійні межі |
 | [Lifecycle hooks для coding agents](sources/agent-hooks-2026-11-08.md) | Офіційні hooks Claude Code, Codex та Antigravity; schema boundaries і межі інтеграції |
 | [Master brief](sources/master-brief.md) | Походження, контрольна сума, охоплення документа |
+| [Unified master plan DR2/DR3](sources/capri-dr2-dr3-master-plan-2026-11-15.md) | Власницький план U0–U10; розмежування proposed roadmap і перевірених артефактів |
 | [LLM Wiki](sources/llm-wiki.md) | Метод ведення й адаптація до проєкту |
 | [Перевірка зовнішніх джерел](sources/external-checks.md) | Що прочитано незалежно, що залишилось неперевіреним |
 | [Аудит локальної системи](sources/system-audit-2026-10-24.md) | Сирі докази hardware/tools та межі перевірки |
@@ -89,4 +95,4 @@ tags: [navigation]
 | [Claude password-policy baseline](sources/claude-password-policy-baseline-2026-11-04.md) | Десять неперевірених категорій із попереднього review; використані лише для оцінки охоплення B-12 |
 | [Журнал](log.md) | Додавання матеріалів, висновки та перевірки |
 
-Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 128 зовнішніх джерел](../raw/source-manifest.json), [README](../README.md), [правила агента](../AGENTS.md).
+Поза wiki: [оригінал](../raw/B-12_Master_Project_2026-10-24.md), [маніфест 137 зовнішніх URL](../raw/source-manifest.json), [оригінал master plan DR2/DR3](../raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md), [README](../README.md), [правила агента](../AGENTS.md).

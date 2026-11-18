@@ -1,12 +1,15 @@
 """Private eval-only Ollama route broker. Does not expose host network to the worker."""
 
+import argparse
 import asyncio
 import ipaddress
 import json
 import os
+import signal
 import socket
 import threading
 import time
+from collections.abc import Iterable
 from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -29,7 +32,8 @@ def _unique_object(pairs):
     return result
 
 
-def broker_app(upstream_url: str, model: str) -> FastAPI:
+def broker_app(upstream_url: str, model: str | Iterable[str]) -> FastAPI:
+    allowed_models = {model} if isinstance(model, str) else set(model)
     parsed = urlsplit(upstream_url)
     if (
         parsed.scheme != "http"
@@ -40,7 +44,8 @@ def broker_app(upstream_url: str, model: str) -> FastAPI:
         or parsed.path not in ("", "/")
         or parsed.query
         or parsed.fragment
-        or not model.strip()
+        or not allowed_models
+        or any(not name or name != name.strip() for name in allowed_models)
     ):
         raise ValueError("explicit loopback upstream and pinned model required")
 
@@ -97,7 +102,7 @@ def broker_app(upstream_url: str, model: str) -> FastAPI:
                     raise ValueError()
             except (ValueError, UnicodeError, RecursionError):
                 return error("invalid_json", 400)
-            if data.get("model") != model:
+            if data.get("model") not in allowed_models:
                 return error("model_denied", 403)
             if route == "/api/show" and set(data) != {"model"}:
                 return error("show_arguments_denied", 403)
@@ -146,7 +151,8 @@ def broker_app(upstream_url: str, model: str) -> FastAPI:
                 payload["models"] = [
                     item
                     for item in payload["models"]
-                    if isinstance(item, dict) and (item.get("name") or item.get("model")) == model
+                    if isinstance(item, dict)
+                    and (item.get("name") or item.get("model")) in allowed_models
                 ]
                 return JSONResponse(payload)
             except (ValueError, KeyError, TypeError, httpx.HTTPError):
@@ -177,7 +183,7 @@ def broker_app(upstream_url: str, model: str) -> FastAPI:
 class ModelBroker:
     """Own the private listener and bounded server lifecycle for one eval invocation."""
 
-    def __init__(self, path: Path, upstream_url: str, model: str):
+    def __init__(self, path: Path, upstream_url: str, model: str | Iterable[str]):
         self.path = path
         self.app = broker_app(upstream_url, model)
         self._socket = None
@@ -232,3 +238,27 @@ class ModelBroker:
 
     def __exit__(self, *_):
         self.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Private allowlisted Ollama route broker")
+    parser.add_argument("--socket", type=Path, required=True)
+    parser.add_argument("--upstream", required=True)
+    parser.add_argument("--model", action="append", required=True)
+    parser.add_argument("--ready-file", type=Path)
+    args = parser.parse_args()
+    stopped = threading.Event()
+    signal.signal(signal.SIGINT, lambda *_: stopped.set())
+    signal.signal(signal.SIGTERM, lambda *_: stopped.set())
+
+    with ModelBroker(args.socket, args.upstream, args.model):
+        if args.ready_file:
+            args.ready_file.write_text("ready\n", encoding="ascii")
+        print("broker-ready", flush=True)
+        stopped.wait()
+    if args.ready_file:
+        args.ready_file.unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    main()

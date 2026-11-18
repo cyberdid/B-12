@@ -1,0 +1,40 @@
+{
+  "family_id": "M04",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Перший запуск синтетичного генератора G-4.",
+        "event_time": "2026-10-02",
+        "kind": "episode",
+        "memory_id": "m04-r1",
+        "recorded_at": "2026-11-28T12:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Коли відбувся перший запуск генератора G-4?",
+  "variant_id": "P1"
+}

@@ -1,0 +1,53 @@
+{
+  "family_id": "M12",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_request",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "content": "Вважаємо, що збої стенду викликає блок живлення.",
+        "event_time": "2026-09-14",
+        "kind": "belief",
+        "memory_id": "m12-r1",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "content": "Причина збоїв — холодна пайка роз'єму J4; гіпотезу про блок живлення спростовано.",
+        "event_time": "2026-10-03",
+        "kind": "fact",
+        "memory_id": "m12-r2",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "supersedes": "m12-r1",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "user_prompt": "Що викликало збої на стенді?",
+  "variant_id": "P1"
+}

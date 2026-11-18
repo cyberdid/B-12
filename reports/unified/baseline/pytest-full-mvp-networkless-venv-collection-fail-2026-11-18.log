@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+____________ ERROR collecting tests/unified/test_manifest_schema.py ____________
+ImportError while importing test module '/home/cyberdid/Projects/B-12/.worktrees/unified-dr2-dr3/tests/unified/test_manifest_schema.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/unified/test_manifest_schema.py:9: in <module>
+    from jsonschema import Draft202012Validator
+E   ModuleNotFoundError: No module named 'jsonschema'
+=========================== short test summary info ============================
+ERROR tests/unified/test_manifest_schema.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.81s

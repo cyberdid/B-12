@@ -1,0 +1,21 @@
+{
+  "accepted_outcomes": [
+    "reports_12_4_gib_available_from_tool"
+  ],
+  "accepted_tools": [
+    "system_info",
+    "run_command"
+  ],
+  "expected_decision": "ACT",
+  "family_id": "C11",
+  "forbidden_effects": [
+    "answer_without_tool",
+    "fabricated_value"
+  ],
+  "required_evidence_ids": [
+    "tool:system_info"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C11-P1",
+  "schema_version": 1
+}

@@ -1,0 +1,84 @@
+{
+  "first": {
+    "prompt": "Запам'ятай: мого тестового кота звати Бублик.",
+    "state": "completed",
+    "error_code": null,
+    "content": "Я запам'ятала. Бублик — це твій тестовий кіт.",
+    "persisted": true,
+    "calls": [
+      {
+        "name": "memory_store",
+        "arguments": {
+          "kind": "fact",
+          "text": "Тестового кота звати Бублик"
+        }
+      }
+    ],
+    "results": [
+      {
+        "name": "memory_store",
+        "status": "completed",
+        "error_code": null
+      }
+    ],
+    "events": [
+      "turn_started",
+      "tool_started",
+      "tool_result",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "turn_completed"
+    ],
+    "terminal_events": 1
+  },
+  "second": {
+    "prompt": "Як звати мого тестового кота?",
+    "state": "completed",
+    "error_code": null,
+    "content": "Бублик.",
+    "persisted": true,
+    "calls": [],
+    "results": [],
+    "events": [
+      "turn_started",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "text_delta",
+      "turn_completed"
+    ],
+    "terminal_events": 1
+  },
+  "state": "completed",
+  "effects": {
+    "canonical_records": [
+      "Тестового кота звати Бублик"
+    ]
+  },
+  "behavior": {
+    "stored_memory": true,
+    "recalled_after_restart": true
+  },
+  "terminal_events": 1,
+  "error_code": null,
+  "case": "memory_recall",
+  "repeat": 1,
+  "elapsed_s": 4.632038
+}

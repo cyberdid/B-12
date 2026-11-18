@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b12.local/schemas/unified-scenarios-v2.json",
+  "title": "Unified evaluation scenario set v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "set_id", "scenarios"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "set_id": {"type": "string", "minLength": 1},
+    "scenarios": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/scenario"}}
+  },
+  "$defs": {
+    "scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario_id", "family_id", "track", "split", "input_fixture", "input_fixture_sha256",
+        "oracle_fixture", "oracle_fixture_sha256", "expected_decision", "risk", "status"
+      ],
+      "properties": {
+        "scenario_id": {"type": "string", "minLength": 1},
+        "family_id": {"type": "string", "minLength": 1},
+        "track": {"enum": ["memory", "control", "integration"]},
+        "split": {"enum": ["dev", "validation", "locked_test", "longitudinal_holdout"]},
+        "input_fixture": {"type": "string", "minLength": 1},
+        "input_fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "oracle_fixture": {"type": "string", "minLength": 1},
+        "oracle_fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "setup_fixture": {"type": "string", "minLength": 1},
+        "setup_fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "expected_decision": {"enum": ["ACT", "NO_TOOL", "ASK", "DEFER", "SILENT", "INCONCLUSIVE"]},
+        "risk": {"enum": ["read_only", "synthetic_mutation", "permission_sensitive"]},
+        "status": {"enum": ["DRAFT", "FROZEN", "RETIRED"]},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}
