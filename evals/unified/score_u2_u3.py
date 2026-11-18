@@ -124,7 +124,8 @@ def score(record, oracle):
             "checks": [],
             "semantic_pending": [],
         }
-    if record.get("runtime_state") != "completed":
+    # A turn that stops for owner approval is a legitimate, scorable outcome.
+    if record.get("runtime_state") not in {"completed", "awaiting_approval"}:
         return {
             "scenario_id": record["scenario_id"],
             "verdict": "RUN_FAILED",

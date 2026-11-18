@@ -143,3 +143,13 @@ def test_policy_can_allow_optional_web_search_for_no_tool():
     looked = record("Конденсатор згладжує пульсації.", [call("web_search", query="x")])
     rule = oracle(tool_policy="web_search_allowed_not_required")
     assert checks(score(looked, rule), "decision")[0]["result"] == "PASS"
+
+
+def test_a_turn_waiting_for_approval_is_scored_not_run_failed():
+    waiting = {
+        **record("", [call("memory_forget", status="approval_pending", memory_id="m")]),
+        "runtime_state": "awaiting_approval",
+    }
+    rule = oracle("ACT", required_tool_calls=[{"name": "memory_forget", "memory_id": "m"}])
+    result = score(waiting, rule)
+    assert result["verdict"] == "PASS_DETERMINISTIC"
