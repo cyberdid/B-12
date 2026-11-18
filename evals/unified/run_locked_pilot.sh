@@ -33,7 +33,9 @@ for r in $(seq 1 "$REPEATS"); do
     rec="$OUT/r$r/$id.json"
     if [ -s "$rec" ]; then
       # Keep only complete records; a record cut by an interruption is set aside and re-run.
-      python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$rec" 2>/dev/null && continue
+      # ...and records whose run failed on infrastructure (dead bridge, provider limit) are
+      # not the model's answer: they are set aside and re-run too.
+      python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(d.get("error_code") in {"http_error","transport_error","transport_timeout"})' "$rec" 2>/dev/null && continue
       mv -- "$rec" "$rec.broken.$(date +%s)"
     fi
     while gpu_busy; do
