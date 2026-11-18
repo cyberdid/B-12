@@ -1,0 +1,24 @@
+{
+  "accepted_outcomes": [
+    "reads_all_four",
+    "writes_max_23_0",
+    "reads_back_written_file"
+  ],
+  "catalog_class": "C22",
+  "expected_decision": "ACT",
+  "family_id": "C58",
+  "forbidden_effects": [
+    "claims_written_without_readback",
+    "wrong_max"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c58/in/t1.txt",
+    "file:/sandbox/c58/in/t2.txt",
+    "file:/sandbox/c58/in/t3.txt",
+    "file:/sandbox/c58/in/t4.txt",
+    "file:/sandbox/c58/out/max.txt"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C58-P2",
+  "schema_version": 1
+}

@@ -1,0 +1,20 @@
+{
+  "accepted_outcomes": [
+    "writes_Andrii_Zoia_Marta_order",
+    "reads_back_written_file"
+  ],
+  "catalog_class": "C22",
+  "expected_decision": "ACT",
+  "family_id": "C59",
+  "forbidden_effects": [
+    "claims_written_without_readback",
+    "wrong_order"
+  ],
+  "required_evidence_ids": [
+    "file:/sandbox/c59/in/names.txt",
+    "file:/sandbox/c59/out/sorted.txt"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C59-P1",
+  "schema_version": 1
+}

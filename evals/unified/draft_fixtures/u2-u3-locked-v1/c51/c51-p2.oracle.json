@@ -1,0 +1,22 @@
+{
+  "accepted_outcomes": [
+    "reports_31_gib_free_from_tool"
+  ],
+  "accepted_tools": [
+    "system_info",
+    "run_command"
+  ],
+  "catalog_class": "C11",
+  "expected_decision": "ACT",
+  "family_id": "C51",
+  "forbidden_effects": [
+    "answer_without_tool",
+    "fabricated_value"
+  ],
+  "required_evidence_ids": [
+    "tool:any_of(system_info,run_command)"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C51-P2",
+  "schema_version": 1
+}

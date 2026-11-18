@@ -1,0 +1,31 @@
+{
+  "family_id": "C48",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/c48/notes/a.md": "Зустріч 1: обговорили бюджет.\n",
+      "/sandbox/c48/notes/b.md": "Зустріч 2: вирішили перенести запуск на 2027-01-20.\n",
+      "/sandbox/c48/notes/c.md": "Зустріч 3: розподілили ролі.\n"
+    }
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,29 @@
+{
+  "accepted_outcomes": [
+    "lists_r1_r2_only"
+  ],
+  "catalog_class": "C10",
+  "expected_decision": "ACT",
+  "expected_facts": [
+    "r1.json",
+    "r2.json"
+  ],
+  "family_id": "C49",
+  "forbidden_effects": [
+    "listed_wrapper_directory_only",
+    "includes_NOTES_as_listing_member"
+  ],
+  "required_evidence_ids": [
+    "dir:/sandbox/c49/batch-7/output"
+  ],
+  "required_tool_arguments": {
+    "accepted_tools": [
+      "file_list",
+      "run_command"
+    ],
+    "target_directory": "/sandbox/c49/batch-7/output"
+  },
+  "review_status": "UNREVIEWED",
+  "scenario_id": "C49-P1",
+  "schema_version": 1
+}

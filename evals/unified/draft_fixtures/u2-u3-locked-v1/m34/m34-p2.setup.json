@@ -1,0 +1,54 @@
+{
+  "family_id": "M34",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "l34-r1",
+        "content": "Замовлення кабелів відправили постачальнику.",
+        "event_time": "2026-11-10",
+        "kind": "episode",
+        "memory_id": "b7d8fe96-37a4-598d-bb8a-ca653a673de9",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "l34-r2",
+        "content": "Кабелі прибули на склад.",
+        "event_time": "2026-11-24",
+        "kind": "episode",
+        "memory_id": "02cccd9a-540c-5707-a014-a9ee5edfa907",
+        "recorded_at": "2026-11-30T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

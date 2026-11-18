@@ -1,0 +1,30 @@
+{
+  "family_id": "C44",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/c44/quote-1.txt": "Постачальник А: 40 шт., 12.50 грн/шт., доставка 3 дні\n",
+      "/sandbox/c44/quote-2.txt": "Постачальник Б: 40 шт., 11.80 грн/шт., доставка 9 днів\n"
+    }
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

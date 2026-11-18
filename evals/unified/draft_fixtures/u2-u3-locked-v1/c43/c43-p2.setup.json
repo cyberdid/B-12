@@ -1,0 +1,30 @@
+{
+  "family_id": "C43",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "sudo_exec"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_files": {
+      "/sandbox/c43/new.md": "# Плата v2\nЖивлення: 5 V\nРоз'єм: USB-C\n",
+      "/sandbox/c43/old.md": "# Плата v1\nЖивлення: 5 V\nРоз'єм: USB-B\n"
+    }
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}
