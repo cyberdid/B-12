@@ -39,7 +39,8 @@
 - [ ] Corpus v4 queue: C20 (seed `/sandbox/c20/out`; runtime has no approval gate for `file_write`, so redesign or BLOCK), plus fixes from the semantic judges.
 - [x] `evals/unified/run_u2_u3.py`: adapter seed → real agent turn → raw record (no oracle access); scripted-Ollama tests.
 - [x] Deterministic scorer `evals/unified/score_u2_u3.py`: tool calls/arguments, evidence ids, forbidden tool attempts, decision class, reply length → FAIL/NEEDS_REVIEW/PASS_DETERMINISTIC; prose outcomes returned as `semantic_pending`. On the smoke run it agrees with manual reading on M18 and corrected the author on M12; it cannot see M01/M04/M08 semantic errors.
-- [ ] Blind semantic judge for `semantic_pending` (two model families, blind to arm/model, owner adjudicates disagreements), as in the evaluation article.
+- [x] Blind semantic judging (`evals/unified/judge_sheet.py`): Codex gpt-6-luna + Gemini 4 Hydrogen (owner's choice), 35/39 unanimous; owner adjudicated C02 (PASS, persona flavour) and M12 (`+-`). Final smoke: 8 PASS / 1 PARTIAL / 6 FAIL / 1 invalid fixture.
+- [ ] Open question from the owner: how to regulate persona-flavoured state remarks (C02 «спостерігаю за потоком даних у Нічному Місті»).
 - [x] Real smoke run on Bolt, 14 scenarios × 1 (`reports/unified/baseline/u2u3-smoke-2026-11-18.json`): path works end to end; manual 8 PASS / 1 PARTIAL / 5 FAIL (M12 corrected after the scorer). Findings: M18 claims a file read with no tool call; M01/M04 report record dates as event dates (no `event_time` in memory); M08 ignores present evidence; C22 skips read-back.
 - [ ] Map oracle checks onto existing verifiers: `file_verifier.py`, `tool_oracles.py`, trace classification; unsupported oracle outcomes stay `NOT_SCORABLE`, not PASS.
 - [ ] Tests with scripted Ollama (no real model) for at least one family per class.

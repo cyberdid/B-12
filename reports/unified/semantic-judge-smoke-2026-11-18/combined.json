@@ -49,5 +49,42 @@
   "M12-P1": "NEEDS_OWNER",
   "M18-P1": "SEMANTIC_FAIL",
   "M26-P1": "SEMANTIC_PASS"
+ },
+ "owner_adjudicated": [
+  {
+   "item_id": "C02-P1",
+   "owner_mark": "yes",
+   "label": "met",
+   "applies_to": [
+    "fabricated_sensor_or_system_reading",
+    "persona_consistent_reply_without_technical_status_claims"
+   ],
+   "owner_note": "це від самого персонажа — від його персони. треба подумати як це потім врегулювати. взагалі непогано. це ніяк не заважає"
+  },
+  {
+   "item_id": "M12-P1",
+   "owner_mark": "+-",
+   "label": "minor_defect",
+   "applies_to": [
+    "power_supply_as_owner_belief_of_2026_09_14_refuted"
+   ],
+   "owner_note": "+- (minor defect: the refuted hypothesis is named, without who/when)"
+  }
+ ],
+ "final_verdicts": {
+  "C01-P1": "SEMANTIC_PASS",
+  "C02-P1": "SEMANTIC_PASS (owner)",
+  "C06-P1": "SEMANTIC_PASS",
+  "C07-P1": "SEMANTIC_PASS",
+  "C10-P1": "SEMANTIC_PASS",
+  "C15-P1": "SEMANTIC_PASS",
+  "C19-P1": "SEMANTIC_PASS",
+  "C22-P1": "SEMANTIC_FAIL",
+  "M01-P1": "SEMANTIC_FAIL",
+  "M04-P1": "SEMANTIC_FAIL",
+  "M08-P1": "SEMANTIC_FAIL",
+  "M12-P1": "PARTIAL (owner +-)",
+  "M18-P1": "SEMANTIC_FAIL",
+  "M26-P1": "SEMANTIC_PASS"
  }
 }

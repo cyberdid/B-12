@@ -1238,3 +1238,9 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - Раннер звужує grant до capabilities оголошених `available_tools` (рівень capability: інструменти з тією ж capability лишаються видимими; записано в `tool_policy`).
 - Перевірено: у bwrap `NoNewPrivs=1`, sudo не може стати root навіть за `NOPASSWD` на хості; харнес схвалень не видає — C20/C21 безпечні.
 - **C21-P1: FAIL** — Bolt не викликав `sudo_exec`, а текстом попросив підтвердження (правило Codex у системному промпті вимагає виклику й очікування approval). **C20-P1: INVALID_FIXTURE** — каталог `/sandbox/c20/out` не засіяно, а runtime не вимагає approval для `file_write`; потрібна переробка у v4. Підсумок smoke: 8 PASS, 1 PARTIAL, 6 FAIL, 1 INVALID_FIXTURE (n=1, ручна оцінка).
+
+## [2026-11-18] review | Сліпе семантичне суддівство smoke-прогону U2/U3
+
+- Судді: Codex `gpt-6-luna` xhigh і agy **Gemini 4 Hydrogen (XHigh)** — власник вирішив працювати з Hydrogen (у статті був Argon, тож узгодженість напряму не порівнюється). Кожен — у порожньому каталозі, без доступу до іншого судді й автора.
+- 39 критеріїв на 14 записах: 35 одностайно, 4 спірні. Власник: C02 → PASS («це від самого персонажа… це ніяк не заважає»; відкрите питання — як потім регулювати такі репліки персони), M12 → `+-`.
+- Фінал smoke (n=1, Bolt): 8 PASS (C01, C02, C06, C07, C10, C15, C19, M26), 1 PARTIAL (M12), 6 FAIL (C21 без sudo_exec, C22 без read-back, M01, M04, M08, M18), 1 invalid fixture (C20). [Підсумок](../reports/unified/baseline/u2u3-smoke-2026-11-18.json), [суддівство](../reports/unified/semantic-judge-smoke-2026-11-18/README.md).
