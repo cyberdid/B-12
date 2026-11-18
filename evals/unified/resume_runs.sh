@@ -15,6 +15,7 @@ RUNS=(
   "A0|$A/unified-locked-pilot-2026-11-18|3|A0|"
   "A1|$A/unified-locked-u2-A1-2026-11-18|3|A1|"
   "E1|$A/unified-locked-u2-E1-2026-11-18|3|E1|"
+  "D|$A/unified-locked-u2-D-2026-11-18|3|D|"
   "haiku|$A/unified-locked-haiku-2026-11-18|1|A0|11500"
   "luna|$A/unified-locked-codex-2026-11-18|1|A0|11501"
 )

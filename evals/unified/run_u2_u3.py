@@ -14,6 +14,7 @@ Real model runs belong inside the bubblewrap worker (`run_u2_u3_sandboxed.sh`), 
 import asyncio
 import hashlib
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -35,7 +36,18 @@ E1_INSTRUCTION = (
     "приблизно до 300 символів, без списків і заголовків. Складні технічні відповіді та звіти "
     "подавай точно й повно."
 )
-ARMS = ("A0", "A1", "E1")
+ARMS = ("A0", "A1", "E1", "D")
+
+# Arm D (U2 control arm "deterministic completion verifier"; owner approved 18.11.2026 as an
+# experiment). The runtime already re-asks once when a turn with no tool result claims a check
+# (b12.agent._ACTION_CLAIM / _ACTION_NUDGE), but only for a few objects (logs, file, system,
+# state, data, config): "прочитав настанову/інструкцію" (M18, M50) slipped through. Arm D widens
+# that one pattern for the run; the prompt stays A0. If D helps, the Capri fix is this pattern.
+BROAD_ACTION_CLAIM = re.compile(
+    r"(?<!не )\b(?:я\s+)?(?:перевіри(?:в|ла|ли)|перегляну(?:в|ла|ли)|прочита(?:в|ла|ли)|"
+    r"проаналізува(?:в|ла|ли)|подиви(?:вся|лася|лись)|відкри(?:в|ла|ли)|знай(?:шов|шла|шли))\b",
+    re.IGNORECASE,
+)
 
 
 def apply_arm(system_prompt, arm):
@@ -48,7 +60,7 @@ def apply_arm(system_prompt, arm):
         return system_prompt.replace(A0_SENTENCE, A1_SENTENCE)
     if arm == "E1":
         return f"{system_prompt.rstrip()} {E1_INSTRUCTION}"
-    return system_prompt
+    return system_prompt  # A0 and D share the baseline prompt
 
 
 def _plain(value):
@@ -146,6 +158,11 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
 
     runtime = open_runtime(settings.model_copy(update={"state_dir": work_dir / "state"}))
     runtime.agent.system_prompt = apply_arm(runtime.agent.system_prompt, arm)
+    import b12.agent as agent_module
+
+    default_claim = agent_module._ACTION_CLAIM
+    if arm == "D":
+        agent_module._ACTION_CLAIM = BROAD_ACTION_CLAIM
     prompt_sha = hashlib.sha256(runtime.agent.system_prompt.encode()).hexdigest()
     loop = asyncio.new_event_loop()
     try:
@@ -157,6 +174,7 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
             runtime.agent.turn(session, grant, prompt, task_id=task, timeout_s=TURN_TIMEOUT_S)
         )
     finally:
+        agent_module._ACTION_CLAIM = default_claim
         runtime.close()
         loop.close()
     real_to_declared = {real: declared for declared, real in report["memory_ids"].items()}
@@ -167,6 +185,7 @@ def run_scenario(row, root, settings, work_dir, *, files_root, existing_files_ro
             **record,
             "status": "EXECUTED",
             "u2_arm": arm,
+            "action_claim_pattern": "broad (arm D)" if arm == "D" else "runtime default",
             "system_prompt_sha256": prompt_sha,
             "model": settings.model,
             "runtime_state": result.state,

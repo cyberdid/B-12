@@ -144,3 +144,45 @@ async def test_record_carries_the_arm_and_prompt_hash(scripted_ollama, tmp_path)
     )
     assert record["u2_arm"] == "A1"
     assert "1–3" in state["requests"][0]["messages"][0]["content"]
+
+
+def test_broad_claim_pattern_covers_what_the_runtime_default_misses():
+    from b12.agent import _ACTION_CLAIM
+    from evals.unified.run_u2_u3 import BROAD_ACTION_CLAIM
+
+    for text in ("Я прочитав настанову: розділ 4.2.", "Я прочитав інструкцію `/sandbox/m50`."):
+        assert not _ACTION_CLAIM.search(text)
+        assert BROAD_ACTION_CLAIM.search(text)
+    assert not BROAD_ACTION_CLAIM.search("Я ще не прочитав файл, зараз перевірю інструментом.")
+    assert not BROAD_ACTION_CLAIM.search("Привіт! Чим допомогти?")
+
+
+async def test_arm_d_makes_the_runtime_re_ask_after_a_claimed_read(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    target = tmp_path / "fs" / "sandbox/c06/notes/project-codename.txt"
+    script = [
+        {"content": "Я прочитав настанову: кодова назва ЖОВТЕНЬ-1."},
+        {"tool_calls": [("file_read", {"path": str(target)})]},
+        {"content": "Кодова назва: ЛИСТОПАД-7."},
+    ]
+    state["script"] = list(script)
+    baseline = await asyncio.to_thread(
+        run_scenario, row("C06-P1"), ROOT, base, tmp_path / "a", files_root=tmp_path / "fs"
+    )
+    assert baseline["reply"].startswith("Я прочитав настанову")  # default pattern misses it
+    state["script"] = list(script)
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C06-P1"),
+        ROOT,
+        base,
+        tmp_path / "d",
+        files_root=tmp_path / "fs2",
+        arm="D",
+    )
+    assert record["reply"] == "Кодова назва: ЛИСТОПАД-7."
+    assert [c["name"] for c in record["tool_calls"]] == ["file_read"]
+    from b12.agent import _ACTION_CLAIM
+    from evals.unified.run_u2_u3 import BROAD_ACTION_CLAIM
+
+    assert _ACTION_CLAIM is not BROAD_ACTION_CLAIM  # restored after the run
