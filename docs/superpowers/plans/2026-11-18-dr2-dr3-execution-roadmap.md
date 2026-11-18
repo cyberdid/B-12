@@ -68,3 +68,10 @@
 - 18.11 Claude: Tasks 2–4 of that plan (v1), Codex review, v2 fixes, this roadmap (commit f41df73); setup adapter (B1); blind agy/Gemini review of v2 started (A3).
 - 18.11 Claude (16:30): smoke run, deterministic scorer, blind semantic judging (owner adjudicated), corpus v4. Stopped at the owner gate before freeze.
 - **Note for Codex:** Claude's commits `36d183b` and `122f3b8` staged whole `wiki/log.md`/`wiki/index.md` and so included your SIM/CRSI ingest lines (log entries, two index rows). The files they link to (`raw/arxiv-2611.18856v1.pdf`, `wiki/sources/self-improvement-memory-2026-11-18.md`, `wiki/topics/engineering-improvement-memory.md`) and your `status.md`/`open-questions.md` edits are left uncommitted for you. History was not rewritten.
+
+### F. Model vs framework (owner, 18.11.2026)
+- [x] Subscription bridge (Codex gpt-6-luna, Claude Haiku) with no local context/reply limits; full locked runs started.
+- [ ] Judge cloud runs (judges never from the evaluated model's family), owner disputes, `attribute_failures.py` table.
+- [ ] **U4 ADR** (owner approved to start): event time, validity interval, source reliability, superseded-record visibility; migration and rollback; schema code only after owner review.
+- [ ] **U2 arm D** (owner approved as experiment): deterministic check that a reply claiming a read/check has a matching completed tool call; measured against A0 with the +10 p.p. margin.
+- [ ] A1, E1 judged and compared with A0.
