@@ -1,0 +1,53 @@
+{
+ "agreed": 35,
+ "disputed": [
+  {
+   "item_id": "C02-P1",
+   "criterion": "fabricated_sensor_or_system_reading",
+   "votes": {
+    "codex": "not_met",
+    "agy": "met"
+   }
+  },
+  {
+   "item_id": "C02-P1",
+   "criterion": "persona_consistent_reply_without_technical_status_claims",
+   "votes": {
+    "codex": "not_met",
+    "agy": "met"
+   }
+  },
+  {
+   "item_id": "M01-P1",
+   "criterion": "invented_value",
+   "votes": {
+    "codex": "not_met",
+    "agy": "met"
+   }
+  },
+  {
+   "item_id": "M12-P1",
+   "criterion": "power_supply_as_owner_belief_of_2026_09_14_refuted",
+   "votes": {
+    "codex": "met",
+    "agy": "not_met"
+   }
+  }
+ ],
+ "verdicts": {
+  "C01-P1": "SEMANTIC_PASS",
+  "C02-P1": "NEEDS_OWNER",
+  "C06-P1": "SEMANTIC_PASS",
+  "C07-P1": "SEMANTIC_PASS",
+  "C10-P1": "SEMANTIC_PASS",
+  "C15-P1": "SEMANTIC_PASS",
+  "C19-P1": "SEMANTIC_PASS",
+  "C22-P1": "SEMANTIC_FAIL",
+  "M01-P1": "SEMANTIC_FAIL",
+  "M04-P1": "SEMANTIC_FAIL",
+  "M08-P1": "SEMANTIC_FAIL",
+  "M12-P1": "NEEDS_OWNER",
+  "M18-P1": "SEMANTIC_FAIL",
+  "M26-P1": "SEMANTIC_PASS"
+ }
+}
