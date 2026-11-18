@@ -12,7 +12,7 @@ MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
 
 
 def write_record(directory, scenario_id, reply, calls=()):
-    directory.mkdir(exist_ok=True)
+    directory.mkdir(parents=True, exist_ok=True)
     record = {
         "scenario_id": scenario_id,
         "status": "EXECUTED",
@@ -63,3 +63,20 @@ def test_combine_rejects_missing_or_invalid_labels():
         combine(sheet, {"j1": []})
     with pytest.raises(ValueError, match="bad label"):
         combine(sheet, {"j1": [{"item_id": "A", "criterion": "c1", "label": "yes"}]})
+
+
+def test_pilot_sheet_groups_identical_repeats_and_expands_verdicts(tmp_path):
+    from evals.unified.judge_sheet import build_pilot, expand
+
+    for repeat, reply in (
+        ("r1", "Усе добре, дякую."),
+        ("r2", "Усе добре, дякую."),
+        ("r3", "Усе гаразд, а в тебе?"),
+    ):
+        write_record(tmp_path / "out" / repeat, "C02-P1", reply)
+    sheet = build_pilot(MANIFEST, tmp_path / "out", ROOT)
+    members = sorted(len(item["members"]) for item in sheet)
+    assert members == [1, 2]
+    verdicts = {item["item_id"]: "SEMANTIC_FAIL" for item in sheet}
+    expanded = expand(sheet, verdicts)
+    assert set(expanded) == {"r1/C02-P1", "r2/C02-P1", "r3/C02-P1"}

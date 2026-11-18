@@ -119,3 +119,68 @@ def main(argv=None):
 
 if __name__ == "__main__":
     main()
+
+
+def build_pilot(manifest, out_dir, root, *, track=None):
+    """Sheet for a multi-repeat pilot: identical records are judged once.
+
+    Records of the same scenario whose reply and tool calls are byte-identical across
+    repeats become one item; `members` lists every (repeat, scenario_id) it stands for.
+    """
+    import hashlib
+
+    rows = {r["scenario_id"]: r for r in json.loads(Path(manifest).read_text())["scenarios"]}
+    groups = {}
+    for path in sorted(Path(out_dir).glob("r*/*.json")):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        row = rows[record["scenario_id"]]
+        if track and row["track"] != track:
+            continue
+        key = json.dumps(
+            [record["scenario_id"], record.get("reply"), record.get("tool_calls")],
+            ensure_ascii=False,
+            sort_keys=True,
+        )
+        digest = hashlib.sha256(key.encode()).hexdigest()[:10]
+        groups.setdefault((record["scenario_id"], digest), {"path": path, "members": []})
+        groups[(record["scenario_id"], digest)]["members"].append(
+            [path.parent.name, record["scenario_id"]]
+        )
+    sheet = []
+    for (sid, digest), group in sorted(groups.items()):
+        record = json.loads(group["path"].read_text(encoding="utf-8"))
+        row = rows[sid]
+        oracle = json.loads((Path(root) / row["oracle_fixture"]).read_text(encoding="utf-8"))
+        result = score(record, oracle)
+        if result["verdict"] in {"BLOCKED", "RUN_FAILED", "FAIL"} or not result["semantic_pending"]:
+            continue  # deterministic FAIL already decides; nothing semantic to judge
+        setup = json.loads((Path(root) / row["setup_fixture"]).read_text(encoding="utf-8"))
+        prompt = json.loads((Path(root) / row["input_fixture"]).read_text(encoding="utf-8"))
+        sheet.append(
+            {
+                "item_id": f"{sid}#{digest}",
+                "members": group["members"],
+                "user_prompt": prompt["user_prompt"],
+                "synthetic_facts": _facts(setup["harness_setup"]),
+                "assistant_tool_calls": [
+                    {"name": c["name"], "arguments": c.get("arguments"), "status": c["status"]}
+                    for c in record["tool_calls"]
+                ],
+                "memory_evidence_offered_by_runtime": len(record.get("evidence_ids", [])),
+                "assistant_reply": record["reply"],
+                "criteria": result["semantic_pending"],
+            }
+        )
+    return sheet
+
+
+def expand(sheet, verdicts):
+    """Map item verdicts back to {"<repeat>/<scenario_id>": verdict} for analyze_pilot."""
+    out = {}
+    for item in sheet:
+        verdict = verdicts.get(item["item_id"])
+        if verdict is None:
+            continue
+        for repeat, sid in item["members"]:
+            out[f"{repeat}/{sid}"] = verdict
+    return out
