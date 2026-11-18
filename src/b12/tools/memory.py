@@ -7,7 +7,7 @@ MemoryStore.forget bool is presented as globally completed erasure.
 import asyncio
 from collections.abc import Callable
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Literal, Protocol
 from uuid import UUID
 
 from pydantic import Field, field_validator
@@ -81,6 +81,30 @@ class StoreArgs(Args):
         return kept
 
 
+class TemporalStoreArgs(StoreArgs):
+    """memory_store with ADR-015 fields; offered only when settings.memory_temporal is on.
+
+    Empty strings mean unknown (the calibrated tool-schema subset has no optional types)."""
+
+    event_time: str = Field(
+        default="",
+        max_length=32,
+        description="When the event happened (ISO date YYYY-MM-DD), only if the user said it",
+    )
+    valid_from: str = Field(
+        default="", max_length=32, description="ISO date the fact starts to hold, if known"
+    )
+    valid_to: str = Field(
+        default="", max_length=32, description="ISO date the fact stops holding, if known"
+    )
+    reliability: Literal["", "high", "normal", "low", "unverified"] = Field(
+        default="", description="unverified for rumours or guesses; leave empty if unsure"
+    )
+    source_locator: str = Field(
+        default="", max_length=200, description="Where the fact comes from, e.g. a document"
+    )
+
+
 class ForgetArgs(Args):
     memory_id: str
 
@@ -126,7 +150,19 @@ class SupersedeArgs(Args):
         return value
 
 
-def register(registry, *, memory=None, knowledge=None, purge=None, memory_revision=None):
+def _temporal_from_args(args) -> dict:
+    """ADR-015 fields the model supplied; marked as coming from conversation."""
+    names = ("event_time", "valid_from", "valid_to", "reliability", "source_locator")
+    values = {name: getattr(args, name, "") or None for name in names}
+    values = {key: value for key, value in values.items() if value is not None}
+    if values:
+        values["temporal_source"] = "conversation"
+    return values
+
+
+def register(
+    registry, *, memory=None, knowledge=None, purge=None, memory_revision=None, temporal=False
+):
     async def memory_search(args, guard):
         if memory is None:
             return failure("coordinator_unavailable")
@@ -175,6 +211,7 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                 evidence_ids=tuple(args.evidence_ids),
                 documents=tuple(args.document_evidence_ids),
                 expected_deletion_revision=expected_revision,
+                **_temporal_from_args(args),
             )
         except PermissionError:
             return failure("permission_denied")
@@ -188,7 +225,9 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
                 error_code="handler_failed",
                 side_effects=(SideEffect(kind="memory_write", state="possible"),),
             )
-        superseded = [old for old in args.supersedes if memory.supersede(old, actor)]
+        superseded = [
+            old for old in args.supersedes if memory.supersede(old, actor, replaced_by=record.id)
+        ]
         # Older live facts on the same words: the model decides whether one is now outdated.
         similar = _similar_active(memory, args.text, actor, exclude={record.id, *superseded})
         content = {"id": record.id, "source": record.source, "superseded": superseded}
@@ -213,14 +252,12 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
         if args.memory_id == args.replaced_by or not memory.is_live(args.replaced_by, actor):
             return failure("unsupported")
         guard.check()
-        if not memory.supersede(args.memory_id, actor):
+        if not memory.supersede(args.memory_id, actor, replaced_by=args.replaced_by):
             return failure("unsupported")
         return HandlerOutcome(
             content={"superseded": args.memory_id, "replaced_by": args.replaced_by},
             side_effects=(
-                SideEffect(
-                    kind="memory_write", state="completed", evidence_ids=(args.memory_id,)
-                ),
+                SideEffect(kind="memory_write", state="completed", evidence_ids=(args.memory_id,)),
             ),
         )
 
@@ -302,8 +339,14 @@ def register(registry, *, memory=None, knowledge=None, purge=None, memory_revisi
     registry.register(
         "memory_store",
         "Remember a fact about the owner. Arguments: text (the fact, required); "
-        "kind (a short type such as fact or user_preference).",
-        StoreArgs,
+        "kind (a short type such as fact or user_preference)."
+        + (
+            " Optional when the user stated them: event_time, valid_from, valid_to (ISO dates), "
+            "reliability, source_locator."
+            if temporal
+            else ""
+        ),
+        TemporalStoreArgs if temporal else StoreArgs,
         memory_store,
         "memory.write",
     )

@@ -74,3 +74,44 @@ async def test_model_is_told_today_only_with_the_flag(scripted_ollama, tmp_path)
             assert ("Сьогодні: 2026-12-01." in system) is temporal
         finally:
             runtime.close()
+
+
+async def test_memory_store_offers_temporal_fields_only_with_the_flag(scripted_ollama, tmp_path):
+    from b12.auth import owner_capabilities
+
+    state, base = scripted_ollama
+    for temporal in (False, True):
+        runtime = _runtime(base, tmp_path / f"store-{temporal}", temporal)
+        try:
+            actor = runtime.control.create_actor(owner=True, consent=True)
+            session = runtime.control.create_session(actor.id)
+            task = runtime.control.create_task(session)
+            grant = runtime.control.issue_grant(
+                actor.id, session, owner_capabilities(runtime.settings), task_id=task, ttl_s=600
+            )
+            call = {"text": "Перший запуск генератора G-4.", "kind": "fact"}
+            if temporal:
+                call["event_time"] = "2026-10-02"
+            state["script"] = [
+                {"tool_calls": [("memory_store", call)]},
+                {"content": "Запам'ятала."},
+            ]
+            await runtime.agent.turn(
+                session,
+                grant,
+                "Запам'ятай: генератор G-4 вперше запустили 2 жовтня.",
+                task_id=task,
+                timeout_s=60,
+            )
+            store = next(
+                t for t in state["requests"][-2]["tools"] if t["function"]["name"] == "memory_store"
+            )
+            assert ("event_time" in store["function"]["parameters"]["properties"]) is temporal
+            [record] = runtime.memory.search("генератора", actor)
+            if temporal:
+                assert record.event_time == "2026-10-02"
+                assert record.temporal_source == "conversation"
+            else:
+                assert record.event_time is None
+        finally:
+            runtime.close()
