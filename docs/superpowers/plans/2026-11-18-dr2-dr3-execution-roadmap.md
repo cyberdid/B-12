@@ -75,3 +75,10 @@
 - [ ] **U4 ADR** (owner approved to start): event time, validity interval, source reliability, superseded-record visibility; migration and rollback; schema code only after owner review.
 - [ ] **U2 arm D** (owner approved as experiment): deterministic check that a reply claiming a read/check has a matching completed tool call; measured against A0 with the +10 p.p. margin.
 - [ ] A1, E1 judged and compared with A0.
+
+### G. Results and framework fixes (18.11, evening; owner delegated decisions)
+- [x] A1, E1 (style arms) rejected; D (broad claimed-check) rejected — false positives on recalled facts.
+- [x] Model vs framework (`reports/unified/MODEL_VS_FRAMEWORK_2026-11-18.md`): Bolt / Haiku / gpt-6-luna control 0.731 / 0.731 / 0.750, memory 0.406 / 0.500 / 0.417; 16 families fail for every model.
+- [x] Framework fixes behind flags (all default off): ADR-015 `memory_temporal` (schema v3, temporal evidence, today's date, history with replacement, temporal memory_store); `verify_writes` (runtime read-back); `goals_in_context` (goal state in context). Harness: synthetic-environment stub (C11, C12, C51–C54).
+- [ ] Runs queued on Bolt: U4 (temporal), D2 (narrow claimed-check), F (temporal + verify_writes + goals); judge each, compare with A0 (+10 p.p. margin).
+- [ ] Next set version: separate `required` from `any_of` in oracles (C35, C36, C39, C40); re-run harness-invalid families with the stub.
