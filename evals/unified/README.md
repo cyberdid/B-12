@@ -44,6 +44,12 @@
 
 Scope follows the master plan's first execution package. These documents do not authorize or imply model inference, production schema migration or behavior changes. A hashed synthetic draft corpus now exists (below); the next gates are independent oracle review, a runner adapter for evaluator-side setup, and fixture lock.
 
+### U2/U3 locked_test set (owner gate 18.11.2026)
+
+[`scenario_sets/u2-u3-locked-v1.json`](scenario_sets/u2-u3-locked-v1.json) (SHA-256 `64d5264715e3328aa1f62d304712964d77f1268786296ed8b9ed59c2e17a9510`) from [`draft_sources/author_u2_u3_locked_v1.py`](draft_sources/author_u2_u3_locked_v1.py) → [`u2_u3_locked_cases_v1.json`](draft_sources/u2_u3_locked_cases_v1.json) (SHA-256 `0f66bf289c62cb198279437130fe4e9fdfa675a87dec0b3e72c3594da78f1f85`): 60 new families C31–C60 (10 casual/no-tool/ask, 20 agentic) and M31–M60, all `split: locked_test`, each oracle naming its `catalog_class`. No prompt, file path or family id is shared with the dev set (`tests/unified/test_u2_u3_locked_set.py`). Decisions: [`reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md`](../../reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md). **Never run on a model before freeze.** Status: DRAFT, two blind oracle reviews in progress.
+
+The draft corpus below (`u2-u3-draft-v4`) is now the dev/validation set.
+
 ### U2/U3 draft fixture corpus (dev, DRAFT)
 
 **Current: `u2-u3-draft-v4`** — v3 plus C20 marked BLOCKED (its output directory is now seeded, but the runtime has no approval gate for `file_write`, found in the smoke run); source [`u2_u3_draft_cases_v4.json`](draft_sources/u2_u3_draft_cases_v4.json) (SHA-256 `60b3a85dbb2d724ff04b2e78a47b3a8a70762eb411f5258207c6c3096530d643`) from [`author_u2_u3_v4.py`](draft_sources/author_u2_u3_v4.py), manifest [`u2-u3-draft-v4.json`](scenario_sets/u2-u3-draft-v4.json) (SHA-256 `d464368c3f24ce1698ba8e2be4d48ade23292d55d4b335b87dec56196e92a7f6`); 7 families BLOCKED.

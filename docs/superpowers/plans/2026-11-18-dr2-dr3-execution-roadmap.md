@@ -30,7 +30,8 @@
 - [x] Independent read-only review by Codex; v2 fixes: evaluator-only setup files, UUID ids, registered tool names, GoalStore goals, exact `ExecArgs`; 6 families BLOCKED.
 - [x] Blind second review of v2 by agy/Gemini: 50 ok / 2 minor / 6 major / 2 blocker; 9 accepted → v3, 1 rejected (sheet artifact); no owner adjudication needed (`reports/unified/oracle-review-v2/`).
 - [x] **Owner gate decided** (`reports/unified/U2_U3_LOCKED_GATE_DECISIONS.md`): new families for `locked_test` (current 60 → dev/validation); two blind model judges + owner; U2 margin +10 p.p.
-- [ ] Author locked set: ≥30 runnable per track (U2: ≥20 agentic, ≥10 casual/no-tool/ask), two blind oracle reviews, then freeze; never run on a model before freeze.
+- [x] Locked set authored: `u2-u3-locked-v1`, 30 + 30 runnable families, no overlap with dev (commit 18f3d7b).
+- [ ] Two blind oracle reviews of the locked set (Codex gpt-6-luna, Gemini 4 Hydrogen) → fixes → freeze (`status: FROZEN`); never run on a model before freeze.
 - [ ] Freeze: copy reviewed families to `status: FROZEN` in a new set version; never edit a frozen file.
 
 ### B. Setup runner adapter (needed before any U2/U3 run)
