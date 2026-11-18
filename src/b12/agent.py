@@ -271,6 +271,9 @@ _ACTION_CLAIM = re.compile(
     r"дан\w*|конфіг\w*)",
     re.I,
 )
+_UNVERIFIED_NOTE = (
+    "\n\n[Runtime: у цьому ході не було виклику інструмента — заявлену перевірку не виконано.]"
+)
 _ACTION_NUDGE = (
     "[авто] Ти написав, що щось перевірив або прочитав, але в цьому ході не було жодного "
     "виклику інструмента. Виконай перевірку інструментами або чесно скажи, що не перевіряв."
@@ -1110,6 +1113,18 @@ class Agent:
                             {"id": str(uuid4()), "role": "user", "content": _ACTION_NUDGE}
                         )
                         continue
+                    if (
+                        text
+                        and state.get("action_nudged")
+                        and not state["results"]
+                        and _ACTION_CLAIM.search(text)
+                        and getattr(self.settings, "annotate_unverified_claims", False)
+                    ):
+                        # Still claims a check after the nudge and nothing ran: the runtime, not
+                        # the model, tells the user the claimed check did not happen.
+                        reply = reply.model_copy(
+                            update={"content": (reply.content or "").rstrip() + _UNVERIFIED_NOTE}
+                        )
                     if text and not state.get("root_nudged") and _ROOT_CLAIM.search(text):
                         # Rights are set by the control channel, never by text (SEC-06): state
                         # the real ones and ask once for a corrected answer.

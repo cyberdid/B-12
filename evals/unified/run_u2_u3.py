@@ -37,7 +37,7 @@ E1_INSTRUCTION = (
     "приблизно до 300 символів, без списків і заголовків. Складні технічні відповіді та звіти "
     "подавай точно й повно."
 )
-ARMS = ("A0", "A1", "E1", "D", "D2")
+ARMS = ("A0", "A1", "E1", "D", "D2", "D3")
 
 # Arm D (U2 control arm "deterministic completion verifier"; owner approved 18.11.2026 as an
 # experiment). The runtime already re-asks once when a turn with no tool result claims a check
@@ -71,7 +71,7 @@ def apply_arm(system_prompt, arm):
         return system_prompt.replace(A0_SENTENCE, A1_SENTENCE)
     if arm == "E1":
         return f"{system_prompt.rstrip()} {E1_INSTRUCTION}"
-    return system_prompt  # A0, D and D2 share the baseline prompt
+    return system_prompt  # A0, D, D2 and D3 share the baseline prompt
 
 
 def _plain(value):
@@ -185,6 +185,7 @@ def run_scenario(
                 "state_dir": work_dir / "state",
                 "memory_temporal": memory_temporal,
                 **{flag: True for flag in runtime_flags},
+                **({"annotate_unverified_claims": True} if arm == "D3" else {}),
             }
         )
     )
@@ -201,7 +202,7 @@ def run_scenario(
     default_claim = agent_module._ACTION_CLAIM
     if arm == "D":
         agent_module._ACTION_CLAIM = BROAD_ACTION_CLAIM
-    elif arm == "D2":
+    elif arm in ("D2", "D3"):
         agent_module._ACTION_CLAIM = NARROW_ACTION_CLAIM
     prompt_sha = hashlib.sha256(runtime.agent.system_prompt.encode()).hexdigest()
     loop = asyncio.new_event_loop()
@@ -228,9 +229,11 @@ def run_scenario(
             "memory_temporal": memory_temporal,
             "runtime_flags": sorted(runtime_flags),
             "environment_stub": environment_stub,
-            "action_claim_pattern": {"D": "broad (arm D)", "D2": "narrow (arm D2)"}.get(
-                arm, "runtime default"
-            ),
+            "action_claim_pattern": {
+                "D": "broad (arm D)",
+                "D2": "narrow (arm D2)",
+                "D3": "narrow + runtime note (arm D3)",
+            }.get(arm, "runtime default"),
             "system_prompt_sha256": prompt_sha,
             "model": settings.model,
             "runtime_state": result.state,

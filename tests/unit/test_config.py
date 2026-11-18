@@ -140,6 +140,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_temporal": False,
         "verify_writes": False,
         "goals_in_context": False,
+        "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
         "tool_result_bytes": 4096,

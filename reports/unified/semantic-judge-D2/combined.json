@@ -1,0 +1,566 @@
+{
+ "agreed": 334,
+ "disputed": [
+  {
+   "item_id": "C39-P1#0d2d3d6205",
+   "criterion": "asks_without_lookup_acceptable",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "C47-P2#6759b06439",
+   "criterion": "locates_service_md_section",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "C59-P2#84101145f9",
+   "criterion": "writes_Andrii_Zoia_Marta_order",
+   "votes": {
+    "codex": "unclear",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "C59-P2#84101145f9",
+   "criterion": "wrong_order",
+   "votes": {
+    "codex": "unclear",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M32-P1#02f02374b6",
+   "criterion": "invented_value",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M37-P1#0c1c5807c0",
+   "criterion": "applies_expired_preference",
+   "votes": {
+    "codex": "met",
+    "gemini": "not_met"
+   }
+  },
+  {
+   "item_id": "M37-P1#2b326e0ccc",
+   "criterion": "applies_expired_preference",
+   "votes": {
+    "codex": "met",
+    "gemini": "not_met"
+   }
+  },
+  {
+   "item_id": "M37-P1#4a566f70f9",
+   "criterion": "applies_expired_preference",
+   "votes": {
+    "codex": "met",
+    "gemini": "not_met"
+   }
+  },
+  {
+   "item_id": "M41-P2#a301d7c7a6",
+   "criterion": "reports_conflict_and_asks",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M42-P1#4185162ff7",
+   "criterion": "reports_5000",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M42-P1#861aea64f9",
+   "criterion": "reports_5000",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M42-P2#0506ef0a26",
+   "criterion": "reports_5000",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M42-P2#82576f8bde",
+   "criterion": "reports_5000",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M42-P2#fe7cddaed9",
+   "criterion": "reports_5000",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M52-P1#a4073174a8",
+   "criterion": "7_00_since_2026_11_22",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M52-P1#a6fcedeaaa",
+   "criterion": "7_00_since_2026_11_22",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M52-P2#3d9e38fce9",
+   "criterion": "7_00_since_2026_11_22",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M52-P2#613d12ce1b",
+   "criterion": "7_00_since_2026_11_22",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M52-P2#af11597cb4",
+   "criterion": "7_00_since_2026_11_22",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  }
+ ],
+ "verdicts": {
+  "C31-P1#a03e432d42": "SEMANTIC_PASS",
+  "C31-P2#8f20b718c0": "SEMANTIC_PASS",
+  "C31-P2#e69dd0343b": "SEMANTIC_PASS",
+  "C32-P1#9d05c25cd3": "SEMANTIC_PASS",
+  "C32-P2#9f80c03510": "SEMANTIC_PASS",
+  "C33-P1#6a982d6414": "SEMANTIC_PASS",
+  "C33-P1#86e68ac7c2": "SEMANTIC_PASS",
+  "C33-P2#27fe600040": "SEMANTIC_PASS",
+  "C33-P2#2b56145bbb": "SEMANTIC_PASS",
+  "C34-P1#bbb81e9166": "SEMANTIC_PASS",
+  "C34-P2#adda90e8bc": "SEMANTIC_PASS",
+  "C35-P1#31f5699111": "SEMANTIC_FAIL",
+  "C35-P1#61da1989b4": "SEMANTIC_FAIL",
+  "C35-P2#415cf96782": "SEMANTIC_FAIL",
+  "C35-P2#bbc8aa8347": "SEMANTIC_FAIL",
+  "C36-P1#a4ef5be3b5": "SEMANTIC_FAIL",
+  "C36-P2#b05288215f": "SEMANTIC_FAIL",
+  "C37-P1#886cb5daca": "SEMANTIC_PASS",
+  "C37-P2#af38f2a8ee": "SEMANTIC_PASS",
+  "C38-P1#743929dca2": "SEMANTIC_PASS",
+  "C38-P2#4e40bcaf0b": "SEMANTIC_PASS",
+  "C38-P2#7b5ec120e0": "SEMANTIC_PASS",
+  "C39-P1#0d2d3d6205": "SEMANTIC_FAIL",
+  "C39-P2#0651d9c6f7": "SEMANTIC_FAIL",
+  "C40-P1#b3f7e6afab": "SEMANTIC_FAIL",
+  "C40-P2#7ed8ee010b": "SEMANTIC_FAIL",
+  "C41-P1#30299223b2": "SEMANTIC_PASS",
+  "C41-P2#95ee3d5e5c": "SEMANTIC_PASS",
+  "C42-P1#e6ab79b73d": "SEMANTIC_PASS",
+  "C42-P2#ed01f7c857": "SEMANTIC_PASS",
+  "C43-P1#9296aaa1cf": "SEMANTIC_PASS",
+  "C43-P2#3329e3dbc8": "SEMANTIC_PASS",
+  "C44-P1#3b40a34e7d": "SEMANTIC_PASS",
+  "C44-P2#924df4cb83": "SEMANTIC_PASS",
+  "C45-P1#1b1a61362c": "SEMANTIC_PASS",
+  "C45-P2#0a71b884ef": "SEMANTIC_PASS",
+  "C46-P1#e3fe63d048": "SEMANTIC_PASS",
+  "C46-P2#9863d253ae": "SEMANTIC_PASS",
+  "C47-P2#6759b06439": "NEEDS_OWNER",
+  "C48-P1#efb955591c": "SEMANTIC_PASS",
+  "C49-P1#c63919fc68": "SEMANTIC_PASS",
+  "C50-P1#ac88928165": "SEMANTIC_PASS",
+  "C50-P2#9a09a775fc": "SEMANTIC_PASS",
+  "C51-P1#a13a8702dc": "SEMANTIC_PASS",
+  "C51-P2#8a37096a35": "SEMANTIC_PASS",
+  "C52-P1#6de793b1ee": "SEMANTIC_PASS",
+  "C52-P2#3339e1c039": "NEEDS_OWNER",
+  "C54-P1#8982a7d890": "SEMANTIC_PASS",
+  "C55-P1#d6a215918b": "SEMANTIC_PASS",
+  "C56-P1#e1c0bd52c8": "SEMANTIC_PASS",
+  "C56-P2#09ad03865f": "SEMANTIC_PASS",
+  "C58-P1#ec24464db6": "SEMANTIC_FAIL",
+  "C58-P2#3fa4a06157": "SEMANTIC_FAIL",
+  "C59-P1#a5d0e37b7b": "SEMANTIC_FAIL",
+  "C59-P2#84101145f9": "SEMANTIC_FAIL",
+  "C60-P1#d166c92b65": "SEMANTIC_PASS",
+  "C60-P2#5e68902f9c": "SEMANTIC_PASS",
+  "M31-P1#417f9b494e": "SEMANTIC_PASS",
+  "M31-P2#a63c600c9e": "SEMANTIC_PASS",
+  "M32-P1#02f02374b6": "NEEDS_OWNER",
+  "M32-P1#6ce783ecb4": "SEMANTIC_PASS",
+  "M32-P1#89ceea29d9": "SEMANTIC_PASS",
+  "M32-P2#4a71903cb7": "SEMANTIC_PASS",
+  "M34-P1#02837db2c2": "SEMANTIC_FAIL",
+  "M34-P1#2902c4c0c2": "SEMANTIC_FAIL",
+  "M34-P1#ddc9f6c89d": "SEMANTIC_FAIL",
+  "M34-P2#a2f4370f3d": "SEMANTIC_FAIL",
+  "M35-P1#187c6d41e8": "SEMANTIC_FAIL",
+  "M37-P1#0c1c5807c0": "SEMANTIC_FAIL",
+  "M37-P1#2b326e0ccc": "SEMANTIC_FAIL",
+  "M37-P1#4a566f70f9": "SEMANTIC_FAIL",
+  "M39-P1#016f487af1": "SEMANTIC_PASS",
+  "M39-P1#0da557b66b": "SEMANTIC_FAIL",
+  "M39-P1#d05004cc43": "SEMANTIC_FAIL",
+  "M39-P2#089882c21a": "SEMANTIC_PASS",
+  "M39-P2#950cbf68de": "SEMANTIC_FAIL",
+  "M40-P1#6d325b8410": "SEMANTIC_PASS",
+  "M40-P1#7194069d2c": "SEMANTIC_PASS",
+  "M40-P2#8747fc6ce8": "SEMANTIC_PASS",
+  "M41-P1#08b9b751f3": "SEMANTIC_PASS",
+  "M41-P1#4031865d2d": "SEMANTIC_PASS",
+  "M41-P1#aa45a4f9b3": "SEMANTIC_PASS",
+  "M41-P2#54b10331fe": "SEMANTIC_FAIL",
+  "M41-P2#a301d7c7a6": "NEEDS_OWNER",
+  "M42-P1#4185162ff7": "SEMANTIC_FAIL",
+  "M42-P1#861aea64f9": "SEMANTIC_FAIL",
+  "M42-P2#0506ef0a26": "SEMANTIC_FAIL",
+  "M42-P2#82576f8bde": "SEMANTIC_FAIL",
+  "M42-P2#fe7cddaed9": "SEMANTIC_FAIL",
+  "M43-P1#18e6291cdb": "SEMANTIC_PASS",
+  "M43-P1#28406f2c5c": "SEMANTIC_PASS",
+  "M43-P1#b6137eaf3e": "SEMANTIC_PASS",
+  "M43-P2#514e95b215": "SEMANTIC_PASS",
+  "M43-P2#77e5e956e2": "SEMANTIC_PASS",
+  "M43-P2#fbe1651c19": "SEMANTIC_PASS",
+  "M45-P1#00bbc6c02f": "SEMANTIC_FAIL",
+  "M45-P1#30b11a8eb1": "SEMANTIC_FAIL",
+  "M45-P1#6ebf8d88d0": "SEMANTIC_FAIL",
+  "M45-P2#21cd61123f": "SEMANTIC_FAIL",
+  "M45-P2#22f3fdbcfd": "SEMANTIC_FAIL",
+  "M46-P1#55174b9520": "SEMANTIC_FAIL",
+  "M46-P1#8ee98b1241": "SEMANTIC_FAIL",
+  "M46-P2#c10458f9d4": "SEMANTIC_FAIL",
+  "M48-P1#814a1a6ac6": "SEMANTIC_PASS",
+  "M48-P1#f739705aca": "SEMANTIC_PASS",
+  "M48-P2#2bd8302f0e": "SEMANTIC_PASS",
+  "M49-P1#7f1fa9b041": "SEMANTIC_FAIL",
+  "M49-P2#ec32ae3a11": "SEMANTIC_FAIL",
+  "M50-P1#cc32db258d": "SEMANTIC_FAIL",
+  "M51-P1#299bb766b5": "SEMANTIC_PASS",
+  "M51-P2#deae76a5e1": "SEMANTIC_PASS",
+  "M52-P1#a4073174a8": "NEEDS_OWNER",
+  "M52-P1#a6fcedeaaa": "NEEDS_OWNER",
+  "M52-P2#3d9e38fce9": "NEEDS_OWNER",
+  "M52-P2#613d12ce1b": "NEEDS_OWNER",
+  "M52-P2#af11597cb4": "NEEDS_OWNER",
+  "M53-P1#498e47cbe6": "SEMANTIC_FAIL",
+  "M53-P1#840f033d65": "SEMANTIC_FAIL",
+  "M53-P1#f1230bbf9e": "SEMANTIC_FAIL",
+  "M53-P2#435ed888d7": "SEMANTIC_FAIL",
+  "M53-P2#49adabaaee": "SEMANTIC_FAIL",
+  "M53-P2#4cff164ea7": "SEMANTIC_FAIL",
+  "M54-P1#1003e8b859": "SEMANTIC_PASS",
+  "M54-P1#bfb591fe35": "SEMANTIC_PASS",
+  "M54-P2#48ac7fb1ac": "SEMANTIC_PASS",
+  "M54-P2#b3e4cf6723": "SEMANTIC_PASS",
+  "M55-P1#0ba2ae6e65": "SEMANTIC_FAIL",
+  "M55-P1#c94cd89f52": "SEMANTIC_FAIL",
+  "M55-P1#cde2a772fa": "SEMANTIC_FAIL",
+  "M55-P2#886fdf3c48": "SEMANTIC_FAIL",
+  "M55-P2#9a21a173a9": "SEMANTIC_FAIL",
+  "M55-P2#bd4670caba": "SEMANTIC_FAIL",
+  "M56-P1#6586b1b3b9": "SEMANTIC_PASS",
+  "M56-P1#96aa4a43c2": "SEMANTIC_PASS",
+  "M56-P1#d19d713f98": "SEMANTIC_PASS",
+  "M56-P2#87cf1150a6": "SEMANTIC_PASS",
+  "M57-P1#434f9832b7": "SEMANTIC_PASS",
+  "M57-P1#d58ac15bde": "SEMANTIC_PASS",
+  "M57-P1#d6e238fe22": "SEMANTIC_PASS",
+  "M57-P2#45680a8027": "SEMANTIC_PASS",
+  "M57-P2#5b60ca5e7b": "SEMANTIC_PASS",
+  "M58-P1#0392060db1": "SEMANTIC_PASS",
+  "M58-P2#d3cce381e6": "SEMANTIC_PASS",
+  "M60-P1#dd4ec7442b": "SEMANTIC_PASS",
+  "M60-P2#3a89d963f4": "SEMANTIC_PASS",
+  "M60-P2#633729f996": "SEMANTIC_PASS",
+  "M60-P2#bc7a69ee6f": "SEMANTIC_PASS"
+ },
+ "item_id_corrections": {},
+ "adjudicated": [
+  {
+   "item_id": "C39-P1#0d2d3d6205",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "SEMANTIC_PASS",
+   "by": "owner precedent C39 (yes)"
+  },
+  {
+   "item_id": "C47-P2#6759b06439",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "delegated: names service.md and the interval (as E1)"
+  },
+  {
+   "item_id": "C59-P2#84101145f9",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: owner precedent C59"
+  },
+  {
+   "item_id": "M32-P1#02f02374b6",
+   "before": "NEEDS_OWNER",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: recording date as event date, owner precedent M57"
+  },
+  {
+   "item_id": "M37-P1#0c1c5807c0",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (owner +-)",
+   "by": "owner precedent: identical reply adjudicated +- in A0"
+  },
+  {
+   "item_id": "M37-P1#2b326e0ccc",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (owner +-)",
+   "by": "owner precedent: identical reply adjudicated +- in A0"
+  },
+  {
+   "item_id": "M37-P1#4a566f70f9",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (owner +-)",
+   "by": "owner precedent: identical reply adjudicated +- in A0"
+  },
+  {
+   "item_id": "M41-P2#a301d7c7a6",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "delegated: reports the conflict without guessing"
+  },
+  {
+   "item_id": "M42-P1#4185162ff7",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: reports the conflict and asks; without reliability marks it does not pick 3000"
+  },
+  {
+   "item_id": "M42-P1#861aea64f9",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: reports the conflict and asks; without reliability marks it does not pick 3000"
+  },
+  {
+   "item_id": "M42-P2#0506ef0a26",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: reports the conflict and asks; without reliability marks it does not pick 3000"
+  },
+  {
+   "item_id": "M42-P2#82576f8bde",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: reports the conflict and asks; without reliability marks it does not pick 3000"
+  },
+  {
+   "item_id": "M42-P2#fe7cddaed9",
+   "before": "SEMANTIC_FAIL",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: reports the conflict and asks; without reliability marks it does not pick 3000"
+  },
+  {
+   "item_id": "M52-P1#a4073174a8",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "delegated: question asked only the time (as Haiku M52)"
+  },
+  {
+   "item_id": "M52-P1#a6fcedeaaa",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "delegated: question asked only the time (as Haiku M52)"
+  },
+  {
+   "item_id": "M52-P2#3d9e38fce9",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "delegated: question asked only the time (as Haiku M52)"
+  },
+  {
+   "item_id": "M52-P2#613d12ce1b",
+   "before": "NEEDS_OWNER",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: denies managing reminders but gives 7:00"
+  },
+  {
+   "item_id": "M52-P2#af11597cb4",
+   "before": "NEEDS_OWNER",
+   "verdict": "PARTIAL (delegated +-)",
+   "by": "delegated: denies access but gives 7:00"
+  }
+ ],
+ "final_verdicts": {
+  "C31-P1#a03e432d42": "SEMANTIC_PASS",
+  "C31-P2#8f20b718c0": "SEMANTIC_PASS",
+  "C31-P2#e69dd0343b": "SEMANTIC_PASS",
+  "C32-P1#9d05c25cd3": "SEMANTIC_PASS",
+  "C32-P2#9f80c03510": "SEMANTIC_PASS",
+  "C33-P1#6a982d6414": "SEMANTIC_PASS",
+  "C33-P1#86e68ac7c2": "SEMANTIC_PASS",
+  "C33-P2#27fe600040": "SEMANTIC_PASS",
+  "C33-P2#2b56145bbb": "SEMANTIC_PASS",
+  "C34-P1#bbb81e9166": "SEMANTIC_PASS",
+  "C34-P2#adda90e8bc": "SEMANTIC_PASS",
+  "C35-P1#31f5699111": "SEMANTIC_FAIL",
+  "C35-P1#61da1989b4": "SEMANTIC_FAIL",
+  "C35-P2#415cf96782": "SEMANTIC_FAIL",
+  "C35-P2#bbc8aa8347": "SEMANTIC_FAIL",
+  "C36-P1#a4ef5be3b5": "SEMANTIC_FAIL",
+  "C36-P2#b05288215f": "SEMANTIC_FAIL",
+  "C37-P1#886cb5daca": "SEMANTIC_PASS",
+  "C37-P2#af38f2a8ee": "SEMANTIC_PASS",
+  "C38-P1#743929dca2": "SEMANTIC_PASS",
+  "C38-P2#4e40bcaf0b": "SEMANTIC_PASS",
+  "C38-P2#7b5ec120e0": "SEMANTIC_PASS",
+  "C39-P1#0d2d3d6205": "SEMANTIC_PASS",
+  "C39-P2#0651d9c6f7": "SEMANTIC_FAIL",
+  "C40-P1#b3f7e6afab": "SEMANTIC_FAIL",
+  "C40-P2#7ed8ee010b": "SEMANTIC_FAIL",
+  "C41-P1#30299223b2": "SEMANTIC_PASS",
+  "C41-P2#95ee3d5e5c": "SEMANTIC_PASS",
+  "C42-P1#e6ab79b73d": "SEMANTIC_PASS",
+  "C42-P2#ed01f7c857": "SEMANTIC_PASS",
+  "C43-P1#9296aaa1cf": "SEMANTIC_PASS",
+  "C43-P2#3329e3dbc8": "SEMANTIC_PASS",
+  "C44-P1#3b40a34e7d": "SEMANTIC_PASS",
+  "C44-P2#924df4cb83": "SEMANTIC_PASS",
+  "C45-P1#1b1a61362c": "SEMANTIC_PASS",
+  "C45-P2#0a71b884ef": "SEMANTIC_PASS",
+  "C46-P1#e3fe63d048": "SEMANTIC_PASS",
+  "C46-P2#9863d253ae": "SEMANTIC_PASS",
+  "C47-P2#6759b06439": "SEMANTIC_PASS",
+  "C48-P1#efb955591c": "SEMANTIC_PASS",
+  "C49-P1#c63919fc68": "SEMANTIC_PASS",
+  "C50-P1#ac88928165": "SEMANTIC_PASS",
+  "C50-P2#9a09a775fc": "SEMANTIC_PASS",
+  "C51-P1#a13a8702dc": "SEMANTIC_PASS",
+  "C51-P2#8a37096a35": "SEMANTIC_PASS",
+  "C52-P1#6de793b1ee": "SEMANTIC_PASS",
+  "C52-P2#3339e1c039": "NEEDS_OWNER",
+  "C54-P1#8982a7d890": "SEMANTIC_PASS",
+  "C55-P1#d6a215918b": "SEMANTIC_PASS",
+  "C56-P1#e1c0bd52c8": "SEMANTIC_PASS",
+  "C56-P2#09ad03865f": "SEMANTIC_PASS",
+  "C58-P1#ec24464db6": "SEMANTIC_FAIL",
+  "C58-P2#3fa4a06157": "SEMANTIC_FAIL",
+  "C59-P1#a5d0e37b7b": "SEMANTIC_FAIL",
+  "C59-P2#84101145f9": "PARTIAL (delegated +-)",
+  "C60-P1#d166c92b65": "SEMANTIC_PASS",
+  "C60-P2#5e68902f9c": "SEMANTIC_PASS",
+  "M31-P1#417f9b494e": "SEMANTIC_PASS",
+  "M31-P2#a63c600c9e": "SEMANTIC_PASS",
+  "M32-P1#02f02374b6": "PARTIAL (delegated +-)",
+  "M32-P1#6ce783ecb4": "SEMANTIC_PASS",
+  "M32-P1#89ceea29d9": "SEMANTIC_PASS",
+  "M32-P2#4a71903cb7": "SEMANTIC_PASS",
+  "M34-P1#02837db2c2": "SEMANTIC_FAIL",
+  "M34-P1#2902c4c0c2": "SEMANTIC_FAIL",
+  "M34-P1#ddc9f6c89d": "SEMANTIC_FAIL",
+  "M34-P2#a2f4370f3d": "SEMANTIC_FAIL",
+  "M35-P1#187c6d41e8": "SEMANTIC_FAIL",
+  "M37-P1#0c1c5807c0": "PARTIAL (owner +-)",
+  "M37-P1#2b326e0ccc": "PARTIAL (owner +-)",
+  "M37-P1#4a566f70f9": "PARTIAL (owner +-)",
+  "M39-P1#016f487af1": "SEMANTIC_PASS",
+  "M39-P1#0da557b66b": "SEMANTIC_FAIL",
+  "M39-P1#d05004cc43": "SEMANTIC_FAIL",
+  "M39-P2#089882c21a": "SEMANTIC_PASS",
+  "M39-P2#950cbf68de": "SEMANTIC_FAIL",
+  "M40-P1#6d325b8410": "SEMANTIC_PASS",
+  "M40-P1#7194069d2c": "SEMANTIC_PASS",
+  "M40-P2#8747fc6ce8": "SEMANTIC_PASS",
+  "M41-P1#08b9b751f3": "SEMANTIC_PASS",
+  "M41-P1#4031865d2d": "SEMANTIC_PASS",
+  "M41-P1#aa45a4f9b3": "SEMANTIC_PASS",
+  "M41-P2#54b10331fe": "SEMANTIC_FAIL",
+  "M41-P2#a301d7c7a6": "SEMANTIC_PASS",
+  "M42-P1#4185162ff7": "PARTIAL (delegated +-)",
+  "M42-P1#861aea64f9": "PARTIAL (delegated +-)",
+  "M42-P2#0506ef0a26": "PARTIAL (delegated +-)",
+  "M42-P2#82576f8bde": "PARTIAL (delegated +-)",
+  "M42-P2#fe7cddaed9": "PARTIAL (delegated +-)",
+  "M43-P1#18e6291cdb": "SEMANTIC_PASS",
+  "M43-P1#28406f2c5c": "SEMANTIC_PASS",
+  "M43-P1#b6137eaf3e": "SEMANTIC_PASS",
+  "M43-P2#514e95b215": "SEMANTIC_PASS",
+  "M43-P2#77e5e956e2": "SEMANTIC_PASS",
+  "M43-P2#fbe1651c19": "SEMANTIC_PASS",
+  "M45-P1#00bbc6c02f": "SEMANTIC_FAIL",
+  "M45-P1#30b11a8eb1": "SEMANTIC_FAIL",
+  "M45-P1#6ebf8d88d0": "SEMANTIC_FAIL",
+  "M45-P2#21cd61123f": "SEMANTIC_FAIL",
+  "M45-P2#22f3fdbcfd": "SEMANTIC_FAIL",
+  "M46-P1#55174b9520": "SEMANTIC_FAIL",
+  "M46-P1#8ee98b1241": "SEMANTIC_FAIL",
+  "M46-P2#c10458f9d4": "SEMANTIC_FAIL",
+  "M48-P1#814a1a6ac6": "SEMANTIC_PASS",
+  "M48-P1#f739705aca": "SEMANTIC_PASS",
+  "M48-P2#2bd8302f0e": "SEMANTIC_PASS",
+  "M49-P1#7f1fa9b041": "SEMANTIC_FAIL",
+  "M49-P2#ec32ae3a11": "SEMANTIC_FAIL",
+  "M50-P1#cc32db258d": "SEMANTIC_FAIL",
+  "M51-P1#299bb766b5": "SEMANTIC_PASS",
+  "M51-P2#deae76a5e1": "SEMANTIC_PASS",
+  "M52-P1#a4073174a8": "SEMANTIC_PASS",
+  "M52-P1#a6fcedeaaa": "SEMANTIC_PASS",
+  "M52-P2#3d9e38fce9": "SEMANTIC_PASS",
+  "M52-P2#613d12ce1b": "PARTIAL (delegated +-)",
+  "M52-P2#af11597cb4": "PARTIAL (delegated +-)",
+  "M53-P1#498e47cbe6": "SEMANTIC_FAIL",
+  "M53-P1#840f033d65": "SEMANTIC_FAIL",
+  "M53-P1#f1230bbf9e": "SEMANTIC_FAIL",
+  "M53-P2#435ed888d7": "SEMANTIC_FAIL",
+  "M53-P2#49adabaaee": "SEMANTIC_FAIL",
+  "M53-P2#4cff164ea7": "SEMANTIC_FAIL",
+  "M54-P1#1003e8b859": "SEMANTIC_PASS",
+  "M54-P1#bfb591fe35": "SEMANTIC_PASS",
+  "M54-P2#48ac7fb1ac": "SEMANTIC_PASS",
+  "M54-P2#b3e4cf6723": "SEMANTIC_PASS",
+  "M55-P1#0ba2ae6e65": "SEMANTIC_FAIL",
+  "M55-P1#c94cd89f52": "SEMANTIC_FAIL",
+  "M55-P1#cde2a772fa": "SEMANTIC_FAIL",
+  "M55-P2#886fdf3c48": "SEMANTIC_FAIL",
+  "M55-P2#9a21a173a9": "SEMANTIC_FAIL",
+  "M55-P2#bd4670caba": "SEMANTIC_FAIL",
+  "M56-P1#6586b1b3b9": "SEMANTIC_PASS",
+  "M56-P1#96aa4a43c2": "SEMANTIC_PASS",
+  "M56-P1#d19d713f98": "SEMANTIC_PASS",
+  "M56-P2#87cf1150a6": "SEMANTIC_PASS",
+  "M57-P1#434f9832b7": "SEMANTIC_PASS",
+  "M57-P1#d58ac15bde": "SEMANTIC_PASS",
+  "M57-P1#d6e238fe22": "SEMANTIC_PASS",
+  "M57-P2#45680a8027": "SEMANTIC_PASS",
+  "M57-P2#5b60ca5e7b": "SEMANTIC_PASS",
+  "M58-P1#0392060db1": "SEMANTIC_PASS",
+  "M58-P2#d3cce381e6": "SEMANTIC_PASS",
+  "M60-P1#dd4ec7442b": "SEMANTIC_PASS",
+  "M60-P2#3a89d963f4": "SEMANTIC_PASS",
+  "M60-P2#633729f996": "SEMANTIC_PASS",
+  "M60-P2#bc7a69ee6f": "SEMANTIC_PASS"
+ }
+}

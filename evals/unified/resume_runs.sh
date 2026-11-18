@@ -20,6 +20,7 @@ RUNS=(
   "D2|$A/unified-locked-u2-D2-2026-11-18|3|D2|"
   "F|$A/unified-locked-framework-F-2026-11-18|3|A0||--memory-temporal --verify-writes --goals-in-context"
   "A0b|$A/unified-locked-A0b-2026-11-18|3|A0|"
+  "D3|$A/unified-locked-u2-D3-2026-11-18|3|D3|"
   "haiku|$A/unified-locked-haiku-2026-11-18|1|A0|11500"
   "luna|$A/unified-locked-codex-2026-11-18|1|A0|11501"
 )

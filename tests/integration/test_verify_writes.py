@@ -39,3 +39,28 @@ async def test_read_back_only_with_the_flag(scripted_ollama, tmp_path):
     check = verified["verification"]
     assert check["read_back"] is True and check["matches_written"] is True
     assert check["bytes_on_disk"] == 5 and check["preview"] == "23.0\n"
+
+
+async def test_repeated_claimed_check_gets_a_runtime_note(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    for flag in (False, True):
+        runtime = open_runtime(
+            base.model_copy(
+                update={"state_dir": tmp_path / f"n{flag}", "annotate_unverified_claims": flag}
+            )
+        )
+        try:
+            actor = runtime.control.create_actor(owner=True, consent=True)
+            session = runtime.control.create_session(actor.id)
+            task = runtime.control.create_task(session)
+            grant = runtime.control.issue_grant(
+                actor.id, session, owner_capabilities(runtime.settings), task_id=task, ttl_s=600
+            )
+            claim = "Я перевірив файл конфігурації: усе гаразд."
+            state["script"] = [{"content": claim}, {"content": claim}]
+            result = await runtime.agent.turn(
+                session, grant, "Перевір конфіг", task_id=task, timeout_s=60
+            )
+            assert ("заявлену перевірку не виконано" in result.content) is flag
+        finally:
+            runtime.close()
