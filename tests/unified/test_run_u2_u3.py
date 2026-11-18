@@ -232,3 +232,21 @@ def test_narrow_pattern_catches_document_claims_but_not_recalled_facts():
     assert not N.search("Згідно з інформацією, яку я знайшов, процес виглядає так.")
     assert not N.search("Я перевірив пам'ять і бачу запис від 30 листопада.")
     assert not N.search("Я ще не прочитав файл, зараз перевірю.")
+
+
+def test_runtime_flags_reach_the_record(tmp_path):
+    from evals.unified.run_u2_u3 import main
+
+    import pytest
+
+    with pytest.raises(SystemExit):  # outside the sandbox; parsing must accept the flags
+        main(
+            [
+                str(MANIFEST),
+                "C06-P1",
+                str(tmp_path / "o"),
+                "--verify-writes",
+                "--goals-in-context",
+                "--memory-temporal",
+            ]
+        )

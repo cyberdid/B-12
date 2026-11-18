@@ -154,6 +154,7 @@ def run_scenario(
     existing_files_root=False,
     arm="A0",
     memory_temporal=False,
+    runtime_flags=(),
 ):
     """Run one manifest row; return the raw record (no scoring)."""
     record = {
@@ -180,7 +181,11 @@ def run_scenario(
 
     runtime = open_runtime(
         settings.model_copy(
-            update={"state_dir": work_dir / "state", "memory_temporal": memory_temporal}
+            update={
+                "state_dir": work_dir / "state",
+                "memory_temporal": memory_temporal,
+                **{flag: True for flag in runtime_flags},
+            }
         )
     )
     runtime.agent.system_prompt = apply_arm(runtime.agent.system_prompt, arm)
@@ -221,6 +226,7 @@ def run_scenario(
             "status": "EXECUTED",
             "u2_arm": arm,
             "memory_temporal": memory_temporal,
+            "runtime_flags": sorted(runtime_flags),
             "environment_stub": environment_stub,
             "action_claim_pattern": {"D": "broad (arm D)", "D2": "narrow (arm D2)"}.get(
                 arm, "runtime default"
@@ -272,6 +278,8 @@ def main(argv=None):
     parser.add_argument(
         "--memory-temporal", action="store_true", help="ADR-015 temporal memory (U4 arm)"
     )
+    parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
+    parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
         "--model-timeout",
         type=float,
@@ -329,6 +337,14 @@ def main(argv=None):
             existing_files_root=True,
             arm=args.arm,
             memory_temporal=args.memory_temporal,
+            runtime_flags=tuple(
+                flag
+                for flag, on in (
+                    ("verify_writes", args.verify_writes),
+                    ("goals_in_context", args.goals_in_context),
+                )
+                if on
+            ),
         )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     out = args.out_dir / f"{args.scenario_id}.json"
