@@ -163,9 +163,12 @@ class Scheduler:
                 lambda e: rt.agent.resolver.live(e, "memory", actor),
             )
             outcome["status"] = "achieved"
+        text = f"Ціль «{goal['intent'][:80]}»: {result.content[:600]}"
+        if getattr(rt.settings, "initiative_gate", False):
+            outcome.update(self._gated_proposal(goal, actor, result, text))
+            return outcome
         decision = rt.attention.decide(actor.id)
         attention_id = rt.attention.record(actor.id, decision) if decision.allowed else None
-        text = f"Ціль «{goal['intent'][:80]}»: {result.content[:600]}"
         outcome["proposal_id"] = rt.goals.add_proposal(
             actor.id,
             goal["id"],
@@ -178,8 +181,99 @@ class Scheduler:
         outcome["delivered"] = decision.allowed
         return outcome
 
+    def _gated_proposal(self, goal, actor, result, text) -> dict:
+        """ADR-018: a deterministic five-way decision instead of attention alone."""
+        from b12.attention import Decision
+        from b12.initiative import GateContext, InitiativeCandidate, decide
+
+        rt, now = self.runtime, self.clock()
+        effectful = any(
+            effect.get("state") == "completed"
+            for item in result.tool_results
+            for effect in item.side_effects
+        )
+        new_evidence = set(result.evidence_ids) - set(goal["evidence_ids"])
+        risk = "high" if result.state == "awaiting_approval" else "action" if effectful else "info"
+        candidate = InitiativeCandidate(
+            actor_id=actor.id,
+            goal_id=goal["id"],
+            trigger="goal_review",
+            text=result.content or text,
+            risk=risk,
+            evidence_ids=tuple(result.evidence_ids),
+            novel=effectful or bool(new_evidence) or result.state == "awaiting_approval",
+        )
+        current = rt.goals.get(goal["id"], actor.id)
+        attention = rt.attention.decide(actor.id)
+        context = GateContext(
+            # A goal this run paused (budget, approval) or completed still reports; only a
+            # goal the owner closed meanwhile is silent.
+            goal_status="active"
+            if current and current["status"] not in ("abandoned", "failed")
+            else (current or {}).get("status"),
+            evidence_live={
+                e: bool(rt.agent.resolver.live(e, "memory", actor)) for e in result.evidence_ids
+            },
+            recent_keys=rt.goals.recent_proposal_keys(actor.id, now - timedelta(hours=24)),
+            muted=rt.goals.is_muted(goal["id"]),
+            attention_reason=attention.reason,
+            attention_allowed=attention.allowed,
+        )
+        gate = decide(candidate, context, now)
+        attention_id = None
+        if gate.decision == "deliver":
+            attention_id = rt.attention.record(actor.id, Decision(True, gate.reason, gate.urgent))
+        proposal = rt.goals.add_proposal(
+            actor.id,
+            goal["id"],
+            text,
+            delivered=gate.decision == "deliver",
+            reason=gate.reason,
+            attention_id=attention_id,
+            tags={**goal["tags"], **dict.fromkeys(result.evidence_ids, "memory")},
+            decision=gate.decision,
+            dedupe_key=gate.dedupe_key,
+            not_before=gate.not_before,
+            expires_at=gate.expires_at,
+        )
+        return {
+            "proposal_id": proposal,
+            "delivered": gate.decision == "deliver",
+            "initiative_decision": gate.decision,
+            "initiative_reason": gate.reason,
+        }
+
+    def redecide_deferred(self) -> list[dict]:
+        """ADR-018: deferred proposals get one more attention decision once their window opens;
+        after 48 h they expire unsaid."""
+        from b12.attention import Decision
+
+        rt, now, settled = self.runtime, self.clock(), []
+        for actor_id in rt.control.actor_ids():
+            for item in rt.goals.due_deferred(actor_id, now):
+                if item["expires_at"] and datetime.fromisoformat(item["expires_at"]) <= now:
+                    rt.goals.settle_proposal(
+                        item["id"], decision="drop", reason="defer_expired", delivered=False
+                    )
+                    settled.append({"proposal_id": item["id"], "decision": "drop"})
+                    continue
+                attention = rt.attention.decide(actor_id)
+                if attention.allowed:
+                    attention_id = rt.attention.record(actor_id, Decision(True, "deferred"))
+                    rt.goals.settle_proposal(
+                        item["id"],
+                        decision="deliver",
+                        reason="deferred",
+                        delivered=True,
+                        attention_id=attention_id,
+                    )
+                    settled.append({"proposal_id": item["id"], "decision": "deliver"})
+        return settled
+
     async def tick(self) -> list[dict]:
         outcomes, ran = [], set()
+        if getattr(self.runtime.settings, "initiative_gate", False):
+            outcomes.extend(self.redecide_deferred())
         while len(ran) < self.max_goals:
             # Re-read the due list each step: a goal that preempted the last one runs next.
             goal = next(

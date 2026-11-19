@@ -3,18 +3,22 @@
 #   evals/unified/launch_judges.sh <name> <run_dir> <judge_a> <judge_b>
 # judges: codex | gemini | opus. Outputs: reports/unified/semantic-judge-<name>/sheet.json and
 # reports/unified/.judge-work-<name>/<judge>-<n>/out.json (git-excluded work dir).
+# Env: MANIFEST (default u2-u3-locked-v2), RUBRIC_DIR (rubric.md + schema.json; default the
+# locked-pilot judge dir; use reports/unified/semantic-judge-u5-u5 for U5 sets).
 set -euo pipefail
 NAME="$1"; RUN="$2"; shift 2
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"; cd "$REPO"
 D="$REPO/reports/unified/semantic-judge-$NAME"; W="$REPO/reports/unified/.judge-work-$NAME"
 mkdir -p "$D" "$W"
-cp reports/unified/semantic-judge-locked-pilot-2026-11-18/rubric.md reports/unified/semantic-judge-locked-pilot-2026-11-18/schema.json "$D/"
-.venv/bin/python - "$D" "$W" "$RUN" <<'PY'
+MANIFEST="${MANIFEST:-evals/unified/scenario_sets/u2-u3-locked-v2.json}"
+RUBRIC_DIR="${RUBRIC_DIR:-reports/unified/semantic-judge-locked-pilot-2026-11-18}"
+cp "$RUBRIC_DIR/rubric.md" "$RUBRIC_DIR/schema.json" "$D/"
+.venv/bin/python - "$D" "$W" "$RUN" "$MANIFEST" <<'PY'
 import json, sys
 from pathlib import Path
 from evals.unified.judge_sheet import build_pilot
-D, W, run = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3]
-sheet = build_pilot("evals/unified/scenario_sets/u2-u3-locked-v2.json", run, Path.cwd())
+D, W, run, manifest = Path(sys.argv[1]), Path(sys.argv[2]), sys.argv[3], sys.argv[4]
+sheet = build_pilot(manifest, run, Path.cwd())
 (D / "sheet.json").write_text(json.dumps(sheet, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 items = [{k: v for k, v in s.items() if k != "members"} for s in sheet]
 rubric = (D / "rubric.md").read_text(); parts, cur = [], []

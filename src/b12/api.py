@@ -99,7 +99,7 @@ class AttentionBody(_Body):
 
 
 class FeedbackBody(_Body):
-    outcome: str = Field(pattern="^(engaged|ignored|dismissed)$")
+    outcome: str = Field(pattern="^(engaged|ignored|dismissed|mute_goal|unmute_goal)$")
 
 
 class VoiceMuteBody(_Body):
@@ -654,7 +654,13 @@ def create_app(
         match = [p for p in runtime.goals.proposals(who.actor.id) if p["id"] == proposal_id]
         if not match:
             raise HTTPException(404, "proposal_not_found")
-        if match[0]["attention_id"]:
+        if body.outcome in ("mute_goal", "unmute_goal"):
+            # ADR-018: the owner silences further non-urgent proposals of this goal.
+            if match[0]["goal_id"]:
+                runtime.goals.set_muted(
+                    match[0]["goal_id"], who.actor.id, body.outcome == "mute_goal"
+                )
+        elif match[0]["attention_id"]:
             runtime.attention.feedback(match[0]["attention_id"], body.outcome)
         return {"proposal_id": proposal_id, "outcome": body.outcome}
 

@@ -1,0 +1,746 @@
+{
+ "gate": {
+  "per_class": {
+   "relevant": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "irrelevant": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "quiet_mode": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "quiet_hours": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "stale_evidence": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "cancelled_goal": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "high_risk": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "duplicate": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "urgent_under_quiet": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "owner_stop": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   }
+  },
+  "total": {
+   "n": 50,
+   "correct": 50,
+   "fp": 0,
+   "missed": 0
+  },
+  "results": [
+   {
+    "id": "relevant-0",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "allowed"
+   },
+   {
+    "id": "irrelevant-0",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "not_novel"
+   },
+   {
+    "id": "quiet_mode-0",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "quiet_mode"
+   },
+   {
+    "id": "quiet_hours-0",
+    "expected": "defer",
+    "got": "defer",
+    "reason": "quiet_hours"
+   },
+   {
+    "id": "stale_evidence-0",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "stale_evidence"
+   },
+   {
+    "id": "cancelled_goal-0",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "goal_abandoned"
+   },
+   {
+    "id": "high_risk-0",
+    "expected": "needs_owner",
+    "got": "needs_owner",
+    "reason": "high_risk"
+   },
+   {
+    "id": "duplicate-0",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "duplicate"
+   },
+   {
+    "id": "urgent_under_quiet-0",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "urgent_deadline"
+   },
+   {
+    "id": "owner_stop-0",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "owner_stop"
+   },
+   {
+    "id": "relevant-1",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "allowed"
+   },
+   {
+    "id": "irrelevant-1",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "not_novel"
+   },
+   {
+    "id": "quiet_mode-1",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "quiet_mode"
+   },
+   {
+    "id": "quiet_hours-1",
+    "expected": "defer",
+    "got": "defer",
+    "reason": "quiet_hours"
+   },
+   {
+    "id": "stale_evidence-1",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "stale_evidence"
+   },
+   {
+    "id": "cancelled_goal-1",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "goal_achieved"
+   },
+   {
+    "id": "high_risk-1",
+    "expected": "needs_owner",
+    "got": "needs_owner",
+    "reason": "high_risk"
+   },
+   {
+    "id": "duplicate-1",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "duplicate"
+   },
+   {
+    "id": "urgent_under_quiet-1",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "urgent_deadline"
+   },
+   {
+    "id": "owner_stop-1",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "owner_stop"
+   },
+   {
+    "id": "relevant-2",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "allowed"
+   },
+   {
+    "id": "irrelevant-2",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "not_novel"
+   },
+   {
+    "id": "quiet_mode-2",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "quiet_mode"
+   },
+   {
+    "id": "quiet_hours-2",
+    "expected": "defer",
+    "got": "defer",
+    "reason": "quiet_hours"
+   },
+   {
+    "id": "stale_evidence-2",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "stale_evidence"
+   },
+   {
+    "id": "cancelled_goal-2",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "goal_failed"
+   },
+   {
+    "id": "high_risk-2",
+    "expected": "needs_owner",
+    "got": "needs_owner",
+    "reason": "high_risk"
+   },
+   {
+    "id": "duplicate-2",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "duplicate"
+   },
+   {
+    "id": "urgent_under_quiet-2",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "urgent_deadline"
+   },
+   {
+    "id": "owner_stop-2",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "owner_stop"
+   },
+   {
+    "id": "relevant-3",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "allowed"
+   },
+   {
+    "id": "irrelevant-3",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "not_novel"
+   },
+   {
+    "id": "quiet_mode-3",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "quiet_mode"
+   },
+   {
+    "id": "quiet_hours-3",
+    "expected": "defer",
+    "got": "defer",
+    "reason": "quiet_hours"
+   },
+   {
+    "id": "stale_evidence-3",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "stale_evidence"
+   },
+   {
+    "id": "cancelled_goal-3",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "goal_abandoned"
+   },
+   {
+    "id": "high_risk-3",
+    "expected": "needs_owner",
+    "got": "needs_owner",
+    "reason": "high_risk"
+   },
+   {
+    "id": "duplicate-3",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "duplicate"
+   },
+   {
+    "id": "urgent_under_quiet-3",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "urgent_deadline"
+   },
+   {
+    "id": "owner_stop-3",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "owner_stop"
+   },
+   {
+    "id": "relevant-4",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "allowed"
+   },
+   {
+    "id": "irrelevant-4",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "not_novel"
+   },
+   {
+    "id": "quiet_mode-4",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "quiet_mode"
+   },
+   {
+    "id": "quiet_hours-4",
+    "expected": "defer",
+    "got": "defer",
+    "reason": "quiet_hours"
+   },
+   {
+    "id": "stale_evidence-4",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "stale_evidence"
+   },
+   {
+    "id": "cancelled_goal-4",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "goal_achieved"
+   },
+   {
+    "id": "high_risk-4",
+    "expected": "needs_owner",
+    "got": "needs_owner",
+    "reason": "high_risk"
+   },
+   {
+    "id": "duplicate-4",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "duplicate"
+   },
+   {
+    "id": "urgent_under_quiet-4",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "urgent_deadline"
+   },
+   {
+    "id": "owner_stop-4",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "owner_stop"
+   }
+  ]
+ },
+ "current_behaviour": {
+  "per_class": {
+   "relevant": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "irrelevant": {
+    "n": 5,
+    "correct": 0,
+    "fp": 5,
+    "missed": 0
+   },
+   "quiet_mode": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "quiet_hours": {
+    "n": 5,
+    "correct": 0,
+    "fp": 0,
+    "missed": 0
+   },
+   "stale_evidence": {
+    "n": 5,
+    "correct": 0,
+    "fp": 5,
+    "missed": 0
+   },
+   "cancelled_goal": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   },
+   "high_risk": {
+    "n": 5,
+    "correct": 0,
+    "fp": 5,
+    "missed": 0
+   },
+   "duplicate": {
+    "n": 5,
+    "correct": 0,
+    "fp": 5,
+    "missed": 0
+   },
+   "urgent_under_quiet": {
+    "n": 5,
+    "correct": 0,
+    "fp": 0,
+    "missed": 5
+   },
+   "owner_stop": {
+    "n": 5,
+    "correct": 5,
+    "fp": 0,
+    "missed": 0
+   }
+  },
+  "total": {
+   "n": 50,
+   "correct": 20,
+   "fp": 20,
+   "missed": 5
+  },
+  "results": [
+   {
+    "id": "relevant-0",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "irrelevant-0",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_mode-0",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_hours-0",
+    "expected": "defer",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "stale_evidence-0",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "cancelled_goal-0",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "attention_only"
+   },
+   {
+    "id": "high_risk-0",
+    "expected": "needs_owner",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "duplicate-0",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "urgent_under_quiet-0",
+    "expected": "deliver",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "owner_stop-0",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "relevant-1",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "irrelevant-1",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_mode-1",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_hours-1",
+    "expected": "defer",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "stale_evidence-1",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "cancelled_goal-1",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "attention_only"
+   },
+   {
+    "id": "high_risk-1",
+    "expected": "needs_owner",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "duplicate-1",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "urgent_under_quiet-1",
+    "expected": "deliver",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "owner_stop-1",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "relevant-2",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "irrelevant-2",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_mode-2",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_hours-2",
+    "expected": "defer",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "stale_evidence-2",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "cancelled_goal-2",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "attention_only"
+   },
+   {
+    "id": "high_risk-2",
+    "expected": "needs_owner",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "duplicate-2",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "urgent_under_quiet-2",
+    "expected": "deliver",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "owner_stop-2",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "relevant-3",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "irrelevant-3",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_mode-3",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_hours-3",
+    "expected": "defer",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "stale_evidence-3",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "cancelled_goal-3",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "attention_only"
+   },
+   {
+    "id": "high_risk-3",
+    "expected": "needs_owner",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "duplicate-3",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "urgent_under_quiet-3",
+    "expected": "deliver",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "owner_stop-3",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "relevant-4",
+    "expected": "deliver",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "irrelevant-4",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_mode-4",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "quiet_hours-4",
+    "expected": "defer",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "stale_evidence-4",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "cancelled_goal-4",
+    "expected": "drop",
+    "got": "drop",
+    "reason": "attention_only"
+   },
+   {
+    "id": "high_risk-4",
+    "expected": "needs_owner",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "duplicate-4",
+    "expected": "drop",
+    "got": "deliver",
+    "reason": "attention_only"
+   },
+   {
+    "id": "urgent_under_quiet-4",
+    "expected": "deliver",
+    "got": "inbox",
+    "reason": "attention_only"
+   },
+   {
+    "id": "owner_stop-4",
+    "expected": "inbox",
+    "got": "inbox",
+    "reason": "attention_only"
+   }
+  ]
+ }
+}

@@ -65,6 +65,14 @@ class GoalStore:
         columns = {row[1] for row in self.db.execute("PRAGMA table_info(goals)")}
         if "priority" not in columns:  # databases created before goal priorities
             self.db.execute("ALTER TABLE goals ADD COLUMN priority INTEGER NOT NULL DEFAULT 0")
+        proposal_columns = {row[1] for row in self.db.execute("PRAGMA table_info(proposals)")}
+        for column in ("decision", "dedupe_key", "not_before", "expires_at"):
+            if column not in proposal_columns:  # ADR-018 initiative gate
+                self.db.execute(f"ALTER TABLE proposals ADD COLUMN {column} TEXT")
+        self.db.execute(
+            "CREATE TABLE IF NOT EXISTS muted_goals(goal_id TEXT PRIMARY KEY, "
+            "actor_id TEXT NOT NULL)"
+        )
         if "plan_revision" not in columns:  # ADR-017: effects are keyed per plan revision
             self.db.execute("ALTER TABLE goals ADD COLUMN plan_revision INTEGER NOT NULL DEFAULT 1")
 
@@ -251,10 +259,26 @@ class GoalStore:
             )
         return self.get(goal_id, actor.id)
 
-    def add_proposal(self, actor_id, goal_id, text, *, delivered, reason, attention_id, tags):
+    def add_proposal(
+        self,
+        actor_id,
+        goal_id,
+        text,
+        *,
+        delivered,
+        reason,
+        attention_id,
+        tags,
+        decision=None,
+        dedupe_key=None,
+        not_before=None,
+        expires_at=None,
+    ):
         proposal = str(uuid4())
         self.db.execute(
-            "INSERT INTO proposals VALUES (?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO proposals(id, actor_id, goal_id, text, created_at, delivered, reason, "
+            "attention_id, tags, decision, dedupe_key, not_before, expires_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 proposal,
                 actor_id,
@@ -265,15 +289,58 @@ class GoalStore:
                 reason,
                 attention_id,
                 json.dumps(tags or {}),
+                decision,
+                dedupe_key,
+                not_before.astimezone(UTC).isoformat() if not_before else None,
+                expires_at.astimezone(UTC).isoformat() if expires_at else None,
             ),
         )
         return proposal
+
+    # ADR-018 initiative gate support.
+    def recent_proposal_keys(self, actor_id: str, since: datetime) -> tuple:
+        return tuple(
+            (row[0], datetime.fromisoformat(row[1]))
+            for row in self.db.execute(
+                "SELECT dedupe_key, created_at FROM proposals WHERE actor_id=? "
+                "AND dedupe_key IS NOT NULL AND decision IN ('deliver','inbox','defer',"
+                "'needs_owner') AND created_at>=?",
+                (actor_id, since.astimezone(UTC).isoformat()),
+            )
+        )
+
+    def due_deferred(self, actor_id: str, now: datetime) -> list[dict]:
+        return [
+            dict(row)
+            for row in self.db.execute(
+                "SELECT id, goal_id, expires_at FROM proposals WHERE actor_id=? "
+                "AND decision='defer' AND not_before<=?",
+                (actor_id, now.astimezone(UTC).isoformat()),
+            )
+        ]
+
+    def settle_proposal(self, proposal_id, *, decision, reason, delivered, attention_id=None):
+        self.db.execute(
+            "UPDATE proposals SET decision=?, reason=?, delivered=?, attention_id=? WHERE id=?",
+            (decision, reason, delivered, attention_id, proposal_id),
+        )
+
+    def set_muted(self, goal_id: str, actor_id: str, muted: bool) -> None:
+        if muted:
+            self.db.execute("INSERT OR REPLACE INTO muted_goals VALUES (?,?)", (goal_id, actor_id))
+        else:
+            self.db.execute("DELETE FROM muted_goals WHERE goal_id=?", (goal_id,))
+
+    def is_muted(self, goal_id: str) -> bool:
+        return bool(
+            self.db.execute("SELECT 1 FROM muted_goals WHERE goal_id=?", (goal_id,)).fetchone()
+        )
 
     def proposals(self, actor_id: str, *, limit: int = 50) -> list[dict]:
         return [
             dict(row)
             for row in self.db.execute(
-                "SELECT id, goal_id, text, created_at, delivered, reason, attention_id "
+                "SELECT id, goal_id, text, created_at, delivered, reason, attention_id, decision "
                 "FROM proposals WHERE actor_id=? ORDER BY created_at DESC LIMIT ?",
                 (actor_id, limit),
             )
