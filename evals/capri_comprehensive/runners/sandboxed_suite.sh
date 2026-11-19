@@ -77,6 +77,7 @@ case "${B12_EVAL_VARIANT:-}" in deployed*)
   EXTRA=(--ro-bind "$EMB_VENV" "$EMB_VENV" --ro-bind "$UV_PYTHONS" "$UV_PYTHONS"
          --ro-bind "$EMB_PKG" "$EMB_PKG"
          --ro-bind "$EMB_WEIGHTS" "$EMB_WEIGHTS" --setenv B12_EVAL_VARIANT "$B12_EVAL_VARIANT")
+  [ -n "${B12_EVAL_PROFILE_FILE:-}" ] && EXTRA+=(--setenv B12_EVAL_PROFILE_FILE "$B12_EVAL_PROFILE_FILE")
   ;;
 esac
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do

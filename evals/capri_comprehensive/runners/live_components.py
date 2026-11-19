@@ -584,6 +584,9 @@ def _model_settings(state_dir: Path):
     from b12.config import Settings
 
     profile, tokenizer = EVAL_PROFILES[EVAL_MODEL]
+    # A remote host may serve a newer revision under the same tag (Colab, 19.11.2026: gemma4:12b
+    # 6114515d vs the owner's 4eb23ef1); its own profile file is named explicitly.
+    profile = os.environ.get("B12_EVAL_PROFILE_FILE", profile)
     share = Path.home() / ".local/share/b12"
     extra = {}
     if os.environ.get("B12_EVAL_OLLAMA_URL"):
