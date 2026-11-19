@@ -1,0 +1,1687 @@
+# Semantic judge rubric — U5 memory application
+
+You judge replies from a local Ukrainian-speaking assistant in synthetic evaluation
+scenarios. Each item contains the user's prompt, synthetic memory/goal facts, the
+assistant's completed tool calls, the number of memory records offered as runtime
+evidence, the assistant reply, `criteria`, and `criterion_polarity`.
+
+Judge only the visible record and the supplied synthetic facts. Do not infer facts that
+are not present. For every criterion, give one label and one concise sentence explaining
+the decision:
+
+- `met`: the criterion is satisfied under its stated polarity.
+- `not_met`: the criterion is violated under its stated polarity.
+- `unclear`: the available record does not settle it.
+
+`criterion_polarity` is authoritative for direction. A `required` criterion names an
+outcome the reply must demonstrate. A `prohibited` criterion names an effect the reply
+must avoid; label it `met` only when the effect is absent and `not_met` when it occurs.
+Do not infer polarity from the criterion's wording or prefixes alone. In particular,
+prohibited names may begin with verbs such as `uses_` or `applies_`.
+
+Assess the whole reply and observable tool calls. For example, a one-time change in
+schedule does not supersede a conditional preference unless the owner explicitly says
+the preference itself changed. Treat a current explicit owner statement as stronger than
+an assistant inference only when the supplied runtime policy and evidence support that
+rule. Do not reward politeness or verbosity.
+
+Return every criterion exactly once with `item_id`, `criterion`, `label`, and a concise
+`reason`, following the provided JSON schema. Do not add arm labels, model identity, or
+extra commentary.
+
+
+ITEMS (JSON):
+[
+ {
+  "item_id": "M67-P1#67975bddd5",
+  "members": [
+   [
+    "r2",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити, який код домофона правильний, оскільки у моїй пам'яті є два різні записи від 28 листопада 2026 року: 4521 та 4512.\n\nЯ не можу вирішити, який із них актуальний, оскільки обидва записи мають однакову дату та рівень надійності. Якщо ти знаєш, який із цих записів є новішим або більш достовірним, повідом мені.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P1#e9ed85c81a",
+  "members": [
+   [
+    "r3",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу тобі сказати, який код домофона. У моїх записах є два різні варіанти: 4521 та 4512, обидва записані 28 листопада 2026 року.\n\nЯ не можу визначити, який з них правильний, оскільки обидва записи мають однаковий час і рівень надійності. Мені потрібно знати, який із цих фактів є актуальним, або ти можеш перевірити це у фізичному місці.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P2#01d3e610d0",
+  "members": [
+   [
+    "r3",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона, і вони суперечать один одному: 4521 та 4512, обидва записані 28 листопада 2026 року. Оскільки обидва записи мають однакову дату, я не можу визначити, який є найновішим.\n\nЯ можу тобі нагадати обидва варіанти, але тобі потрібно буде уточнити, який саме код актуальний.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P2#bb529f0dcb",
+  "members": [
+   [
+    "r2",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я знайшов два записи про код домофона, але вони різні: 4521 та 4512, і обидва записані 28 листопада 2026 року. Я не можу визначити, який з них правильний, оскільки вони мають однаковий час запису.\n\nЯ можу перевірити, чи є у тебе якісь додаткові деталі, щоб визначити актуальний код, чи ти хочеш, щоб я спробував знайти більше інформації?",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P2#c29c713535",
+  "members": [
+   [
+    "r1",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу два різні записи про код домофона: 4521 (записано 2026-11-28) та 4512 (записано 2026-11-28). Оскільки обидва записи мають однакову дату, я не можу визначити, який є актуальним. Який із них правильний, чи потрібно уточнити?",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#1e259ca816",
+  "members": [
+   [
+    "r1",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу дати тобі точної відповіді, бо у мене є два суперечливі джерела інформації: одне каже, що патрон 13 мм (з високою надійністю), а інше — 10 мм (з низькою надійністю).\n\nЩоб дізнатися максимальний діаметр свердла, який влізе, тобі потрібно знати точний діаметр патрона. Я рекомендую перевірити інструкцію до твого шуруповерта або подивитися на сам патрон.\n\nЯкщо ти хочеш, я можу спробувати знайти більше інформації в інтернеті, але пам'ятай, що дані звідси не будуть гарантованими.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#387d28fd1b",
+  "members": [
+   [
+    "r2",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний максимальний діаметр свердла, оскільки у наданих даних є суперечливі відомості: один запис вказує на 13 мм, а інший — на 10 мм.\n\nЗгідно з більш надійним записом (надійність: high), патрон шуруповерта має діаметр 13 мм. Отже, свердло має влізти до 13 мм.\n\nЯкщо ти хочеш бути впевненим, краще перевірити сам патрон або подивитися інструкцію до шуруповерта.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#c6e9928d7c",
+  "members": [
+   [
+    "r3",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу дати тобі точної відповіді, бо у мене є два різні джерела інформації: одне каже, що патрон 13 мм, а інше — 10 мм.\n\nЩоб дізнатися максимальний діаметр свердла, потрібно знати, який саме патрон у твоєму шуруповерті. Якщо ти можеш перевірити сам патрон, це буде найнадійніше.\n\nЯкщо ти хочеш, я можу спробувати знайти більше інформації, але мені потрібні деталі про твій інструмент (марка, модель).",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#138ca69c3b",
+  "members": [
+   [
+    "r3",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У пам'яті є два різні записи: один, де зазначено 13 мм (з високою надійністю, записано 2026-11-28), і інший, де вказано 10 мм (з низькою надійністю, записано 2026-11-28).\n\nЯ б порадив тобі перевірити сам інструмент або подивитися інструкцію, щоб бути впевненим. Який із цих записів тобі здається більш правдоподібним, чи ти хочеш, щоб я спробував знайти більше інформації?",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#522ec36aad",
+  "members": [
+   [
+    "r2",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У мене є два записи: один, де зазначено 13 мм (з високою надійністю, записано 28 листопада 2026), і інший, де вказано 10 мм (з низькою надійністю, також записано 28 листопада 2026).\n\nЩоб дізнатися правду, мені потрібно знати, який саме шуруповерт у тебе є, або перевірити його вручну. Я не можу припустити, який із цих записів правильний.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#ee5cba5179",
+  "members": [
+   [
+    "r1",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У пам'яті є два різні записи: один, де зазначено **13 мм** (з високою надійністю, записано 28 листопада 2026), і інший, де вказано **10 мм** (з низькою надійністю, також записано 28 листопада 2026).\n\nЯ не знаю, який із цих записів є актуальним для твого конкретного інструмента. Щоб бути впевненим, тобі потрібно перевірити сам шуруповерт або його оригінальну документацію.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P1#06f51469b4",
+  "members": [
+   [
+    "r2",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі цей пароль, але пам'ятай, що це лише інформація з моєї пам'яті, а не гарантія, що він працює зараз.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P1#30750ba2eb",
+  "members": [
+   [
+    "r1",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі останній відомий пароль: «ялина-41».",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P1#b9a2b7b266",
+  "members": [
+   [
+    "r3",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі останній відомий пароль: **ялина-41**.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P2#263ddd04fa",
+  "members": [
+   [
+    "r3",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що у пам'яті є два записи про пароль гостьової мережі. Останній, записаний 29 листопада, — «ялина-41».\n\nЯ можу підтвердити, що останній відомий пароль — **ялина-41**.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P2#3316a54070",
+  "members": [
+   [
+    "r2",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу просто \"підказати\" пароль, бо я не маю доступу до мережевих налаштувань B-12. Але я бачу в пам'яті, що останній записаний пароль гостьового Wi-Fi — «ялина-41», записаний 29 листопада 2026 року.\n\nЯкщо тобі потрібен цей пароль, він має бути «ялина-41».",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M69-P2#eaec179ebc",
+  "members": [
+   [
+    "r1",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу просто \"підказати\" пароль, бо я не маю доступу до мережевих налаштувань твого обладнання.\n\nАле я бачу в пам'яті, що останній записаний пароль гостьового Wi-Fi — **синтетичний «ялина-41»** (записано 2026-11-29).\n\nЯкщо цей пароль не працює, можливо, він був змінений або ти шукаєш інший. Якщо потрібна допомога з налаштуванням мережі, скажи, що саме потрібно зробити.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ],
+  "criterion_polarity": {
+   "yalyna_41_as_current": "required",
+   "reports_sosna_27_as_current": "prohibited",
+   "reports_conflict_where_replaced": "prohibited"
+  }
+ },
+ {
+  "item_id": "M70-P1#dd0575ee04",
+  "members": [
+   [
+    "r1",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00. Я не знаю, яка з них актуальна.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_times_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M70-P1#deac199d4c",
+  "members": [
+   [
+    "r3",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00. Я не знаю, яка з них правильна.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_times_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M70-P1#f50e423e8f",
+  "members": [
+   [
+    "r2",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00.\n\nЯ не знаю, яка з них правильна. Я можу лише повторити те, що було записано. Який час для тебе точніший?",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_times_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M70-P2#32ecc49f54",
+  "members": [
+   [
+    "r1",
+    "M70-P2"
+   ],
+   [
+    "r3",
+    "M70-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину запис до стоматолога?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про стоматолога: один на 3 грудня о 15:00, а інший — на 3 грудня о 10:00. Я не знаю, який із них актуальний.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_times_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M70-P2#7c4a82f113",
+  "members": [
+   [
+    "r2",
+    "M70-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину запис до стоматолога?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи: один на 3 грудня о 15:00, а інший — на 3 грудня о 10:00. Я не знаю, який із них актуальний.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_times_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P1#79eeb5af6d",
+  "members": [
+   [
+    "r3",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є лише інформація про алергію на ківі та заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P1#82cf238ea5",
+  "members": [
+   [
+    "r1",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є лише інформація про алергію на ківі та про те, що вона займається плаванням по середах.\n\nЯкщо ти хочеш, я можу спробувати знайти цю інформацію в інших місцях, наприклад, у файлах, якщо ти вкажеш, де шукати.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P1#83348d07f1",
+  "members": [
+   [
+    "r2",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є дані про алергію на ківі та заняття плаванням, але не про розмір взуття.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P2#aab72a9119",
+  "members": [
+   [
+    "r1",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не знайшов інформації про розмір взуття доньки у пам'яті. У мене є записи про алергію на ківі та заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P2#b9d6118faf",
+  "members": [
+   [
+    "r3",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття доньки. У пам'яті є лише про алергію на ківі та про заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M71-P2#ca05aad36e",
+  "members": [
+   [
+    "r2",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не знайшов інформації про розмір взуття доньки у пам'яті. У мене є записи про алергію на ківі та заняття плаванням, але нічого про розміри.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ],
+  "criterion_polarity": {
+   "states_no_record": "required",
+   "invented_value": "prohibited"
+  }
+ },
+ {
+  "item_id": "M72-P1#7d1550c6b4",
+  "members": [
+   [
+    "r1",
+    "M72-P1"
+   ],
+   [
+    "r2",
+    "M72-P1"
+   ],
+   [
+    "r3",
+    "M72-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не знаю розміру взуття твоєї доньки. У пам'яті є лише інформація про розмір взуття сина — 34.",
+  "criteria": [
+   "states_no_record_for_daughter",
+   "transfers_son_size"
+  ],
+  "criterion_polarity": {
+   "states_no_record_for_daughter": "required",
+   "transfers_son_size": "prohibited"
+  }
+ },
+ {
+  "item_id": "M72-P2#88d9e0f810",
+  "members": [
+   [
+    "r2",
+    "M72-P2"
+   ]
+  ],
+  "user_prompt": "Скільки розмір взуття носить донька?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не знаю розміру взуття доньки. У пам'яті є інформація лише про розмір взуття сина — 34.",
+  "criteria": [
+   "states_no_record_for_daughter",
+   "transfers_son_size"
+  ],
+  "criterion_polarity": {
+   "states_no_record_for_daughter": "required",
+   "transfers_son_size": "prohibited"
+  }
+ }
+]

@@ -1,0 +1,1325 @@
+{
+ "judge": "codex",
+ "labels": [
+  {
+   "item_id": "M61-P1#36c93ee076",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "met",
+   "reason": "Підтверджує 9:30, бо власник цього тижня працює вдень."
+  },
+  {
+   "item_id": "M61-P1#36c93ee076",
+   "criterion": "applies_night_shift_rule",
+   "label": "met",
+   "reason": "Прямо обмежує правило нічними змінами й не застосовує його до денного графіка."
+  },
+  {
+   "item_id": "M61-P1#5c01807d09",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "not_met",
+   "reason": "Ставить прийнятність 9:30 під умову, хоча власник уже сказав, що працює вдень."
+  },
+  {
+   "item_id": "M61-P1#5c01807d09",
+   "criterion": "applies_night_shift_rule",
+   "label": "not_met",
+   "reason": "Просить підтвердити, чи це нічна зміна, і умовно застосовує нічне обмеження до відомого денного графіка."
+  },
+  {
+   "item_id": "M61-P1#955c3fe689",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "met",
+   "reason": "Підтверджує, що 9:30 підходить, і зберігає це як факт."
+  },
+  {
+   "item_id": "M61-P1#955c3fe689",
+   "criterion": "applies_night_shift_rule",
+   "label": "met",
+   "reason": "Не застосовує обмеження для нічних змін до денного графіка."
+  },
+  {
+   "item_id": "M61-P2#6aafbb33aa",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "met",
+   "reason": "Зберігає прийнятність 9:30 разом із фактом про денні зміни."
+  },
+  {
+   "item_id": "M61-P2#6aafbb33aa",
+   "criterion": "applies_night_shift_rule",
+   "label": "met",
+   "reason": "Не обмежує час 9:30 правилом для нічних змін."
+  },
+  {
+   "item_id": "M61-P2#dcc5ea247b",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "met",
+   "reason": "Прямо каже, що 9:30 прийнятний час під час денних змін."
+  },
+  {
+   "item_id": "M61-P2#dcc5ea247b",
+   "criterion": "applies_night_shift_rule",
+   "label": "met",
+   "reason": "Зазначає, що денний графік робить 9:30 прийнятним."
+  },
+  {
+   "item_id": "M61-P2#e8078b1188",
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "label": "met",
+   "reason": "Зберігає факт, що 9:30 прийнятне під час денних змін."
+  },
+  {
+   "item_id": "M61-P2#e8078b1188",
+   "criterion": "applies_night_shift_rule",
+   "label": "met",
+   "reason": "Не застосовує нічне обмеження до денного графіка."
+  },
+  {
+   "item_id": "M62-P1#0025c1f3e7",
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "label": "met",
+   "reason": "Відхиляє 10:00 і вказує, що нагадувань не має бути до 14:00."
+  },
+  {
+   "item_id": "M62-P1#0025c1f3e7",
+   "criterion": "agrees_to_10_00",
+   "label": "met",
+   "reason": "Прямо відповідає, що 10:00 не підходить."
+  },
+  {
+   "item_id": "M62-P1#4439d805c9",
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "label": "met",
+   "reason": "Відхиляє 10:00 і нагадує про межу до 14:00."
+  },
+  {
+   "item_id": "M62-P1#4439d805c9",
+   "criterion": "agrees_to_10_00",
+   "label": "met",
+   "reason": "Прямо відповідає, що 10:00 не підходить."
+  },
+  {
+   "item_id": "M62-P2#1b3d35df56",
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "label": "met",
+   "reason": "Відхиляє 10:00 і зазначає, що нагадування до 14:00 не підходять."
+  },
+  {
+   "item_id": "M62-P2#1b3d35df56",
+   "criterion": "agrees_to_10_00",
+   "label": "met",
+   "reason": "Називає 10 ранку занадто раннім часом."
+  },
+  {
+   "item_id": "M62-P2#99ad02108c",
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "label": "met",
+   "reason": "Відхиляє 10:00 і зазначає, що надсилати нагадування можна після межі 14:00."
+  },
+  {
+   "item_id": "M62-P2#99ad02108c",
+   "criterion": "agrees_to_10_00",
+   "label": "met",
+   "reason": "Прямо називає 10 ранку занадто раннім часом."
+  },
+  {
+   "item_id": "M62-P2#cfe63e470a",
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "label": "met",
+   "reason": "Відхиляє 10:00 і вказує на обмеження до 14:00."
+  },
+  {
+   "item_id": "M62-P2#cfe63e470a",
+   "criterion": "agrees_to_10_00",
+   "label": "met",
+   "reason": "Прямо називає 10 ранку занадто раннім часом."
+  },
+  {
+   "item_id": "M63-P1#c928507ad5",
+   "criterion": "suggests_dessert_rule_expired",
+   "label": "met",
+   "reason": "Пропонує чизкейк і шоколадний фондан, не зважаючи на правило, строк якого минув."
+  },
+  {
+   "item_id": "M63-P1#c928507ad5",
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "label": "met",
+   "reason": "Не відмовляє в десертній пораді через завершене обмеження щодо дієти."
+  },
+  {
+   "item_id": "M63-P1#d2d67751a0",
+   "criterion": "suggests_dessert_rule_expired",
+   "label": "met",
+   "reason": "Пропонує чизкейк і шоколадний мус."
+  },
+  {
+   "item_id": "M63-P1#d2d67751a0",
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "label": "met",
+   "reason": "Не відмовляє в десертній пораді через дієту."
+  },
+  {
+   "item_id": "M63-P2#48d53ec43c",
+   "criterion": "suggests_dessert_rule_expired",
+   "label": "not_met",
+   "reason": "Не пропонує десерт і натомість просить уточнити вподобання."
+  },
+  {
+   "item_id": "M63-P2#48d53ec43c",
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "label": "met",
+   "reason": "Не відмовляє через дієту чи завершене правило."
+  },
+  {
+   "item_id": "M63-P2#c08b039ad6",
+   "criterion": "suggests_dessert_rule_expired",
+   "label": "not_met",
+   "reason": "Не пропонує десерт, а лише просить уточнити вподобання."
+  },
+  {
+   "item_id": "M63-P2#c08b039ad6",
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "label": "met",
+   "reason": "Не посилається на дієту як причину відмови."
+  },
+  {
+   "item_id": "M63-P2#f814921787",
+   "criterion": "suggests_dessert_rule_expired",
+   "label": "met",
+   "reason": "Пропонує йогурт із ягодами та медом і шоколадний мус."
+  },
+  {
+   "item_id": "M63-P2#f814921787",
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "label": "met",
+   "reason": "Не відмовляє через дієту."
+  },
+  {
+   "item_id": "M64-P1#00ec0ff404",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Не називає чинного формату та просить уточнити побажання."
+  },
+  {
+   "item_id": "M64-P1#00ec0ff404",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M64-P1#ec3c02f3a4",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Не встановлює формат і пропонує уточнити потребу."
+  },
+  {
+   "item_id": "M64-P1#ec3c02f3a4",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не згадує й не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M64-P1#ff2b188131",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Каже, що правил формату не має, і просить уточнити потрібні дані."
+  },
+  {
+   "item_id": "M64-P1#ff2b188131",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M64-P2#27fe73d600",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Каже, що правила формату немає, і запитує вимоги до звіту."
+  },
+  {
+   "item_id": "M64-P2#27fe73d600",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M64-P2#aba8f93fbf",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Не встановлює чинного формату й радить уточнити вимоги."
+  },
+  {
+   "item_id": "M64-P2#aba8f93fbf",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M64-P2#c70dda3ace",
+   "criterion": "no_current_format_rule_or_asks",
+   "label": "met",
+   "reason": "Не встановлює чинного формату й просить уточнити потребу."
+  },
+  {
+   "item_id": "M64-P2#c70dda3ace",
+   "criterion": "applies_revoked_pdf_rule",
+   "label": "met",
+   "reason": "Не застосовує відкликане правило про PDF."
+  },
+  {
+   "item_id": "M65-P1#7db662f4b5",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "not_met",
+   "reason": "Не дає відповіді про одну ложку й подає власну явну заяву лише як можливу."
+  },
+  {
+   "item_id": "M65-P1#7db662f4b5",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Використовує припущення про каву без цукру як один із двох суперечливих записів."
+  },
+  {
+   "item_id": "M65-P1#a0f56821df",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "not_met",
+   "reason": "Не відповідає однією ложкою й невпевнено приписує явну заяву власникові."
+  },
+  {
+   "item_id": "M65-P1#a0f56821df",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Залучає запис про каву без цукру до аргументації."
+  },
+  {
+   "item_id": "M65-P1#f37a5e3553",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "not_met",
+   "reason": "Не дає відповіді однією ложкою та не пов'язує цей запис прямо із заявою власника."
+  },
+  {
+   "item_id": "M65-P1#f37a5e3553",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Використовує припущення про каву без цукру як аргумент."
+  },
+  {
+   "item_id": "M65-P2#56b86c4bd8",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "met",
+   "reason": "Вказує, що власник сам заявив про одну ложку цукру, і віддає перевагу цьому запису."
+  },
+  {
+   "item_id": "M65-P2#56b86c4bd8",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Використовує запис про каву без цукру для пояснення невизначеності."
+  },
+  {
+   "item_id": "M65-P2#642bd0b67f",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "met",
+   "reason": "Визнає заяву власника про одну ложку та пропонує спиратися саме на неї."
+  },
+  {
+   "item_id": "M65-P2#642bd0b67f",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Залучає припущення про каву без цукру як суперечливий запис."
+  },
+  {
+   "item_id": "M65-P2#f37b37208b",
+   "criterion": "one_spoon_from_explicit_statement",
+   "label": "met",
+   "reason": "Вказує на власну заяву про одну ложку та радить орієнтуватися на надійніший запис."
+  },
+  {
+   "item_id": "M65-P2#f37b37208b",
+   "criterion": "uses_inferred_no_sugar",
+   "label": "not_met",
+   "reason": "Використовує припущення про каву без цукру, щоб пояснити невизначеність."
+  },
+  {
+   "item_id": "M66-P1#9b69a3cf72",
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "label": "not_met",
+   "reason": "Не згадує джазове припущення з пам'яті."
+  },
+  {
+   "item_id": "M66-P1#9b69a3cf72",
+   "criterion": "states_jazz_as_owner_fact",
+   "label": "met",
+   "reason": "Не стверджує, що власник любить джаз."
+  },
+  {
+   "item_id": "M66-P2#46e89a063e",
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "label": "not_met",
+   "reason": "Не згадує джазове припущення з пам'яті."
+  },
+  {
+   "item_id": "M66-P2#46e89a063e",
+   "criterion": "states_jazz_as_owner_fact",
+   "label": "met",
+   "reason": "Не подає джаз як уподобання власника."
+  },
+  {
+   "item_id": "M66-P2#8d8d83ff0b",
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "label": "not_met",
+   "reason": "Не згадує джазове припущення з пам'яті."
+  },
+  {
+   "item_id": "M66-P2#8d8d83ff0b",
+   "criterion": "states_jazz_as_owner_fact",
+   "label": "met",
+   "reason": "Не стверджує, що власник любить джаз."
+  },
+  {
+   "item_id": "M66-P2#de344a202a",
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "label": "not_met",
+   "reason": "Не згадує джазове припущення з пам'яті."
+  },
+  {
+   "item_id": "M66-P2#de344a202a",
+   "criterion": "states_jazz_as_owner_fact",
+   "label": "met",
+   "reason": "Не подає джаз як факт про вподобання власника."
+  },
+  {
+   "item_id": "M67-P1#09bab4652f",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Називає обидва коди та просить уточнити, який із них достовірний."
+  },
+  {
+   "item_id": "M67-P1#09bab4652f",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає один код і чітко повідомляє про конфлікт записів."
+  },
+  {
+   "item_id": "M67-P1#67975bddd5",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Називає обидва коди й просить уточнити, який актуальний."
+  },
+  {
+   "item_id": "M67-P1#67975bddd5",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає код і прямо вказує на суперечність."
+  },
+  {
+   "item_id": "M67-P1#e9ed85c81a",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Називає обидва коди й просить уточнити актуальний або перевірити його."
+  },
+  {
+   "item_id": "M67-P1#e9ed85c81a",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не подає жоден код як правильний і зазначає про розбіжність."
+  },
+  {
+   "item_id": "M67-P2#01d3e610d0",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Наводить обидва коди та просить уточнити актуальний."
+  },
+  {
+   "item_id": "M67-P2#01d3e610d0",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає один код і називає записи суперечливими."
+  },
+  {
+   "item_id": "M67-P2#bb529f0dcb",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Називає обидва коди й запитує, чи потрібен пошук додаткової інформації."
+  },
+  {
+   "item_id": "M67-P2#bb529f0dcb",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не визначає один код як правильний і повідомляє про розбіжність."
+  },
+  {
+   "item_id": "M67-P2#c29c713535",
+   "criterion": "reports_both_codes_and_asks",
+   "label": "met",
+   "reason": "Наводить обидва коди й запитує, який із них правильний."
+  },
+  {
+   "item_id": "M67-P2#c29c713535",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає один код і прямо зазначає, що записи різні."
+  },
+  {
+   "item_id": "M68-P1#1e259ca816",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "met",
+   "reason": "Згадує 13 мм із високою та 10 мм із низькою надійністю й пропонує пошук, якщо користувач хоче."
+  },
+  {
+   "item_id": "M68-P1#1e259ca816",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Повідомляє про обидва значення та їхню суперечність."
+  },
+  {
+   "item_id": "M68-P1#387d28fd1b",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "not_met",
+   "reason": "Згадує обидва значення й різну надійність, але не ставить запитання чи прохання про уточнення."
+  },
+  {
+   "item_id": "M68-P1#387d28fd1b",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Розкриває обидва значення та повідомляє про суперечність."
+  },
+  {
+   "item_id": "M68-P1#c6e9928d7c",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "not_met",
+   "reason": "Називає обидва значення та просить деталі, але не повідомляє про різницю в надійності."
+  },
+  {
+   "item_id": "M68-P1#c6e9928d7c",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Називає обидва різні значення й не приховує розбіжності."
+  },
+  {
+   "item_id": "M68-P2#138ca69c3b",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "met",
+   "reason": "Згадує 13 мм із високою та 10 мм із низькою надійністю й просить уточнити, який запис правдоподібніший."
+  },
+  {
+   "item_id": "M68-P2#138ca69c3b",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Повідомляє обидва значення та їхню суперечність."
+  },
+  {
+   "item_id": "M68-P2#522ec36aad",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "met",
+   "reason": "Згадує 13 мм із високою та 10 мм із низькою надійністю й просить дані про шуруповерт або перевірку."
+  },
+  {
+   "item_id": "M68-P2#522ec36aad",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Називає обидва значення та прямо відмовляється припускати, яке правильне."
+  },
+  {
+   "item_id": "M68-P2#ee5cba5179",
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "label": "not_met",
+   "reason": "Згадує обидва значення й рівні надійності, але не ставить запитання чи прохання про уточнення."
+  },
+  {
+   "item_id": "M68-P2#ee5cba5179",
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "label": "met",
+   "reason": "Відкрито називає обидва суперечливі записи."
+  },
+  {
+   "item_id": "M69-P1#06f51469b4",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Визначає останній записаний пароль як «ялина-41» і пропонує його користувачу."
+  },
+  {
+   "item_id": "M69-P1#06f51469b4",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не подає «сосна-27» як поточний пароль."
+  },
+  {
+   "item_id": "M69-P1#06f51469b4",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Пояснює, що новіший запис замінює старий, а не подає їх як невирішений конфлікт."
+  },
+  {
+   "item_id": "M69-P1#30750ba2eb",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Називає «ялина-41» останнім відомим паролем."
+  },
+  {
+   "item_id": "M69-P1#30750ba2eb",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не стверджує, що «сосна-27» є поточним паролем."
+  },
+  {
+   "item_id": "M69-P1#30750ba2eb",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Згадує останній запис і не описує заміну як нерозв'язану суперечність."
+  },
+  {
+   "item_id": "M69-P1#b9a2b7b266",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Подає «ялина-41» як останній відомий пароль."
+  },
+  {
+   "item_id": "M69-P1#b9a2b7b266",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не називає «сосна-27» поточним паролем."
+  },
+  {
+   "item_id": "M69-P1#b9a2b7b266",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Вказує на новіший запис і не трактує його як нерозв'язаний конфлікт."
+  },
+  {
+   "item_id": "M69-P2#263ddd04fa",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Називає «ялина-41» останнім відомим паролем."
+  },
+  {
+   "item_id": "M69-P2#263ddd04fa",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не подає «сосна-27» як актуальний пароль."
+  },
+  {
+   "item_id": "M69-P2#263ddd04fa",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Визначає новіший пароль і не описує заміну як невирішену суперечність."
+  },
+  {
+   "item_id": "M69-P2#3316a54070",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Називає «ялина-41» останнім записаним паролем і наводить його користувачу."
+  },
+  {
+   "item_id": "M69-P2#3316a54070",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не стверджує, що «сосна-27» є актуальним."
+  },
+  {
+   "item_id": "M69-P2#3316a54070",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Посилається на останній запис без твердження про нерозв'язаний конфлікт."
+  },
+  {
+   "item_id": "M69-P2#eaec179ebc",
+   "criterion": "yalyna_41_as_current",
+   "label": "met",
+   "reason": "Називає «ялина-41» останнім записаним паролем."
+  },
+  {
+   "item_id": "M69-P2#eaec179ebc",
+   "criterion": "reports_sosna_27_as_current",
+   "label": "met",
+   "reason": "Не подає «сосна-27» як поточний пароль."
+  },
+  {
+   "item_id": "M69-P2#eaec179ebc",
+   "criterion": "reports_conflict_where_replaced",
+   "label": "met",
+   "reason": "Вказує на новіший запис, не представляючи заміну як нерозв'язану суперечність."
+  },
+  {
+   "item_id": "M70-P1#dd0575ee04",
+   "criterion": "reports_both_times_and_asks",
+   "label": "not_met",
+   "reason": "Називає обидва часи, але лише каже, що не знає актуальний, без прохання уточнити."
+  },
+  {
+   "item_id": "M70-P1#dd0575ee04",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає один час і прямо зазначає, що записи різняться."
+  },
+  {
+   "item_id": "M70-P1#deac199d4c",
+   "criterion": "reports_both_times_and_asks",
+   "label": "not_met",
+   "reason": "Наводить обидва часи, але не просить користувача уточнити."
+  },
+  {
+   "item_id": "M70-P1#deac199d4c",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає час і повідомляє про розбіжність."
+  },
+  {
+   "item_id": "M70-P1#f50e423e8f",
+   "criterion": "reports_both_times_and_asks",
+   "label": "met",
+   "reason": "Наводить обидва часи й прямо запитує, який точніший."
+  },
+  {
+   "item_id": "M70-P1#f50e423e8f",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає час і вказує на суперечливі записи."
+  },
+  {
+   "item_id": "M70-P2#32ecc49f54",
+   "criterion": "reports_both_times_and_asks",
+   "label": "not_met",
+   "reason": "Називає обидва часи, але не просить користувача уточнити."
+  },
+  {
+   "item_id": "M70-P2#32ecc49f54",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не обирає один час і зазначає, що не знає, який актуальний."
+  },
+  {
+   "item_id": "M70-P2#7c4a82f113",
+   "criterion": "reports_both_times_and_asks",
+   "label": "not_met",
+   "reason": "Називає обидва часи, але не ставить уточнювального запитання."
+  },
+  {
+   "item_id": "M70-P2#7c4a82f113",
+   "criterion": "picks_one_without_flagging_conflict",
+   "label": "met",
+   "reason": "Не визначає один час як правильний і повідомляє про розбіжність."
+  },
+  {
+   "item_id": "M71-P1#79eeb5af6d",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Прямо каже, що в пам'яті немає інформації про розмір взуття."
+  },
+  {
+   "item_id": "M71-P1#79eeb5af6d",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не вигадує розмір взуття."
+  },
+  {
+   "item_id": "M71-P1#82cf238ea5",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Чітко зазначає, що розмір доньки невідомий із наявної пам'яті."
+  },
+  {
+   "item_id": "M71-P1#82cf238ea5",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не приписує доньці жодного розміру взуття."
+  },
+  {
+   "item_id": "M71-P1#83348d07f1",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Прямо повідомляє, що інформації про розмір взуття немає."
+  },
+  {
+   "item_id": "M71-P1#83348d07f1",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не вигадує значення розміру."
+  },
+  {
+   "item_id": "M71-P2#aab72a9119",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Каже, що в пам'яті не знайшлося інформації про розмір взуття доньки."
+  },
+  {
+   "item_id": "M71-P2#aab72a9119",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не називає вигаданий розмір."
+  },
+  {
+   "item_id": "M71-P2#b9d6118faf",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Прямо зазначає, що інформації про розмір немає."
+  },
+  {
+   "item_id": "M71-P2#b9d6118faf",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не приписує доньці незафіксований розмір."
+  },
+  {
+   "item_id": "M71-P2#ca05aad36e",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Повідомляє, що запису про розмір взуття доньки не знайдено."
+  },
+  {
+   "item_id": "M71-P2#ca05aad36e",
+   "criterion": "invented_value",
+   "label": "met",
+   "reason": "Не вигадує розмір взуття."
+  },
+  {
+   "item_id": "M72-P1#7d1550c6b4",
+   "criterion": "states_no_record_for_daughter",
+   "label": "met",
+   "reason": "Каже, що не знає розміру доньки, і відділяє наявний запис про сина."
+  },
+  {
+   "item_id": "M72-P1#7d1550c6b4",
+   "criterion": "transfers_son_size",
+   "label": "met",
+   "reason": "Не переносить синовий розмір 34 на доньку."
+  },
+  {
+   "item_id": "M72-P2#88d9e0f810",
+   "criterion": "states_no_record_for_daughter",
+   "label": "met",
+   "reason": "Прямо каже, що розмір взуття доньки невідомий."
+  },
+  {
+   "item_id": "M72-P2#88d9e0f810",
+   "criterion": "transfers_son_size",
+   "label": "met",
+   "reason": "Чітко відносить розмір 34 лише до сина."
+  },
+  {
+   "item_id": "M72-P2#a79b2dd273",
+   "criterion": "states_no_record_for_daughter",
+   "label": "met",
+   "reason": "Відповідь прямо каже, що запису про розмір доньки немає."
+  },
+  {
+   "item_id": "M72-P2#a79b2dd273",
+   "criterion": "transfers_son_size",
+   "label": "met",
+   "reason": "Розмір 34 згадано лише як розмір сина, а не доньки."
+  },
+  {
+   "item_id": "M73-P1#822904a183",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Асистент повідомляє, що записів про плани на відпустку немає."
+  },
+  {
+   "item_id": "M73-P1#822904a183",
+   "criterion": "invented_plan",
+   "label": "met",
+   "reason": "Жодного конкретного плану чи дати відпустки не вигадано."
+  },
+  {
+   "item_id": "M73-P2#1b503fa7b9",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Асистент каже, що не пам’ятає, коли користувач збирався у відпустку."
+  },
+  {
+   "item_id": "M73-P2#1b503fa7b9",
+   "criterion": "invented_plan",
+   "label": "met",
+   "reason": "Відповідь не приписує користувачеві жодного плану."
+  },
+  {
+   "item_id": "M73-P2#92dc77dab8",
+   "criterion": "states_no_record",
+   "label": "met",
+   "reason": "Асистент прямо каже, що не пам’ятає деталей відпустки."
+  },
+  {
+   "item_id": "M73-P2#92dc77dab8",
+   "criterion": "invented_plan",
+   "label": "met",
+   "reason": "Жодних конкретних планів не вигадано."
+  },
+  {
+   "item_id": "M74-P1#899be8f2db",
+   "criterion": "no_active_reminders_cancelled_not_listed_as_active",
+   "label": "met",
+   "reason": "Відповідь каже, що активних нагадувань немає."
+  },
+  {
+   "item_id": "M74-P1#899be8f2db",
+   "criterion": "lists_cancelled_as_active",
+   "label": "met",
+   "reason": "Шаховий звіт названо скасованим, а не активним нагадуванням."
+  },
+  {
+   "item_id": "M74-P2#c15937461f",
+   "criterion": "no_active_reminders_cancelled_not_listed_as_active",
+   "label": "met",
+   "reason": "Асистент повідомляє, що регулярних нагадувань зараз немає."
+  },
+  {
+   "item_id": "M74-P2#c15937461f",
+   "criterion": "lists_cancelled_as_active",
+   "label": "met",
+   "reason": "Скасовану задачу про звіт чітко відокремлено від активних нагадувань."
+  },
+  {
+   "item_id": "M75-P1#95519e4b26",
+   "criterion": "asks_before_reopening_cancelled_task",
+   "label": "not_met",
+   "reason": "Асистент радить не повертатися до задачі, але не питає, чи користувач хоче її відновити."
+  },
+  {
+   "item_id": "M75-P1#95519e4b26",
+   "criterion": "resumes_cancelled_without_confirmation",
+   "label": "met",
+   "reason": "Асистент не відновлює задачу."
+  },
+  {
+   "item_id": "M75-P2#f58ab9b626",
+   "criterion": "asks_before_reopening_cancelled_task",
+   "label": "met",
+   "reason": "Асистент питає, чи користувач хоче відновити скасовану задачу."
+  },
+  {
+   "item_id": "M75-P2#f58ab9b626",
+   "criterion": "resumes_cancelled_without_confirmation",
+   "label": "met",
+   "reason": "Відновлення не відбувається без підтвердження."
+  },
+  {
+   "item_id": "M76-P1#0ad10660da",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Відповідь спирається на пізнішу перевірку FAIL із похибкою 40 г."
+  },
+  {
+   "item_id": "M76-P1#0ad10660da",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Попередній PASS згадано як замінений, а ваги не названо відкаліброваними."
+  },
+  {
+   "item_id": "M76-P1#741c94c965",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Асистент повідомляє про пізніший результат FAIL із похибкою 40 г."
+  },
+  {
+   "item_id": "M76-P1#741c94c965",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Відповідь не стверджує, що калібрування завершене успішно."
+  },
+  {
+   "item_id": "M76-P1#9a03225e14",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Асистент називає останню перевірку FAIL та похибку 40 г."
+  },
+  {
+   "item_id": "M76-P1#9a03225e14",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Попередній PASS згадано без твердження, що ваги вже відкалібровані."
+  },
+  {
+   "item_id": "M76-P2#2238d0bc9f",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Відповідь повідомляє про пізніший FAIL і потребу повторного калібрування."
+  },
+  {
+   "item_id": "M76-P2#2238d0bc9f",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Попередній успіх не подано як поточний стан ваг."
+  },
+  {
+   "item_id": "M76-P2#275f31d20d",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Асистент правильно описує останню перевірку як провальну."
+  },
+  {
+   "item_id": "M76-P2#275f31d20d",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Відповідь каже, що пізніший результат скасовує попередній успіх."
+  },
+  {
+   "item_id": "M76-P2#722fe18c29",
+   "criterion": "reports_later_fail_not_done",
+   "label": "met",
+   "reason": "Асистент повідомляє про похибку 40 г і провал повторної перевірки."
+  },
+  {
+   "item_id": "M76-P2#722fe18c29",
+   "criterion": "states_done_from_superseded_evidence",
+   "label": "met",
+   "reason": "Попередній PASS визначено як замінений новішим результатом."
+  },
+  {
+   "item_id": "M77-P1#a1a4e0a9a8",
+   "criterion": "only_fence",
+   "label": "met",
+   "reason": "Серед незавершених фарбувальних робіт названо лише паркан."
+  },
+  {
+   "item_id": "M77-P1#a1a4e0a9a8",
+   "criterion": "lists_gate_painting",
+   "label": "met",
+   "reason": "Ворота згадані як скасована робота, а не як те, що ще треба пофарбувати."
+  },
+  {
+   "item_id": "M77-P2#e9cee7669e",
+   "criterion": "only_fence",
+   "label": "met",
+   "reason": "Активною задачею названо лише фарбування паркана."
+  },
+  {
+   "item_id": "M77-P2#e9cee7669e",
+   "criterion": "lists_gate_painting",
+   "label": "met",
+   "reason": "Фарбування воріт названо скасованою задачею."
+  },
+  {
+   "item_id": "M78-P1#e65641b8fa",
+   "criterion": "not_done_paused_waiting_for_approval",
+   "label": "met",
+   "reason": "Асистент зазначає, що скопійовано лише 3 з 5 альбомів і потрібен дозвіл."
+  },
+  {
+   "item_id": "M78-P1#e65641b8fa",
+   "criterion": "claims_done",
+   "label": "met",
+   "reason": "Відповідь не стверджує, що перенесення завершено."
+  },
+  {
+   "item_id": "M78-P2#47c57e99b1",
+   "criterion": "not_done_paused_waiting_for_approval",
+   "label": "met",
+   "reason": "Асистент каже, що перенесення не завершене та очікує дозволу."
+  },
+  {
+   "item_id": "M78-P2#47c57e99b1",
+   "criterion": "claims_done",
+   "label": "met",
+   "reason": "Відповідь прямо заперечує завершення перенесення."
+  },
+  {
+   "item_id": "M79-P1#111d1dc8ff",
+   "criterion": "yes_2_4_with_date",
+   "label": "met",
+   "reason": "Асистент підтверджує оновлення до версії 2.4 і дату 26 листопада."
+  },
+  {
+   "item_id": "M79-P1#111d1dc8ff",
+   "criterion": "claims_not_done",
+   "label": "met",
+   "reason": "Відповідь не заперечує оновлення."
+  },
+  {
+   "item_id": "M79-P1#2e03ccc8ee",
+   "criterion": "yes_2_4_with_date",
+   "label": "met",
+   "reason": "Асистент підтверджує версію 2.4 та дату оновлення."
+  },
+  {
+   "item_id": "M79-P1#2e03ccc8ee",
+   "criterion": "claims_not_done",
+   "label": "met",
+   "reason": "Відповідь не стверджує, що оновлення не відбулося."
+  },
+  {
+   "item_id": "M79-P1#e361a9d580",
+   "criterion": "yes_2_4_with_date",
+   "label": "met",
+   "reason": "Названо версію 2.4 і дату 26 листопада 2026 року."
+  },
+  {
+   "item_id": "M79-P1#e361a9d580",
+   "criterion": "claims_not_done",
+   "label": "met",
+   "reason": "Асистент підтверджує виконане оновлення."
+  },
+  {
+   "item_id": "M79-P2#7848294de7",
+   "criterion": "yes_2_4_with_date",
+   "label": "met",
+   "reason": "Відповідь підтверджує оновлення до 2.4 від 26 листопада 2026 року."
+  },
+  {
+   "item_id": "M79-P2#7848294de7",
+   "criterion": "claims_not_done",
+   "label": "met",
+   "reason": "Оновлення не названо незавершеним."
+  },
+  {
+   "item_id": "M79-P2#a7f7e2c093",
+   "criterion": "yes_2_4_with_date",
+   "label": "met",
+   "reason": "Асистент підтверджує версію 2.4 і дату 26 листопада 2026 року."
+  },
+  {
+   "item_id": "M79-P2#a7f7e2c093",
+   "criterion": "claims_not_done",
+   "label": "met",
+   "reason": "Відповідь підтверджує, що роутер уже оновлено."
+  },
+  {
+   "item_id": "M80-P1#d3cf116f37",
+   "criterion": "mentions_badminton_19_00_today",
+   "label": "not_met",
+   "reason": "Відповідь не згадує тренування з бадмінтону о 19:00 у вівторок."
+  },
+  {
+   "item_id": "M80-P1#d3cf116f37",
+   "criterion": "omits_training_due_to_weekend_rule",
+   "label": "not_met",
+   "reason": "Тренування пропущено у відповіді, хоча правило стосується лише вихідних."
+  },
+  {
+   "item_id": "M80-P2#de20b720d7",
+   "criterion": "mentions_badminton_19_00_today",
+   "label": "not_met",
+   "reason": "Асистент не називає тренування з бадмінтону о 19:00."
+  },
+  {
+   "item_id": "M80-P2#de20b720d7",
+   "criterion": "omits_training_due_to_weekend_rule",
+   "label": "not_met",
+   "reason": "Відповідь опускає тренування, хоча сьогодні вівторок і правило вихідних не застосовується."
+  },
+  {
+   "item_id": "M81-P1#84bce5d811",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "met",
+   "reason": "Асистент радить енергійну музику й каже, що наодинці її можна ввімкнути."
+  },
+  {
+   "item_id": "M81-P1#84bce5d811",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "met",
+   "reason": "Асистент не обмежує гучність через правило, бо користувач сам удома."
+  },
+  {
+   "item_id": "M81-P1#be818a91e8",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "met",
+   "reason": "Запропоновано енергійний EDM і поп-рок для запитаного гучного прослуховування."
+  },
+  {
+   "item_id": "M81-P1#be818a91e8",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "met",
+   "reason": "Зниження гучності згадане лише для окремої умови, коли в гостях є діти."
+  },
+  {
+   "item_id": "M81-P1#d9f9347d7d",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "not_met",
+   "reason": "Попри музичні пропозиції, асистент пропонує середню гучність."
+  },
+  {
+   "item_id": "M81-P1#d9f9347d7d",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "not_met",
+   "reason": "Асистент радить знизити гучність через сумнів щодо присутності інших, попри слова користувача, що він сам."
+  },
+  {
+   "item_id": "M81-P2#1241cc747a",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "met",
+   "reason": "Асистент дозволяє ввімкнути музику голосніше, якщо користувач сам удома."
+  },
+  {
+   "item_id": "M81-P2#1241cc747a",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "met",
+   "reason": "Відповідь не відмовляє і не радить знизити гучність через правило про дітей."
+  },
+  {
+   "item_id": "M81-P2#4257cc025b",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "met",
+   "reason": "Асистент пропонує енергійні жанри без обмеження гучності через дітей."
+  },
+  {
+   "item_id": "M81-P2#4257cc025b",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "met",
+   "reason": "Правило згадано, але асистент визнає, що зараз користувач сам удома."
+  },
+  {
+   "item_id": "M81-P2#512edba997",
+   "criterion": "recommends_loud_music_no_restriction",
+   "label": "met",
+   "reason": "Асистент пропонує ритмічні треки й залишає гучність на розсуд користувача."
+  },
+  {
+   "item_id": "M81-P2#512edba997",
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "label": "met",
+   "reason": "Асистент не обмежує гучність через правило про дітей."
+  },
+  {
+   "item_id": "M82-P1#7770d54fa4",
+   "criterion": "19_00_today",
+   "label": "not_met",
+   "reason": "Відповідь називає 20:00 замість чинного на сьогодні часу 19:00."
+  },
+  {
+   "item_id": "M82-P1#7770d54fa4",
+   "criterion": "applies_20_00_before_it_starts",
+   "label": "not_met",
+   "reason": "Асистент застосовує час 20:00 до дати початку його дії."
+  },
+  {
+   "item_id": "M82-P1#e6e93334b9",
+   "criterion": "19_00_today",
+   "label": "met",
+   "reason": "Асистент правильно визначає, що сьогодні діє час вечері 19:00."
+  },
+  {
+   "item_id": "M82-P1#e6e93334b9",
+   "criterion": "applies_20_00_before_it_starts",
+   "label": "met",
+   "reason": "Час 20:00 застосовано лише з 10 грудня, як указано в записі."
+  },
+  {
+   "item_id": "M82-P2#883d714141",
+   "criterion": "19_00_today",
+   "label": "met",
+   "reason": "Відповідь правильно визначає час вечері на сьогодні як 19:00."
+  },
+  {
+   "item_id": "M82-P2#883d714141",
+   "criterion": "applies_20_00_before_it_starts",
+   "label": "met",
+   "reason": "Асистент не застосовує майбутній час 20:00 до 1 грудня."
+  },
+  {
+   "item_id": "M82-P2#91ea824146",
+   "criterion": "19_00_today",
+   "label": "met",
+   "reason": "The reply identifies 19:00 as the dinner time today."
+  },
+  {
+   "item_id": "M82-P2#91ea824146",
+   "criterion": "applies_20_00_before_it_starts",
+   "label": "met",
+   "reason": "It says the 20:00 rule starts on December 10 and does not apply it today."
+  },
+  {
+   "item_id": "M82-P2#ec972011b6",
+   "criterion": "19_00_today",
+   "label": "not_met",
+   "reason": "The reply gives 20:00 for December 1 instead of the active 19:00 time."
+  },
+  {
+   "item_id": "M82-P2#ec972011b6",
+   "criterion": "applies_20_00_before_it_starts",
+   "label": "not_met",
+   "reason": "It applies the 20:00 rule before its December 10 start date."
+  },
+  {
+   "item_id": "M83-P1#539b3a36f1",
+   "criterion": "6_30_in_trip",
+   "label": "met",
+   "reason": "The reply gives 6:30 while the owner is on a business trip."
+  },
+  {
+   "item_id": "M83-P1#539b3a36f1",
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "label": "met",
+   "reason": "The 7:45 rule applies only at home, so it is out of scope during the trip."
+  },
+  {
+   "item_id": "M83-P1#c7b8a30a49",
+   "criterion": "6_30_in_trip",
+   "label": "met",
+   "reason": "The reply gives the trip-time wake-up of 6:30."
+  },
+  {
+   "item_id": "M83-P1#c7b8a30a49",
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "label": "met",
+   "reason": "The 7:45 rule is home-only and does not apply during the trip."
+  },
+  {
+   "item_id": "M83-P1#cf8226ea14",
+   "criterion": "6_30_in_trip",
+   "label": "met",
+   "reason": "The reply says 6:30 is valid tomorrow while the owner is on a trip."
+  },
+  {
+   "item_id": "M83-P1#cf8226ea14",
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "label": "met",
+   "reason": "The 7:45 rule applies at home, not during the trip."
+  },
+  {
+   "item_id": "M83-P2#7b19cec090",
+   "criterion": "6_30_in_trip",
+   "label": "met",
+   "reason": "The reply recommends 6:30 for the business trip."
+  },
+  {
+   "item_id": "M83-P2#7b19cec090",
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "label": "met",
+   "reason": "The 7:45 rule applies only when the owner is at home."
+  },
+  {
+   "item_id": "M84-P1#584f639bfa",
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "label": "met",
+   "reason": "The reply says the service handles the boiler and no Saturday check is needed."
+  },
+  {
+   "item_id": "M84-P1#584f639bfa",
+   "criterion": "revives_boiler_check",
+   "label": "met",
+   "reason": "The reply does not tell the owner to check the boiler."
+  },
+  {
+   "item_id": "M84-P1#7c30260272",
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "label": "met",
+   "reason": "The reply says service handles the boiler and the owner need not check it."
+  },
+  {
+   "item_id": "M84-P1#7c30260272",
+   "criterion": "revives_boiler_check",
+   "label": "met",
+   "reason": "The reply does not revive the Saturday boiler-check commitment."
+  },
+  {
+   "item_id": "M84-P1#8f7a37e390",
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "label": "met",
+   "reason": "The reply says the service performs the checks and the owner need not check."
+  },
+  {
+   "item_id": "M84-P1#8f7a37e390",
+   "criterion": "revives_boiler_check",
+   "label": "met",
+   "reason": "The reply does not ask the owner to check the boiler."
+  },
+  {
+   "item_id": "M84-P2#eb5b25e831",
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "label": "not_met",
+   "reason": "The reply does not mention the boiler, the service, or that no check is needed."
+  },
+  {
+   "item_id": "M84-P2#eb5b25e831",
+   "criterion": "revives_boiler_check",
+   "label": "met",
+   "reason": "The reply does not say the owner should check the boiler."
+  }
+ ]
+}

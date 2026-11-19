@@ -51,7 +51,9 @@ def repair_ids(sheet, labels):
     return sorted(fixes)
 
 
-def finalize(sheet, labels_by_judge, adjudication=None, criterion_adjudication=None):
+def finalize(
+    sheet, labels_by_judge, adjudication=None, criterion_adjudication=None, adjudicator="owner"
+):
     corrections = {judge: repair_ids(sheet, labels) for judge, labels in labels_by_judge.items()}
     result = combine(sheet, labels_by_judge)
     result["item_id_corrections"] = {k: v for k, v in corrections.items() if v}
@@ -90,7 +92,7 @@ def finalize(sheet, labels_by_judge, adjudication=None, criterion_adjudication=N
                             f"bad criterion adjudication label for {key}/{criterion}: {label!r}"
                         )
                     criteria[criterion]["label"] = label
-                    criteria[criterion]["adjudicated_by"] = "owner"
+                    criteria[criterion]["adjudicated_by"] = adjudicator
                     used.add((key, criterion))
         requested = {
             (key, criterion)
@@ -118,6 +120,11 @@ def main(argv=None):
         help="JSON mapping family/scenario/item IDs to criterion labels (met/not_met/unclear)",
     )
     parser.add_argument(
+        "--adjudicator",
+        default="owner",
+        help="who decided criterion labels: owner, or claude_delegated under owner rules",
+    )
+    parser.add_argument(
         "--stale-sheet",
         type=Path,
         help="sheet the labels were made from; labels of its items that are no longer in the "
@@ -143,7 +150,9 @@ def main(argv=None):
     )
     disputes_only = adjudication is None
     try:
-        result = finalize(sheet, labels, adjudication, criterion_adjudication)
+        result = finalize(
+            sheet, labels, adjudication, criterion_adjudication, adjudicator=args.adjudicator
+        )
     except ValueError as exc:
         parser.exit(2, f"{exc}\n")
     args.out_dir.mkdir(parents=True, exist_ok=True)

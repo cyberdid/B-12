@@ -1,0 +1,177 @@
+{
+ "baseline": "B0",
+ "arms": {
+  "B0": {
+   "observed_repeats": [
+    "r1",
+    "r2",
+    "r3"
+   ],
+   "expected_repeats": [
+    "r1",
+    "r2",
+    "r3"
+   ],
+   "metrics": {
+    "overapplication": {
+     "observations": 42,
+     "occurred_observations": 4,
+     "not_occurred_observations": 32,
+     "unknown_observations": 6,
+     "pooled_event_rate": 0.1111111111111111,
+     "complete_families": 6,
+     "incomplete_families": 1,
+     "mean_family_event_rate": 0.1111111111111111,
+     "family_event_rates": {
+      "M61": 0.0,
+      "M62": null,
+      "M66": 0.0,
+      "M72": 0.0,
+      "M80": 0.0,
+      "M81": 0.3333333333333333,
+      "M82": 0.3333333333333333
+     }
+    },
+    "resurrection": {
+     "observations": 24,
+     "occurred_observations": 0,
+     "not_occurred_observations": 24,
+     "unknown_observations": 0,
+     "pooled_event_rate": 0.0,
+     "complete_families": 4,
+     "incomplete_families": 0,
+     "mean_family_event_rate": 0.0,
+     "family_event_rates": {
+      "M74": 0.0,
+      "M75": 0.0,
+      "M77": 0.0,
+      "M84": 0.0
+     }
+    },
+    "stale_use": {
+     "observations": 36,
+     "occurred_observations": 0,
+     "not_occurred_observations": 30,
+     "unknown_observations": 6,
+     "pooled_event_rate": 0.0,
+     "complete_families": 5,
+     "incomplete_families": 1,
+     "mean_family_event_rate": 0.0,
+     "family_event_rates": {
+      "M62": null,
+      "M63": 0.0,
+      "M64": 0.0,
+      "M65": 0.0,
+      "M69": 0.0,
+      "M76": 0.0
+     }
+    }
+   }
+  },
+  "U5": {
+   "observed_repeats": [
+    "r1",
+    "r2",
+    "r3"
+   ],
+   "expected_repeats": [
+    "r1",
+    "r2",
+    "r3"
+   ],
+   "metrics": {
+    "overapplication": {
+     "observations": 42,
+     "occurred_observations": 0,
+     "not_occurred_observations": 36,
+     "unknown_observations": 6,
+     "pooled_event_rate": 0.0,
+     "complete_families": 6,
+     "incomplete_families": 1,
+     "mean_family_event_rate": 0.0,
+     "family_event_rates": {
+      "M61": 0.0,
+      "M62": null,
+      "M66": 0.0,
+      "M72": 0.0,
+      "M80": 0.0,
+      "M81": 0.0,
+      "M82": 0.0
+     }
+    },
+    "resurrection": {
+     "observations": 24,
+     "occurred_observations": 0,
+     "not_occurred_observations": 24,
+     "unknown_observations": 0,
+     "pooled_event_rate": 0.0,
+     "complete_families": 4,
+     "incomplete_families": 0,
+     "mean_family_event_rate": 0.0,
+     "family_event_rates": {
+      "M74": 0.0,
+      "M75": 0.0,
+      "M77": 0.0,
+      "M84": 0.0
+     }
+    },
+    "stale_use": {
+     "observations": 36,
+     "occurred_observations": 0,
+     "not_occurred_observations": 30,
+     "unknown_observations": 6,
+     "pooled_event_rate": 0.0,
+     "complete_families": 5,
+     "incomplete_families": 1,
+     "mean_family_event_rate": 0.0,
+     "family_event_rates": {
+      "M62": null,
+      "M63": 0.0,
+      "M64": 0.0,
+      "M65": 0.0,
+      "M69": 0.0,
+      "M76": 0.0
+     }
+    }
+   }
+  }
+ },
+ "paired_comparisons": {
+  "U5": {
+   "overapplication": {
+    "baseline": "B0",
+    "arm": "U5",
+    "complete_paired_families": 6,
+    "mean_delta": -0.111,
+    "cluster_bootstrap_95ci": [
+     -0.222,
+     0.0
+    ],
+    "positive_delta_means_more_adverse_outcomes": true
+   },
+   "resurrection": {
+    "baseline": "B0",
+    "arm": "U5",
+    "complete_paired_families": 4,
+    "mean_delta": 0.0,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.0
+    ],
+    "positive_delta_means_more_adverse_outcomes": true
+   },
+   "stale_use": {
+    "baseline": "B0",
+    "arm": "U5",
+    "complete_paired_families": 5,
+    "mean_delta": 0.0,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.0
+    ],
+    "positive_delta_means_more_adverse_outcomes": true
+   }
+  }
+ },
+ "interpretation": "Metric events are adverse forbidden effects; positive delta is worse."
+}

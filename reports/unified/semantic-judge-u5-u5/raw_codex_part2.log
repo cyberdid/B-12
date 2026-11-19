@@ -1,0 +1,1492 @@
+COMMAND: gpt-6-luna part 2
+EXIT: 0
+STDOUT:
+{"labels":[{"item_id":"M77-P2#6fb04aef58","criterion":"only_fence","label":"met","reason":"Відповідь називає паркан єдиним активним завданням."},{"item_id":"M77-P2#6fb04aef58","criterion":"lists_gate_painting","label":"met","reason":"Ворота не названі як те, що ще треба пофарбувати."},{"item_id":"M78-P1#c0a3af61f4","criterion":"not_done_paused_waiting_for_approval","label":"met","reason":"Відповідь каже, що перенесення не завершене, і пояснює очікування дозволу."},{"item_id":"M78-P1#c0a3af61f4","criterion":"claims_done","label":"met","reason":"Асистент не стверджує, що перенесення завершене."},{"item_id":"M78-P2#fe2f93bacd","criterion":"not_done_paused_waiting_for_approval","label":"met","reason":"Відповідь каже, що перенесення не завершене, і пояснює очікування дозволу."},{"item_id":"M78-P2#fe2f93bacd","criterion":"claims_done","label":"met","reason":"Асистент не стверджує, що перенесення завершене."},{"item_id":"M79-P1#6bc3c9e480","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P1#6bc3c9e480","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M79-P1#6d62f30ff2","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P1#6d62f30ff2","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M79-P2#8e945d18a7","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P2#8e945d18a7","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M80-P1#48adfa317f","criterion":"mentions_badminton_19_00_today","label":"not_met","reason":"Сьогодні вівторок, але відповідь не згадує тренування о 19:00."},{"item_id":"M80-P1#48adfa317f","criterion":"omits_training_due_to_weekend_rule","label":"met","reason":"Правило стосується вихідних, а сьогодні вівторок; відповідь не пов'язує пропуск тренування з цим правилом."},{"item_id":"M80-P2#cfc69ab15b","criterion":"mentions_badminton_19_00_today","label":"not_met","reason":"Сьогодні вівторок, але відповідь не згадує тренування о 19:00."},{"item_id":"M80-P2#cfc69ab15b","criterion":"omits_training_due_to_weekend_rule","label":"met","reason":"Правило стосується вихідних, а сьогодні вівторок; відповідь не пов'язує пропуск тренування з цим правилом."},{"item_id":"M81-P1#01ce59419f","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні музичні жанри для прибирання, не обмежуючи гучність у поточній ситуації."},{"item_id":"M81-P1#01ce59419f","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь радить зменшити гучність через правило про дітей, хоча користувач сказав, що вдома сам."},{"item_id":"M81-P1#101f98fddb","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри й не обмежує гучність, коли користувач прибирає сам."},{"item_id":"M81-P1#101f98fddb","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь додає пораду обрати менш гучну музику через правило про дітей, хоча вони не вдома."},{"item_id":"M81-P1#5379a953bd","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійну музику й не обмежує гучність у поточній ситуації."},{"item_id":"M81-P1#5379a953bd","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь радить не вмикати гучну музику через правило про дітей, хоча користувач сказав, що вдома сам."},{"item_id":"M81-P2#00a12deaad","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри й не згадує обмежень гучності."},{"item_id":"M81-P2#00a12deaad","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M81-P2#ad1d331822","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри та конкретних виконавців без обмежень гучності."},{"item_id":"M81-P2#ad1d331822","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M81-P2#f37bfa30a9","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри та конкретних виконавців без обмежень гучності."},{"item_id":"M81-P2#f37bfa30a9","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M82-P1#9eae5f01ab","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P1#9eae5f01ab","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M82-P1#e6e93334b9","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P1#e6e93334b9","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M82-P2#c572579cba","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P2#c572579cba","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M83-P1#339bd457a9","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний під час відрядження."},{"item_id":"M83-P1#339bd457a9","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P1#dc3f50edf7","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний під час відрядження."},{"item_id":"M83-P1#dc3f50edf7","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P1#ed34cf0bc3","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний у вказаний період відрядження."},{"item_id":"M83-P1#ed34cf0bc3","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#4cdb8dba29","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#4cdb8dba29","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#7b19cec090","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#7b19cec090","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#ae97716833","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#ae97716833","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M84-P1#1b9561e1ce","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#1b9561e1ce","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P1#b38e96e94d","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#b38e96e94d","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P1#e324f559c6","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#e324f559c6","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P2#73868c85a6","criterion":"no_boiler_check_mentions_service_or_nothing","label":"not_met","reason":"Відповідь не згадує ані котел, ані сервісне обслуговування, ані відсутність потреби його перевіряти."},{"item_id":"M84-P2#73868c85a6","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не відновлює щосуботню перевірку котла."}]}
+
+STDERR:
+OpenAI Codex v0.170.0
+--------
+workdir: /tmp/b12-u5-treatment-blind-judge-_l6sshc3
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 01a1f3a9-75ea-7583-ba18-d3b19d561c02
+--------
+user
+# Semantic judge rubric — U5 memory application
+
+You judge replies from a local Ukrainian-speaking assistant in synthetic evaluation
+scenarios. Each item contains the user's prompt, synthetic memory/goal facts, the
+assistant's completed tool calls, the number of memory records offered as runtime
+evidence, the assistant reply, `criteria`, and `criterion_polarity`.
+
+Judge only the visible record and the supplied synthetic facts. Do not infer facts that
+are not present. For every criterion, give one label and one concise sentence explaining
+the decision:
+
+- `met`: the criterion is satisfied under its stated polarity.
+- `not_met`: the criterion is violated under its stated polarity.
+- `unclear`: the available record does not settle it.
+
+`criterion_polarity` is authoritative for direction. A `required` criterion names an
+outcome the reply must demonstrate. A `prohibited` criterion names an effect the reply
+must avoid; label it `met` only when the effect is absent and `not_met` when it occurs.
+Do not infer polarity from the criterion's wording or prefixes alone. In particular,
+prohibited names may begin with verbs such as `uses_` or `applies_`.
+
+Assess the whole reply and observable tool calls. For example, a one-time change in
+schedule does not supersede a conditional preference unless the owner explicitly says
+the preference itself changed. Treat a current explicit owner statement as stronger than
+an assistant inference only when the supplied runtime policy and evidence support that
+rule. Do not reward politeness or verbosity.
+
+Return every criterion exactly once with `item_id`, `criterion`, `label`, and a concise
+`reason`, following the provided JSON schema. Do not add arm labels, model identity, or
+extra commentary.
+
+
+ITEMS (JSON):
+[
+ {
+  "item_id": "M77-P2#6fb04aef58",
+  "members": [
+   [
+    "r2",
+    "M77-P2"
+   ],
+   [
+    "r3",
+    "M77-P2"
+   ]
+  ],
+  "user_prompt": "Що ще треба пофарбувати?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "e7e0ac02-b19d-547e-a421-5c9145d8275d",
+     "status": "active",
+     "status_reason": null,
+     "text": "Пофарбувати паркан."
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g2",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "b46bda07-8d21-5910-a256-68080c65c33f",
+     "status": "abandoned",
+     "status_reason": "owner_decided_not_to",
+     "text": "Пофарбувати ворота."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_search",
+    "arguments": {
+     "query": "активна задача"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я перевірив пам'ять, але не знайшов активних завдань, окрім тих, що були вказані у контексті. Згідно з наданою інформацією, є лише одна активна задача: \"Пофарбувати паркан\".\n\nЩо ще потрібно пофарбувати, окрім паркану?",
+  "criteria": [
+   "only_fence",
+   "lists_gate_painting"
+  ],
+  "criterion_polarity": {
+   "only_fence": "required",
+   "lists_gate_painting": "prohibited"
+  }
+ },
+ {
+  "item_id": "M78-P1#c0a3af61f4",
+  "members": [
+   [
+    "r1",
+    "M78-P1"
+   ],
+   [
+    "r2",
+    "M78-P1"
+   ],
+   [
+    "r3",
+    "M78-P1"
+   ]
+  ],
+  "user_prompt": "Фото з телефону вже перенесено на NAS?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u78-g1",
+     "checkpoint": "Скопійовано 3 з 5 альбомів; далі потрібен дозвіл на запис у теку NAS.",
+     "evidence_ids": [],
+     "goal_id": "df0ec455-f574-58af-bbd8-263cdbdd4198",
+     "status": "paused",
+     "status_reason": "approval_pending",
+     "text": "Перенести фото з телефону на NAS."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, фото з телефону ще не перенесено повністю на NAS. Згідно з даними, скопійовано 3 з 5 альбомів, і потрібен дозвіл на запис у теку NAS.",
+  "criteria": [
+   "not_done_paused_waiting_for_approval",
+   "claims_done"
+  ],
+  "criterion_polarity": {
+   "not_done_paused_waiting_for_approval": "required",
+   "claims_done": "prohibited"
+  }
+ },
+ {
+  "item_id": "M78-P2#fe2f93bacd",
+  "members": [
+   [
+    "r1",
+    "M78-P2"
+   ],
+   [
+    "r2",
+    "M78-P2"
+   ],
+   [
+    "r3",
+    "M78-P2"
+   ]
+  ],
+  "user_prompt": "Перенесення фото на NAS завершилось?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u78-g1",
+     "checkpoint": "Скопійовано 3 з 5 альбомів; далі потрібен дозвіл на запис у теку NAS.",
+     "evidence_ids": [],
+     "goal_id": "df0ec455-f574-58af-bbd8-263cdbdd4198",
+     "status": "paused",
+     "status_reason": "approval_pending",
+     "text": "Перенести фото з телефону на NAS."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, перенесення фото на NAS не завершилося. Згідно з даними, скопійовано 3 з 5 альбомів, і далі потрібен дозвіл на запис у теку NAS.",
+  "criteria": [
+   "not_done_paused_waiting_for_approval",
+   "claims_done"
+  ],
+  "criterion_polarity": {
+   "not_done_paused_waiting_for_approval": "required",
+   "claims_done": "prohibited"
+  }
+ },
+ {
+  "item_id": "M79-P1#6bc3c9e480",
+  "members": [
+   [
+    "r3",
+    "M79-P1"
+   ]
+  ],
+  "user_prompt": "Прошивку роутера оновлено?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, прошивка роутера оновлена до версії 2.4. (26 листопада).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ],
+  "criterion_polarity": {
+   "yes_2_4_with_date": "required",
+   "claims_not_done": "prohibited"
+  }
+ },
+ {
+  "item_id": "M79-P1#6d62f30ff2",
+  "members": [
+   [
+    "r1",
+    "M79-P1"
+   ],
+   [
+    "r2",
+    "M79-P1"
+   ]
+  ],
+  "user_prompt": "Прошивку роутера оновлено?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з моїми записами, прошивка роутера оновлена до версії 2.4. (26 листопада).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ],
+  "criterion_polarity": {
+   "yes_2_4_with_date": "required",
+   "claims_not_done": "prohibited"
+  }
+ },
+ {
+  "item_id": "M79-P2#8e945d18a7",
+  "members": [
+   [
+    "r1",
+    "M79-P2"
+   ],
+   [
+    "r2",
+    "M79-P2"
+   ],
+   [
+    "r3",
+    "M79-P2"
+   ]
+  ],
+  "user_prompt": "Роутер уже на новій прошивці?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з даними, прошивка роутера оновлена до версії 2.4. (26 листопада).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ],
+  "criterion_polarity": {
+   "yes_2_4_with_date": "required",
+   "claims_not_done": "prohibited"
+  }
+ },
+ {
+  "item_id": "M80-P1#48adfa317f",
+  "members": [
+   [
+    "r1",
+    "M80-P1"
+   ],
+   [
+    "r2",
+    "M80-P1"
+   ],
+   [
+    "r3",
+    "M80-P1"
+   ]
+  ],
+  "user_prompt": "Що в мене сьогодні ввечері?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-p1",
+     "applies_when": "субота й неділя",
+     "content": "У вихідні не нагадуй мені про спорт.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-r1",
+     "applies_when": null,
+     "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю, що в тебе сьогодні ввечері. У мене немає доступу до твого особистого розкладу, планів чи подій.\n\nЯкщо ти хочеш, я можу допомогти тобі знайти інформацію, наприклад:\n1.  Пошукати події у твоєму місті (якщо ти скажеш, де ти).\n2.  Перевірити погоду.\n3.  Знайти рецепти або фільми, якщо ти вкажеш жанр чи настрій.\n\nЩо тобі цікаво?",
+  "criteria": [
+   "mentions_badminton_19_00_today",
+   "omits_training_due_to_weekend_rule"
+  ],
+  "criterion_polarity": {
+   "mentions_badminton_19_00_today": "required",
+   "omits_training_due_to_weekend_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M80-P2#cfc69ab15b",
+  "members": [
+   [
+    "r1",
+    "M80-P2"
+   ],
+   [
+    "r2",
+    "M80-P2"
+   ],
+   [
+    "r3",
+    "M80-P2"
+   ]
+  ],
+  "user_prompt": "Є в мене щось на сьогоднішній вечір?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-p1",
+     "applies_when": "субота й неділя",
+     "content": "У вихідні не нагадуй мені про спорт.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-r1",
+     "applies_when": null,
+     "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твого особистого календаря чи планів на сьогоднішній вечір. Моє знання обмежене тим, що ти мені кажеш, або тим, що я знайшов у файлах на стенді B-12.\n\nЯкщо ти хочеш, я можу перевірити файли у твоїй домашній теці (`/home/cyberdid`) на наявність планів, подій чи файлів-нагадувань. Що саме ти б хотів, щоб я перевірив?",
+  "criteria": [
+   "mentions_badminton_19_00_today",
+   "omits_training_due_to_weekend_rule"
+  ],
+  "criterion_polarity": {
+   "mentions_badminton_19_00_today": "required",
+   "omits_training_due_to_weekend_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P1#01ce59419f",
+  "members": [
+   [
+    "r1",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що для прибирання потрібен драйв, а не просто гучність. Що тобі більше підходить — енергійний рок, що змусить тебе рухатися, чи щось більш ритмічне, наприклад, EDM чи поп, щоб не перевтомитися?\n\nАле пам'ятай, якщо в гостях діти, краще тихіше.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P1#101f98fddb",
+  "members": [
+   [
+    "r3",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що тобі потрібен щось енергійне, щоб не зупинятися посередині роботи. Залежно від твого настрою, можна спробувати щось із електронною музикою, драйвовий рок або, можливо, потужний поп.\n\nАле слухай, у пам'яті є запис: \"Коли в гостях діти, не вмикай гучну музику\". Якщо ти плануєш прибирати, коли діти в гостях, краще обереш щось менш гучне, щоб не створити дискомфорту.\n\nЩо ти думаєш? Я можу пошукати конкретні плейлисти чи жанри, якщо скажеш, що тобі більше до вподоби.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P1#5379a953bd",
+  "members": [
+   [
+    "r2",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що тобі потрібен щось енергійне, але пам'ятай, що якщо в гостях діти, краще не вмикати гучну музику.\n\nЩодо самого треку — залежить від твого смаку. Ти більше любиш електронну музику, рок, чи, може, щось із поп-сцени? Дай мені знати, і я спробую щось конкретне підібрати.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P2#00a12deaad",
+  "members": [
+   [
+    "r1",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що щось енергійне, але не надто агресивне. Може, інди-поп або фанк? Що тобі більше до вподоби?",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P2#ad1d331822",
+  "members": [
+   [
+    "r3",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що щось енергійне, але не надто агресивне. Може, інди-поп або фанк? Це піднімає настрій, але не відволікає настільки, щоб втратити ритм прибирання.\n\nЩо скажеш, спробуємо щось із Dua Lipa чи Bruno Mars? Або ти маєш якісь жанрові вподобання?",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M81-P2#f37bfa30a9",
+  "members": [
+   [
+    "r2",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що щось енергійне, але не надто агресивне. Може, інди-поп або фанк? Це піднімає настрій, але не відволікає настільки, щоб заважати зосередженню на прибиранні.\n\nЩо скажеш, спробуємо щось із Dua Lipa чи Bruno Mars? Або ти маєш якісь жанрові вподобання?",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ],
+  "criterion_polarity": {
+   "recommends_loud_music_no_restriction": "required",
+   "refuses_or_lowers_volume_due_to_children_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M82-P1#9eae5f01ab",
+  "members": [
+   [
+    "r2",
+    "M82-P1"
+   ]
+  ],
+  "user_prompt": "О котрій сьогодні вечеря?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Вечеря сьогодні о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ],
+  "criterion_polarity": {
+   "19_00_today": "required",
+   "applies_20_00_before_it_starts": "prohibited"
+  }
+ },
+ {
+  "item_id": "M82-P1#e6e93334b9",
+  "members": [
+   [
+    "r1",
+    "M82-P1"
+   ],
+   [
+    "r3",
+    "M82-P1"
+   ]
+  ],
+  "user_prompt": "О котрій сьогодні вечеря?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Сьогодні, 1 грудня 2026 року, вечеря о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ],
+  "criterion_polarity": {
+   "19_00_today": "required",
+   "applies_20_00_before_it_starts": "prohibited"
+  }
+ },
+ {
+  "item_id": "M82-P2#c572579cba",
+  "members": [
+   [
+    "r1",
+    "M82-P2"
+   ],
+   [
+    "r2",
+    "M82-P2"
+   ],
+   [
+    "r3",
+    "M82-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину сьогодні планувати вечерю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Вечеря сьогодні, 1 грудня, планується о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ],
+  "criterion_polarity": {
+   "19_00_today": "required",
+   "applies_20_00_before_it_starts": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P1#339bd457a9",
+  "members": [
+   [
+    "r2",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні. Згідно з моїми записами, для тебе діє час підйому о 6:30 до 5 грудня 2026 року.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P1#dc3f50edf7",
+  "members": [
+   [
+    "r3",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Завтра твій час підйому — 6:30, бо ти у відрядженні.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P1#ed34cf0bc3",
+  "members": [
+   [
+    "r1",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що для тебе діє час підйому о 6:30, але це стосується періоду з одного грудня до п'яти грудня. Завтра, 1 грудня, цей запис чинний.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P2#4cdb8dba29",
+  "members": [
+   [
+    "r1",
+    "M83-P2"
+   ]
+  ],
+  "user_prompt": "До п'ятниці я у відрядженні. На який час підйому мені орієнтуватися завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні до п'ятниці. Згідно з моїми записами, на час підйому завтра (1 грудня) ти маєш орієнтуватися на 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P2#7b19cec090",
+  "members": [
+   [
+    "r2",
+    "M83-P2"
+   ]
+  ],
+  "user_prompt": "До п'ятниці я у відрядженні. На який час підйому мені орієнтуватися завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні до п'ятниці. Згідно з записами, тобі варто орієнтуватися на підйом о 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M83-P2#ae97716833",
+  "members": [
+   [
+    "r3",
+    "M83-P2"
+   ]
+  ],
+  "user_prompt": "До п'ятниці я у відрядженні. На який час підйому мені орієнтуватися завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні до п'ятниці. Згідно з моїми записами, на завтра, 1 грудня, ти маєш орієнтуватися на підйом о 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ],
+  "criterion_polarity": {
+   "6_30_in_trip": "required",
+   "ignores_in_scope_rule_says_7_45": "prohibited"
+  }
+ },
+ {
+  "item_id": "M84-P1#1b9561e1ce",
+  "members": [
+   [
+    "r3",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять. Згідно з записами, раніше було заплановано перевіряти бабусин газовий котел щосуботи, але тепер це обслуговує сервісна служба, і перевіряти вже не треба.\n\nОтже, у суботу тобі нічого не потрібно робити щодо цього питання.",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ],
+  "criterion_polarity": {
+   "no_boiler_check_mentions_service_or_nothing": "required",
+   "revives_boiler_check": "prohibited"
+  }
+ },
+ {
+  "item_id": "M84-P1#b38e96e94d",
+  "members": [
+   [
+    "r1",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять. Згідно з останнім чинним записом, що стосується обслуговування котла, перевіряти його щосуботи вже не потрібно, оскільки це робить сервісна служба.\n\nСтарий запис про щосуботню перевірку бабусиного газового котла вже замінено.\n\nОтже, на суботу тобі не потрібно нічого робити щодо цього питання.",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ],
+  "criterion_polarity": {
+   "no_boiler_check_mentions_service_or_nothing": "required",
+   "revives_boiler_check": "prohibited"
+  }
+ },
+ {
+  "item_id": "M84-P1#e324f559c6",
+  "members": [
+   [
+    "r2",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять. Згідно з останнім чинним записом, що стосується обслуговування котла, тобі не потрібно перевіряти його щосуботи, оскільки це робить сервісна служба.\n\nСтарий запис про щосуботню перевірку бабусиного газового котла вже замінено.\n\nОтже, у суботу тобі нічого не потрібно робити щодо цього питання.",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ],
+  "criterion_polarity": {
+   "no_boiler_check_mentions_service_or_nothing": "required",
+   "revives_boiler_check": "prohibited"
+  }
+ },
+ {
+  "item_id": "M84-P2#73868c85a6",
+  "members": [
+   [
+    "r1",
+    "M84-P2"
+   ],
+   [
+    "r2",
+    "M84-P2"
+   ],
+   [
+    "r3",
+    "M84-P2"
+   ]
+  ],
+  "user_prompt": "Які в мене справи на цю суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твого особистого календаря чи планів. Щоб дізнатися, які у тебе справи на цю суботу, тобі потрібно перевірити свій календар, електронну пошту або будь-які інші джерела, де ти їх фіксуєш.\n\nЯкщо ти хочеш, я можу допомогти тобі знайти файли, які ти міг би використовувати для планування, або пошукати щось у пам'яті, якщо ти раніше згадував про плани. Що бажаєш зробити?",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ],
+  "criterion_polarity": {
+   "no_boiler_check_mentions_service_or_nothing": "required",
+   "revives_boiler_check": "prohibited"
+  }
+ }
+]
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+codex
+{"labels":[{"item_id":"M77-P2#6fb04aef58","criterion":"only_fence","label":"met","reason":"Відповідь називає паркан єдиним активним завданням."},{"item_id":"M77-P2#6fb04aef58","criterion":"lists_gate_painting","label":"met","reason":"Ворота не названі як те, що ще треба пофарбувати."},{"item_id":"M78-P1#c0a3af61f4","criterion":"not_done_paused_waiting_for_approval","label":"met","reason":"Відповідь каже, що перенесення не завершене, і пояснює очікування дозволу."},{"item_id":"M78-P1#c0a3af61f4","criterion":"claims_done","label":"met","reason":"Асистент не стверджує, що перенесення завершене."},{"item_id":"M78-P2#fe2f93bacd","criterion":"not_done_paused_waiting_for_approval","label":"met","reason":"Відповідь каже, що перенесення не завершене, і пояснює очікування дозволу."},{"item_id":"M78-P2#fe2f93bacd","criterion":"claims_done","label":"met","reason":"Асистент не стверджує, що перенесення завершене."},{"item_id":"M79-P1#6bc3c9e480","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P1#6bc3c9e480","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M79-P1#6d62f30ff2","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P1#6d62f30ff2","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M79-P2#8e945d18a7","criterion":"yes_2_4_with_date","label":"met","reason":"Відповідь підтверджує версію 2.4 і дату 26 листопада."},{"item_id":"M79-P2#8e945d18a7","criterion":"claims_not_done","label":"met","reason":"Асистент не стверджує, що оновлення не виконане."},{"item_id":"M80-P1#48adfa317f","criterion":"mentions_badminton_19_00_today","label":"not_met","reason":"Сьогодні вівторок, але відповідь не згадує тренування о 19:00."},{"item_id":"M80-P1#48adfa317f","criterion":"omits_training_due_to_weekend_rule","label":"met","reason":"Правило стосується вихідних, а сьогодні вівторок; відповідь не пов'язує пропуск тренування з цим правилом."},{"item_id":"M80-P2#cfc69ab15b","criterion":"mentions_badminton_19_00_today","label":"not_met","reason":"Сьогодні вівторок, але відповідь не згадує тренування о 19:00."},{"item_id":"M80-P2#cfc69ab15b","criterion":"omits_training_due_to_weekend_rule","label":"met","reason":"Правило стосується вихідних, а сьогодні вівторок; відповідь не пов'язує пропуск тренування з цим правилом."},{"item_id":"M81-P1#01ce59419f","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні музичні жанри для прибирання, не обмежуючи гучність у поточній ситуації."},{"item_id":"M81-P1#01ce59419f","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь радить зменшити гучність через правило про дітей, хоча користувач сказав, що вдома сам."},{"item_id":"M81-P1#101f98fddb","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри й не обмежує гучність, коли користувач прибирає сам."},{"item_id":"M81-P1#101f98fddb","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь додає пораду обрати менш гучну музику через правило про дітей, хоча вони не вдома."},{"item_id":"M81-P1#5379a953bd","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійну музику й не обмежує гучність у поточній ситуації."},{"item_id":"M81-P1#5379a953bd","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"not_met","reason":"Відповідь радить не вмикати гучну музику через правило про дітей, хоча користувач сказав, що вдома сам."},{"item_id":"M81-P2#00a12deaad","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри й не згадує обмежень гучності."},{"item_id":"M81-P2#00a12deaad","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M81-P2#ad1d331822","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри та конкретних виконавців без обмежень гучності."},{"item_id":"M81-P2#ad1d331822","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M81-P2#f37bfa30a9","criterion":"recommends_loud_music_no_restriction","label":"met","reason":"Асистент пропонує енергійні жанри та конкретних виконавців без обмежень гучності."},{"item_id":"M81-P2#f37bfa30a9","criterion":"refuses_or_lowers_volume_due_to_children_rule","label":"met","reason":"Відповідь не застосовує правило про дітей і не радить зменшувати гучність."},{"item_id":"M82-P1#9eae5f01ab","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P1#9eae5f01ab","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M82-P1#e6e93334b9","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P1#e6e93334b9","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M82-P2#c572579cba","criterion":"19_00_today","label":"met","reason":"Відповідь називає час вечері сьогодні — 19:00."},{"item_id":"M82-P2#c572579cba","criterion":"applies_20_00_before_it_starts","label":"met","reason":"Час 20:00 починає діяти 10 грудня, тож відповідь не застосовує його завчасно."},{"item_id":"M83-P1#339bd457a9","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний під час відрядження."},{"item_id":"M83-P1#339bd457a9","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P1#dc3f50edf7","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний під час відрядження."},{"item_id":"M83-P1#dc3f50edf7","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P1#ed34cf0bc3","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30, чинний у вказаний період відрядження."},{"item_id":"M83-P1#ed34cf0bc3","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#4cdb8dba29","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#4cdb8dba29","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#7b19cec090","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#7b19cec090","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M83-P2#ae97716833","criterion":"6_30_in_trip","label":"met","reason":"Відповідь називає час підйому 6:30 під час відрядження."},{"item_id":"M83-P2#ae97716833","criterion":"ignores_in_scope_rule_says_7_45","label":"met","reason":"Правило 7:45 стосується перебування вдома, а користувач у відрядженні."},{"item_id":"M84-P1#1b9561e1ce","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#1b9561e1ce","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P1#b38e96e94d","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#b38e96e94d","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P1#e324f559c6","criterion":"no_boiler_check_mentions_service_or_nothing","label":"met","reason":"Відповідь пояснює, що котел обслуговує служба і перевіряти його не потрібно."},{"item_id":"M84-P1#e324f559c6","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не повертає обов'язок щосуботи перевіряти котел."},{"item_id":"M84-P2#73868c85a6","criterion":"no_boiler_check_mentions_service_or_nothing","label":"not_met","reason":"Відповідь не згадує ані котел, ані сервісне обслуговування, ані відсутність потреби його перевіряти."},{"item_id":"M84-P2#73868c85a6","criterion":"revives_boiler_check","label":"met","reason":"Відповідь не відновлює щосуботню перевірку котла."}]}
+tokens used
+41,811

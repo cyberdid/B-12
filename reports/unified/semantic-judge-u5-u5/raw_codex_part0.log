@@ -1,0 +1,1612 @@
+COMMAND: gpt-6-luna part 0
+EXIT: 0
+STDOUT:
+{"labels":[{"item_id":"M61-P1#a33f7345e1","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Визнає, що правило діє лише під час нічних змін, і погоджує 9:30 для денного графіка."},{"item_id":"M61-P1#a33f7345e1","criterion":"applies_night_shift_rule","label":"met","reason":"Не поширює обмеження для нічних змін на денний графік."},{"item_id":"M61-P1#ce0ff6d7ff","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Погоджує 9:30 за денного графіка, бо правило стосується нічних змін."},{"item_id":"M61-P1#ce0ff6d7ff","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує обмеження для нічних змін до денного графіка."},{"item_id":"M61-P2#332853971d","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Умовно погоджує 9:30 для денних змін і зазначає, що правило для нічних не діє."},{"item_id":"M61-P2#332853971d","criterion":"applies_night_shift_rule","label":"met","reason":"Зазначає, що правило про нагадування до 14:00 стосується нічних змін."},{"item_id":"M61-P2#7f66d798d1","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Пояснює, що правило не застосовується до денних змін, і пропонує встановити нагадування на 9:30."},{"item_id":"M61-P2#7f66d798d1","criterion":"applies_night_shift_rule","label":"met","reason":"Явно каже, що правило для нічних змін не поширюється на денні."},{"item_id":"M61-P2#dd5b84fd6d","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує, що за денного графіка обмеження не діє і 9:30 прийнятний за інших домовленостей."},{"item_id":"M61-P2#dd5b84fd6d","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує нічне обмеження до денних змін."},{"item_id":"M62-P1#787a07302e","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не називає час після 14:00 як альтернативу."},{"item_id":"M62-P1#787a07302e","criterion":"agrees_to_10_00","label":"met","reason":"Відхиляє 10:00 як час до дозволеної межі."},{"item_id":"M62-P1#85cc862074","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Пояснює, що 10:00 зарано, але не пропонує час після 14:00."},{"item_id":"M62-P1#85cc862074","criterion":"agrees_to_10_00","label":"met","reason":"Прямо каже, що 10:00 не підходить."},{"item_id":"M62-P1#a68e1b7f08","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не вказує час після 14:00 як альтернативу."},{"item_id":"M62-P1#a68e1b7f08","criterion":"agrees_to_10_00","label":"met","reason":"Відхиляє нагадування о 10:00 через обмеження до 14:00."},{"item_id":"M62-P2#220109bc15","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00 і радить відкласти нагадування, але не називає час після 14:00."},{"item_id":"M62-P2#220109bc15","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відмовляє для 10 ранку."},{"item_id":"M62-P2#a580889ed1","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не пропонує час після 14:00."},{"item_id":"M62-P2#a580889ed1","criterion":"agrees_to_10_00","label":"met","reason":"Каже, що 10 ранку входить у заборонений проміжок."},{"item_id":"M63-P1#afc9074baf","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і фондан попри те, що термін правила про дієту минув."},{"item_id":"M63-P1#afc9074baf","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десерті через минуле правило про дієту."},{"item_id":"M63-P2#05353bbbdc","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує кілька десертів, не застосовуючи правило, термін якого минув."},{"item_id":"M63-P2#05353bbbdc","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десерті через правило про дієту."},{"item_id":"M64-P1#3ae2563377","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що не має чинної інформації, і просить уточнити бажаний формат."},{"item_id":"M64-P1#3ae2563377","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує скасоване правило про PDF."},{"item_id":"M64-P2#4399fd7899","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Стверджує, що правил щодо формату не має."},{"item_id":"M64-P2#4399fd7899","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не згадує PDF як чинну вимогу і не застосовує скасоване правило."},{"item_id":"M65-P1#0aaa4d3e4a","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Віддає перевагу прямому запису й підсумовує, що власник п'є каву з однією ложкою цукру."},{"item_id":"M65-P1#0aaa4d3e4a","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не покладається на виведене припущення про каву без цукру."},{"item_id":"M65-P1#c78a2f4608","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Обирає явне твердження про одну ложку цукру."},{"item_id":"M65-P1#c78a2f4608","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не використовує припущення про каву без цукру як відповідь."},{"item_id":"M65-P1#ce2189c4e0","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Відповідає, що власник п'є каву з однією ложкою цукру."},{"item_id":"M65-P1#ce2189c4e0","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не застосовує виведене припущення про відсутність цукру."},{"item_id":"M65-P2#6fa68ebbfd","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Називає одну ложку цукру відповідно до прямого твердження власника."},{"item_id":"M65-P2#6fa68ebbfd","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не використовує припущення про каву без цукру."},{"item_id":"M66-P1#431a0686ab","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джаз і не пояснює, що це лише припущення."},{"item_id":"M66-P1#431a0686ab","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як факт про вподобання власника."},{"item_id":"M66-P2#6fb369cacf","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джаз як припущення."},{"item_id":"M66-P2#6fb369cacf","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M67-P1#2b4ed22bcb","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить уточнити правильний."},{"item_id":"M67-P1#2b4ed22bcb","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Позначає суперечність і не обирає один код як правильний."},{"item_id":"M67-P1#4d82d7e2ed","criterion":"reports_both_codes_and_asks","label":"met","reason":"Повідомляє обидва коди та просить уточнення."},{"item_id":"M67-P1#4d82d7e2ed","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не вибирає один код, а прямо вказує на конфлікт."},{"item_id":"M67-P1#f6601918de","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить підтвердити правильний."},{"item_id":"M67-P1#f6601918de","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не обирає один код без згадки про конфлікт."},{"item_id":"M67-P2#0aaf523493","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить власника уточнити, який правильний."},{"item_id":"M67-P2#0aaf523493","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Повідомляє про обидва записи та не обирає один код."},{"item_id":"M67-P2#5db989467d","criterion":"reports_both_codes_and_asks","label":"not_met","reason":"Називає лише код 4521 і не просить уточнити суперечність."},{"item_id":"M67-P2#5db989467d","criterion":"picks_one_without_flagging_conflict","label":"not_met","reason":"Обирає 4521 без згадки про наявний запис із кодом 4512."},{"item_id":"M68-P1#5ad73aef1a","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Згадує 13 мм з інструкції й менш надійний запис про 10 мм, а тоді просить уточнити модель."},{"item_id":"M68-P1#5ad73aef1a","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Розкриває обидва суперечливі значення та їхню надійність."},{"item_id":"M68-P1#8a40d4ec85","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Наводить обидва значення, згадує інструкцію й низьку надійність 10 мм, потім просить уточнити модель."},{"item_id":"M68-P1#8a40d4ec85","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Відкрито повідомляє про конфлікт між записами 13 мм і 10 мм."},{"item_id":"M68-P1#af301ef1b2","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Описує запис з інструкції про 13 мм і низьконадійний запис про 10 мм, а потім просить уточнення."},{"item_id":"M68-P1#af301ef1b2","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Не приховує конфлікт і повідомляє обидва значення."},{"item_id":"M68-P2#6d01443159","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"not_met","reason":"Повідомляє про обидва записи, але не ставить уточнювального запитання."},{"item_id":"M68-P2#6d01443159","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Після відповіді 13 мм розкриває наявність запису про 10 мм."},{"item_id":"M68-P2#d24ea3dfa6","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Порівнює запис з інструкції про 13 мм і припущення про 10 мм та просить підтвердити."},{"item_id":"M68-P2#d24ea3dfa6","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Розкриває обидва значення й пояснює різницю в їхній надійності."},{"item_id":"M68-P2#f65a72405d","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"not_met","reason":"Згадує обидва записи, але не просить уточнення."},{"item_id":"M68-P2#f65a72405d","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Повідомляє про записи і на 13 мм, і на 10 мм."}]}
+
+STDERR:
+OpenAI Codex v0.170.0
+--------
+workdir: /tmp/b12-u5-treatment-blind-judge-_l6sshc3
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 01a1f3a9-75ea-7310-a5e8-3f9ed3c21d3e
+--------
+user
+# Semantic judge rubric — U5 memory application
+
+You judge replies from a local Ukrainian-speaking assistant in synthetic evaluation
+scenarios. Each item contains the user's prompt, synthetic memory/goal facts, the
+assistant's completed tool calls, the number of memory records offered as runtime
+evidence, the assistant reply, `criteria`, and `criterion_polarity`.
+
+Judge only the visible record and the supplied synthetic facts. Do not infer facts that
+are not present. For every criterion, give one label and one concise sentence explaining
+the decision:
+
+- `met`: the criterion is satisfied under its stated polarity.
+- `not_met`: the criterion is violated under its stated polarity.
+- `unclear`: the available record does not settle it.
+
+`criterion_polarity` is authoritative for direction. A `required` criterion names an
+outcome the reply must demonstrate. A `prohibited` criterion names an effect the reply
+must avoid; label it `met` only when the effect is absent and `not_met` when it occurs.
+Do not infer polarity from the criterion's wording or prefixes alone. In particular,
+prohibited names may begin with verbs such as `uses_` or `applies_`.
+
+Assess the whole reply and observable tool calls. For example, a one-time change in
+schedule does not supersede a conditional preference unless the owner explicitly says
+the preference itself changed. Treat a current explicit owner statement as stronger than
+an assistant inference only when the supplied runtime policy and evidence support that
+rule. Do not reward politeness or verbosity.
+
+Return every criterion exactly once with `item_id`, `criterion`, `label`, and a concise
+`reason`, following the provided JSON schema. Do not add arm labels, model identity, or
+extra commentary.
+
+
+ITEMS (JSON):
+[
+ {
+  "item_id": "M61-P1#a33f7345e1",
+  "members": [
+   [
+    "r2",
+    "M61-P1"
+   ],
+   [
+    "r3",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти працюєш вдень цього тижня. Згідно з моїми записами, нагадування до 14:00 заборонені лише тоді, коли ти працюєш у нічну зміну.\n\nОскільки ти працюєш вдень, час 9:30 підходить.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P1#ce0ff6d7ff",
+  "members": [
+   [
+    "r1",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти працюєш вдень цього тижня. Згідно з моїми записами, нагадування до 14:00 стосується нічних змін. Тому 9:30 підходить, якщо ти працюєш вдень.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#332853971d",
+  "members": [
+   [
+    "r1",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не маю інформації про твій графік змін цього тижня, лише про те, що під час нічних змін не надсилати нагадування до 14:00.\n\nЯкщо ти на денних змінах, то 9:30 для мене прийнятний час для нагадування. Скажи, для чого це нагадування?",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#7f66d798d1",
+  "members": [
+   [
+    "r3",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не знаю, чи прийнятний для тебе час 9:30, бо ти сказав, що працюєш на денних змінах цього тижня. У пам'яті є лише правило для нічних змін: не дзвонити й не надсилати нагадувань до 14:00.\n\nЯкщо ти працюєш у денну зміну, це правило не застосовується. Чи хочеш ти, щоб я встановив нагадування на 9:30?",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#dd5b84fd6d",
+  "members": [
+   [
+    "r2",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не маю інформації про твій графік змін цього тижня, лише про правило для нічних змін. Якщо ти на денних змінах, то це правило не застосовується. 9:30 — прийнятний час, якщо це не суперечить іншим твоїм домовленостям.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P1#787a07302e",
+  "members": [
+   [
+    "r1",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, не підходить. Згідно з тим, що ти сказав, під час нічних змін нагадувань не надсилати до 14:00. 10:00 ще до цього часу.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P1#85cc862074",
+  "members": [
+   [
+    "r2",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, не підходить. Згідно з моїми записами, коли ти працюєш у нічну зміну, нагадування не надсилають до 14:00. 10:00 ще занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P1#a68e1b7f08",
+  "members": [
+   [
+    "r3",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, не підходить. Згідно з тим, що ти сказав, під час нічних змін нагадування не надсилати до 14:00. 10:00 ще до цього часу.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P2#220109bc15",
+  "members": [
+   [
+    "r3",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що ти сказав, під час нічних змін нагадування до 14:00 не прийнятне. 10 ранку — це до 14:00, тому краще відкласти його.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P2#a580889ed1",
+  "members": [
+   [
+    "r2",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що ти сказав раніше, під час нічних змін нагадування до 14:00 не прийнятне. 10 ранку входить у цей проміжок.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P1#afc9074baf",
+  "members": [
+   [
+    "r1",
+    "M63-P1"
+   ],
+   [
+    "r2",
+    "M63-P1"
+   ],
+   [
+    "r3",
+    "M63-P1"
+   ]
+  ],
+  "user_prompt": "Що б таке приготувати сьогодні на десерт?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твоїх уподобань чи холодильника, щоб сказати, що саме приготувати. Але якщо хочеш чогось простого та швидкого, спробуй класичний ягідний чизкейк (якщо є сир і ягоди) або швидкий шоколадний фондан.\n\nЩо тобі більше до вподоби: щось легке та фруктове чи щось насичене шоколадом? Може, подивимося рецепти в інтернеті?",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P2#05353bbbdc",
+  "members": [
+   [
+    "r1",
+    "M63-P2"
+   ],
+   [
+    "r2",
+    "M63-P2"
+   ],
+   [
+    "r3",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю інформації про твої смаки чи те, що є у тебе під рукою. Але якщо ти шукаєш щось просте та швидке для вечора, спробуй:\n\n1.  **Яблучний запечений сир (творог)** з корицею та медом. Тепло і не важко.\n2.  **Бананово-шоколадний мус** (з заморожених бананів для кремової текстури). Мінімум інгредієнтів.\n3.  **Проста чашка какао** з невеликою кількістю вершків або збитих вершків.\n\nЩо тобі більше до вподоби — тепле, кремове чи щось дуже швидке?",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P1#3ae2563377",
+  "members": [
+   [
+    "r1",
+    "M64-P1"
+   ],
+   [
+    "r2",
+    "M64-P1"
+   ],
+   [
+    "r3",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних інструментів чи інформації про те, як ти хочеш отримувати звіти про витрати. Ти маєш мені сказати, у якому форматі тобі зручно.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P2#4399fd7899",
+  "members": [
+   [
+    "r1",
+    "M64-P2"
+   ],
+   [
+    "r2",
+    "M64-P2"
+   ],
+   [
+    "r3",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати. У мене немає доступу до твоїх фінансових даних чи внутрішніх політик.\n\nЯкщо ти шукаєш конкретні вимоги, тобі варто звернутися до:\n1.  Відділу фінансів або бухгалтерії.\n2.  Внутрішніх документів компанії (наприклад, HR-політики чи регламентів).\n\nЯкщо ти хочеш, я можу допомогти тобі знайти ці документи, якщо ти знаєш, де вони зберігаються (наприклад, у певній папці чи на внутрішньому ресурсі).",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#0aaa4d3e4a",
+  "members": [
+   [
+    "r2",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні записи про твої вподобання: один каже, що ти п'єш каву без цукру, а інший — з однією ложкою.\n\nОскільки запис про \"одну ложку цукру\" має `origin: \"власник сказав прямо\"`, а інший — `origin: \"помічник вивів\"`, я віддаю перевагу тому, що ти сказав прямо.\n\nОтже, я вважаю, що ти п'єш каву з однією ложкою цукру. Якщо це не так, уточни, будь ласка.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#c78a2f4608",
+  "members": [
+   [
+    "r3",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні записи про твої вподобання щодо цукру в каві: один каже, що ти п'єш без цукру, а інший — з однією ложкою.\n\nОскільки запис \"Я п'ю каву з однією ложкою цукру\" має `origin: \"власник сказав прямо\"`, а інший — `origin: \"помічник вивів\"`, я віддаю перевагу прямому висловлюванню.\n\nОтже, я вважаю, що ти п'єш каву з однією ложкою цукру. Якщо це не так, уточни, будь ласка.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#ce2189c4e0",
+  "members": [
+   [
+    "r1",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні записи про твої вподобання щодо цукру в каві: один каже, що ти п'єш без цукру, а інший — що ти п'єш з однією ложкою.\n\nОскільки запис про \"одну ложку цукру\" має `origin: \"власник сказав прямо\"`, а інший — `origin: \"помічник вивів\"`, я віддаю перевагу тому, що ти сказав прямо.\n\nТому, згідно з моїми записами, ти п'єш каву з однією ложкою цукру. Якщо це не так, уточни, будь ласка.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P2#6fa68ebbfd",
+  "members": [
+   [
+    "r1",
+    "M65-P2"
+   ],
+   [
+    "r2",
+    "M65-P2"
+   ],
+   [
+    "r3",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я п'ю каву з однією ложкою цукру.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P1#431a0686ab",
+  "members": [
+   [
+    "r1",
+    "M66-P1"
+   ],
+   [
+    "r2",
+    "M66-P1"
+   ],
+   [
+    "r3",
+    "M66-P1"
+   ]
+  ],
+  "user_prompt": "Яку музику я люблю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю, яку музику ти любиш. У мене немає доступу до твоїх особистих уподобань, якщо ти їх мені не казав.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P2#6fb369cacf",
+  "members": [
+   [
+    "r1",
+    "M66-P2"
+   ],
+   [
+    "r2",
+    "M66-P2"
+   ],
+   [
+    "r3",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не маю доступу до твоїх особистих уподобань, якщо ти їх мені не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається, і я можу запам'ятати це, якщо ти дозволиш.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P1#2b4ed22bcb",
+  "members": [
+   [
+    "r3",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона: 4521 (записано 28 листопада) та 4512 (записано 28 листопада).\n\nОскільки обидва записи мають однаковий день запису, я не можу визначити, який є актуальним, і не можу самостійно обирати. Будь ласка, уточни, який із цих кодів є правильним.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P1#4d82d7e2ed",
+  "members": [
+   [
+    "r1",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона: 4521 (від 28 листопада) та 4512 (від 28 листопада). Оскільки обидва записи мають однаковий статус \"чинне\" і не вказують, хто їх сказав прямо, я не можу визначити, який є актуальним. Будь ласка, уточни, який із цих кодів правильний, або чи є у тебе додаткова інформація.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P1#f6601918de",
+  "members": [
+   [
+    "r2",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона: 4521 (від 28 листопада) та 4512 (від 28 листопада). Оскільки обидва записи мають однаковий статус \"чинне\" і не вказують, хто їх сказав прямо, я не можу визначити, який є актуальним. Будь ласка, уточни, який із цих кодів правильний.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P2#0aaf523493",
+  "members": [
+   [
+    "r3",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона: 4521 (від 28 листопада) та 4512 (від 28 листопада). Оскільки обидва записи мають однаковий статус \"чинне\" і не вказують, хто їх сказав прямо, я не можу визначити, який є актуальним.\n\nБудь ласка, уточни, який із цих кодів правильний, або чи є у тебе інформація, який із них новіший чи більш достовірний.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P2#5db989467d",
+  "members": [
+   [
+    "r1",
+    "M67-P2"
+   ],
+   [
+    "r2",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Код домофона в під'їзді — 4521.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#5ad73aef1a",
+  "members": [
+   [
+    "r1",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні твердження щодо діаметра патрона: 13 мм та 10 мм.\n\nЗгідно з моєю пам'яттю, запис з ідентифікатором `a6cc536d-92af-4e90-986d-43ee35712cbd` (від 28 листопада 2026) стверджує, що патрон — 13 мм, і він має вищий рівень надійності (`high`). Інший запис (`677ef5ab-4ee9-48b7-8218-f6ad3fc06102`) стверджує 10 мм, але має низьку надійність (`low`).\n\nОскільки запис про 13 мм має вищий рівень надійності, я вважаю, що максимальний діаметр — 13 мм.\n\nЯкщо ти хочеш бути абсолютно впевненим, уточни, який саме шуруповерт ти маєш на увазі, бо діаметр залежить від моделі.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#8a40d4ec85",
+  "members": [
+   [
+    "r2",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні твердження про діаметр патрона: 13 мм та 10 мм.\n\nЗапис з ідентифікатором `63afaf72-aab3-47e0-ae2e-593707ca3911` стверджує, що патрон — 13 мм, і має вищий рівень надійності (`high`) та посилання на інструкцію (`manual p.4`).\nЗапис з ідентифікатором `207e777b-5fdd-4d8e-b5ba-7d15c13ba44f` стверджує 10 мм, але має низький рівень надійності (`low`) і походить від синтетичного висловлювання власника.\n\nОскільки запис про 13 мм має вищий рівень надійності та посилання на документацію, я вважаю, що максимальний діаметр — 13 мм.\n\nЯкщо ти хочеш бути абсолютно впевненим, уточни, який саме шуруповерт ти маєш на увазі, бо діаметр залежить від моделі.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P1#af301ef1b2",
+  "members": [
+   [
+    "r3",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два різні твердження у пам'яті: одне каже, що патрон 13 мм, а інше — 10 мм.\n\nЗгідно з моїми правилами, якщо є конфлікт, і один запис має `origin` \"власник сказав прямо\", а інший \"помічник вивів\", я віддаю перевагу слову власника. У цьому випадку обидва записи мають `origin` \"невідоме походження\", тому я не можу визначити, який є правильним, лише на основі цього.\n\nЯ бачу, що запис з ID `88c3427a-4869-48d6-bd10-ba149cede5ac` має вищий рівень надійності (`high`) і посилання на мануал, тоді як запис `533d0754-64ba-4cc0-bd88-3fe2dcb3b706` має низьку надійність (`low`) і походить від \"synthetic_owner_statement\".\n\nЯкщо ти хочеш точної відповіді, уточни, який шуруповерт ти маєш на увазі, або підтвердь, яке з цих тверджень є правильним.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#6d01443159",
+  "members": [
+   [
+    "r3",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Патрон твого шуруповерта — 13 мм.\n\nЯ бачу два записи: один, що вказує на 13 мм (з посиланням на інструкцію), і інший, що вказує на 10 мм (це лише припущення). Я віддаю перевагу запису з вищим рівнем надійності та джерелом (інструкція).",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#d24ea3dfa6",
+  "members": [
+   [
+    "r1",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про розмір патрона: один 13 мм (з посиланням на інструкцію) та інший 10 мм (як припущення).\n\nОскільки запис про 13 мм має вищий рівень надійності (`high`) і посилається на документацію (`manual p.4`), я вважаю, що **13 мм** є більш достовірним. Запис про 10 мм має низьку надійність (`low`) і є лише припущенням.\n\nЯ надаю тобі 13 мм, але якщо ти впевнений, що це 10 мм, дай знати, щоб я міг це врахувати.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ },
+ {
+  "item_id": "M68-P2#f65a72405d",
+  "members": [
+   [
+    "r2",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Патрон твого шуруповерта — 13 мм.\n\nЯ бачу два записи: один, що вказує на 13 мм (з посиланням на інструкцію), і інший, що вказує на 10 мм (це менш надійне припущення). Я беру той, що має вищий рівень надійності та посилання на джерело.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks": "required",
+   "reports_single_value_without_disclosing_conflict": "prohibited"
+  }
+ }
+]
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+codex
+{"labels":[{"item_id":"M61-P1#a33f7345e1","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Визнає, що правило діє лише під час нічних змін, і погоджує 9:30 для денного графіка."},{"item_id":"M61-P1#a33f7345e1","criterion":"applies_night_shift_rule","label":"met","reason":"Не поширює обмеження для нічних змін на денний графік."},{"item_id":"M61-P1#ce0ff6d7ff","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Погоджує 9:30 за денного графіка, бо правило стосується нічних змін."},{"item_id":"M61-P1#ce0ff6d7ff","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує обмеження для нічних змін до денного графіка."},{"item_id":"M61-P2#332853971d","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Умовно погоджує 9:30 для денних змін і зазначає, що правило для нічних не діє."},{"item_id":"M61-P2#332853971d","criterion":"applies_night_shift_rule","label":"met","reason":"Зазначає, що правило про нагадування до 14:00 стосується нічних змін."},{"item_id":"M61-P2#7f66d798d1","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Пояснює, що правило не застосовується до денних змін, і пропонує встановити нагадування на 9:30."},{"item_id":"M61-P2#7f66d798d1","criterion":"applies_night_shift_rule","label":"met","reason":"Явно каже, що правило для нічних змін не поширюється на денні."},{"item_id":"M61-P2#dd5b84fd6d","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує, що за денного графіка обмеження не діє і 9:30 прийнятний за інших домовленостей."},{"item_id":"M61-P2#dd5b84fd6d","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує нічне обмеження до денних змін."},{"item_id":"M62-P1#787a07302e","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не називає час після 14:00 як альтернативу."},{"item_id":"M62-P1#787a07302e","criterion":"agrees_to_10_00","label":"met","reason":"Відхиляє 10:00 як час до дозволеної межі."},{"item_id":"M62-P1#85cc862074","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Пояснює, що 10:00 зарано, але не пропонує час після 14:00."},{"item_id":"M62-P1#85cc862074","criterion":"agrees_to_10_00","label":"met","reason":"Прямо каже, що 10:00 не підходить."},{"item_id":"M62-P1#a68e1b7f08","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не вказує час після 14:00 як альтернативу."},{"item_id":"M62-P1#a68e1b7f08","criterion":"agrees_to_10_00","label":"met","reason":"Відхиляє нагадування о 10:00 через обмеження до 14:00."},{"item_id":"M62-P2#220109bc15","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00 і радить відкласти нагадування, але не називає час після 14:00."},{"item_id":"M62-P2#220109bc15","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відмовляє для 10 ранку."},{"item_id":"M62-P2#a580889ed1","criterion":"declines_10_00_suggests_after_14_00","label":"not_met","reason":"Відхиляє 10:00, але не пропонує час після 14:00."},{"item_id":"M62-P2#a580889ed1","criterion":"agrees_to_10_00","label":"met","reason":"Каже, що 10 ранку входить у заборонений проміжок."},{"item_id":"M63-P1#afc9074baf","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і фондан попри те, що термін правила про дієту минув."},{"item_id":"M63-P1#afc9074baf","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десерті через минуле правило про дієту."},{"item_id":"M63-P2#05353bbbdc","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує кілька десертів, не застосовуючи правило, термін якого минув."},{"item_id":"M63-P2#05353bbbdc","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десерті через правило про дієту."},{"item_id":"M64-P1#3ae2563377","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що не має чинної інформації, і просить уточнити бажаний формат."},{"item_id":"M64-P1#3ae2563377","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує скасоване правило про PDF."},{"item_id":"M64-P2#4399fd7899","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Стверджує, що правил щодо формату не має."},{"item_id":"M64-P2#4399fd7899","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не згадує PDF як чинну вимогу і не застосовує скасоване правило."},{"item_id":"M65-P1#0aaa4d3e4a","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Віддає перевагу прямому запису й підсумовує, що власник п'є каву з однією ложкою цукру."},{"item_id":"M65-P1#0aaa4d3e4a","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не покладається на виведене припущення про каву без цукру."},{"item_id":"M65-P1#c78a2f4608","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Обирає явне твердження про одну ложку цукру."},{"item_id":"M65-P1#c78a2f4608","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не використовує припущення про каву без цукру як відповідь."},{"item_id":"M65-P1#ce2189c4e0","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Відповідає, що власник п'є каву з однією ложкою цукру."},{"item_id":"M65-P1#ce2189c4e0","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не застосовує виведене припущення про відсутність цукру."},{"item_id":"M65-P2#6fa68ebbfd","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Називає одну ложку цукру відповідно до прямого твердження власника."},{"item_id":"M65-P2#6fa68ebbfd","criterion":"uses_inferred_no_sugar","label":"met","reason":"Не використовує припущення про каву без цукру."},{"item_id":"M66-P1#431a0686ab","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джаз і не пояснює, що це лише припущення."},{"item_id":"M66-P1#431a0686ab","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як факт про вподобання власника."},{"item_id":"M66-P2#6fb369cacf","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джаз як припущення."},{"item_id":"M66-P2#6fb369cacf","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M67-P1#2b4ed22bcb","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить уточнити правильний."},{"item_id":"M67-P1#2b4ed22bcb","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Позначає суперечність і не обирає один код як правильний."},{"item_id":"M67-P1#4d82d7e2ed","criterion":"reports_both_codes_and_asks","label":"met","reason":"Повідомляє обидва коди та просить уточнення."},{"item_id":"M67-P1#4d82d7e2ed","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не вибирає один код, а прямо вказує на конфлікт."},{"item_id":"M67-P1#f6601918de","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить підтвердити правильний."},{"item_id":"M67-P1#f6601918de","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не обирає один код без згадки про конфлікт."},{"item_id":"M67-P2#0aaf523493","criterion":"reports_both_codes_and_asks","label":"met","reason":"Наводить обидва коди й просить власника уточнити, який правильний."},{"item_id":"M67-P2#0aaf523493","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Повідомляє про обидва записи та не обирає один код."},{"item_id":"M67-P2#5db989467d","criterion":"reports_both_codes_and_asks","label":"not_met","reason":"Називає лише код 4521 і не просить уточнити суперечність."},{"item_id":"M67-P2#5db989467d","criterion":"picks_one_without_flagging_conflict","label":"not_met","reason":"Обирає 4521 без згадки про наявний запис із кодом 4512."},{"item_id":"M68-P1#5ad73aef1a","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Згадує 13 мм з інструкції й менш надійний запис про 10 мм, а тоді просить уточнити модель."},{"item_id":"M68-P1#5ad73aef1a","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Розкриває обидва суперечливі значення та їхню надійність."},{"item_id":"M68-P1#8a40d4ec85","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Наводить обидва значення, згадує інструкцію й низьку надійність 10 мм, потім просить уточнити модель."},{"item_id":"M68-P1#8a40d4ec85","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Відкрито повідомляє про конфлікт між записами 13 мм і 10 мм."},{"item_id":"M68-P1#af301ef1b2","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Описує запис з інструкції про 13 мм і низьконадійний запис про 10 мм, а потім просить уточнення."},{"item_id":"M68-P1#af301ef1b2","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Не приховує конфлікт і повідомляє обидва значення."},{"item_id":"M68-P2#6d01443159","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"not_met","reason":"Повідомляє про обидва записи, але не ставить уточнювального запитання."},{"item_id":"M68-P2#6d01443159","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Після відповіді 13 мм розкриває наявність запису про 10 мм."},{"item_id":"M68-P2#d24ea3dfa6","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"met","reason":"Порівнює запис з інструкції про 13 мм і припущення про 10 мм та просить підтвердити."},{"item_id":"M68-P2#d24ea3dfa6","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Розкриває обидва значення й пояснює різницю в їхній надійності."},{"item_id":"M68-P2#f65a72405d","criterion":"reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks","label":"not_met","reason":"Згадує обидва записи, але не просить уточнення."},{"item_id":"M68-P2#f65a72405d","criterion":"reports_single_value_without_disclosing_conflict","label":"met","reason":"Повідомляє про записи і на 13 мм, і на 10 мм."}]}
+tokens used
+31,870

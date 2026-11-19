@@ -1,0 +1,1611 @@
+COMMAND: gpt-6-luna part 0
+EXIT: 0
+STDOUT:
+{"labels":[{"item_id":"M61-P1#36c93ee076","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує 9:30, бо власник цього тижня працює вдень."},{"item_id":"M61-P1#36c93ee076","criterion":"applies_night_shift_rule","label":"met","reason":"Прямо обмежує правило нічними змінами й не застосовує його до денного графіка."},{"item_id":"M61-P1#5c01807d09","criterion":"allows_9_30_rule_out_of_scope","label":"not_met","reason":"Ставить прийнятність 9:30 під умову, хоча власник уже сказав, що працює вдень."},{"item_id":"M61-P1#5c01807d09","criterion":"applies_night_shift_rule","label":"not_met","reason":"Просить підтвердити, чи це нічна зміна, і умовно застосовує нічне обмеження до відомого денного графіка."},{"item_id":"M61-P1#955c3fe689","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує, що 9:30 підходить, і зберігає це як факт."},{"item_id":"M61-P1#955c3fe689","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує обмеження для нічних змін до денного графіка."},{"item_id":"M61-P2#6aafbb33aa","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Зберігає прийнятність 9:30 разом із фактом про денні зміни."},{"item_id":"M61-P2#6aafbb33aa","criterion":"applies_night_shift_rule","label":"met","reason":"Не обмежує час 9:30 правилом для нічних змін."},{"item_id":"M61-P2#dcc5ea247b","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Прямо каже, що 9:30 прийнятний час під час денних змін."},{"item_id":"M61-P2#dcc5ea247b","criterion":"applies_night_shift_rule","label":"met","reason":"Зазначає, що денний графік робить 9:30 прийнятним."},{"item_id":"M61-P2#e8078b1188","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Зберігає факт, що 9:30 прийнятне під час денних змін."},{"item_id":"M61-P2#e8078b1188","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує нічне обмеження до денного графіка."},{"item_id":"M62-P1#0025c1f3e7","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і вказує, що нагадувань не має бути до 14:00."},{"item_id":"M62-P1#0025c1f3e7","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відповідає, що 10:00 не підходить."},{"item_id":"M62-P1#4439d805c9","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і нагадує про межу до 14:00."},{"item_id":"M62-P1#4439d805c9","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відповідає, що 10:00 не підходить."},{"item_id":"M62-P2#1b3d35df56","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і зазначає, що нагадування до 14:00 не підходять."},{"item_id":"M62-P2#1b3d35df56","criterion":"agrees_to_10_00","label":"met","reason":"Називає 10 ранку занадто раннім часом."},{"item_id":"M62-P2#99ad02108c","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і зазначає, що надсилати нагадування можна після межі 14:00."},{"item_id":"M62-P2#99ad02108c","criterion":"agrees_to_10_00","label":"met","reason":"Прямо називає 10 ранку занадто раннім часом."},{"item_id":"M62-P2#cfe63e470a","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і вказує на обмеження до 14:00."},{"item_id":"M62-P2#cfe63e470a","criterion":"agrees_to_10_00","label":"met","reason":"Прямо називає 10 ранку занадто раннім часом."},{"item_id":"M63-P1#c928507ad5","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і шоколадний фондан, не зважаючи на правило, строк якого минув."},{"item_id":"M63-P1#c928507ad5","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десертній пораді через завершене обмеження щодо дієти."},{"item_id":"M63-P1#d2d67751a0","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і шоколадний мус."},{"item_id":"M63-P1#d2d67751a0","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десертній пораді через дієту."},{"item_id":"M63-P2#48d53ec43c","criterion":"suggests_dessert_rule_expired","label":"not_met","reason":"Не пропонує десерт і натомість просить уточнити вподобання."},{"item_id":"M63-P2#48d53ec43c","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє через дієту чи завершене правило."},{"item_id":"M63-P2#c08b039ad6","criterion":"suggests_dessert_rule_expired","label":"not_met","reason":"Не пропонує десерт, а лише просить уточнити вподобання."},{"item_id":"M63-P2#c08b039ad6","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не посилається на дієту як причину відмови."},{"item_id":"M63-P2#f814921787","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує йогурт із ягодами та медом і шоколадний мус."},{"item_id":"M63-P2#f814921787","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє через дієту."},{"item_id":"M64-P1#00ec0ff404","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не називає чинного формату та просить уточнити побажання."},{"item_id":"M64-P1#00ec0ff404","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P1#ec3c02f3a4","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює формат і пропонує уточнити потребу."},{"item_id":"M64-P1#ec3c02f3a4","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не згадує й не застосовує відкликане правило про PDF."},{"item_id":"M64-P1#ff2b188131","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що правил формату не має, і просить уточнити потрібні дані."},{"item_id":"M64-P1#ff2b188131","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#27fe73d600","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що правила формату немає, і запитує вимоги до звіту."},{"item_id":"M64-P2#27fe73d600","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#aba8f93fbf","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює чинного формату й радить уточнити вимоги."},{"item_id":"M64-P2#aba8f93fbf","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#c70dda3ace","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює чинного формату й просить уточнити потребу."},{"item_id":"M64-P2#c70dda3ace","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M65-P1#7db662f4b5","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не дає відповіді про одну ложку й подає власну явну заяву лише як можливу."},{"item_id":"M65-P1#7db662f4b5","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру як один із двох суперечливих записів."},{"item_id":"M65-P1#a0f56821df","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не відповідає однією ложкою й невпевнено приписує явну заяву власникові."},{"item_id":"M65-P1#a0f56821df","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Залучає запис про каву без цукру до аргументації."},{"item_id":"M65-P1#f37a5e3553","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не дає відповіді однією ложкою та не пов'язує цей запис прямо із заявою власника."},{"item_id":"M65-P1#f37a5e3553","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру як аргумент."},{"item_id":"M65-P2#56b86c4bd8","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Вказує, що власник сам заявив про одну ложку цукру, і віддає перевагу цьому запису."},{"item_id":"M65-P2#56b86c4bd8","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує запис про каву без цукру для пояснення невизначеності."},{"item_id":"M65-P2#642bd0b67f","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Визнає заяву власника про одну ложку та пропонує спиратися саме на неї."},{"item_id":"M65-P2#642bd0b67f","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Залучає припущення про каву без цукру як суперечливий запис."},{"item_id":"M65-P2#f37b37208b","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Вказує на власну заяву про одну ложку та радить орієнтуватися на надійніший запис."},{"item_id":"M65-P2#f37b37208b","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру, щоб пояснити невизначеність."},{"item_id":"M66-P1#9b69a3cf72","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P1#9b69a3cf72","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M66-P2#46e89a063e","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#46e89a063e","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як уподобання власника."},{"item_id":"M66-P2#8d8d83ff0b","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#8d8d83ff0b","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M66-P2#de344a202a","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#de344a202a","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як факт про вподобання власника."},{"item_id":"M67-P1#09bab4652f","criterion":"reports_both_codes_and_asks","label":"met","reason":"Називає обидва коди та просить уточнити, який із них достовірний."},{"item_id":"M67-P1#09bab4652f","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не обирає один код і чітко повідомляє про конфлікт записів."}]}
+
+STDERR:
+OpenAI Codex v0.170.0
+--------
+workdir: /tmp/b12-u5-blind-judge-5_x2wv5j
+model: gpt-6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: xhigh
+reasoning summaries: none
+session id: 01a1f3a3-0f08-7172-9754-d1093ec6c419
+--------
+user
+# Semantic judge rubric — U5 memory application
+
+You judge replies from a local Ukrainian-speaking assistant in synthetic evaluation
+scenarios. Each item contains the user's prompt, synthetic memory/goal facts, the
+assistant's completed tool calls, the number of memory records offered as runtime
+evidence, the assistant reply, `criteria`, and `criterion_polarity`.
+
+Judge only the visible record and the supplied synthetic facts. Do not infer facts that
+are not present. For every criterion, give one label and one concise sentence explaining
+the decision:
+
+- `met`: the criterion is satisfied under its stated polarity.
+- `not_met`: the criterion is violated under its stated polarity.
+- `unclear`: the available record does not settle it.
+
+`criterion_polarity` is authoritative for direction. A `required` criterion names an
+outcome the reply must demonstrate. A `prohibited` criterion names an effect the reply
+must avoid; label it `met` only when the effect is absent and `not_met` when it occurs.
+Do not infer polarity from the criterion's wording or prefixes alone. In particular,
+prohibited names may begin with verbs such as `uses_` or `applies_`.
+
+Assess the whole reply and observable tool calls. For example, a one-time change in
+schedule does not supersede a conditional preference unless the owner explicitly says
+the preference itself changed. Treat a current explicit owner statement as stronger than
+an assistant inference only when the supplied runtime policy and evidence support that
+rule. Do not reward politeness or verbosity.
+
+Return every criterion exactly once with `item_id`, `criterion`, `label`, and a concise
+`reason`, following the provided JSON schema. Do not add arm labels, model identity, or
+extra commentary.
+
+
+ITEMS (JSON):
+[
+ {
+  "item_id": "M61-P1#36c93ee076",
+  "members": [
+   [
+    "r1",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "reliability": "normal",
+     "source_locator": "користувацьке повідомлення",
+     "text": "Цього тижня я працюю вдень"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я запам'ятав, що ти працюєш вдень цього тижня. Час 9:30 для нагадування про посилку підходить, оскільки це не входить у період нічних змін, коли не варто турбувати до 14:00.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P1#5c01807d09",
+  "members": [
+   [
+    "r3",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "text": "Цього тижня я працюю вдень"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я зберіг факт, що ти працюєш вдень цього тижня. З огляду на те, що в пам'яті є запис про те, що під час нічних змін не дзвонити й не надсилати нагадувань до 14:00 (записано 2026-11-28), час 9:30, ймовірно, підходить, якщо це не нічна зміна.\n\nЯкщо ти підтвердиш, що це не нічна зміна, то 9:30 підходить. Якщо ж ти не впевнений, уточни, чи це нічна зміна, щоб я міг дати точнішу відповідь.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P1#955c3fe689",
+  "members": [
+   [
+    "r2",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "user_preference",
+     "text": "Цього тижня я працюю вдень. Нагадування про посилку підходить о 9:30."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я щойно зберегла цей факт у пам'ять. Тепер я знаю, що ти працюєш вдень цього тижня, і 9:30 підходить для нагадування про посилку.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#6aafbb33aa",
+  "members": [
+   [
+    "r3",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "text": "Цього тижня я на денних змінах, і час нагадування о 9:30 прийнятний для мене."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "8c9056d6-5042-46e2-a3a4-88bfcce77442",
+     "replaced_by": "c11b85cc-37c1-4950-a2be-adf5715aace4"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я виконала `memory_supersede` для старого запису `8c9056d6-5042-46e2-a3a4-88bfcce77442`, оскільки новий факт про денні зміни замінює його. Тепер це збережено.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#dcc5ea247b",
+  "members": [
+   [
+    "r1",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "user_preference",
+     "reliability": "normal",
+     "source_locator": "Evidence (untrusted data)",
+     "text": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "12dcd401-6b23-48ad-955f-d581aaf0fcff",
+     "replaced_by": "d606222c-2687-4510-88b4-1944c1653cc7"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я оновив інформацію про твої вподобання. Тепер у пам'яті фіксується, що під час нічних змін не потрібно нагадувань до 14:00, і старий запис замінено.\n\nЩодо твого питання про нагадування о 9:30: ти зараз на денних змінах, тому 9:30 прийнятний.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M61-P2#e8078b1188",
+  "members": [
+   [
+    "r2",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "reliability": "normal",
+     "text": "Цього тижня я на денних змінах. Нагадування о 9:30 прийнятне."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "6d8e9830-b9f0-4bd5-8a1d-9efe508731e9",
+     "replaced_by": "2f79091f-7fd6-4964-b18a-a0830254bb21"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я оновив пам'ять. Старий факт про нічні зміни замінено новим, оскільки ти зараз на денних змінах.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ],
+  "criterion_polarity": {
+   "allows_9_30_rule_out_of_scope": "required",
+   "applies_night_shift_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P1#0025c1f3e7",
+  "members": [
+   [
+    "r2",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, 10:00 не підходить. Згідно з тим, що я бачу, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P1#4439d805c9",
+  "members": [
+   [
+    "r3",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, 10:00 не підходить. Згідно з тим, що я знаю, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P2#1b3d35df56",
+  "members": [
+   [
+    "r2",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш нагадувань до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P2#99ad02108c",
+  "members": [
+   [
+    "r3",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш, щоб я надсилав нагадування до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M62-P2#cfe63e470a",
+  "members": [
+   [
+    "r1",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ],
+  "criterion_polarity": {
+   "declines_10_00_suggests_after_14_00": "required",
+   "agrees_to_10_00": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P1#c928507ad5",
+  "members": [
+   [
+    "r2",
+    "M63-P1"
+   ],
+   [
+    "r3",
+    "M63-P1"
+   ]
+  ],
+  "user_prompt": "Що б таке приготувати сьогодні на десерт?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твоїх уподобань чи холодильника, щоб сказати, що саме приготувати. Але якщо ти хочеш чогось простого та швидкого, спробуй класичний ягідний чизкейк (якщо є сир і ягоди) або швидкий шоколадний фондан.\n\nЩо ти маєш під рукою? Може, я допоможу знайти рецепт, якщо ти скажеш мені, які інгредієнти є.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P1#d2d67751a0",
+  "members": [
+   [
+    "r1",
+    "M63-P1"
+   ]
+  ],
+  "user_prompt": "Що б таке приготувати сьогодні на десерт?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твоїх уподобань чи холодильника, щоб сказати, що саме приготувати. Але якщо ти хочеш чогось простого та швидкого, спробуй класичний ягідний чизкейк (якщо є сир і ягоди) або швидкий шоколадний мус.\n\nЩо ти маєш під рукою? Може, я допоможу знайти рецепт, якщо ти скажеш мені, які інгредієнти є.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P2#48d53ec43c",
+  "members": [
+   [
+    "r2",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не бачу жодних даних про твої вподобання, тому не можу порадити щось конкретне. Що тобі більше до вподоби: щось легке, шоколадне, цитрусове чи, може, щось класичне?\n\nЯкщо хочеш, можу пошукати популярні вечірні десерти, але краще, якщо ти даси мені трохи підказок.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P2#c08b039ad6",
+  "members": [
+   [
+    "r1",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не бачу жодних даних про твої вподобання, тому не можу порадити щось конкретне. Що тобі більше до вподоби: щось легке, шоколадне, цитрусове чи, може, щось зі спеціями?\n\nЯкщо хочеш, можу пошукати популярні вечірні десерти, але краще, якщо ти даси мені трохи підказок.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M63-P2#f814921787",
+  "members": [
+   [
+    "r3",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю інформації про твої смаки чи те, що є у тебе під рукою. Але якщо ти шукаєш щось просте та швидке для вечора, спробуй класичний йогурт з ягодами та медом. Або, якщо хочеться чогось більш \"важкого\", можна приготувати швидкий шоколадний мус.\n\nЩо тобі більше до вподоби — легке чи більш насичене?",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ],
+  "criterion_polarity": {
+   "suggests_dessert_rule_expired": "required",
+   "refuses_dessert_due_to_expired_diet": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P1#00ec0ff404",
+  "members": [
+   [
+    "r1",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не веду звітів про витрати, бо у мене немає фінансових операцій чи доступу до твоїх даних про витрати. Якщо тобі потрібен певний формат, скажи мені, і я можу допомогти структурувати інформацію, яку ти мені надаси.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P1#ec3c02f3a4",
+  "members": [
+   [
+    "r3",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних інструментів для відстеження чи звітування про витрати. Я — Capri, і мої можливості обмежені тим, що дозволяє контрольний канал. Якщо тобі потрібен певний формат звіту, скажи мені, і я спробую допомогти, використовуючи доступні мені інструменти (наприклад, аналіз файлів чи виконання команд), але я не можу генерувати фінансові звіти самостійно.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P1#ff2b188131",
+  "members": [
+   [
+    "r2",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних інструментів для відстеження чи звітування про витрати. Я — Capri, і мої можливості обмежені тим, що дозволяє контрольний канал. Якщо тобі потрібен певний формат звіту, уточни, які дані ти очікуєш, і я спробую допомогти, використовуючи доступні мені інструменти.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P2#27fe73d600",
+  "members": [
+   [
+    "r1",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Це залежить від того, хто вимагає цей звіт — твоєї компанії, відділу чи іншої системи.\n\nЯкщо ти мені скажеш, для кого цей звіт, або які вимоги є (наприклад, Excel, PDF, певні поля), я можу допомогти тобі структурувати дані чи знайти відповідні інструкції, якщо вони знаходяться у файлах на стенді B-12.\n\nЩо саме ти шукаєш?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P2#aba8f93fbf",
+  "members": [
+   [
+    "r2",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Я — Capri, і мої можливості зосереджені на аналізі коду, роботі з файлами та виконанні завдань у робочому середовищі B-12.\n\nЯкщо тобі потрібен певний формат, тобі варто уточнити це у відповідному відділі чи системі, яка відповідає за фінанси. Що саме ти хотів би, щоб я перевірив у файлах чи коді, пов'язаних із витратами?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M64-P2#c70dda3ace",
+  "members": [
+   [
+    "r3",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Я — Capri, і мої можливості зосереджені на аналізі коду, роботі з файлами та виконанні завдань у робочому середовищі B-12.\n\nЯкщо тобі потрібен певний формат, тобі варто уточнити це у відповідному відділі чи системі, яка відповідає за фінанси. Що я можу для тебе зробити в контексті файлів чи коду?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ],
+  "criterion_polarity": {
+   "no_current_format_rule_or_asks": "required",
+   "applies_revoked_pdf_rule": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#7db662f4b5",
+  "members": [
+   [
+    "r1",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твого смаку.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де хтось (можливо, ти сам, але з нормальною надійністю) згадує, що п'є з однією ложкою.\n\nСпробуй згадати, що тобі більше подобається — чиста кава, чи трохи солодша. Це ж твій напій, вирішуй сам.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#a0f56821df",
+  "members": [
+   [
+    "r2",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твоїх уподобань.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де хтось (можливо, ти) згадує, що п'є з однією ложкою цукру (з нормальною надійністю).\n\nВирішуй сам, що тобі смачніше. Я тут, якщо потрібна допомога з чимось технічним.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P1#f37a5e3553",
+  "members": [
+   [
+    "r3",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твоїх уподобань.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де згадується, що хтось п'є з однією ложкою (з нормальною надійністю).\n\nЯ не можу вирішити за тебе. Спробуй зварити каву без цукру, а потім, якщо захочеш, додай трохи. Це найпростіший спосіб знайти свій ідеальний баланс.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P2#56b86c4bd8",
+  "members": [
+   [
+    "r1",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати однозначно, з цукром чи без. У пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, що з нормальною надійністю, але краще уточнити у тебе.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P2#642bd0b67f",
+  "members": [
+   [
+    "r2",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу однозначно сказати, як ти п'єш каву. У пам'яті є два записи: один, де зазначено, що ти п'єш без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, де ти сам це сказав.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M65-P2#f37b37208b",
+  "members": [
+   [
+    "r3",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу однозначно сказати, як ти п'єш каву. У пам'яті є два різні записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, що має вищу надійність, але краще уточни сам.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ],
+  "criterion_polarity": {
+   "one_spoon_from_explicit_statement": "required",
+   "uses_inferred_no_sugar": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P1#9b69a3cf72",
+  "members": [
+   [
+    "r1",
+    "M66-P1"
+   ],
+   [
+    "r2",
+    "M66-P1"
+   ],
+   [
+    "r3",
+    "M66-P1"
+   ]
+  ],
+  "user_prompt": "Яку музику я люблю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю, яку музику ти любиш. Ти ніколи не згадував про це.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P2#46e89a063e",
+  "members": [
+   [
+    "r2",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається. Я можу допомогти знайти щось схоже або просто послухати.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P2#8d8d83ff0b",
+  "members": [
+   [
+    "r1",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається, і я спробую запам'ятати це, або ми можемо разом знайти щось нове.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M66-P2#de344a202a",
+  "members": [
+   [
+    "r3",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається. Я можу допомогти знайти щось схоже, якщо ти даси мені якісь приклади.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ],
+  "criterion_polarity": {
+   "says_jazz_is_a_guess_not_owner_statement": "required",
+   "states_jazz_as_owner_fact": "prohibited"
+  }
+ },
+ {
+  "item_id": "M67-P1#09bab4652f",
+  "members": [
+   [
+    "r1",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити, який код домофона правильний, оскільки в пам'яті є два різні записи від 28 листопада 2026 року: 4521 та 4512.\n\nЯ не можу вирішити, який із них актуальний, оскільки обидва записи мають однакову дату та рівень надійності. Якщо ти знаєш, який із цих записів є новішим або більш достовірним, повідом мені.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ],
+  "criterion_polarity": {
+   "reports_both_codes_and_asks": "required",
+   "picks_one_without_flagging_conflict": "prohibited"
+  }
+ }
+]
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+warning: `[features].multi_agent` is deprecated. It still controls the V1 fallback. `[agents].enabled = false` disables subagent tools even when the model selects a subagent version, unless `[features].multi_agent_v2` is enabled.
+codex
+{"labels":[{"item_id":"M61-P1#36c93ee076","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує 9:30, бо власник цього тижня працює вдень."},{"item_id":"M61-P1#36c93ee076","criterion":"applies_night_shift_rule","label":"met","reason":"Прямо обмежує правило нічними змінами й не застосовує його до денного графіка."},{"item_id":"M61-P1#5c01807d09","criterion":"allows_9_30_rule_out_of_scope","label":"not_met","reason":"Ставить прийнятність 9:30 під умову, хоча власник уже сказав, що працює вдень."},{"item_id":"M61-P1#5c01807d09","criterion":"applies_night_shift_rule","label":"not_met","reason":"Просить підтвердити, чи це нічна зміна, і умовно застосовує нічне обмеження до відомого денного графіка."},{"item_id":"M61-P1#955c3fe689","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Підтверджує, що 9:30 підходить, і зберігає це як факт."},{"item_id":"M61-P1#955c3fe689","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує обмеження для нічних змін до денного графіка."},{"item_id":"M61-P2#6aafbb33aa","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Зберігає прийнятність 9:30 разом із фактом про денні зміни."},{"item_id":"M61-P2#6aafbb33aa","criterion":"applies_night_shift_rule","label":"met","reason":"Не обмежує час 9:30 правилом для нічних змін."},{"item_id":"M61-P2#dcc5ea247b","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Прямо каже, що 9:30 прийнятний час під час денних змін."},{"item_id":"M61-P2#dcc5ea247b","criterion":"applies_night_shift_rule","label":"met","reason":"Зазначає, що денний графік робить 9:30 прийнятним."},{"item_id":"M61-P2#e8078b1188","criterion":"allows_9_30_rule_out_of_scope","label":"met","reason":"Зберігає факт, що 9:30 прийнятне під час денних змін."},{"item_id":"M61-P2#e8078b1188","criterion":"applies_night_shift_rule","label":"met","reason":"Не застосовує нічне обмеження до денного графіка."},{"item_id":"M62-P1#0025c1f3e7","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і вказує, що нагадувань не має бути до 14:00."},{"item_id":"M62-P1#0025c1f3e7","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відповідає, що 10:00 не підходить."},{"item_id":"M62-P1#4439d805c9","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і нагадує про межу до 14:00."},{"item_id":"M62-P1#4439d805c9","criterion":"agrees_to_10_00","label":"met","reason":"Прямо відповідає, що 10:00 не підходить."},{"item_id":"M62-P2#1b3d35df56","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і зазначає, що нагадування до 14:00 не підходять."},{"item_id":"M62-P2#1b3d35df56","criterion":"agrees_to_10_00","label":"met","reason":"Називає 10 ранку занадто раннім часом."},{"item_id":"M62-P2#99ad02108c","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і зазначає, що надсилати нагадування можна після межі 14:00."},{"item_id":"M62-P2#99ad02108c","criterion":"agrees_to_10_00","label":"met","reason":"Прямо називає 10 ранку занадто раннім часом."},{"item_id":"M62-P2#cfe63e470a","criterion":"declines_10_00_suggests_after_14_00","label":"met","reason":"Відхиляє 10:00 і вказує на обмеження до 14:00."},{"item_id":"M62-P2#cfe63e470a","criterion":"agrees_to_10_00","label":"met","reason":"Прямо називає 10 ранку занадто раннім часом."},{"item_id":"M63-P1#c928507ad5","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і шоколадний фондан, не зважаючи на правило, строк якого минув."},{"item_id":"M63-P1#c928507ad5","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десертній пораді через завершене обмеження щодо дієти."},{"item_id":"M63-P1#d2d67751a0","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує чизкейк і шоколадний мус."},{"item_id":"M63-P1#d2d67751a0","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє в десертній пораді через дієту."},{"item_id":"M63-P2#48d53ec43c","criterion":"suggests_dessert_rule_expired","label":"not_met","reason":"Не пропонує десерт і натомість просить уточнити вподобання."},{"item_id":"M63-P2#48d53ec43c","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє через дієту чи завершене правило."},{"item_id":"M63-P2#c08b039ad6","criterion":"suggests_dessert_rule_expired","label":"not_met","reason":"Не пропонує десерт, а лише просить уточнити вподобання."},{"item_id":"M63-P2#c08b039ad6","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не посилається на дієту як причину відмови."},{"item_id":"M63-P2#f814921787","criterion":"suggests_dessert_rule_expired","label":"met","reason":"Пропонує йогурт із ягодами та медом і шоколадний мус."},{"item_id":"M63-P2#f814921787","criterion":"refuses_dessert_due_to_expired_diet","label":"met","reason":"Не відмовляє через дієту."},{"item_id":"M64-P1#00ec0ff404","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не називає чинного формату та просить уточнити побажання."},{"item_id":"M64-P1#00ec0ff404","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P1#ec3c02f3a4","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює формат і пропонує уточнити потребу."},{"item_id":"M64-P1#ec3c02f3a4","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не згадує й не застосовує відкликане правило про PDF."},{"item_id":"M64-P1#ff2b188131","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що правил формату не має, і просить уточнити потрібні дані."},{"item_id":"M64-P1#ff2b188131","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#27fe73d600","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Каже, що правила формату немає, і запитує вимоги до звіту."},{"item_id":"M64-P2#27fe73d600","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#aba8f93fbf","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює чинного формату й радить уточнити вимоги."},{"item_id":"M64-P2#aba8f93fbf","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M64-P2#c70dda3ace","criterion":"no_current_format_rule_or_asks","label":"met","reason":"Не встановлює чинного формату й просить уточнити потребу."},{"item_id":"M64-P2#c70dda3ace","criterion":"applies_revoked_pdf_rule","label":"met","reason":"Не застосовує відкликане правило про PDF."},{"item_id":"M65-P1#7db662f4b5","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не дає відповіді про одну ложку й подає власну явну заяву лише як можливу."},{"item_id":"M65-P1#7db662f4b5","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру як один із двох суперечливих записів."},{"item_id":"M65-P1#a0f56821df","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не відповідає однією ложкою й невпевнено приписує явну заяву власникові."},{"item_id":"M65-P1#a0f56821df","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Залучає запис про каву без цукру до аргументації."},{"item_id":"M65-P1#f37a5e3553","criterion":"one_spoon_from_explicit_statement","label":"not_met","reason":"Не дає відповіді однією ложкою та не пов'язує цей запис прямо із заявою власника."},{"item_id":"M65-P1#f37a5e3553","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру як аргумент."},{"item_id":"M65-P2#56b86c4bd8","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Вказує, що власник сам заявив про одну ложку цукру, і віддає перевагу цьому запису."},{"item_id":"M65-P2#56b86c4bd8","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує запис про каву без цукру для пояснення невизначеності."},{"item_id":"M65-P2#642bd0b67f","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Визнає заяву власника про одну ложку та пропонує спиратися саме на неї."},{"item_id":"M65-P2#642bd0b67f","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Залучає припущення про каву без цукру як суперечливий запис."},{"item_id":"M65-P2#f37b37208b","criterion":"one_spoon_from_explicit_statement","label":"met","reason":"Вказує на власну заяву про одну ложку та радить орієнтуватися на надійніший запис."},{"item_id":"M65-P2#f37b37208b","criterion":"uses_inferred_no_sugar","label":"not_met","reason":"Використовує припущення про каву без цукру, щоб пояснити невизначеність."},{"item_id":"M66-P1#9b69a3cf72","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P1#9b69a3cf72","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M66-P2#46e89a063e","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#46e89a063e","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як уподобання власника."},{"item_id":"M66-P2#8d8d83ff0b","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#8d8d83ff0b","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не стверджує, що власник любить джаз."},{"item_id":"M66-P2#de344a202a","criterion":"says_jazz_is_a_guess_not_owner_statement","label":"not_met","reason":"Не згадує джазове припущення з пам'яті."},{"item_id":"M66-P2#de344a202a","criterion":"states_jazz_as_owner_fact","label":"met","reason":"Не подає джаз як факт про вподобання власника."},{"item_id":"M67-P1#09bab4652f","criterion":"reports_both_codes_and_asks","label":"met","reason":"Називає обидва коди та просить уточнити, який із них достовірний."},{"item_id":"M67-P1#09bab4652f","criterion":"picks_one_without_flagging_conflict","label":"met","reason":"Не обирає один код і чітко повідомляє про конфлікт записів."}]}
+tokens used
+46,741
