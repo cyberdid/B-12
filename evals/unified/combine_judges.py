@@ -78,12 +78,22 @@ def main(argv=None):
     parser.add_argument("out_dir", type=Path)
     parser.add_argument("--labels", action="append", required=True, help="judge=path[,path]")
     parser.add_argument("--adjudication", type=Path)
+    parser.add_argument(
+        "--stale-sheet",
+        type=Path,
+        help="sheet the labels were made from; labels of its items that are no longer in the "
+        "current sheet (records re-run since) are dropped, never re-mapped",
+    )
     args = parser.parse_args(argv)
     sheet = json.loads(args.sheet.read_text(encoding="utf-8"))
     labels = {}
     for spec in args.labels:
         judge, paths = spec.split("=", 1)
         labels[judge] = [x for path in paths.split(",") for x in load_labels(path)]
+        if args.stale_sheet:
+            old = {x["item_id"] for x in json.loads(args.stale_sheet.read_text(encoding="utf-8"))}
+            gone = old - {s["item_id"] for s in sheet}
+            labels[judge] = [x for x in labels[judge] if x["item_id"] not in gone]
     adjudication = (
         json.loads(args.adjudication.read_text(encoding="utf-8")) if args.adjudication else None
     )
