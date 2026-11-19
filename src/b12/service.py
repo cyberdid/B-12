@@ -259,7 +259,9 @@ class Operations:
                         continue
                     actor = runtime.control.resolve_actor(entry["actor_id"])
                     for target in entry["target_ids"]:
-                        if runtime.memory.is_live(target, actor):
+                        # Any stored payload, not only live records: a forgotten record that was
+                        # already superseded would otherwise return as history (ADR-015).
+                        if runtime.memory.has_payload(target, actor):
                             receipt = await runtime.purge.forget(target, actor.id)
                             replayed.append({"target": target, "state": receipt.state})
                 await runtime.purge.resume()

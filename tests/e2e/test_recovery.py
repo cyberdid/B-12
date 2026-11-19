@@ -314,3 +314,34 @@ async def test_failed_migration_rolls_back_by_restoring_snapshot(ops):
     await Operations(settings.state_dir).restore(snapshot["id"], settings)
     restored = open_one()
     assert restored.memory.is_live(record.id, actor)
+
+
+async def test_restore_replays_deletion_of_a_superseded_record(ops, tmp_path):
+    """U4/ADR-015: a forgotten record that was already superseded (stale) must not come back
+    as history next to its replacement after an older snapshot copy is restored."""
+    _, settings, open_one = ops
+    runtime = open_one()
+    actor = runtime.control.create_actor(owner=True, consent=True)
+    old = runtime.memory.remember("старий код замка 1111", actor, event_time="2026-10-01")
+    new = runtime.memory.remember("новий код замка 2222", actor, event_time="2026-11-01")
+    assert runtime.memory.supersede(old.id, actor, replaced_by=new.id)
+    snapshot = runtime.operations.create_snapshot()
+    import shutil
+
+    preserved = tmp_path / "older"
+    shutil.copytree(settings.state_dir / "snapshots" / snapshot["id"], preserved)
+    await runtime.purge.forget(old.id, actor.id)
+    assert runtime.memory.superseded_by_records([new.id], actor) == {}
+    runtime.close()
+    shutil.rmtree(settings.state_dir / "snapshots" / snapshot["id"])
+    shutil.copytree(preserved, settings.state_dir / "snapshots" / snapshot["id"])
+    from b12.service import Operations
+
+    await Operations(settings.state_dir).restore(snapshot["id"], settings)
+    runtime = open_one()
+    try:
+        assert runtime.memory.get(old.id, actor) is None
+        assert runtime.memory.superseded_by_records([new.id], actor) == {}
+        assert runtime.memory.is_live(new.id, actor)
+    finally:
+        runtime.close()

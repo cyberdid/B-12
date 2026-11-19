@@ -518,6 +518,22 @@ class MemoryStore:
                 ).fetchone()
             )
 
+    def has_payload(self, memory_id: str, actor: Actor) -> bool:
+        """Payload-free check for trusted resolvers: the record's content is still stored and
+        not tombstoned, whatever its status (stale/superseded records included)."""
+        try:
+            UUID(memory_id)
+        except (ValueError, TypeError, AttributeError):
+            return False
+        with self._transaction():
+            return bool(
+                self._connection.execute(
+                    """SELECT 1 FROM memories m WHERE id=? AND actor_id=?
+                       AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)""",
+                    (memory_id, actor.id),
+                ).fetchone()
+            )
+
     def remember(
         self,
         text: str,
