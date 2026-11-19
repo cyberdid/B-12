@@ -27,7 +27,7 @@ RUNS=(
 declare -A BRIDGE=([11500]="claude claude-haiku-5-5" [11501]="codex gpt-6-luna")
 
 expected() { python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["scenarios"]))' "$SET"; }
-count() { find "$1" -name '*.json' -path '*/r*/*' 2>/dev/null | wc -l; }
+count() { find "$1" -mindepth 2 -maxdepth 2 -name '*.json' -path "$1/r*/*" 2>/dev/null | wc -l; }
 running() { pgrep -f "run_locked_pilot.sh $SET $1 " >/dev/null; }
 
 for spec in "${RUNS[@]}"; do
