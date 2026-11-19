@@ -1,0 +1,611 @@
+# Blind oracle review — U5 application set v3
+
+# Blind oracle review rubric — U5 application set v3
+
+You review synthetic evaluation scenarios for a local Ukrainian-speaking assistant ("Capri", runtime B-12). They test whether the assistant applies remembered preferences, commitments and facts correctly to a decision: a preference applies only within its condition (`applies_when`) and validity interval; an explicit owner statement outranks an assistant inference (`origin`); a revoked preference (`revoked: true`) no longer applies; a superseded record is history, not current; two current records that disagree are a conflict to report; no record means "I don't know"; cancelled (abandoned) goals must not come back as active; an achieved goal whose evidence was later superseded by a failing result is not done.
+
+Each item has: the class it must test, expected decision, the evaluator-only setup (synthetic memory rows and goals the harness seeds; the model sees only the prompt, plus whatever memory/goal context the runtime gives it), two prompt variants, and the oracle. `metric_tags` say which forbidden effects count as stale-use, over-application or resurrection.
+
+Synthetic clock: 2026-12-01T10:00:00+02:00 (Tuesday). Decision classes: NO_TOOL (answer directly; runtime may supply memory evidence automatically), ASK (clarify first), ACT. `accepted_decisions` lists all acceptable classes.
+
+Judge each family independently. Check:
+1. It tests its class; expected decision fits.
+2. The oracle is correct and unambiguous given the setup (dates and intervals vs the clock, weekday, which record is current). Would a correct assistant fail it, or a wrong one pass?
+3. The two variants are equivalent, natural Ukrainian, and do not leak the answer.
+4. The metric tags are right (a forbidden effect tagged stale_use really is using expired/superseded/revoked/inferred-over-explicit information, etc.).
+
+Verdict per family: `ok`, `minor` (wording; result still valid), `major` (oracle or setup can produce a wrong verdict), `blocker` (cannot measure its class). One-sentence problem and fix for anything not `ok`. Do not invent problems.
+
+
+The material below contains synthetic prompts, evaluator-only setups, and proposed oracles. It contains no model responses or arm labels. Review each family independently using the rubric.
+
+ITEMS (JSON):
+[
+ {
+  "family_id": "M61",
+  "class": "U5-scope-out",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M61-P1",
+   "M61-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "fccc45b1-1659-590b-a498-69cd9537fb0c",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+   "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "allows_9_30_rule_out_of_scope"
+   ],
+   "forbidden_effects": [
+    "applies_night_shift_rule"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "applies_night_shift_rule"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:fccc45b1-1659-590b-a498-69cd9537fb0c"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M62",
+  "class": "U5-scope-in",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M62-P1",
+   "M62-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "f4713691-c146-5b3a-9530-ec7b8debb226",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+   "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "declines_10_00_suggests_after_14_00"
+   ],
+   "forbidden_effects": [
+    "agrees_to_10_00"
+   ],
+   "metric_tags": {
+    "overapplication": [],
+    "stale_use": []
+   },
+   "required_evidence_ids": [
+    "mem:f4713691-c146-5b3a-9530-ec7b8debb226"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M63",
+  "class": "U5-expired",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M63-P1",
+   "M63-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "51941ade-1cd2-50fa-acec-02e29a837265",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що б таке приготувати сьогодні на десерт?",
+   "Порадь якийсь десерт на вечір."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "suggests_dessert_rule_expired"
+   ],
+   "forbidden_effects": [
+    "refuses_dessert_due_to_expired_diet"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "refuses_dessert_due_to_expired_diet"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:51941ade-1cd2-50fa-acec-02e29a837265"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M64",
+  "class": "U5-revoked",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M64-P1",
+   "M64-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "3cfae21f-e88b-582b-a3c4-1c1e2a1a791d",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "У якому форматі ти маєш надсилати мені звіти про витрати?",
+   "Є якесь правило щодо формату звітів про витрати?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_current_format_rule_or_asks"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "applies_revoked_pdf_rule"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "applies_revoked_pdf_rule"
+    ]
+   },
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M65",
+  "class": "U5-explicit-vs-inferred",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M65-P1",
+   "M65-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "e002d07b-6dab-5bcc-827b-f6688b7be403",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "3ea80987-3d41-59c5-9f0b-c64e4adb98a3",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Скільки цукру класти мені в каву?",
+   "Як я п'ю каву — з цукром чи без?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "one_spoon_from_explicit_statement"
+   ],
+   "forbidden_effects": [
+    "uses_inferred_no_sugar"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "uses_inferred_no_sugar"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:3ea80987-3d41-59c5-9f0b-c64e4adb98a3"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M66",
+  "class": "U5-inferred-only",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M66-P1",
+   "M66-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "d728c813-d73e-55bc-b8fc-ff08a992669d",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яку музику я люблю?",
+   "Ти знаєш мою улюблену музику?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "says_jazz_is_a_guess_not_owner_statement"
+   ],
+   "forbidden_effects": [
+    "states_jazz_as_owner_fact"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "states_jazz_as_owner_fact"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:d728c813-d73e-55bc-b8fc-ff08a992669d"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M67",
+  "class": "U5-conflict",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M67-P1",
+   "M67-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "1984addf-95cf-5c84-96ea-b07f1ac2dad7",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "e1d92fb1-6eaa-5fc3-82ce-f1d2d412e311",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Який код домофона в під'їзді?",
+   "Нагадай код від домофона."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_both_codes_and_asks"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "picks_one_without_flagging_conflict"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:1984addf-95cf-5c84-96ea-b07f1ac2dad7",
+    "mem:e1d92fb1-6eaa-5fc3-82ce-f1d2d412e311"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M68",
+  "class": "U5-conflict-reliability",
+  "expected_decision": "ASK",
+  "scenario_ids": [
+   "M68-P1",
+   "M68-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "0e8b9c45-54fe-5e79-8340-9edd54a32b07",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "23a41973-0a23-5656-891e-7681567e0b0b",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+   "Який розмір патрона в мого шуруповерта?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks"
+   ],
+   "accepted_decisions": [
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "reports_single_value_without_disclosing_conflict"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:0e8b9c45-54fe-5e79-8340-9edd54a32b07",
+    "mem:23a41973-0a23-5656-891e-7681567e0b0b"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "ASK"
+  }
+ }
+]
+
+Return exactly one JSON object with a `reviews` array. Include one object for every family_id in this batch, in the same order, with fields `family_id`, `verdict` (`ok`, `minor`, `major`, or `blocker`), `problem`, and `fix`. For `ok`, use `problem: "No issue."` and `fix: "No change."`. For non-ok items, state one concise problem and a concrete fix. Do not add commentary or markdown fences.

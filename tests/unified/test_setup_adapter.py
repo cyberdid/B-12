@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PATH = ROOT / "evals/unified/setup_adapter.py"
 FIXTURES = ROOT / "evals/unified/draft_fixtures/u2-u3-v4"
 MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
+U5_V3_MANIFEST = ROOT / "evals/unified/scenario_sets/u5-application-v3.json"
 
 
 @pytest.fixture
@@ -159,3 +160,124 @@ def test_recorded_at_becomes_created_at_and_event_time_is_dropped(
         assert record.created_at == "2026-11-28T10:00:00+00:00"
     finally:
         runtime.close()
+
+
+def u5_setup_of(scenario_id):
+    rows = json.loads(U5_V3_MANIFEST.read_text(encoding="utf-8"))["scenarios"]
+    row = next(item for item in rows if item["scenario_id"] == scenario_id)
+    return json.loads((ROOT / row["setup_fixture"]).read_text(encoding="utf-8"))["harness_setup"]
+
+
+def test_scoped_temporal_seed_preserves_scope_and_document_provenance(
+    adapter, tmp_path, profile_settings
+):
+    setup = u5_setup_of("M61-P1")
+    report = adapter.build_runtime(
+        setup, tmp_path / "state", profile_settings, temporal=True, scoped=True
+    )
+    assert report["dropped_fields"] == {}
+
+    runtime = reopen(
+        profile_settings.model_copy(update={"memory_temporal": True, "memory_scoped": True}),
+        tmp_path / "state",
+    )
+    try:
+        actor = runtime.control.resolve_actor(report["actors"]["synthetic-owner"])
+        record = runtime.memory.get(report["memory_ids"][declared(setup, "u61-p1")], actor)
+        assert record.applies_when == "коли власник працює в нічну зміну"
+        assert record.origin == "explicit"
+    finally:
+        runtime.close()
+
+    manual_setup = u5_setup_of("M68-P1")
+    manual_report = adapter.build_runtime(
+        manual_setup, tmp_path / "manual-state", profile_settings, temporal=True, scoped=True
+    )
+    runtime = reopen(
+        profile_settings.model_copy(update={"memory_temporal": True, "memory_scoped": True}),
+        tmp_path / "manual-state",
+    )
+    try:
+        actor = runtime.control.resolve_actor(manual_report["actors"]["synthetic-owner"])
+        manual_id = manual_report["memory_ids"][declared(manual_setup, "u68-r1")]
+        record = runtime.memory.get(manual_id, actor)
+        assert record.reliability == "high"
+        assert record.source_locator == "manual p.4"
+        assert record.temporal_source == "document"
+    finally:
+        runtime.close()
+
+
+def test_revoked_fixture_memory_is_retired_during_seed(adapter, tmp_path, profile_settings):
+    setup = u5_setup_of("M64-P1")
+    report = adapter.build_runtime(
+        setup, tmp_path / "state", profile_settings, temporal=True, scoped=True
+    )
+    assert report["revoked_memories"] == ["u64-p1"]
+    runtime = reopen(profile_settings, tmp_path / "state")
+    try:
+        actor = runtime.control.resolve_actor(report["actors"]["synthetic-owner"])
+        record = runtime.memory.get(report["memory_ids"][declared(setup, "u64-p1")], actor)
+        assert record.status == "stale"
+        assert record.status_reason == "revoked"
+        assert not runtime.memory.is_live(record.id, actor)
+    finally:
+        runtime.close()
+
+
+def test_u5_replacement_can_make_completed_goal_evidence_stale(
+    adapter, tmp_path, profile_settings
+):
+    setup = u5_setup_of("M76-P1")
+    report = adapter.build_runtime(
+        setup, tmp_path / "state", profile_settings, temporal=True, scoped=True
+    )
+    runtime = reopen(profile_settings, tmp_path / "state")
+    try:
+        actor = runtime.control.resolve_actor(report["actors"]["synthetic-owner"])
+        goal_id = report["goal_ids"][declared(setup, "u76-g1", "synthetic_goals", "goal_id")]
+        goal = runtime.goals.get(goal_id, actor.id)
+        old_evidence = report["memory_ids"][declared(setup, "u76-e1")]
+        new_evidence = report["memory_ids"][declared(setup, "u76-e2")]
+        assert goal["status"] == "achieved"
+        assert goal["evidence_ids"] == [old_evidence]
+        assert not runtime.memory.is_live(old_evidence, actor)
+        assert runtime.memory.is_live(new_evidence, actor)
+    finally:
+        runtime.close()
+
+
+def test_every_u5_v3_p1_setup_seeds_without_dropped_memory_fields(
+    adapter, tmp_path, profile_settings
+):
+    rows = json.loads(U5_V3_MANIFEST.read_text(encoding="utf-8"))["scenarios"]
+    seeded = 0
+    for row in rows:
+        if not row["scenario_id"].endswith("P1"):
+            continue
+        setup = json.loads((ROOT / row["setup_fixture"]).read_text(encoding="utf-8"))[
+            "harness_setup"
+        ]
+        report = adapter.build_runtime(
+            setup,
+            tmp_path / row["scenario_id"],
+            profile_settings,
+            temporal=True,
+            scoped=True,
+        )
+        assert report["dropped_fields"] == {}, row["scenario_id"]
+        expected_relations = {
+            (memory["alias"], next(
+                item["alias"]
+                for item in setup.get("synthetic_memory", [])
+                if item["memory_id"] == memory["supersedes"]
+            ))
+            for memory in setup.get("synthetic_memory", [])
+            if memory.get("supersedes")
+        }
+        actual_relations = {
+            (item["by"], item["supersedes"]) for item in report["applied_relations"]
+        }
+        assert actual_relations == expected_relations, row["scenario_id"]
+        seeded += 1
+    assert seeded == 24

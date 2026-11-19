@@ -1,0 +1,58 @@
+{
+  "family_id": "M68",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u68-r1",
+        "applies_when": null,
+        "content": "Патрон шуруповерта — 13 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "0e8b9c45-54fe-5e79-8340-9edd54a32b07",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "high",
+        "source": "synthetic_manual",
+        "source_locator": "manual p.4",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u68-r2",
+        "applies_when": null,
+        "content": "Здається, патрон шуруповерта на 10 мм.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "23a41973-0a23-5656-891e-7681567e0b0b",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "low",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

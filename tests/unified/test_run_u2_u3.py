@@ -8,10 +8,16 @@ from evals.unified.run_u2_u3 import run_scenario
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "evals/unified/scenario_sets/u2-u3-draft-v4.json"
+U5_MANIFEST = ROOT / "evals/unified/scenario_sets/u5-application-v3.json"
 
 
 def row(scenario_id):
     rows = json.loads(MANIFEST.read_text(encoding="utf-8"))["scenarios"]
+    return next(r for r in rows if r["scenario_id"] == scenario_id)
+
+
+def u5_row(scenario_id):
+    rows = json.loads(U5_MANIFEST.read_text(encoding="utf-8"))["scenarios"]
     return next(r for r in rows if r["scenario_id"] == scenario_id)
 
 
@@ -51,6 +57,32 @@ async def test_seeded_memory_evidence_maps_back_to_declared_ids(scripted_ollama,
     assert declared["m08-r2"] in record["evidence_ids"]
     assert declared["m08-r1"] not in record["evidence_ids"]  # superseded, not live
     assert record["seed_report"]["applied_relations"] == [{"supersedes": "m08-r1", "by": "m08-r2"}]
+
+
+async def test_u5_runner_seeds_scoped_temporal_memory_consistently(
+    scripted_ollama, tmp_path
+):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Нагадування о 9:30 може підійти."}]
+
+    record = await asyncio.to_thread(
+        run_scenario,
+        u5_row("M61-P1"),
+        ROOT,
+        base,
+        tmp_path / "work",
+        files_root=tmp_path / "fs",
+        memory_temporal=True,
+        runtime_flags=("memory_scoped",),
+    )
+
+    assert record["status"] == "EXECUTED"
+    assert record["runtime_flags"] == ["memory_scoped"]
+    assert record["memory_temporal"] is True
+    assert record["seed_report"]["dropped_fields"] == {}
+    prompt = json.dumps(state["requests"][0], ensure_ascii=False)
+    assert "applies_when" in prompt
+    assert "власник працює в нічну зміну" in prompt
 
 
 async def test_guest_turn_does_not_receive_owner_private_memory(scripted_ollama, tmp_path):

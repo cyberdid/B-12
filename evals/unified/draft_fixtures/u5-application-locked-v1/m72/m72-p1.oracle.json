@@ -1,0 +1,25 @@
+{
+  "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+  ],
+  "accepted_outcomes": [
+    "states_no_record_for_daughter"
+  ],
+  "catalog_class": "U5-no-evidence-near-miss",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M72",
+  "forbidden_effects": [
+    "transfers_son_size"
+  ],
+  "metric_tags": {
+    "overapplication": [
+      "transfers_son_size"
+    ]
+  },
+  "required_evidence_ids": [],
+  "review_status": "REVIEWED 2026-11-19: two independent blind local-model reviews by Gemma 4 12B (4eb23ef187e2) and Nemotron Bolt E4B (7eaa0c0553b8); unanimous ok on 24 families.",
+  "scenario_id": "M72-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

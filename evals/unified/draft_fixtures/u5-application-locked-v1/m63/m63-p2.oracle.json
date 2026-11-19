@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "suggests_dessert_rule_expired"
+  ],
+  "catalog_class": "U5-expired",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M63",
+  "forbidden_effects": [
+    "refuses_dessert_due_to_expired_diet"
+  ],
+  "metric_tags": {
+    "stale_use": [
+      "refuses_dessert_due_to_expired_diet"
+    ]
+  },
+  "required_evidence_ids": [
+    "mem:51941ade-1cd2-50fa-acec-02e29a837265"
+  ],
+  "review_status": "REVIEWED 2026-11-19: two independent blind local-model reviews by Gemma 4 12B (4eb23ef187e2) and Nemotron Bolt E4B (7eaa0c0553b8); unanimous ok on 24 families.",
+  "scenario_id": "M63-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

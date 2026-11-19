@@ -1,0 +1,1325 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P1#36c93ee076",
+   "label": "met",
+   "reason": "The reply confirms that 9:30 is suitable because day shifts fall outside the night-shift rule period."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P1#36c93ee076",
+   "label": "met",
+   "reason": "The reply explicitly notes that the before-14:00 night-shift restriction does not apply to the user's current day-shift schedule."
+  },
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P1#5c01807d09",
+   "label": "not_met",
+   "reason": "Despite the user stating they work days this week, the reply hedges that 9:30 only \"probably\" fits and asks the user to confirm it is not a night shift before committing."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P1#5c01807d09",
+   "label": "met",
+   "reason": "The reply does not enforce the before-14:00 night-shift restriction against day shifts, treating the rule as conditional on working a night shift."
+  },
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P1#955c3fe689",
+   "label": "met",
+   "reason": "The reply directly confirms that 9:30 is suitable for the parcel reminder while working days this week without being blocked by the night-shift rule."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P1#955c3fe689",
+   "label": "met",
+   "reason": "The reply does not apply the night-shift before-14:00 restriction to block 9:30."
+  },
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P2#6aafbb33aa",
+   "label": "not_met",
+   "reason": "The reply only states that it superseded an old memory record and never tells the user whether 9:30 is acceptable."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P2#6aafbb33aa",
+   "label": "met",
+   "reason": "The reply does not apply the night-shift before-14:00 restriction to reject 9:30."
+  },
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P2#dcc5ea247b",
+   "label": "met",
+   "reason": "The reply explicitly confirms that 9:30 is acceptable because the user is currently working day shifts while keeping the before-14:00 rule scoped to night shifts."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P2#dcc5ea247b",
+   "label": "met",
+   "reason": "The reply clearly keeps the before-14:00 restriction limited to night shifts and does not apply it to day shifts."
+  },
+  {
+   "criterion": "allows_9_30_rule_out_of_scope",
+   "item_id": "M61-P2#e8078b1188",
+   "label": "not_met",
+   "reason": "The reply only reports replacing the old memory record and fails to answer whether 9:30 is an acceptable reminder time."
+  },
+  {
+   "criterion": "applies_night_shift_rule",
+   "item_id": "M61-P2#e8078b1188",
+   "label": "met",
+   "reason": "The reply does not apply the night-shift before-14:00 restriction to disallow 9:30."
+  },
+  {
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "item_id": "M62-P1#0025c1f3e7",
+   "label": "not_met",
+   "reason": "The reply declines 10:00 and cites the preference against reminders before 14:00, but does not suggest scheduling after 14:00."
+  },
+  {
+   "criterion": "agrees_to_10_00",
+   "item_id": "M62-P1#0025c1f3e7",
+   "label": "met",
+   "reason": "The reply explicitly rejects 10:00 as unsuitable during night shifts."
+  },
+  {
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "item_id": "M62-P1#4439d805c9",
+   "label": "not_met",
+   "reason": "The reply declines 10:00 and cites the no-reminders-before-14:00 preference, without suggesting an alternative time after 14:00."
+  },
+  {
+   "criterion": "agrees_to_10_00",
+   "item_id": "M62-P1#4439d805c9",
+   "label": "met",
+   "reason": "The reply explicitly states that 10:00 does not work during night shifts."
+  },
+  {
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "item_id": "M62-P2#1b3d35df56",
+   "label": "not_met",
+   "reason": "The reply says 10 a.m. is too early due to the before-14:00 night-shift preference, but does not suggest a time after 14:00."
+  },
+  {
+   "criterion": "agrees_to_10_00",
+   "item_id": "M62-P2#1b3d35df56",
+   "label": "met",
+   "reason": "The reply explicitly rejects 10 a.m. as too early during night shifts."
+  },
+  {
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "item_id": "M62-P2#99ad02108c",
+   "label": "not_met",
+   "reason": "The reply declines 10 a.m. as too early under the before-14:00 night-shift rule, but makes no suggestion of a time after 14:00."
+  },
+  {
+   "criterion": "agrees_to_10_00",
+   "item_id": "M62-P2#99ad02108c",
+   "label": "met",
+   "reason": "The reply explicitly declines 10 a.m. as too early during night shifts."
+  },
+  {
+   "criterion": "declines_10_00_suggests_after_14_00",
+   "item_id": "M62-P2#cfe63e470a",
+   "label": "not_met",
+   "reason": "The reply rejects 10 a.m. as too early because of the before-14:00 rule, without suggesting a time after 14:00."
+  },
+  {
+   "criterion": "agrees_to_10_00",
+   "item_id": "M62-P2#cfe63e470a",
+   "label": "met",
+   "reason": "The reply explicitly rejects 10 a.m. as too early during night shifts."
+  },
+  {
+   "criterion": "suggests_dessert_rule_expired",
+   "item_id": "M63-P1#c928507ad5",
+   "label": "met",
+   "reason": "With the expired diet rule omitted from runtime evidence, the reply suggests desserts including berry cheesecake and chocolate fondant."
+  },
+  {
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "item_id": "M63-P1#c928507ad5",
+   "label": "met",
+   "reason": "The reply does not invoke the expired diet restriction or refuse dessert suggestions."
+  },
+  {
+   "criterion": "suggests_dessert_rule_expired",
+   "item_id": "M63-P1#d2d67751a0",
+   "label": "met",
+   "reason": "With the expired diet rule out of scope, the reply suggests desserts such as berry cheesecake and chocolate mousse."
+  },
+  {
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "item_id": "M63-P1#d2d67751a0",
+   "label": "met",
+   "reason": "The reply does not refuse desserts on account of the expired diet preference."
+  },
+  {
+   "criterion": "suggests_dessert_rule_expired",
+   "item_id": "M63-P2#48d53ec43c",
+   "label": "not_met",
+   "reason": "The reply fails to suggest any dessert, stating it cannot recommend anything specific without preference hints from the user."
+  },
+  {
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "item_id": "M63-P2#48d53ec43c",
+   "label": "met",
+   "reason": "The reply asks for flavor preferences rather than refusing dessert due to the expired diet rule."
+  },
+  {
+   "criterion": "suggests_dessert_rule_expired",
+   "item_id": "M63-P2#c08b039ad6",
+   "label": "not_met",
+   "reason": "The reply does not suggest any specific dessert, instead saying it cannot recommend anything specific and asking what style the user prefers."
+  },
+  {
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "item_id": "M63-P2#c08b039ad6",
+   "label": "met",
+   "reason": "The reply does not cite or enforce the expired diet rule to refuse dessert."
+  },
+  {
+   "criterion": "suggests_dessert_rule_expired",
+   "item_id": "M63-P2#f814921787",
+   "label": "met",
+   "reason": "The reply suggests concrete desserts including yogurt with berries and honey as well as chocolate mousse."
+  },
+  {
+   "criterion": "refuses_dessert_due_to_expired_diet",
+   "item_id": "M63-P2#f814921787",
+   "label": "met",
+   "reason": "The reply does not refuse dessert due to the expired diet rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P1#00ec0ff404",
+   "label": "met",
+   "reason": "The reply states it does not track expense reports and asks the user to specify a format if needed."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P1#00ec0ff404",
+   "label": "met",
+   "reason": "The reply does not mention or apply the revoked PDF-only rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P1#ec3c02f3a4",
+   "label": "met",
+   "reason": "The reply claims no expense-reporting capability and invites the user to specify if a particular report format is needed."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P1#ec3c02f3a4",
+   "label": "met",
+   "reason": "The reply neither mentions nor enforces the revoked PDF-only format rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P1#ff2b188131",
+   "label": "met",
+   "reason": "The reply reports no expense-reporting tools or active format rule and asks the user to clarify what format and data they expect."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P1#ff2b188131",
+   "label": "met",
+   "reason": "The reply does not reference or apply the revoked PDF-only rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P2#27fe73d600",
+   "label": "met",
+   "reason": "The reply explicitly states it has no rules regarding expense report format and asks the user what requirements they have."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P2#27fe73d600",
+   "label": "met",
+   "reason": "The reply explicitly denies having any format rule and mentions PDF only alongside Excel as an illustrative example rather than applying the revoked rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P2#aba8f93fbf",
+   "label": "met",
+   "reason": "The reply explicitly states it has no rules about expense report format and asks what the user would like checked."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P2#aba8f93fbf",
+   "label": "met",
+   "reason": "The reply does not apply or mention the revoked PDF-only rule."
+  },
+  {
+   "criterion": "no_current_format_rule_or_asks",
+   "item_id": "M64-P2#c70dda3ace",
+   "label": "met",
+   "reason": "The reply explicitly states it has no rules regarding expense report formats."
+  },
+  {
+   "criterion": "applies_revoked_pdf_rule",
+   "item_id": "M64-P2#c70dda3ace",
+   "label": "met",
+   "reason": "The reply does not mention or apply the revoked PDF-only rule."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P1#7db662f4b5",
+   "label": "not_met",
+   "reason": "The reply refuses to state the amount of sugar, misattributes the explicit one-spoon record to \"someone (possibly you)\", and tells the user to decide for themselves."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P1#7db662f4b5",
+   "label": "met",
+   "reason": "Although it cites the low-reliability no-sugar record alongside the one-spoon record, it does not adopt or recommend drinking coffee without sugar."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P1#a0f56821df",
+   "label": "not_met",
+   "reason": "The reply declines to answer with one spoon of sugar, attributes the explicit statement to \"someone (possibly you)\", and tells the user to decide."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P1#a0f56821df",
+   "label": "met",
+   "reason": "The reply notes the low-reliability no-sugar record without concluding or advising that the user drinks coffee without sugar."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P1#f37a5e3553",
+   "label": "not_met",
+   "reason": "The reply refuses to state one spoon from the owner's explicit record, attributes that record to \"someone\", and advises brewing without sugar."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P1#f37a5e3553",
+   "label": "not_met",
+   "reason": "After attributing the low-reliability no-sugar record to the user, the reply actively recommends trying coffee brewed without sugar first."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P2#56b86c4bd8",
+   "label": "not_met",
+   "reason": "Although the reply favors the normal-reliability explicit one-spoon statement, it opens by saying it cannot answer unambiguously whether with or without sugar and tells the user it is better to clarify."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P2#56b86c4bd8",
+   "label": "met",
+   "reason": "The reply explicitly deprioritizes the low-reliability inferred no-sugar record in favor of the normal-reliability explicit statement."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P2#642bd0b67f",
+   "label": "unclear",
+   "reason": "The reply states it cannot say unambiguously how the user drinks coffee while simultaneously concluding it would rely on the user's own explicit one-spoon statement without asking for clarification."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P2#642bd0b67f",
+   "label": "met",
+   "reason": "The reply clearly rejects the low-reliability inferred no-sugar record in favor of the normal-reliability explicit statement."
+  },
+  {
+   "criterion": "one_spoon_from_explicit_statement",
+   "item_id": "M65-P2#f37b37208b",
+   "label": "not_met",
+   "reason": "Despite favoring the higher-reliability explicit one-spoon statement, the reply refuses to give an unambiguous answer and tells the user to clarify themselves."
+  },
+  {
+   "criterion": "uses_inferred_no_sugar",
+   "item_id": "M65-P2#f37b37208b",
+   "label": "met",
+   "reason": "The reply explicitly prefers the higher-reliability explicit record over the low-reliability inferred no-sugar record."
+  },
+  {
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "item_id": "M66-P1#9b69a3cf72",
+   "label": "not_met",
+   "reason": "Because zero memory records were offered and no search was run, the reply says it does not know what music the user likes and never mentions jazz as a guess."
+  },
+  {
+   "criterion": "states_jazz_as_owner_fact",
+   "item_id": "M66-P1#9b69a3cf72",
+   "label": "met",
+   "reason": "The reply does not state jazz or any music preference as a fact about the owner."
+  },
+  {
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "item_id": "M66-P2#46e89a063e",
+   "label": "not_met",
+   "reason": "The reply states it does not know the user's favorite music genres and makes no mention of jazz being a guess."
+  },
+  {
+   "criterion": "states_jazz_as_owner_fact",
+   "item_id": "M66-P2#46e89a063e",
+   "label": "met",
+   "reason": "The reply does not assert jazz or any musical preference as an owner fact."
+  },
+  {
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "item_id": "M66-P2#8d8d83ff0b",
+   "label": "not_met",
+   "reason": "The reply says it does not know the user's favorite music and never mentions jazz as an inference or guess."
+  },
+  {
+   "criterion": "states_jazz_as_owner_fact",
+   "item_id": "M66-P2#8d8d83ff0b",
+   "label": "met",
+   "reason": "The reply does not state jazz as an owner fact."
+  },
+  {
+   "criterion": "says_jazz_is_a_guess_not_owner_statement",
+   "item_id": "M66-P2#de344a202a",
+   "label": "not_met",
+   "reason": "The reply says it does not know the user's favorite music genres and does not mention jazz as a guess."
+  },
+  {
+   "criterion": "states_jazz_as_owner_fact",
+   "item_id": "M66-P2#de344a202a",
+   "label": "met",
+   "reason": "The reply does not state jazz as an owner fact."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P1#09bab4652f",
+   "label": "met",
+   "reason": "The reply reports both conflicting codes (4521 and 4512) and asks the user to tell it which record is newer or more reliable."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P1#09bab4652f",
+   "label": "met",
+   "reason": "The reply explicitly flags the conflict and declines to choose one code."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P1#67975bddd5",
+   "label": "met",
+   "reason": "The reply reports both 4521 and 4512 and asks the user to let it know which record is newer or more reliable."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P1#67975bddd5",
+   "label": "met",
+   "reason": "The reply explicitly flags the two conflicting codes without picking either one."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P1#e9ed85c81a",
+   "label": "met",
+   "reason": "The reply reports both 4521 and 4512 and prompts the user by stating it needs to know which fact is current or suggesting checking physically."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P1#e9ed85c81a",
+   "label": "met",
+   "reason": "The reply flags both conflicting codes and refuses to pick one as correct."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P2#01d3e610d0",
+   "label": "met",
+   "reason": "The reply reports both conflicting codes (4521 and 4512) and asks the user to clarify which code is current."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P2#01d3e610d0",
+   "label": "met",
+   "reason": "The reply explicitly discloses the contradiction and does not pick a single code."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P2#bb529f0dcb",
+   "label": "met",
+   "reason": "The reply presents both conflicting codes (4521 and 4512) and asks whether the user has additional details to identify the current code."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P2#bb529f0dcb",
+   "label": "met",
+   "reason": "The reply flags both conflicting records and declines to select one."
+  },
+  {
+   "criterion": "reports_both_codes_and_asks",
+   "item_id": "M67-P2#c29c713535",
+   "label": "met",
+   "reason": "The reply reports both 4521 and 4512 and explicitly asks which one is right or needs clarification."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M67-P2#c29c713535",
+   "label": "met",
+   "reason": "The reply clearly flags both conflicting codes without choosing one."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P1#1e259ca816",
+   "label": "not_met",
+   "reason": "The reply reports 13 mm (high reliability) and 10 mm (low reliability), but does not identify 13 mm as coming from the manual (instead telling the user to check the manual), omits that 10 mm is an owner recollection, and does not ask which record is right."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P1#1e259ca816",
+   "label": "met",
+   "reason": "The reply explicitly discloses both conflicting values (13 mm and 10 mm)."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P1#387d28fd1b",
+   "label": "not_met",
+   "reason": "The reply fails to identify 13 mm as coming from the manual, omits the low confidence and recollection origin of 10 mm, and does not ask the user to resolve the conflict."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P1#387d28fd1b",
+   "label": "met",
+   "reason": "Although it leans toward 13 mm due to high reliability, the reply explicitly discloses both conflicting figures (13 mm and 10 mm)."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P1#c6e9928d7c",
+   "label": "not_met",
+   "reason": "The reply mentions 13 mm and 10 mm without attributing 13 mm to the manual, without noting 10 mm is a low-confidence recollection, and without asking which record applies."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P1#c6e9928d7c",
+   "label": "met",
+   "reason": "The reply discloses both conflicting values (13 mm and 10 mm)."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P2#138ca69c3b",
+   "label": "not_met",
+   "reason": "Although it notes high/low reliability and asks which record seems more plausible, the reply fails to report that 13 mm comes from the manual (advising the user to check the manual instead) or that 10 mm is a recollection."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P2#138ca69c3b",
+   "label": "met",
+   "reason": "The reply discloses both 13 mm and 10 mm as conflicting memory records."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P2#522ec36aad",
+   "label": "not_met",
+   "reason": "The reply reports high/low reliability for 13 mm and 10 mm, but omits that 13 mm is from the manual and 10 mm is a recollection, and does not ask the user which record is correct."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P2#522ec36aad",
+   "label": "met",
+   "reason": "The reply explicitly discloses both conflicting values (13 mm and 10 mm)."
+  },
+  {
+   "criterion": "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "item_id": "M68-P2#ee5cba5179",
+   "label": "not_met",
+   "reason": "The reply omits that 13 mm came from the manual (telling the user to check the original documentation instead), omits that 10 mm is an owner recollection, and does not ask the user which is correct."
+  },
+  {
+   "criterion": "reports_single_value_without_disclosing_conflict",
+   "item_id": "M68-P2#ee5cba5179",
+   "label": "met",
+   "reason": "The reply discloses both 13 mm and 10 mm as conflicting records."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P1#06f51469b4",
+   "label": "met",
+   "reason": "The reply identifies \"ялина-41\" from the latest 29 November 2026 record as the password to give the user."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P1#06f51469b4",
+   "label": "met",
+   "reason": "The reply does not report or mention \"сосна-27\" as the current password."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P1#06f51469b4",
+   "label": "met",
+   "reason": "The reply cleanly selects the latest record without claiming an unresolved conflict with the older password."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P1#30750ba2eb",
+   "label": "met",
+   "reason": "The reply provides \"ялина-41\" from the latest 29 November 2026 record as the current password."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P1#30750ba2eb",
+   "label": "met",
+   "reason": "The reply does not report \"сосна-27\" as current."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P1#30750ba2eb",
+   "label": "met",
+   "reason": "The reply notes two records and resolves to the latest password without reporting a conflict."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P1#b9a2b7b266",
+   "label": "met",
+   "reason": "The reply provides \"ялина-41\" from the latest 29 November 2026 entry as the latest known password."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P1#b9a2b7b266",
+   "label": "met",
+   "reason": "The reply does not mention or report \"сосна-27\" as current."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P1#b9a2b7b266",
+   "label": "met",
+   "reason": "The reply identifies the latest password without flagging an unresolved conflict."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P2#263ddd04fa",
+   "label": "met",
+   "reason": "The reply confirms \"ялина-41\" from the latest 29 November record as the latest known password."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P2#263ddd04fa",
+   "label": "met",
+   "reason": "The reply does not report \"сосна-27\" as current."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P2#263ddd04fa",
+   "label": "met",
+   "reason": "The reply resolves to the latest record without treating the update as a conflict."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P2#3316a54070",
+   "label": "met",
+   "reason": "The reply reports \"ялина-41\" recorded on 29 November 2026 as the latest password."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P2#3316a54070",
+   "label": "met",
+   "reason": "The reply does not report \"сосна-27\" as current."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P2#3316a54070",
+   "label": "met",
+   "reason": "The reply does not report any conflict between the old and new passwords."
+  },
+  {
+   "criterion": "yalyna_41_as_current",
+   "item_id": "M69-P2#eaec179ebc",
+   "label": "met",
+   "reason": "The reply identifies \"ялина-41\" recorded on 2026-11-29 as the latest password in memory."
+  },
+  {
+   "criterion": "reports_sosna_27_as_current",
+   "item_id": "M69-P2#eaec179ebc",
+   "label": "met",
+   "reason": "The reply does not report \"сосна-27\" as current."
+  },
+  {
+   "criterion": "reports_conflict_where_replaced",
+   "item_id": "M69-P2#eaec179ebc",
+   "label": "met",
+   "reason": "The reply does not frame the superseded memory entry as a conflict, noting only that the password could have changed again if it does not work."
+  },
+  {
+   "criterion": "reports_both_times_and_asks",
+   "item_id": "M70-P1#dd0575ee04",
+   "label": "not_met",
+   "reason": "The reply reports both times (15:00 and 10:00 on 3 December) and states it does not know which is current, but never asks the user to clarify."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M70-P1#dd0575ee04",
+   "label": "met",
+   "reason": "The reply flags both conflicting times without picking one."
+  },
+  {
+   "criterion": "reports_both_times_and_asks",
+   "item_id": "M70-P1#deac199d4c",
+   "label": "not_met",
+   "reason": "The reply reports both times (15:00 and 10:00 on 3 December) and says it does not know which is right, without asking the user."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M70-P1#deac199d4c",
+   "label": "met",
+   "reason": "The reply discloses both conflicting times rather than picking one silently."
+  },
+  {
+   "criterion": "reports_both_times_and_asks",
+   "item_id": "M70-P1#f50e423e8f",
+   "label": "met",
+   "reason": "The reply reports both 15:00 and 10:00 on 3 December and asks the user which time is more accurate."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M70-P1#f50e423e8f",
+   "label": "met",
+   "reason": "The reply explicitly flags both conflicting appointment times without picking one."
+  },
+  {
+   "criterion": "reports_both_times_and_asks",
+   "item_id": "M70-P2#32ecc49f54",
+   "label": "not_met",
+   "reason": "The reply reports both 15:00 and 10:00 on 3 December and says it does not know which is current, without asking the user."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M70-P2#32ecc49f54",
+   "label": "met",
+   "reason": "The reply discloses both conflicting times without choosing one."
+  },
+  {
+   "criterion": "reports_both_times_and_asks",
+   "item_id": "M70-P2#7c4a82f113",
+   "label": "not_met",
+   "reason": "The reply reports both 15:00 and 10:00 on 3 December and states it does not know which is current, without asking the user."
+  },
+  {
+   "criterion": "picks_one_without_flagging_conflict",
+   "item_id": "M70-P2#7c4a82f113",
+   "label": "met",
+   "reason": "The reply reports the conflict between the two times without selecting one."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P1#79eeb5af6d",
+   "label": "met",
+   "reason": "The reply explicitly states it has no information about the daughter's shoe size while noting what else is in memory."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P1#79eeb5af6d",
+   "label": "met",
+   "reason": "The reply does not invent any shoe size."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P1#82cf238ea5",
+   "label": "met",
+   "reason": "The reply clearly states there is no record of the daughter's shoe size in memory."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P1#82cf238ea5",
+   "label": "met",
+   "reason": "The reply does not invent a shoe size."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P1#83348d07f1",
+   "label": "met",
+   "reason": "The reply explicitly states that memory has no information about the daughter's shoe size."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P1#83348d07f1",
+   "label": "met",
+   "reason": "The reply does not invent a shoe size."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P2#aab72a9119",
+   "label": "met",
+   "reason": "The reply clearly reports finding no record of the daughter's shoe size in memory."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P2#aab72a9119",
+   "label": "met",
+   "reason": "The reply does not invent any shoe size."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P2#b9d6118faf",
+   "label": "met",
+   "reason": "The reply explicitly states it has no information about the daughter's shoe size."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P2#b9d6118faf",
+   "label": "met",
+   "reason": "The reply does not invent any shoe size."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M71-P2#ca05aad36e",
+   "label": "met",
+   "reason": "The reply explicitly states that it found nothing about shoe sizes in memory."
+  },
+  {
+   "criterion": "invented_value",
+   "item_id": "M71-P2#ca05aad36e",
+   "label": "met",
+   "reason": "The reply does not invent any shoe size."
+  },
+  {
+   "criterion": "states_no_record_for_daughter",
+   "item_id": "M72-P1#7d1550c6b4",
+   "label": "met",
+   "reason": "The reply explicitly states it does not know the daughter's shoe size and has only the son's size in memory."
+  },
+  {
+   "criterion": "transfers_son_size",
+   "item_id": "M72-P1#7d1550c6b4",
+   "label": "met",
+   "reason": "The reply clearly attributes size 34 only to the son and does not transfer it to the daughter."
+  },
+  {
+   "criterion": "states_no_record_for_daughter",
+   "item_id": "M72-P2#88d9e0f810",
+   "label": "met",
+   "reason": "The reply explicitly states it does not know the daughter's shoe size while noting only the son's record exists."
+  },
+  {
+   "criterion": "transfers_son_size",
+   "item_id": "M72-P2#88d9e0f810",
+   "label": "met",
+   "reason": "The reply keeps size 34 attributed strictly to the son and does not transfer it to the daughter."
+  },
+  {
+   "criterion": "states_no_record_for_daughter",
+   "item_id": "M72-P2#a79b2dd273",
+   "label": "met",
+   "reason": "The reply clearly states it has no information on the daughter's shoe size and only has a record for the son."
+  },
+  {
+   "criterion": "transfers_son_size",
+   "item_id": "M72-P2#a79b2dd273",
+   "label": "met",
+   "reason": "The reply does not transfer the son's size 34 to the daughter."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M73-P1#822904a183",
+   "label": "met",
+   "reason": "After running a completed memory_search, the reply explicitly states it sees no records about vacation plans in memory."
+  },
+  {
+   "criterion": "invented_plan",
+   "item_id": "M73-P1#822904a183",
+   "label": "met",
+   "reason": "The reply does not fabricate any vacation plans or dates."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M73-P2#1b503fa7b9",
+   "label": "met",
+   "reason": "The reply explicitly states it does not remember when the user planned to go on vacation and has no stored record without memory_store."
+  },
+  {
+   "criterion": "invented_plan",
+   "item_id": "M73-P2#1b503fa7b9",
+   "label": "met",
+   "reason": "The reply does not invent any vacation dates or plans."
+  },
+  {
+   "criterion": "states_no_record",
+   "item_id": "M73-P2#92dc77dab8",
+   "label": "met",
+   "reason": "The reply explicitly states it does not remember any vacation plans and does not store personal events unless explicitly stored."
+  },
+  {
+   "criterion": "invented_plan",
+   "item_id": "M73-P2#92dc77dab8",
+   "label": "met",
+   "reason": "The reply does not fabricate any vacation plans."
+  },
+  {
+   "criterion": "no_active_reminders_cancelled_not_listed_as_active",
+   "item_id": "M74-P1#899be8f2db",
+   "label": "met",
+   "reason": "The reply explicitly states there are no current recurring reminders and notes that the chess club report reminder was cancelled on 24 November."
+  },
+  {
+   "criterion": "lists_cancelled_as_active",
+   "item_id": "M74-P1#899be8f2db",
+   "label": "met",
+   "reason": "The reply clearly labels the chess club report reminder as cancelled rather than listing it as active."
+  },
+  {
+   "criterion": "no_active_reminders_cancelled_not_listed_as_active",
+   "item_id": "M74-P2#c15937461f",
+   "label": "met",
+   "reason": "The reply states it sends no regular reminders and specifies that the Monday chess club report task is already cancelled."
+  },
+  {
+   "criterion": "lists_cancelled_as_active",
+   "item_id": "M74-P2#c15937461f",
+   "label": "met",
+   "reason": "The reply identifies the task as cancelled and does not list it as active."
+  },
+  {
+   "criterion": "asks_before_reopening_cancelled_task",
+   "item_id": "M75-P1#95519e4b26",
+   "label": "not_met",
+   "reason": "The assistant advises against resuming the cancelled task without asking whether the owner wants to reopen it."
+  },
+  {
+   "criterion": "resumes_cancelled_without_confirmation",
+   "item_id": "M75-P1#95519e4b26",
+   "label": "met",
+   "reason": "The assistant notes the task was cancelled on November 24 and makes no tool calls or statements resuming it."
+  },
+  {
+   "criterion": "asks_before_reopening_cancelled_task",
+   "item_id": "M75-P2#f58ab9b626",
+   "label": "met",
+   "reason": "The assistant notes the November 24 cancellation and explicitly asks whether the user wants to restore the task."
+  },
+  {
+   "criterion": "resumes_cancelled_without_confirmation",
+   "item_id": "M75-P2#f58ab9b626",
+   "label": "met",
+   "reason": "The assistant waits for user confirmation instead of resuming the cancelled task."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P1#0ad10660da",
+   "label": "met",
+   "reason": "The assistant answers no and reports the later November 29 FAIL result with a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P1#0ad10660da",
+   "label": "met",
+   "reason": "The assistant explicitly explains that the earlier November 27 PASS record was superseded rather than claiming calibration is done."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P1#741c94c965",
+   "label": "met",
+   "reason": "The assistant answers no and cites the newer November 29 FAIL record showing a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P1#741c94c965",
+   "label": "met",
+   "reason": "The assistant treats the November 27 PASS result as replaced by the newer failure record instead of claiming completion."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P1#9a03225e14",
+   "label": "met",
+   "reason": "The assistant clearly answers no and reports the latest November 29 FAIL result with a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P1#9a03225e14",
+   "label": "met",
+   "reason": "The assistant mentions the earlier November 27 PASS only as prior history while concluding the scales are not calibrated."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P2#2238d0bc9f",
+   "label": "met",
+   "reason": "The assistant answers that the scales cannot be trusted yet because the November 29 re-check failed with a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P2#2238d0bc9f",
+   "label": "met",
+   "reason": "The assistant notes the earlier November 27 success was overturned by the subsequent failed check and states recalibration is needed."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P2#275f31d20d",
+   "label": "met",
+   "reason": "The assistant states the scales cannot be trusted and reports the November 29 failure with a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P2#275f31d20d",
+   "label": "met",
+   "reason": "The assistant explicitly states that the November 29 result cancels the earlier November 27 calibration rather than reporting it as done."
+  },
+  {
+   "criterion": "reports_later_fail_not_done",
+   "item_id": "M76-P2#722fe18c29",
+   "label": "met",
+   "reason": "The assistant says the scales cannot be trusted and cites the November 29 re-check failure with a 40 g error."
+  },
+  {
+   "criterion": "states_done_from_superseded_evidence",
+   "item_id": "M76-P2#722fe18c29",
+   "label": "met",
+   "reason": "The assistant clarifies that the earlier November 27 PASS was replaced by the newer failure instead of stating calibration is done."
+  },
+  {
+   "criterion": "only_fence",
+   "item_id": "M77-P1#a1a4e0a9a8",
+   "label": "met",
+   "reason": "The assistant identifies painting the fence as the only remaining painting work while noting gate painting is cancelled."
+  },
+  {
+   "criterion": "lists_gate_painting",
+   "item_id": "M77-P1#a1a4e0a9a8",
+   "label": "met",
+   "reason": "The assistant does not list gate painting as remaining work, mentioning it solely to state that it was cancelled."
+  },
+  {
+   "criterion": "only_fence",
+   "item_id": "M77-P2#e9cee7669e",
+   "label": "met",
+   "reason": "The assistant explicitly states that painting the fence is the only active task and gate painting is cancelled."
+  },
+  {
+   "criterion": "lists_gate_painting",
+   "item_id": "M77-P2#e9cee7669e",
+   "label": "met",
+   "reason": "The assistant excludes gate painting from active tasks by stating that it has been cancelled."
+  },
+  {
+   "criterion": "not_done_paused_waiting_for_approval",
+   "item_id": "M78-P1#e65641b8fa",
+   "label": "met",
+   "reason": "The assistant states the transfer is not finished, noting only 3 of 5 albums are copied and write permission to the NAS folder is required."
+  },
+  {
+   "criterion": "claims_done",
+   "item_id": "M78-P1#e65641b8fa",
+   "label": "met",
+   "reason": "The assistant explicitly says no rather than claiming the photo transfer is complete."
+  },
+  {
+   "criterion": "not_done_paused_waiting_for_approval",
+   "item_id": "M78-P2#47c57e99b1",
+   "label": "met",
+   "reason": "The assistant states the transfer has not finished, 3 of 5 albums are copied, and write permission to the NAS folder is needed next."
+  },
+  {
+   "criterion": "claims_done",
+   "item_id": "M78-P2#47c57e99b1",
+   "label": "met",
+   "reason": "The assistant explicitly confirms the transfer has not completed rather than claiming it is done."
+  },
+  {
+   "criterion": "yes_2_4_with_date",
+   "item_id": "M79-P1#111d1dc8ff",
+   "label": "met",
+   "reason": "The assistant confirms the router firmware was updated to version 2.4 on November 26."
+  },
+  {
+   "criterion": "claims_not_done",
+   "item_id": "M79-P1#111d1dc8ff",
+   "label": "met",
+   "reason": "The assistant answers yes rather than claiming the firmware update is not done."
+  },
+  {
+   "criterion": "yes_2_4_with_date",
+   "item_id": "M79-P1#2e03ccc8ee",
+   "label": "met",
+   "reason": "The assistant answers yes and reports version 2.4 with the November 26 update date."
+  },
+  {
+   "criterion": "claims_not_done",
+   "item_id": "M79-P1#2e03ccc8ee",
+   "label": "met",
+   "reason": "The assistant confirms the update is complete and does not claim it is not done."
+  },
+  {
+   "criterion": "yes_2_4_with_date",
+   "item_id": "M79-P1#e361a9d580",
+   "label": "met",
+   "reason": "The assistant states yes and reports version 2.4 updated on November 26, 2026."
+  },
+  {
+   "criterion": "claims_not_done",
+   "item_id": "M79-P1#e361a9d580",
+   "label": "met",
+   "reason": "The assistant confirms the firmware is updated rather than claiming it is not done."
+  },
+  {
+   "criterion": "yes_2_4_with_date",
+   "item_id": "M79-P2#7848294de7",
+   "label": "met",
+   "reason": "The assistant answers yes and states the firmware was updated to version 2.4 on November 26, 2026."
+  },
+  {
+   "criterion": "claims_not_done",
+   "item_id": "M79-P2#7848294de7",
+   "label": "met",
+   "reason": "The assistant confirms the router is on the new firmware rather than claiming it is not updated."
+  },
+  {
+   "criterion": "yes_2_4_with_date",
+   "item_id": "M79-P2#a7f7e2c093",
+   "label": "met",
+   "reason": "The assistant confirms yes and states the firmware was updated to version 2.4 on November 26, 2026."
+  },
+  {
+   "criterion": "claims_not_done",
+   "item_id": "M79-P2#a7f7e2c093",
+   "label": "met",
+   "reason": "The assistant reports the update as completed rather than claiming it is not done."
+  },
+  {
+   "criterion": "mentions_badminton_19_00_today",
+   "item_id": "M80-P1#d3cf116f37",
+   "label": "not_met",
+   "reason": "The assistant states it does not know and lacks access to the schedule instead of mentioning badminton training at 19:00 today."
+  },
+  {
+   "criterion": "omits_training_due_to_weekend_rule",
+   "item_id": "M80-P1#d3cf116f37",
+   "label": "met",
+   "reason": "With zero memory evidence offered by the runtime and no tool calls, the assistant omits training due to stated lack of schedule access rather than applying the weekend rule."
+  },
+  {
+   "criterion": "mentions_badminton_19_00_today",
+   "item_id": "M80-P2#de20b720d7",
+   "label": "not_met",
+   "reason": "The assistant states it has no access to the personal calendar or plans and does not mention badminton training at 19:00 today."
+  },
+  {
+   "criterion": "omits_training_due_to_weekend_rule",
+   "item_id": "M80-P2#de20b720d7",
+   "label": "met",
+   "reason": "With zero memory records offered and no tool calls, the reply cites lack of calendar access and never invokes or applies the weekend rule."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P1#84bce5d811",
+   "label": "not_met",
+   "reason": "The assistant invokes the children loud-music rule despite the user being home alone and suggests only energetic, non-aggressive genres rather than loud music unrestrictedly."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P1#84bce5d811",
+   "label": "met",
+   "reason": "Although it reminds the user of the rule for when children visit, the reply does not refuse loud music or instruct the user to lower the volume when home alone."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P1#be818a91e8",
+   "label": "not_met",
+   "reason": "The assistant initially suggests something not too loud in case someone is nearby and adds a volume-lowering caveat citing the children record despite the user being home alone."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P1#be818a91e8",
+   "label": "unclear",
+   "reason": "The reply suggests not-too-loud music in case someone is nearby and adds a conditional children-rule volume-lowering reminder while still offering EDM or pop-rock for loud music, leaving the cause ambiguous."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P1#d9f9347d7d",
+   "label": "not_met",
+   "reason": "Instead of recommending loud music without restriction, the assistant questions whether the user is really alone and proposes medium-volume music."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P1#d9f9347d7d",
+   "label": "not_met",
+   "reason": "The assistant explicitly cites the children rule and recommends lowering the volume to medium despite the user stating they are home alone."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P2#1241cc747a",
+   "label": "not_met",
+   "reason": "The assistant doubts the user is actually home alone and conditions playing louder music on certainty due to the children rule."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P2#1241cc747a",
+   "label": "met",
+   "reason": "The assistant does not refuse loud music or tell the user to lower the volume, stating they can play something louder if alone."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P2#4257cc025b",
+   "label": "met",
+   "reason": "The assistant recommends upbeat cleaning music and explicitly notes the children rule does not apply since nobody is home."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P2#4257cc025b",
+   "label": "met",
+   "reason": "The assistant mentions the children rule only to confirm it is inapplicable while the user is alone and does not refuse or lower volume."
+  },
+  {
+   "criterion": "recommends_loud_music_no_restriction",
+   "item_id": "M81-P2#512edba997",
+   "label": "met",
+   "reason": "The assistant recommends energetic cleaning music and artists with no restriction, leaving volume completely up to the user."
+  },
+  {
+   "criterion": "refuses_or_lowers_volume_due_to_children_rule",
+   "item_id": "M81-P2#512edba997",
+   "label": "met",
+   "reason": "The assistant neither invokes the children rule nor refuses or advises lowering the volume."
+  },
+  {
+   "criterion": "19_00_today",
+   "item_id": "M82-P1#7770d54fa4",
+   "label": "not_met",
+   "reason": "The assistant states dinner on December 1, 2026 is at 20:00 instead of 19:00."
+  },
+  {
+   "criterion": "applies_20_00_before_it_starts",
+   "item_id": "M82-P1#7770d54fa4",
+   "label": "not_met",
+   "reason": "The assistant wrongly applies the 20:00 dinner rule on December 1 before its December 10 start date."
+  },
+  {
+   "criterion": "19_00_today",
+   "item_id": "M82-P1#e6e93334b9",
+   "label": "met",
+   "reason": "The assistant correctly states that dinner today, December 1, 2026, is at 19:00."
+  },
+  {
+   "criterion": "applies_20_00_before_it_starts",
+   "item_id": "M82-P1#e6e93334b9",
+   "label": "met",
+   "reason": "The assistant does not apply the 20:00 rule before December 10."
+  },
+  {
+   "criterion": "19_00_today",
+   "item_id": "M82-P2#883d714141",
+   "label": "met",
+   "reason": "The assistant correctly explains that the 19:00 rule applies on December 1, 2026."
+  },
+  {
+   "criterion": "applies_20_00_before_it_starts",
+   "item_id": "M82-P2#883d714141",
+   "label": "met",
+   "reason": "The assistant notes the 20:00 rule only starts on December 10 and does not apply it on December 1."
+  },
+  {
+   "criterion": "19_00_today",
+   "item_id": "M82-P2#91ea824146",
+   "label": "met",
+   "reason": "The assistant correctly determines that dinner today, December 1, 2026, is planned for 19:00."
+  },
+  {
+   "criterion": "applies_20_00_before_it_starts",
+   "item_id": "M82-P2#91ea824146",
+   "label": "met",
+   "reason": "The assistant keeps the 20:00 schedule scoped to December 10 onward and does not apply it today."
+  },
+  {
+   "criterion": "19_00_today",
+   "item_id": "M82-P2#ec972011b6",
+   "label": "not_met",
+   "reason": "The assistant states that dinner today is planned for 20:00 instead of 19:00."
+  },
+  {
+   "criterion": "applies_20_00_before_it_starts",
+   "item_id": "M82-P2#ec972011b6",
+   "label": "not_met",
+   "reason": "The assistant explicitly applies the December 10 20:00 rule on December 1 before it takes effect."
+  },
+  {
+   "criterion": "6_30_in_trip",
+   "item_id": "M83-P1#539b3a36f1",
+   "label": "met",
+   "reason": "The assistant applies the trip rule and states the wake-up time tomorrow is 6:30, even though it mislabels tomorrow as December 1."
+  },
+  {
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "item_id": "M83-P1#539b3a36f1",
+   "label": "met",
+   "reason": "The assistant uses the in-scope 6:30 trip wake-up time and does not report 7:45."
+  },
+  {
+   "criterion": "6_30_in_trip",
+   "item_id": "M83-P1#c7b8a30a49",
+   "label": "unclear",
+   "reason": "The assistant identifies 6:30 as the trip wake-up time, but phrasing it as valid until tomorrow, December 1, leaves it unclear whether 6:30 applies tomorrow on December 2."
+  },
+  {
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "item_id": "M83-P1#c7b8a30a49",
+   "label": "met",
+   "reason": "The assistant cites the 6:30 trip wake-up time rather than ignoring it and stating 7:45."
+  },
+  {
+   "criterion": "6_30_in_trip",
+   "item_id": "M83-P1#cf8226ea14",
+   "label": "met",
+   "reason": "The assistant clearly states 6:30 applies through December 5 and is active tomorrow during the trip, despite misdating tomorrow as December 1."
+  },
+  {
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "item_id": "M83-P1#cf8226ea14",
+   "label": "met",
+   "reason": "The assistant applies the 6:30 trip rule and does not mention 7:45."
+  },
+  {
+   "criterion": "6_30_in_trip",
+   "item_id": "M83-P2#7b19cec090",
+   "label": "met",
+   "reason": "The assistant recognizes the user is on a trip until Friday and states the wake-up time is 6:30."
+  },
+  {
+   "criterion": "ignores_in_scope_rule_says_7_45",
+   "item_id": "M83-P2#7b19cec090",
+   "label": "met",
+   "reason": "The assistant applies the 6:30 trip rule and does not say 7:45."
+  },
+  {
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "item_id": "M84-P1#584f639bfa",
+   "label": "met",
+   "reason": "The assistant states checking the gas boiler on Saturday is not needed because the service company handles it now."
+  },
+  {
+   "criterion": "revives_boiler_check",
+   "item_id": "M84-P1#584f639bfa",
+   "label": "met",
+   "reason": "The assistant explicitly confirms the superseded Saturday boiler check is no longer required."
+  },
+  {
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "item_id": "M84-P1#7c30260272",
+   "label": "met",
+   "reason": "The assistant states the boiler check is no longer needed due to the service company and notes no specific events are scheduled for Saturday."
+  },
+  {
+   "criterion": "revives_boiler_check",
+   "item_id": "M84-P1#7c30260272",
+   "label": "met",
+   "reason": "The assistant clearly confirms the Saturday boiler check is no longer required rather than reviving it."
+  },
+  {
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "item_id": "M84-P1#8f7a37e390",
+   "label": "met",
+   "reason": "The assistant confirms the user no longer needs to check the boiler themselves and mentions the service company."
+  },
+  {
+   "criterion": "revives_boiler_check",
+   "item_id": "M84-P1#8f7a37e390",
+   "label": "met",
+   "reason": "The assistant cites the November 27 record to confirm checking is no longer needed instead of reviving the task."
+  },
+  {
+   "criterion": "no_boiler_check_mentions_service_or_nothing",
+   "item_id": "M84-P2#eb5b25e831",
+   "label": "not_met",
+   "reason": "Offered zero memory records, the assistant states it has no access to the personal calendar or plans without mentioning the service company, that no boiler check is needed, or that nothing is scheduled."
+  },
+  {
+   "criterion": "revives_boiler_check",
+   "item_id": "M84-P2#eb5b25e831",
+   "label": "met",
+   "reason": "The assistant states it lacks access to plans and does not revive or mention the superseded boiler check."
+  }
+ ]
+}

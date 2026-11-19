@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "no_active_reminders_cancelled_not_listed_as_active"
+  ],
+  "catalog_class": "U5-cancelled",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M74",
+  "forbidden_effects": [
+    "lists_cancelled_as_active"
+  ],
+  "metric_tags": {
+    "resurrection": [
+      "lists_cancelled_as_active"
+    ]
+  },
+  "required_evidence_ids": [
+    "goal:a8da82fb-78ba-558e-a096-2af25a1a5db3"
+  ],
+  "review_status": "REVIEWED 2026-11-19: two independent blind local-model reviews by Gemma 4 12B (4eb23ef187e2) and Nemotron Bolt E4B (7eaa0c0553b8); unanimous ok on 24 families.",
+  "scenario_id": "M74-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

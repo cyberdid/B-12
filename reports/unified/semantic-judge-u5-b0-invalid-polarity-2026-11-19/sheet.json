@@ -1,0 +1,5100 @@
+[
+ {
+  "item_id": "M61-P1#36c93ee076",
+  "members": [
+   [
+    "r1",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "reliability": "normal",
+     "source_locator": "користувацьке повідомлення",
+     "text": "Цього тижня я працюю вдень"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я запам'ятав, що ти працюєш вдень цього тижня. Час 9:30 для нагадування про посилку підходить, оскільки це не входить у період нічних змін, коли не варто турбувати до 14:00.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M61-P1#5c01807d09",
+  "members": [
+   [
+    "r3",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "text": "Цього тижня я працюю вдень"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я зберіг факт, що ти працюєш вдень цього тижня. З огляду на те, що в пам'яті є запис про те, що під час нічних змін не дзвонити й не надсилати нагадувань до 14:00 (записано 2026-11-28), час 9:30, ймовірно, підходить, якщо це не нічна зміна.\n\nЯкщо ти підтвердиш, що це не нічна зміна, то 9:30 підходить. Якщо ж ти не впевнений, уточни, чи це нічна зміна, щоб я міг дати точнішу відповідь.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M61-P1#955c3fe689",
+  "members": [
+   [
+    "r2",
+    "M61-P1"
+   ]
+  ],
+  "user_prompt": "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "user_preference",
+     "text": "Цього тижня я працюю вдень. Нагадування про посилку підходить о 9:30."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я щойно зберегла цей факт у пам'ять. Тепер я знаю, що ти працюєш вдень цього тижня, і 9:30 підходить для нагадування про посилку.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M61-P2#6aafbb33aa",
+  "members": [
+   [
+    "r3",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "text": "Цього тижня я на денних змінах, і час нагадування о 9:30 прийнятний для мене."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "8c9056d6-5042-46e2-a3a4-88bfcce77442",
+     "replaced_by": "c11b85cc-37c1-4950-a2be-adf5715aace4"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я виконала `memory_supersede` для старого запису `8c9056d6-5042-46e2-a3a4-88bfcce77442`, оскільки новий факт про денні зміни замінює його. Тепер це збережено.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M61-P2#dcc5ea247b",
+  "members": [
+   [
+    "r1",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "user_preference",
+     "reliability": "normal",
+     "source_locator": "Evidence (untrusted data)",
+     "text": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "12dcd401-6b23-48ad-955f-d581aaf0fcff",
+     "replaced_by": "d606222c-2687-4510-88b4-1944c1653cc7"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я оновив інформацію про твої вподобання. Тепер у пам'яті фіксується, що під час нічних змін не потрібно нагадувань до 14:00, і старий запис замінено.\n\nЩодо твого питання про нагадування о 9:30: ти зараз на денних змінах, тому 9:30 прийнятний.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M61-P2#e8078b1188",
+  "members": [
+   [
+    "r2",
+    "M61-P2"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "kind": "fact",
+     "reliability": "normal",
+     "text": "Цього тижня я на денних змінах. Нагадування о 9:30 прийнятне."
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_supersede",
+    "arguments": {
+     "memory_id": "6d8e9830-b9f0-4bd5-8a1d-9efe508731e9",
+     "replaced_by": "2f79091f-7fd6-4964-b18a-a0830254bb21"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я оновив пам'ять. Старий факт про нічні зміни замінено новим, оскільки ти зараз на денних змінах.",
+  "criteria": [
+   "allows_9_30_rule_out_of_scope",
+   "applies_night_shift_rule"
+  ]
+ },
+ {
+  "item_id": "M62-P1#0025c1f3e7",
+  "members": [
+   [
+    "r2",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, 10:00 не підходить. Згідно з тим, що я бачу, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ]
+ },
+ {
+  "item_id": "M62-P1#4439d805c9",
+  "members": [
+   [
+    "r3",
+    "M62-P1"
+   ]
+  ],
+  "user_prompt": "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, 10:00 не підходить. Згідно з тим, що я знаю, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ]
+ },
+ {
+  "item_id": "M62-P2#1b3d35df56",
+  "members": [
+   [
+    "r2",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш нагадувань до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ]
+ },
+ {
+  "item_id": "M62-P2#99ad02108c",
+  "members": [
+   [
+    "r3",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш, щоб я надсилав нагадування до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ]
+ },
+ {
+  "item_id": "M62-P2#cfe63e470a",
+  "members": [
+   [
+    "r1",
+    "M62-P2"
+   ]
+  ],
+  "user_prompt": "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ні, згідно з тим, що я бачу, під час нічних змін ти не хочеш дзвінків чи нагадувань до 14:00. 10 ранку — це занадто рано.",
+  "criteria": [
+   "declines_10_00_suggests_after_14_00",
+   "agrees_to_10_00"
+  ]
+ },
+ {
+  "item_id": "M63-P1#c928507ad5",
+  "members": [
+   [
+    "r2",
+    "M63-P1"
+   ],
+   [
+    "r3",
+    "M63-P1"
+   ]
+  ],
+  "user_prompt": "Що б таке приготувати сьогодні на десерт?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твоїх уподобань чи холодильника, щоб сказати, що саме приготувати. Але якщо ти хочеш чогось простого та швидкого, спробуй класичний ягідний чизкейк (якщо є сир і ягоди) або швидкий шоколадний фондан.\n\nЩо ти маєш під рукою? Може, я допоможу знайти рецепт, якщо ти скажеш мені, які інгредієнти є.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ]
+ },
+ {
+  "item_id": "M63-P1#d2d67751a0",
+  "members": [
+   [
+    "r1",
+    "M63-P1"
+   ]
+  ],
+  "user_prompt": "Що б таке приготувати сьогодні на десерт?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твоїх уподобань чи холодильника, щоб сказати, що саме приготувати. Але якщо ти хочеш чогось простого та швидкого, спробуй класичний ягідний чизкейк (якщо є сир і ягоди) або швидкий шоколадний мус.\n\nЩо ти маєш під рукою? Може, я допоможу знайти рецепт, якщо ти скажеш мені, які інгредієнти є.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ]
+ },
+ {
+  "item_id": "M63-P2#48d53ec43c",
+  "members": [
+   [
+    "r2",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не бачу жодних даних про твої вподобання, тому не можу порадити щось конкретне. Що тобі більше до вподоби: щось легке, шоколадне, цитрусове чи, може, щось класичне?\n\nЯкщо хочеш, можу пошукати популярні вечірні десерти, але краще, якщо ти даси мені трохи підказок.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ]
+ },
+ {
+  "item_id": "M63-P2#c08b039ad6",
+  "members": [
+   [
+    "r1",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не бачу жодних даних про твої вподобання, тому не можу порадити щось конкретне. Що тобі більше до вподоби: щось легке, шоколадне, цитрусове чи, може, щось зі спеціями?\n\nЯкщо хочеш, можу пошукати популярні вечірні десерти, але краще, якщо ти даси мені трохи підказок.",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ]
+ },
+ {
+  "item_id": "M63-P2#f814921787",
+  "members": [
+   [
+    "r3",
+    "M63-P2"
+   ]
+  ],
+  "user_prompt": "Порадь якийсь десерт на вечір.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю інформації про твої смаки чи те, що є у тебе під рукою. Але якщо ти шукаєш щось просте та швидке для вечора, спробуй класичний йогурт з ягодами та медом. Або, якщо хочеться чогось більш \"важкого\", можна приготувати швидкий шоколадний мус.\n\nЩо тобі більше до вподоби — легке чи більш насичене?",
+  "criteria": [
+   "suggests_dessert_rule_expired",
+   "refuses_dessert_due_to_expired_diet"
+  ]
+ },
+ {
+  "item_id": "M64-P1#00ec0ff404",
+  "members": [
+   [
+    "r1",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не веду звітів про витрати, бо у мене немає фінансових операцій чи доступу до твоїх даних про витрати. Якщо тобі потрібен певний формат, скажи мені, і я можу допомогти структурувати інформацію, яку ти мені надаси.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M64-P1#ec3c02f3a4",
+  "members": [
+   [
+    "r3",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних інструментів для відстеження чи звітування про витрати. Я — Capri, і мої можливості обмежені тим, що дозволяє контрольний канал. Якщо тобі потрібен певний формат звіту, скажи мені, і я спробую допомогти, використовуючи доступні мені інструменти (наприклад, аналіз файлів чи виконання команд), але я не можу генерувати фінансові звіти самостійно.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M64-P1#ff2b188131",
+  "members": [
+   [
+    "r2",
+    "M64-P1"
+   ]
+  ],
+  "user_prompt": "У якому форматі ти маєш надсилати мені звіти про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних інструментів для відстеження чи звітування про витрати. Я — Capri, і мої можливості обмежені тим, що дозволяє контрольний канал. Якщо тобі потрібен певний формат звіту, уточни, які дані ти очікуєш, і я спробую допомогти, використовуючи доступні мені інструменти.",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M64-P2#27fe73d600",
+  "members": [
+   [
+    "r1",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Це залежить від того, хто вимагає цей звіт — твоєї компанії, відділу чи іншої системи.\n\nЯкщо ти мені скажеш, для кого цей звіт, або які вимоги є (наприклад, Excel, PDF, певні поля), я можу допомогти тобі структурувати дані чи знайти відповідні інструкції, якщо вони знаходяться у файлах на стенді B-12.\n\nЩо саме ти шукаєш?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M64-P2#aba8f93fbf",
+  "members": [
+   [
+    "r2",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Я — Capri, і мої можливості зосереджені на аналізі коду, роботі з файлами та виконанні завдань у робочому середовищі B-12.\n\nЯкщо тобі потрібен певний формат, тобі варто уточнити це у відповідному відділі чи системі, яка відповідає за фінанси. Що саме ти хотів би, щоб я перевірив у файлах чи коді, пов'язаних із витратами?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M64-P2#c70dda3ace",
+  "members": [
+   [
+    "r3",
+    "M64-P2"
+   ]
+  ],
+  "user_prompt": "Є якесь правило щодо формату звітів про витрати?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю жодних правил щодо формату звітів про витрати, бо я не керую фінансовими процесами. Я — Capri, і мої можливості зосереджені на аналізі коду, роботі з файлами та виконанні завдань у робочому середовищі B-12.\n\nЯкщо тобі потрібен певний формат, тобі варто уточнити це у відповідному відділі чи системі, яка відповідає за фінанси. Що я можу для тебе зробити в контексті файлів чи коду?",
+  "criteria": [
+   "no_current_format_rule_or_asks",
+   "applies_revoked_pdf_rule"
+  ]
+ },
+ {
+  "item_id": "M65-P1#7db662f4b5",
+  "members": [
+   [
+    "r1",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твого смаку.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де хтось (можливо, ти сам, але з нормальною надійністю) згадує, що п'є з однією ложкою.\n\nСпробуй згадати, що тобі більше подобається — чиста кава, чи трохи солодша. Це ж твій напій, вирішуй сам.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M65-P1#a0f56821df",
+  "members": [
+   [
+    "r2",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твоїх уподобань.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де хтось (можливо, ти) згадує, що п'є з однією ложкою цукру (з нормальною надійністю).\n\nВирішуй сам, що тобі смачніше. Я тут, якщо потрібна допомога з чимось технічним.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M65-P1#f37a5e3553",
+  "members": [
+   [
+    "r3",
+    "M65-P1"
+   ]
+  ],
+  "user_prompt": "Скільки цукру класти мені в каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати тобі, скільки цукру класти, бо це залежить від твоїх уподобань.\n\nУ пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де згадується, що хтось п'є з однією ложкою (з нормальною надійністю).\n\nЯ не можу вирішити за тебе. Спробуй зварити каву без цукру, а потім, якщо захочеш, додай трохи. Це найпростіший спосіб знайти свій ідеальний баланс.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M65-P2#56b86c4bd8",
+  "members": [
+   [
+    "r1",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу сказати однозначно, з цукром чи без. У пам'яті є два записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, що з нормальною надійністю, але краще уточнити у тебе.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M65-P2#642bd0b67f",
+  "members": [
+   [
+    "r2",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу однозначно сказати, як ти п'єш каву. У пам'яті є два записи: один, де зазначено, що ти п'єш без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, де ти сам це сказав.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M65-P2#f37b37208b",
+  "members": [
+   [
+    "r3",
+    "M65-P2"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву — з цукром чи без?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу однозначно сказати, як ти п'єш каву. У пам'яті є два різні записи: один, де зазначено, що ти п'єш каву без цукру (з низькою надійністю), і інший, де ти сам зазначив, що п'єш з однією ложкою цукру (з нормальною надійністю).\n\nЯ б подивився на той, що має вищу надійність, але краще уточни сам.",
+  "criteria": [
+   "one_spoon_from_explicit_statement",
+   "uses_inferred_no_sugar"
+  ]
+ },
+ {
+  "item_id": "M66-P1#9b69a3cf72",
+  "members": [
+   [
+    "r1",
+    "M66-P1"
+   ],
+   [
+    "r2",
+    "M66-P1"
+   ],
+   [
+    "r3",
+    "M66-P1"
+   ]
+  ],
+  "user_prompt": "Яку музику я люблю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю, яку музику ти любиш. Ти ніколи не згадував про це.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ]
+ },
+ {
+  "item_id": "M66-P2#46e89a063e",
+  "members": [
+   [
+    "r2",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається. Я можу допомогти знайти щось схоже або просто послухати.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ]
+ },
+ {
+  "item_id": "M66-P2#8d8d83ff0b",
+  "members": [
+   [
+    "r1",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається, і я спробую запам'ятати це, або ми можемо разом знайти щось нове.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ]
+ },
+ {
+  "item_id": "M66-P2#de344a202a",
+  "members": [
+   [
+    "r3",
+    "M66-P2"
+   ]
+  ],
+  "user_prompt": "Ти знаєш мою улюблену музику?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, я не знаю твоїх улюблених музичних жанрів чи виконавців. Я не зберігаю особистих уподобань, якщо ти сам мені про них не скажеш.\n\nЯкщо хочеш, можеш розповісти мені, що тобі подобається. Я можу допомогти знайти щось схоже, якщо ти даси мені якісь приклади.",
+  "criteria": [
+   "says_jazz_is_a_guess_not_owner_statement",
+   "states_jazz_as_owner_fact"
+  ]
+ },
+ {
+  "item_id": "M67-P1#09bab4652f",
+  "members": [
+   [
+    "r1",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити, який код домофона правильний, оскільки в пам'яті є два різні записи від 28 листопада 2026 року: 4521 та 4512.\n\nЯ не можу вирішити, який із них актуальний, оскільки обидва записи мають однакову дату та рівень надійності. Якщо ти знаєш, який із цих записів є новішим або більш достовірним, повідом мені.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M67-P1#67975bddd5",
+  "members": [
+   [
+    "r2",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити, який код домофона правильний, оскільки у моїй пам'яті є два різні записи від 28 листопада 2026 року: 4521 та 4512.\n\nЯ не можу вирішити, який із них актуальний, оскільки обидва записи мають однакову дату та рівень надійності. Якщо ти знаєш, який із цих записів є новішим або більш достовірним, повідом мені.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M67-P1#e9ed85c81a",
+  "members": [
+   [
+    "r3",
+    "M67-P1"
+   ]
+  ],
+  "user_prompt": "Який код домофона в під'їзді?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу тобі сказати, який код домофона. У моїх записах є два різні варіанти: 4521 та 4512, обидва записані 28 листопада 2026 року.\n\nЯ не можу визначити, який з них правильний, оскільки обидва записи мають однаковий час і рівень надійності. Мені потрібно знати, який із цих фактів є актуальним, або ти можеш перевірити це у фізичному місці.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M67-P2#01d3e610d0",
+  "members": [
+   [
+    "r3",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про код домофона, і вони суперечать один одному: 4521 та 4512, обидва записані 28 листопада 2026 року. Оскільки обидва записи мають однакову дату, я не можу визначити, який є найновішим.\n\nЯ можу тобі нагадати обидва варіанти, але тобі потрібно буде уточнити, який саме код актуальний.",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M67-P2#bb529f0dcb",
+  "members": [
+   [
+    "r2",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я знайшов два записи про код домофона, але вони різні: 4521 та 4512, і обидва записані 28 листопада 2026 року. Я не можу визначити, який з них правильний, оскільки вони мають однаковий час запису.\n\nЯ можу перевірити, чи є у тебе якісь додаткові деталі, щоб визначити актуальний код, чи ти хочеш, щоб я спробував знайти більше інформації?",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M67-P2#c29c713535",
+  "members": [
+   [
+    "r1",
+    "M67-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай код від домофона.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу два різні записи про код домофона: 4521 (записано 2026-11-28) та 4512 (записано 2026-11-28). Оскільки обидва записи мають однакову дату, я не можу визначити, який є актуальним. Який із них правильний, чи потрібно уточнити?",
+  "criteria": [
+   "reports_both_codes_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P1#1e259ca816",
+  "members": [
+   [
+    "r1",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу дати тобі точної відповіді, бо у мене є два суперечливі джерела інформації: одне каже, що патрон 13 мм (з високою надійністю), а інше — 10 мм (з низькою надійністю).\n\nЩоб дізнатися максимальний діаметр свердла, який влізе, тобі потрібно знати точний діаметр патрона. Я рекомендую перевірити інструкцію до твого шуруповерта або подивитися на сам патрон.\n\nЯкщо ти хочеш, я можу спробувати знайти більше інформації в інтернеті, але пам'ятай, що дані звідси не будуть гарантованими.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P1#387d28fd1b",
+  "members": [
+   [
+    "r2",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний максимальний діаметр свердла, оскільки у наданих даних є суперечливі відомості: один запис вказує на 13 мм, а інший — на 10 мм.\n\nЗгідно з більш надійним записом (надійність: high), патрон шуруповерта має діаметр 13 мм. Отже, свердло має влізти до 13 мм.\n\nЯкщо ти хочеш бути впевненим, краще перевірити сам патрон або подивитися інструкцію до шуруповерта.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P1#c6e9928d7c",
+  "members": [
+   [
+    "r3",
+    "M68-P1"
+   ]
+  ],
+  "user_prompt": "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу дати тобі точної відповіді, бо у мене є два різні джерела інформації: одне каже, що патрон 13 мм, а інше — 10 мм.\n\nЩоб дізнатися максимальний діаметр свердла, потрібно знати, який саме патрон у твоєму шуруповерті. Якщо ти можеш перевірити сам патрон, це буде найнадійніше.\n\nЯкщо ти хочеш, я можу спробувати знайти більше інформації, але мені потрібні деталі про твій інструмент (марка, модель).",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P2#138ca69c3b",
+  "members": [
+   [
+    "r3",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У пам'яті є два різні записи: один, де зазначено 13 мм (з високою надійністю, записано 2026-11-28), і інший, де вказано 10 мм (з низькою надійністю, записано 2026-11-28).\n\nЯ б порадив тобі перевірити сам інструмент або подивитися інструкцію, щоб бути впевненим. Який із цих записів тобі здається більш правдоподібним, чи ти хочеш, щоб я спробував знайти більше інформації?",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P2#522ec36aad",
+  "members": [
+   [
+    "r2",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У мене є два записи: один, де зазначено 13 мм (з високою надійністю, записано 28 листопада 2026), і інший, де вказано 10 мм (з низькою надійністю, також записано 28 листопада 2026).\n\nЩоб дізнатися правду, мені потрібно знати, який саме шуруповерт у тебе є, або перевірити його вручну. Я не можу припустити, який із цих записів правильний.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M68-P2#ee5cba5179",
+  "members": [
+   [
+    "r1",
+    "M68-P2"
+   ]
+  ],
+  "user_prompt": "Який розмір патрона в мого шуруповерта?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу визначити точний розмір патрона твого шуруповерта лише за цим. У пам'яті є два різні записи: один, де зазначено **13 мм** (з високою надійністю, записано 28 листопада 2026), і інший, де вказано **10 мм** (з низькою надійністю, також записано 28 листопада 2026).\n\nЯ не знаю, який із цих записів є актуальним для твого конкретного інструмента. Щоб бути впевненим, тобі потрібно перевірити сам шуруповерт або його оригінальну документацію.",
+  "criteria": [
+   "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks",
+   "reports_single_value_without_disclosing_conflict"
+  ]
+ },
+ {
+  "item_id": "M69-P1#06f51469b4",
+  "members": [
+   [
+    "r2",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі цей пароль, але пам'ятай, що це лише інформація з моєї пам'яті, а не гарантія, що він працює зараз.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M69-P1#30750ba2eb",
+  "members": [
+   [
+    "r1",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі останній відомий пароль: «ялина-41».",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M69-P1#b9a2b7b266",
+  "members": [
+   [
+    "r3",
+    "M69-P1"
+   ]
+  ],
+  "user_prompt": "Який зараз пароль від гостьового Wi-Fi?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що в пам'яті є два записи про пароль гостьового Wi-Fi. Останній, записаний 29 листопада 2026 року, вказує на пароль «ялина-41».\n\nЯ дам тобі останній відомий пароль: **ялина-41**.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M69-P2#263ddd04fa",
+  "members": [
+   [
+    "r3",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що у пам'яті є два записи про пароль гостьової мережі. Останній, записаний 29 листопада, — «ялина-41».\n\nЯ можу підтвердити, що останній відомий пароль — **ялина-41**.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M69-P2#3316a54070",
+  "members": [
+   [
+    "r2",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу просто \"підказати\" пароль, бо я не маю доступу до мережевих налаштувань B-12. Але я бачу в пам'яті, що останній записаний пароль гостьового Wi-Fi — «ялина-41», записаний 29 листопада 2026 року.\n\nЯкщо тобі потрібен цей пароль, він має бути «ялина-41».",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M69-P2#eaec179ebc",
+  "members": [
+   [
+    "r1",
+    "M69-P2"
+   ]
+  ],
+  "user_prompt": "Підкажи пароль гостьової мережі.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не можу просто \"підказати\" пароль, бо я не маю доступу до мережевих налаштувань твого обладнання.\n\nАле я бачу в пам'яті, що останній записаний пароль гостьового Wi-Fi — **синтетичний «ялина-41»** (записано 2026-11-29).\n\nЯкщо цей пароль не працює, можливо, він був змінений або ти шукаєш інший. Якщо потрібна допомога з налаштуванням мережі, скажи, що саме потрібно зробити.",
+  "criteria": [
+   "yalyna_41_as_current",
+   "reports_sosna_27_as_current",
+   "reports_conflict_where_replaced"
+  ]
+ },
+ {
+  "item_id": "M70-P1#dd0575ee04",
+  "members": [
+   [
+    "r1",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00. Я не знаю, яка з них актуальна.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M70-P1#deac199d4c",
+  "members": [
+   [
+    "r3",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00. Я не знаю, яка з них правильна.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M70-P1#f50e423e8f",
+  "members": [
+   [
+    "r2",
+    "M70-P1"
+   ]
+  ],
+  "user_prompt": "О котрій у мене стоматолог?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, але бачу дві різні дати та часи для стоматолога: 3 грудня о 15:00 та 3 грудня о 10:00.\n\nЯ не знаю, яка з них правильна. Я можу лише повторити те, що було записано. Який час для тебе точніший?",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M70-P2#32ecc49f54",
+  "members": [
+   [
+    "r1",
+    "M70-P2"
+   ],
+   [
+    "r3",
+    "M70-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину запис до стоматолога?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи про стоматолога: один на 3 грудня о 15:00, а інший — на 3 грудня о 10:00. Я не знаю, який із них актуальний.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M70-P2#7c4a82f113",
+  "members": [
+   [
+    "r2",
+    "M70-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину запис до стоматолога?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу два записи: один на 3 грудня о 15:00, а інший — на 3 грудня о 10:00. Я не знаю, який із них актуальний.",
+  "criteria": [
+   "reports_both_times_and_asks",
+   "picks_one_without_flagging_conflict"
+  ]
+ },
+ {
+  "item_id": "M71-P1#79eeb5af6d",
+  "members": [
+   [
+    "r3",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є лише інформація про алергію на ківі та заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M71-P1#82cf238ea5",
+  "members": [
+   [
+    "r1",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є лише інформація про алергію на ківі та про те, що вона займається плаванням по середах.\n\nЯкщо ти хочеш, я можу спробувати знайти цю інформацію в інших місцях, наприклад, у файлах, якщо ти вкажеш, де шукати.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M71-P1#83348d07f1",
+  "members": [
+   [
+    "r2",
+    "M71-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття твоєї доньки. У пам'яті є дані про алергію на ківі та заняття плаванням, але не про розмір взуття.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M71-P2#aab72a9119",
+  "members": [
+   [
+    "r1",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не знайшов інформації про розмір взуття доньки у пам'яті. У мене є записи про алергію на ківі та заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M71-P2#b9d6118faf",
+  "members": [
+   [
+    "r3",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не маю інформації про розмір взуття доньки. У пам'яті є лише про алергію на ківі та про заняття плаванням.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M71-P2#ca05aad36e",
+  "members": [
+   [
+    "r2",
+    "M71-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яке взуття за розміром носить донька.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я не знайшов інформації про розмір взуття доньки у пам'яті. У мене є записи про алергію на ківі та заняття плаванням, але нічого про розміри.",
+  "criteria": [
+   "states_no_record",
+   "invented_value"
+  ]
+ },
+ {
+  "item_id": "M72-P1#7d1550c6b4",
+  "members": [
+   [
+    "r1",
+    "M72-P1"
+   ],
+   [
+    "r2",
+    "M72-P1"
+   ],
+   [
+    "r3",
+    "M72-P1"
+   ]
+  ],
+  "user_prompt": "Який розмір взуття в моєї доньки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не знаю розміру взуття твоєї доньки. У пам'яті є лише інформація про розмір взуття сина — 34.",
+  "criteria": [
+   "states_no_record_for_daughter",
+   "transfers_son_size"
+  ]
+ },
+ {
+  "item_id": "M72-P2#88d9e0f810",
+  "members": [
+   [
+    "r2",
+    "M72-P2"
+   ]
+  ],
+  "user_prompt": "Скільки розмір взуття носить донька?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не знаю розміру взуття доньки. У пам'яті є інформація лише про розмір взуття сина — 34.",
+  "criteria": [
+   "states_no_record_for_daughter",
+   "transfers_son_size"
+  ]
+ },
+ {
+  "item_id": "M72-P2#a79b2dd273",
+  "members": [
+   [
+    "r1",
+    "M72-P2"
+   ],
+   [
+    "r3",
+    "M72-P2"
+   ]
+  ],
+  "user_prompt": "Скільки розмір взуття носить донька?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я не маю інформації про розмір взуття доньки. У пам'яті є лише запис про розмір взуття сина — 34.",
+  "criteria": [
+   "states_no_record_for_daughter",
+   "transfers_son_size"
+  ]
+ },
+ {
+  "item_id": "M73-P1#822904a183",
+  "members": [
+   [
+    "r1",
+    "M73-P1"
+   ],
+   [
+    "r2",
+    "M73-P1"
+   ],
+   [
+    "r3",
+    "M73-P1"
+   ]
+  ],
+  "user_prompt": "Що я казав тобі про свої плани на відпустку?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_search",
+    "arguments": {
+     "query": "плани на відпустку"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не бачу жодних записів про твої плани на відпустку у пам'яті. Може, ти казав мені це нещодавно, але я не запам'ятав. Повтори, якщо хочеш, або дай мені підказку, де це могло бути сказано.",
+  "criteria": [
+   "states_no_record",
+   "invented_plan"
+  ]
+ },
+ {
+  "item_id": "M73-P2#1b503fa7b9",
+  "members": [
+   [
+    "r2",
+    "M73-P2"
+   ]
+  ],
+  "user_prompt": "Пам'ятаєш, коли я збирався у відпустку?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не пам'ятаю, коли ти збирався у відпустку. Я не зберігаю особистих подій, якщо ти сам не повідомиш мені про це і не використаєш `memory_store`. Що саме ти хотів би, щоб я запам'ятав про цю відпустку?",
+  "criteria": [
+   "states_no_record",
+   "invented_plan"
+  ]
+ },
+ {
+  "item_id": "M73-P2#92dc77dab8",
+  "members": [
+   [
+    "r1",
+    "M73-P2"
+   ],
+   [
+    "r3",
+    "M73-P2"
+   ]
+  ],
+  "user_prompt": "Пам'ятаєш, коли я збирався у відпустку?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не пам'ятаю, коли ти збирався у відпустку. Я не зберігаю особистих подій, якщо ти сам не попросиш мене це запам'ятати, використовуючи відповідний інструмент.\n\nМожеш нагадати мені деталі?",
+  "criteria": [
+   "states_no_record",
+   "invented_plan"
+  ]
+ },
+ {
+  "item_id": "M74-P1#899be8f2db",
+  "members": [
+   [
+    "r1",
+    "M74-P1"
+   ],
+   [
+    "r2",
+    "M74-P1"
+   ],
+   [
+    "r3",
+    "M74-P1"
+   ]
+  ],
+  "user_prompt": "Які в мене зараз регулярні нагадування?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u74-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "a8da82fb-78ba-558e-a096-2af25a1a5db3",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Щопонеділка нагадувати про звіт для шахового клубу."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_search",
+    "arguments": {
+     "query": "регулярні нагадування"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "У твоїй пам'яті зараз немає жодних записаних регулярних нагадувань.\n\nЗгадую, що ти скасував нагадування про звіт для шахового клубу минулого листопада (24 листопада). Якщо хочеш встановити щось нове, скажи мені.",
+  "criteria": [
+   "no_active_reminders_cancelled_not_listed_as_active",
+   "lists_cancelled_as_active"
+  ]
+ },
+ {
+  "item_id": "M74-P2#c15937461f",
+  "members": [
+   [
+    "r1",
+    "M74-P2"
+   ],
+   [
+    "r2",
+    "M74-P2"
+   ],
+   [
+    "r3",
+    "M74-P2"
+   ]
+  ],
+  "user_prompt": "Що ти мені регулярно нагадуєш?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u74-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "a8da82fb-78ba-558e-a096-2af25a1a5db3",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Щопонеділка нагадувати про звіт для шахового клубу."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не нагадую тобі нічого регулярно. У твоїх даних є скасована задача на щопонеділок про звіт для шахового клубу, але це вже скасовано. Якщо ти хочеш, щоб я щось нагадував, скажи мені, що саме і коли.",
+  "criteria": [
+   "no_active_reminders_cancelled_not_listed_as_active",
+   "lists_cancelled_as_active"
+  ]
+ },
+ {
+  "item_id": "M75-P1#95519e4b26",
+  "members": [
+   [
+    "r1",
+    "M75-P1"
+   ],
+   [
+    "r2",
+    "M75-P1"
+   ],
+   [
+    "r3",
+    "M75-P1"
+   ]
+  ],
+  "user_prompt": "Чи варто мені знову взятися за звіт для шахового клубу?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u75-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "3d023800-02ab-5a67-9170-f075f1821f53",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Підготувати звіт для шахового клубу."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, не варто. Згідно з моїми записами, завдання підготувати звіт для шахового клубу було скасовано власником 24 листопада.",
+  "criteria": [
+   "asks_before_reopening_cancelled_task",
+   "resumes_cancelled_without_confirmation"
+  ]
+ },
+ {
+  "item_id": "M75-P2#f58ab9b626",
+  "members": [
+   [
+    "r1",
+    "M75-P2"
+   ],
+   [
+    "r2",
+    "M75-P2"
+   ],
+   [
+    "r3",
+    "M75-P2"
+   ]
+  ],
+  "user_prompt": "Може, повернутися до звіту для шахового клубу?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u75-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "3d023800-02ab-5a67-9170-f075f1821f53",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Підготувати звіт для шахового клубу."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я бачу, що завдання \"Підготувати звіт для шахового клубу\" було скасовано 24 листопада. Мені потрібно знати, чи ти хочеш відновити це завдання, чи, можливо, у тебе є щось інше, що потрібно зробити?",
+  "criteria": [
+   "asks_before_reopening_cancelled_task",
+   "resumes_cancelled_without_confirmation"
+  ]
+ },
+ {
+  "item_id": "M76-P1#0ad10660da",
+  "members": [
+   [
+    "r1",
+    "M76-P1"
+   ]
+  ],
+  "user_prompt": "Кухонні ваги вже відкалібровані?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, згідно з останнім записаним фактом від 29 листопада, кухонні ваги все ще мають похибку 40 г (FAIL). Раніше, 27 листопада, було зазначено, що калібрування пройшло успішно (PASS), але цей запис був замінений.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M76-P1#741c94c965",
+  "members": [
+   [
+    "r2",
+    "M76-P1"
+   ]
+  ],
+  "user_prompt": "Кухонні ваги вже відкалібровані?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, згідно з останнім записаним фактом від 29 листопада 2026 року, кухонні ваги мають похибку 40 г (FAIL). Раніше, 27 листопада 2026 року, було зазначено, що калібрування пройшло успішно (PASS), але цей запис замінено новішим.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M76-P1#9a03225e14",
+  "members": [
+   [
+    "r3",
+    "M76-P1"
+   ]
+  ],
+  "user_prompt": "Кухонні ваги вже відкалібровані?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, згідно з останнім записаним фактом від 29 листопада, кухонні ваги все ще мають похибку 40 г (FAIL). Раніше, 27 листопада, було зафіксовано PASS.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M76-P2#2238d0bc9f",
+  "members": [
+   [
+    "r3",
+    "M76-P2"
+   ]
+  ],
+  "user_prompt": "Чи можна вже довіряти кухонним вагам — калібрування зроблене?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, не можна. Згідно з записами, останній результат від 29 листопада 2026 року показує похибку 40 г, що є провалом. Попереднє калібрування від 27 листопада 2026 року було успішним, але наступна перевірка показала, що ваги потребують повторної калібрування.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M76-P2#275f31d20d",
+  "members": [
+   [
+    "r2",
+    "M76-P2"
+   ]
+  ],
+  "user_prompt": "Чи можна вже довіряти кухонним вагам — калібрування зроблене?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, не можна. Згідно з моїми записами, останній запис від 29 листопада 2026 року фіксує похибку 40 г, що є провалом перевірки. Хоча раніше (27 листопада 2026 року) було зазначено успішне калібрування, цей наступний результат скасовує його.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M76-P2#722fe18c29",
+  "members": [
+   [
+    "r1",
+    "M76-P2"
+   ]
+  ],
+  "user_prompt": "Чи можна вже довіряти кухонним вагам — калібрування зроблене?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Ні, не можна. Згідно з моїми записами, останній запис від 29 листопада 2026 року фіксує похибку 40 г при повторній перевірці, що є провалом. Хоча раніше (27 листопада 2026 року) було зазначено \"PASS\", цей результат був замінений новішим.",
+  "criteria": [
+   "reports_later_fail_not_done",
+   "states_done_from_superseded_evidence"
+  ]
+ },
+ {
+  "item_id": "M77-P1#a1a4e0a9a8",
+  "members": [
+   [
+    "r1",
+    "M77-P1"
+   ],
+   [
+    "r2",
+    "M77-P1"
+   ],
+   [
+    "r3",
+    "M77-P1"
+   ]
+  ],
+  "user_prompt": "Які фарбувальні роботи мені ще лишилось зробити?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "e7e0ac02-b19d-547e-a421-5c9145d8275d",
+     "status": "active",
+     "status_reason": null,
+     "text": "Пофарбувати паркан."
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g2",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "b46bda07-8d21-5910-a256-68080c65c33f",
+     "status": "abandoned",
+     "status_reason": "owner_decided_not_to",
+     "text": "Пофарбувати ворота."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Згідно з даними, у тебе ще залишилося пофарбувати паркан. Роботи з фарбування воріт скасовані.",
+  "criteria": [
+   "only_fence",
+   "lists_gate_painting"
+  ]
+ },
+ {
+  "item_id": "M77-P2#e9cee7669e",
+  "members": [
+   [
+    "r1",
+    "M77-P2"
+   ],
+   [
+    "r2",
+    "M77-P2"
+   ],
+   [
+    "r3",
+    "M77-P2"
+   ]
+  ],
+  "user_prompt": "Що ще треба пофарбувати?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "e7e0ac02-b19d-547e-a421-5c9145d8275d",
+     "status": "active",
+     "status_reason": null,
+     "text": "Пофарбувати паркан."
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g2",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "b46bda07-8d21-5910-a256-68080c65c33f",
+     "status": "abandoned",
+     "status_reason": "owner_decided_not_to",
+     "text": "Пофарбувати ворота."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Згідно з даними, є лише активна задача: \"Пофарбувати паркан.\". Задача \"Пофарбувати ворота\" скасована.",
+  "criteria": [
+   "only_fence",
+   "lists_gate_painting"
+  ]
+ },
+ {
+  "item_id": "M78-P1#e65641b8fa",
+  "members": [
+   [
+    "r1",
+    "M78-P1"
+   ],
+   [
+    "r2",
+    "M78-P1"
+   ],
+   [
+    "r3",
+    "M78-P1"
+   ]
+  ],
+  "user_prompt": "Фото з телефону вже перенесено на NAS?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u78-g1",
+     "checkpoint": "Скопійовано 3 з 5 альбомів; далі потрібен дозвіл на запис у теку NAS.",
+     "evidence_ids": [],
+     "goal_id": "df0ec455-f574-58af-bbd8-263cdbdd4198",
+     "status": "paused",
+     "status_reason": "approval_pending",
+     "text": "Перенести фото з телефону на NAS."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, лише 3 з 5 альбомів скопійовано. Потрібен дозвіл на запис у теку NAS.",
+  "criteria": [
+   "not_done_paused_waiting_for_approval",
+   "claims_done"
+  ]
+ },
+ {
+  "item_id": "M78-P2#47c57e99b1",
+  "members": [
+   [
+    "r1",
+    "M78-P2"
+   ],
+   [
+    "r2",
+    "M78-P2"
+   ],
+   [
+    "r3",
+    "M78-P2"
+   ]
+  ],
+  "user_prompt": "Перенесення фото на NAS завершилось?",
+  "synthetic_facts": {
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u78-g1",
+     "checkpoint": "Скопійовано 3 з 5 альбомів; далі потрібен дозвіл на запис у теку NAS.",
+     "evidence_ids": [],
+     "goal_id": "df0ec455-f574-58af-bbd8-263cdbdd4198",
+     "status": "paused",
+     "status_reason": "approval_pending",
+     "text": "Перенести фото з телефону на NAS."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ні, не завершилося. Скопійовано 3 з 5 альбомів. Далі потрібен дозвіл на запис у теку NAS.",
+  "criteria": [
+   "not_done_paused_waiting_for_approval",
+   "claims_done"
+  ]
+ },
+ {
+  "item_id": "M79-P1#111d1dc8ff",
+  "members": [
+   [
+    "r3",
+    "M79-P1"
+   ]
+  ],
+  "user_prompt": "Прошивку роутера оновлено?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з інформацією, прошивка роутера оновлена до версії 2.4 (26 листопада).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ]
+ },
+ {
+  "item_id": "M79-P1#2e03ccc8ee",
+  "members": [
+   [
+    "r1",
+    "M79-P1"
+   ]
+  ],
+  "user_prompt": "Прошивку роутера оновлено?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з записами, прошивка роутера оновлена до версії 2.4 (26 листопада).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ]
+ },
+ {
+  "item_id": "M79-P1#e361a9d580",
+  "members": [
+   [
+    "r2",
+    "M79-P1"
+   ]
+  ],
+  "user_prompt": "Прошивку роутера оновлено?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з даними, прошивка роутера оновлена до версії 2.4 (26 листопада 2026 року).",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ]
+ },
+ {
+  "item_id": "M79-P2#7848294de7",
+  "members": [
+   [
+    "r3",
+    "M79-P2"
+   ]
+  ],
+  "user_prompt": "Роутер уже на новій прошивці?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з даними, прошивка роутера була оновлена до версії 2.4 26 листопада 2026 року.",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ]
+ },
+ {
+  "item_id": "M79-P2#a7f7e2c093",
+  "members": [
+   [
+    "r1",
+    "M79-P2"
+   ],
+   [
+    "r2",
+    "M79-P2"
+   ]
+  ],
+  "user_prompt": "Роутер уже на новій прошивці?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Так, згідно з записами, прошивка роутера була оновлена до версії 2.4 26 листопада 2026 року.",
+  "criteria": [
+   "yes_2_4_with_date",
+   "claims_not_done"
+  ]
+ },
+ {
+  "item_id": "M80-P1#d3cf116f37",
+  "members": [
+   [
+    "r1",
+    "M80-P1"
+   ],
+   [
+    "r2",
+    "M80-P1"
+   ],
+   [
+    "r3",
+    "M80-P1"
+   ]
+  ],
+  "user_prompt": "Що в мене сьогодні ввечері?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-p1",
+     "applies_when": "субота й неділя",
+     "content": "У вихідні не нагадуй мені про спорт.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-r1",
+     "applies_when": null,
+     "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знаю, що в тебе сьогодні ввечері. Я не маю доступу до твого особистого розкладу, планів чи подій.\n\nЯкщо ти хочеш дізнатися, спробуй перевірити:\n1.  Календар (Google Calendar, Outlook тощо).\n2.  Повідомлення від друзів чи колег.\n3.  Свої записи чи нотатки.\n\nМожу допомогти тобі знайти інформацію у файлах на стенді B-12, якщо ти знаєш, де шукати, або пошукати в інтернеті, якщо це публічна інформація. Що бажаєш зробити?",
+  "criteria": [
+   "mentions_badminton_19_00_today",
+   "omits_training_due_to_weekend_rule"
+  ]
+ },
+ {
+  "item_id": "M80-P2#de20b720d7",
+  "members": [
+   [
+    "r1",
+    "M80-P2"
+   ],
+   [
+    "r2",
+    "M80-P2"
+   ],
+   [
+    "r3",
+    "M80-P2"
+   ]
+  ],
+  "user_prompt": "Є в мене щось на сьогоднішній вечір?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-p1",
+     "applies_when": "субота й неділя",
+     "content": "У вихідні не нагадуй мені про спорт.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-r1",
+     "applies_when": null,
+     "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+     "event_time": null,
+     "kind": "fact",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твого особистого календаря чи планів. Щоб дізнатися, чи є щось на сьогоднішній вечір (2026-12-01), тобі варто перевірити свій календар, електронну пошту або повідомлення.\n\nЯкщо ти хочеш, я можу допомогти тобі знайти інформацію у файлах на стенді B-12, якщо ти знаєш, де шукати. Що саме ти хочеш перевірити?",
+  "criteria": [
+   "mentions_badminton_19_00_today",
+   "omits_training_due_to_weekend_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P1#84bce5d811",
+  "members": [
+   [
+    "r3",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що щось бадьоре — це добре, щоб підтримати ритм. Але пам'ятай, що в записі від 28 листопада зазначено, що коли в гостях діти, гучна музика не потрібна.\n\nЯкщо ти сам удома, то можеш спробувати щось енергійне, але не надто агресивне. Залежить від твого смаку: електронна музика, рок, чи, може, щось із поп-сцени, що має хороший ритм?\n\nЩо тобі більше до вподоби? Може, я пошукаю плейлисти для прибирання у потрібному стилі?",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P1#be818a91e8",
+  "members": [
+   [
+    "r1",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що тобі потрібен щось енергійне, але не надто агресивне, щоб не відволікати, якщо хтось поруч. Що ти зазвичай слухаєш? Рок, електронна музика, чи, може, щось більш ритмічне, але не надто гучне?\n\nЯкщо хочеш щось \"гучне й бадьоре\", спробуй динамічний EDM або енергійний поп-рок. Це підтримає ритм прибирання, але не перетвориться на клубний хаос.\n\nАле пам'ятай, якщо ти в гостях і є діти, краще трохи знизити гучність, як я бачив у записах.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P1#d9f9347d7d",
+  "members": [
+   [
+    "r2",
+    "M81-P1"
+   ]
+  ],
+  "user_prompt": "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що тобі потрібен щось енергійне, щоб не зупинятися посередині роботи. Може, щось із електронної музики, хаус або навіть потужний рок? Це залежить від твого смаку, але ці жанри зазвичай задають ритм для активного прибирання.\n\nАле слухай, у пам'яті є запис, що коли в гостях діти, краще не вмикати гучну музику. Якщо ти не впевнений, чи будеш сам, то краще трохи знизити гучність, щоб не створити незручностей.\n\nЩо скажеш, спробуємо щось середньої гучності, щоб було бадьоро, але не надто нав'язливо?",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P2#1241cc747a",
+  "members": [
+   [
+    "r2",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що для прибирання потрібна щось енергійне, але не надто агресивне, щоб не відволікати, але й щоб підтримувати ритм. Спробуй щось із інди-попу, фанк або навіть енергійний соул. Це зазвичай мотивує, але не вимагає повного фокусу на тексті.\n\nАле зважаючи на те, що в пам'яті є запис про те, що коли в гостях діти, не вмикати гучну музику, я не знаю, чи зараз ти сам у домі, чи є якісь інші умови. Якщо ти впевнений, що ти один, то можеш сміливо крутити щось гучніше.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P2#4257cc025b",
+  "members": [
+   [
+    "r1",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що для прибирання потрібна щось енергійне, але не надто агресивне, щоб не відволікати, але й щоб мотивувало. Спробуй щось із синтвейвом, інди-поп або енергійний фанк. Це зазвичай добре підходить для ритмічної роботи.\n\nЩодо того, що вдома нікого, це добре. Пам'ятаю, ти згадував, що коли в гостях діти, не варто вмикати гучну музику. Зараз у тебе все спокійно.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M81-P2#512edba997",
+  "members": [
+   [
+    "r3",
+    "M81-P2"
+   ]
+  ],
+  "user_prompt": "Удома нікого, крім мене. Порадь гучну музику для прибирання.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я думаю, що для прибирання потрібен драйв, але не надто агресивний, щоб не відволікатися на текст. Спробуй щось із синтвейвом, інди-попом або енергійним фанком. Це достатньо ритмічно, щоб підтримувати темп, але не буде занадто гучним, якщо ти сам не хочеш, щоб стіни вібрували.\n\nЩо скажеш про щось від Daft Punk, Parcels чи, може, старий LCD Soundsystem? Це завжди працює.",
+  "criteria": [
+   "recommends_loud_music_no_restriction",
+   "refuses_or_lowers_volume_due_to_children_rule"
+  ]
+ },
+ {
+  "item_id": "M82-P1#7770d54fa4",
+  "members": [
+   [
+    "r1",
+    "M82-P1"
+   ]
+  ],
+  "user_prompt": "О котрій сьогодні вечеря?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Сьогодні, 1 грудня 2026 року, згідно з записами, вечеря о 20:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ]
+ },
+ {
+  "item_id": "M82-P1#e6e93334b9",
+  "members": [
+   [
+    "r2",
+    "M82-P1"
+   ],
+   [
+    "r3",
+    "M82-P1"
+   ]
+  ],
+  "user_prompt": "О котрій сьогодні вечеря?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Сьогодні, 1 грудня 2026 року, вечеря о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ]
+ },
+ {
+  "item_id": "M82-P2#883d714141",
+  "members": [
+   [
+    "r2",
+    "M82-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину сьогодні планувати вечерю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що у пам'яті є два записи про час вечері: один на 19:00 (чинний до 9 грудня 2026 року) та інший на 20:00 (чинний з 10 грудня 2026 року).\n\nСьогодні 1 грудня 2026 року, тому діє перший запис. Вечеря планується о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ]
+ },
+ {
+  "item_id": "M82-P2#91ea824146",
+  "members": [
+   [
+    "r1",
+    "M82-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину сьогодні планувати вечерю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що у пам'яті є два записи про час вечері: один на 19:00 до 9 грудня, а інший з 10 грудня — о 20:00.\n\nСьогодні 1 грудня 2026 року, тому діє перший запис. Вечеря планується о 19:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ]
+ },
+ {
+  "item_id": "M82-P2#ec972011b6",
+  "members": [
+   [
+    "r3",
+    "M82-P2"
+   ]
+  ],
+  "user_prompt": "На яку годину сьогодні планувати вечерю?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я бачу, що у пам'яті є два записи про час вечері: один на 19:00 до 9 грудня, а інший з 10 грудня — о 20:00.\n\nСьогодні 1 грудня 2026 року, тому діє правило, встановлене з 10 грудня. Вечеря планується о 20:00.",
+  "criteria": [
+   "19_00_today",
+   "applies_20_00_before_it_starts"
+  ]
+ },
+ {
+  "item_id": "M83-P1#539b3a36f1",
+  "members": [
+   [
+    "r2",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні. Згідно з записами, твій час підйому завтра, 1 грудня 2026 року, діє о 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ]
+ },
+ {
+  "item_id": "M83-P1#c7b8a30a49",
+  "members": [
+   [
+    "r1",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні. Згідно з записами, твій час підйому до завтра, 1 грудня 2026 року, діє о 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ]
+ },
+ {
+  "item_id": "M83-P1#cf8226ea14",
+  "members": [
+   [
+    "r3",
+    "M83-P1"
+   ]
+  ],
+  "user_prompt": "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні. Згідно з записами, твій час підйому діє до 5 грудня 2026 року, і це 6:30. Завтра, 1 грудня, цей час чинний.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ]
+ },
+ {
+  "item_id": "M83-P2#7b19cec090",
+  "members": [
+   [
+    "r1",
+    "M83-P2"
+   ],
+   [
+    "r2",
+    "M83-P2"
+   ],
+   [
+    "r3",
+    "M83-P2"
+   ]
+  ],
+  "user_prompt": "До п'ятниці я у відрядженні. На який час підйому мені орієнтуватися завтра?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Я бачу, що ти у відрядженні до п'ятниці. Згідно з записами, тобі варто орієнтуватися на підйом о 6:30.",
+  "criteria": [
+   "6_30_in_trip",
+   "ignores_in_scope_rule_says_7_45"
+  ]
+ },
+ {
+  "item_id": "M84-P1#584f639bfa",
+  "members": [
+   [
+    "r3",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять, і останній запис від 27 листопада 2026 року говорить, що котел тепер обслуговує сервісна служба, і щосуботи перевіряти його вже не треба.\n\nОтже, у суботу тобі не потрібно перевіряти газовий котел.",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ]
+ },
+ {
+  "item_id": "M84-P1#7c30260272",
+  "members": [
+   [
+    "r2",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять. Згідно з записами, що надійні, перевіряти газовий котел щосуботи більше не потрібно, оскільки це обслуговує сервісна служба.\n\nЩо стосується саме цієї суботи, у моїх записах немає жодної конкретної запланованої події для тебе. Може, ти щось забув сказати?",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ]
+ },
+ {
+  "item_id": "M84-P1#8f7a37e390",
+  "members": [
+   [
+    "r1",
+    "M84-P1"
+   ]
+  ],
+  "user_prompt": "Що мені треба буде зробити в суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "Я перевірив пам'ять. Згідно з записами, що надійні, ти більше не повинен перевіряти газовий котел сам, бо це робить сервісна служба щосуботи.\n\nОстанній актуальний запис (від 27 листопада) говорить, що перевіряти вже не треба.",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ]
+ },
+ {
+  "item_id": "M84-P2#eb5b25e831",
+  "members": [
+   [
+    "r1",
+    "M84-P2"
+   ],
+   [
+    "r2",
+    "M84-P2"
+   ],
+   [
+    "r3",
+    "M84-P2"
+   ]
+  ],
+  "user_prompt": "Які в мене справи на цю суботу?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до твого особистого календаря чи планів. Щоб дізнатися, що у тебе на суботу, тобі потрібно перевірити свій календар, електронну пошту або будь-які інші джерела, де ти фіксуєш свої справи.\n\nЯкщо ти хочеш, я можу допомогти тобі знайти файли, які ти міг би використовувати для планування, або пошукати щось у пам'яті, якщо ти раніше це згадував. Що бажаєш зробити?",
+  "criteria": [
+   "no_boiler_check_mentions_service_or_nothing",
+   "revives_boiler_check"
+  ]
+ }
+]

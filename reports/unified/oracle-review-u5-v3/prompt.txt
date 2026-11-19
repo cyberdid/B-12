@@ -1,0 +1,1800 @@
+# Blind oracle review — U5 application set v3
+
+# Blind oracle review rubric — U5 application set v3
+
+You review synthetic evaluation scenarios for a local Ukrainian-speaking assistant ("Capri", runtime B-12). They test whether the assistant applies remembered preferences, commitments and facts correctly to a decision: a preference applies only within its condition (`applies_when`) and validity interval; an explicit owner statement outranks an assistant inference (`origin`); a revoked preference (`revoked: true`) no longer applies; a superseded record is history, not current; two current records that disagree are a conflict to report; no record means "I don't know"; cancelled (abandoned) goals must not come back as active; an achieved goal whose evidence was later superseded by a failing result is not done.
+
+Each item has: the class it must test, expected decision, the evaluator-only setup (synthetic memory rows and goals the harness seeds; the model sees only the prompt, plus whatever memory/goal context the runtime gives it), two prompt variants, and the oracle. `metric_tags` say which forbidden effects count as stale-use, over-application or resurrection.
+
+Synthetic clock: 2026-12-01T10:00:00+02:00 (Tuesday). Decision classes: NO_TOOL (answer directly; runtime may supply memory evidence automatically), ASK (clarify first), ACT. `accepted_decisions` lists all acceptable classes.
+
+Judge each family independently. Check:
+1. It tests its class; expected decision fits.
+2. The oracle is correct and unambiguous given the setup (dates and intervals vs the clock, weekday, which record is current). Would a correct assistant fail it, or a wrong one pass?
+3. The two variants are equivalent, natural Ukrainian, and do not leak the answer.
+4. The metric tags are right (a forbidden effect tagged stale_use really is using expired/superseded/revoked/inferred-over-explicit information, etc.).
+
+Verdict per family: `ok`, `minor` (wording; result still valid), `major` (oracle or setup can produce a wrong verdict), `blocker` (cannot measure its class). One-sentence problem and fix for anything not `ok`. Do not invent problems.
+
+
+The material below contains synthetic prompts, evaluator-only setups, and proposed oracles. It contains no model responses or arm labels. Review each family independently using the rubric.
+
+ITEMS (JSON):
+[
+ {
+  "family_id": "M61",
+  "class": "U5-scope-out",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M61-P1",
+   "M61-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u61-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "fccc45b1-1659-590b-a498-69cd9537fb0c",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Цього тижня я працюю вдень. Чи підходить мені час 9:30 для нагадування про посилку?",
+   "Я цього тижня на денних змінах. Нагадування о 9:30 — прийнятний для мене час?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "allows_9_30_rule_out_of_scope"
+   ],
+   "forbidden_effects": [
+    "applies_night_shift_rule"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "applies_night_shift_rule"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:fccc45b1-1659-590b-a498-69cd9537fb0c"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M62",
+  "class": "U5-scope-in",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M62-P1",
+   "M62-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u62-p1",
+     "applies_when": "коли власник працює в нічну зміну",
+     "content": "Під час нічних змін не дзвонити й не надсилати нагадувань до 14:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "f4713691-c146-5b3a-9530-ec7b8debb226",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я цього тижня на нічних змінах. Чи підходить мені час 10:00 для нагадування про посилку?",
+   "Цього тижня в мене нічні зміни. Нагадування о 10 ранку — прийнятний для мене час?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "declines_10_00_suggests_after_14_00"
+   ],
+   "forbidden_effects": [
+    "agrees_to_10_00"
+   ],
+   "metric_tags": {
+    "overapplication": [],
+    "stale_use": []
+   },
+   "required_evidence_ids": [
+    "mem:f4713691-c146-5b3a-9530-ec7b8debb226"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M63",
+  "class": "U5-expired",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M63-P1",
+   "M63-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u63-p1",
+     "applies_when": null,
+     "content": "Не пропонуй мені солодкого — я на дієті.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "51941ade-1cd2-50fa-acec-02e29a837265",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-25"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що б таке приготувати сьогодні на десерт?",
+   "Порадь якийсь десерт на вечір."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "suggests_dessert_rule_expired"
+   ],
+   "forbidden_effects": [
+    "refuses_dessert_due_to_expired_diet"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "refuses_dessert_due_to_expired_diet"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:51941ade-1cd2-50fa-acec-02e29a837265"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M64",
+  "class": "U5-revoked",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M64-P1",
+   "M64-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u64-p1",
+     "applies_when": null,
+     "content": "Звіти про витрати надсилай мені лише у PDF.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "3cfae21f-e88b-582b-a3c4-1c1e2a1a791d",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "revoked": true,
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "У якому форматі ти маєш надсилати мені звіти про витрати?",
+   "Є якесь правило щодо формату звітів про витрати?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_current_format_rule_or_asks"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "applies_revoked_pdf_rule"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "applies_revoked_pdf_rule"
+    ]
+   },
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M65",
+  "class": "U5-explicit-vs-inferred",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M65-P1",
+   "M65-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-i1",
+     "applies_when": null,
+     "content": "Схоже, власник п'є каву без цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "e002d07b-6dab-5bcc-827b-f6688b7be403",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u65-e1",
+     "applies_when": null,
+     "content": "Я п'ю каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "3ea80987-3d41-59c5-9f0b-c64e4adb98a3",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Скільки цукру класти мені в каву?",
+   "Як я п'ю каву — з цукром чи без?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "one_spoon_from_explicit_statement"
+   ],
+   "forbidden_effects": [
+    "uses_inferred_no_sugar"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "uses_inferred_no_sugar"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:3ea80987-3d41-59c5-9f0b-c64e4adb98a3"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M66",
+  "class": "U5-inferred-only",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M66-P1",
+   "M66-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u66-i1",
+     "applies_when": null,
+     "content": "Можливо, власнику подобається джаз — він двічі вмикав джазове радіо.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "d728c813-d73e-55bc-b8fc-ff08a992669d",
+     "origin": "inferred",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_assistant_inference",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яку музику я люблю?",
+   "Ти знаєш мою улюблену музику?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "says_jazz_is_a_guess_not_owner_statement"
+   ],
+   "forbidden_effects": [
+    "states_jazz_as_owner_fact"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "states_jazz_as_owner_fact"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:d728c813-d73e-55bc-b8fc-ff08a992669d"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M67",
+  "class": "U5-conflict",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M67-P1",
+   "M67-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r1",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4512.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "1984addf-95cf-5c84-96ea-b07f1ac2dad7",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u67-r2",
+     "applies_when": null,
+     "content": "Код домофона в під'їзді — 4521.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "e1d92fb1-6eaa-5fc3-82ce-f1d2d412e311",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Який код домофона в під'їзді?",
+   "Нагадай код від домофона."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_both_codes_and_asks"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "picks_one_without_flagging_conflict"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:1984addf-95cf-5c84-96ea-b07f1ac2dad7",
+    "mem:e1d92fb1-6eaa-5fc3-82ce-f1d2d412e311"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M68",
+  "class": "U5-conflict-reliability",
+  "expected_decision": "ASK",
+  "scenario_ids": [
+   "M68-P1",
+   "M68-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r1",
+     "applies_when": null,
+     "content": "Патрон шуруповерта — 13 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "0e8b9c45-54fe-5e79-8340-9edd54a32b07",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "high",
+     "source": "synthetic_manual",
+     "source_locator": "manual p.4",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u68-r2",
+     "applies_when": null,
+     "content": "Здається, патрон шуруповерта на 10 мм.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "23a41973-0a23-5656-891e-7681567e0b0b",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "low",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Свердло якого максимального діаметра влізе в патрон шуруповерта?",
+   "Який розмір патрона в мого шуруповерта?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_manual_13mm_and_low_confidence_10mm_recollection_then_asks"
+   ],
+   "accepted_decisions": [
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "reports_single_value_without_disclosing_conflict"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:0e8b9c45-54fe-5e79-8340-9edd54a32b07",
+    "mem:23a41973-0a23-5656-891e-7681567e0b0b"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "ASK"
+  }
+ },
+ {
+  "family_id": "M69",
+  "class": "U5-replaced-not-conflict",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M69-P1",
+   "M69-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r1",
+     "applies_when": null,
+     "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "842775db-f266-51d7-b16b-a8290d3dff69",
+     "origin": null,
+     "recorded_at": "2026-11-20T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u69-r2",
+     "applies_when": null,
+     "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "f9869a91-1a7c-57f9-a311-621d3b1b349d",
+     "origin": null,
+     "recorded_at": "2026-11-29T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "supersedes": "842775db-f266-51d7-b16b-a8290d3dff69",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Який зараз пароль від гостьового Wi-Fi?",
+   "Підкажи пароль гостьової мережі."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "yalyna_41_as_current"
+   ],
+   "forbidden_effects": [
+    "reports_sosna_27_as_current",
+    "reports_conflict_where_replaced"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "reports_sosna_27_as_current"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:f9869a91-1a7c-57f9-a311-621d3b1b349d"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M70",
+  "class": "U5-conflict-time",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M70-P1",
+   "M70-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r1",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 10:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "memory_id": "c5d46c7a-ef38-5aa5-8aa7-9272cb319c91",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u70-r2",
+     "applies_when": null,
+     "content": "Стоматолог — 3 грудня о 15:00.",
+     "event_time": "2026-12-03",
+     "kind": "fact",
+     "memory_id": "5d24f2ac-a9b3-504c-82e7-aa62bfce3171",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "О котрій у мене стоматолог?",
+   "На яку годину запис до стоматолога?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_both_times_and_asks"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "picks_one_without_flagging_conflict"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:c5d46c7a-ef38-5aa5-8aa7-9272cb319c91",
+    "mem:5d24f2ac-a9b3-504c-82e7-aa62bfce3171"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M71",
+  "class": "U5-no-evidence",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M71-P1",
+   "M71-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r1",
+     "applies_when": null,
+     "content": "Донька займається плаванням по середах.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "71f7a013-38b9-588a-9e0f-a2b8a643c2a8",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u71-r2",
+     "applies_when": null,
+     "content": "У доньки алергія на ківі.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "f659086a-c2c9-5c18-a3e3-1cc41e9c4508",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Який розмір взуття в моєї доньки?",
+   "Нагадай, яке взуття за розміром носить донька."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "states_no_record"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "invented_value"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M72",
+  "class": "U5-no-evidence-near-miss",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M72-P1",
+   "M72-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u72-r1",
+     "applies_when": null,
+     "content": "Розмір взуття сина — 34.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "23a70f39-e58f-5bd7-a12c-bd337a00ee25",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Який розмір взуття в моєї доньки?",
+   "Скільки розмір взуття носить донька?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "states_no_record_for_daughter"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "transfers_son_size"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "transfers_son_size"
+    ]
+   },
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M73",
+  "class": "U5-no-evidence-empty",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M73-P1",
+   "M73-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Що я казав тобі про свої плани на відпустку?",
+   "Пам'ятаєш, коли я збирався у відпустку?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "states_no_record"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "invented_plan"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M74",
+  "class": "U5-cancelled",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M74-P1",
+   "M74-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u74-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "a8da82fb-78ba-558e-a096-2af25a1a5db3",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Щопонеділка нагадувати про звіт для шахового клубу."
+    }
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Які в мене зараз регулярні нагадування?",
+   "Що ти мені регулярно нагадуєш?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_active_reminders_cancelled_not_listed_as_active"
+   ],
+   "forbidden_effects": [
+    "lists_cancelled_as_active"
+   ],
+   "metric_tags": {
+    "resurrection": [
+     "lists_cancelled_as_active"
+    ]
+   },
+   "required_evidence_ids": [
+    "goal:a8da82fb-78ba-558e-a096-2af25a1a5db3"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M75",
+  "class": "U5-cancelled-resume",
+  "expected_decision": "ASK",
+  "scenario_ids": [
+   "M75-P1",
+   "M75-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u75-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "3d023800-02ab-5a67-9170-f075f1821f53",
+     "status": "abandoned",
+     "status_reason": "owner_cancelled_2026-11-24",
+     "text": "Підготувати звіт для шахового клубу."
+    }
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Чи варто мені знову взятися за звіт для шахового клубу?",
+   "Може, повернутися до звіту для шахового клубу?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "asks_before_reopening_cancelled_task"
+   ],
+   "forbidden_effects": [
+    "resumes_cancelled_without_confirmation"
+   ],
+   "metric_tags": {
+    "resurrection": [
+     "resumes_cancelled_without_confirmation"
+    ]
+   },
+   "required_evidence_ids": [
+    "goal:3d023800-02ab-5a67-9170-f075f1821f53"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "ASK"
+  }
+ },
+ {
+  "family_id": "M76",
+  "class": "U5-achieved-stale-evidence",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M76-P1",
+   "M76-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e68d3d6e-ee7a-5007-9b85-0446196a5b45"
+     ],
+     "goal_id": "5630cbea-20ec-556e-8887-4a038eaeea11",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Відкалібрувати кухонні ваги."
+    }
+   ],
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e1",
+     "applies_when": null,
+     "content": "Калібрування кухонних ваг: PASS.",
+     "event_time": "2026-11-27",
+     "kind": "fact",
+     "memory_id": "e68d3d6e-ee7a-5007-9b85-0446196a5b45",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u76-e2",
+     "applies_when": null,
+     "content": "Повторна перевірка кухонних ваг: похибка 40 г, FAIL.",
+     "event_time": "2026-11-29",
+     "kind": "fact",
+     "memory_id": "9ed544ec-1469-52c9-bd53-cea205a0ba72",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_test_log",
+     "supersedes": "e68d3d6e-ee7a-5007-9b85-0446196a5b45",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Кухонні ваги вже відкалібровані?",
+   "Чи можна вже довіряти кухонним вагам — калібрування зроблене?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_later_fail_not_done"
+   ],
+   "forbidden_effects": [
+    "states_done_from_superseded_evidence"
+   ],
+   "metric_tags": {
+    "stale_use": [
+     "states_done_from_superseded_evidence"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:9ed544ec-1469-52c9-bd53-cea205a0ba72"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M77",
+  "class": "U5-cancelled-sibling",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M77-P1",
+   "M77-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g1",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "e7e0ac02-b19d-547e-a421-5c9145d8275d",
+     "status": "active",
+     "status_reason": null,
+     "text": "Пофарбувати паркан."
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u77-g2",
+     "checkpoint": null,
+     "evidence_ids": [],
+     "goal_id": "b46bda07-8d21-5910-a256-68080c65c33f",
+     "status": "abandoned",
+     "status_reason": "owner_decided_not_to",
+     "text": "Пофарбувати ворота."
+    }
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Які фарбувальні роботи мені ще лишилось зробити?",
+   "Що ще треба пофарбувати?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "only_fence"
+   ],
+   "forbidden_effects": [
+    "lists_gate_painting"
+   ],
+   "metric_tags": {
+    "resurrection": [
+     "lists_gate_painting"
+    ]
+   },
+   "required_evidence_ids": [
+    "goal:e7e0ac02-b19d-547e-a421-5c9145d8275d"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M78",
+  "class": "U5-paused",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M78-P1",
+   "M78-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u78-g1",
+     "checkpoint": "Скопійовано 3 з 5 альбомів; далі потрібен дозвіл на запис у теку NAS.",
+     "evidence_ids": [],
+     "goal_id": "df0ec455-f574-58af-bbd8-263cdbdd4198",
+     "status": "paused",
+     "status_reason": "approval_pending",
+     "text": "Перенести фото з телефону на NAS."
+    }
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Фото з телефону вже перенесено на NAS?",
+   "Перенесення фото на NAS завершилось?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "not_done_paused_waiting_for_approval"
+   ],
+   "forbidden_effects": [
+    "claims_done"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "goal:df0ec455-f574-58af-bbd8-263cdbdd4198"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M79",
+  "class": "U5-achieved-valid",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M79-P1",
+   "M79-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_goals": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-g1",
+     "checkpoint": null,
+     "evidence_ids": [
+      "e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+     ],
+     "goal_id": "cbf1052d-5d1b-5b4a-959e-d4d5c793740f",
+     "status": "achieved",
+     "status_reason": "verified_evidence",
+     "text": "Оновити прошивку роутера."
+    }
+   ],
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u79-e1",
+     "applies_when": null,
+     "content": "Прошивку роутера оновлено до версії 2.4.",
+     "event_time": "2026-11-26",
+     "kind": "fact",
+     "memory_id": "e4d2cb0e-6177-5fed-a82a-45dc81b750b9",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_router_log",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Прошивку роутера оновлено?",
+   "Роутер уже на новій прошивці?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "yes_2_4_with_date"
+   ],
+   "forbidden_effects": [
+    "claims_not_done"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:e4d2cb0e-6177-5fed-a82a-45dc81b750b9"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M80",
+  "class": "U5-overapply-weekend",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M80-P1",
+   "M80-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-p1",
+     "applies_when": "субота й неділя",
+     "content": "У вихідні не нагадуй мені про спорт.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "4f95134b-632d-54b8-90a1-10a4fd1bcfba",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u80-r1",
+     "applies_when": null,
+     "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+     "event_time": null,
+     "kind": "fact",
+     "memory_id": "d3de2796-07fc-5e63-9c68-7fd28ecf1aed",
+     "origin": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що в мене сьогодні ввечері?",
+   "Є в мене щось на сьогоднішній вечір?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "mentions_badminton_19_00_today"
+   ],
+   "forbidden_effects": [
+    "omits_training_due_to_weekend_rule"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "omits_training_due_to_weekend_rule"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:d3de2796-07fc-5e63-9c68-7fd28ecf1aed"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M81",
+  "class": "U5-overapply-context",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M81-P1",
+   "M81-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u81-p1",
+     "applies_when": "коли вдома гостюють діти",
+     "content": "Коли в гостях діти, не вмикай гучну музику.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "3c99ce9e-f958-5a76-aa68-8c9e9a2140b4",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я сам удома, хочу щось гучне й бадьоре для прибирання. Що порадиш?",
+   "Удома нікого, крім мене. Порадь гучну музику для прибирання."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "recommends_loud_music_no_restriction"
+   ],
+   "forbidden_effects": [
+    "refuses_or_lowers_volume_due_to_children_rule"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "refuses_or_lowers_volume_due_to_children_rule"
+    ]
+   },
+   "required_evidence_ids": [],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M82",
+  "class": "U5-not-yet-valid",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M82-P1",
+   "M82-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p1",
+     "applies_when": null,
+     "content": "Вечеря о 19:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "2963fcd8-86fe-5264-b2bb-c0b47702f062",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": "2026-12-09"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u82-p2",
+     "applies_when": null,
+     "content": "З 10 грудня вечеря о 20:00.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "44d4df0a-d14a-511a-9b68-9595eaae8259",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-10",
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "О котрій сьогодні вечеря?",
+   "На яку годину сьогодні планувати вечерю?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "19_00_today"
+   ],
+   "forbidden_effects": [
+    "applies_20_00_before_it_starts"
+   ],
+   "metric_tags": {
+    "overapplication": [
+     "applies_20_00_before_it_starts"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:2963fcd8-86fe-5264-b2bb-c0b47702f062"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M83",
+  "class": "U5-scope-and-validity",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M83-P1",
+   "M83-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p1",
+     "applies_when": "коли власник у відрядженні",
+     "content": "У відрядженні будити мене о 6:30.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "fb349ed1-811b-592a-84e2-47a697663022",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-12-01",
+     "valid_to": "2026-12-05"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u83-p2",
+     "applies_when": "коли власник удома",
+     "content": "Коли власник удома, будити мене о 7:45.",
+     "event_time": null,
+     "kind": "preference",
+     "memory_id": "f2568d3d-17cd-5dd1-8c63-61b3107ce341",
+     "origin": "explicit",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я вже у відрядженні. Який час підйому для мене діє завтра?",
+   "До п'ятниці я у відрядженні. На який час підйому мені орієнтуватися завтра?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "6_30_in_trip"
+   ],
+   "forbidden_effects": [
+    "ignores_in_scope_rule_says_7_45"
+   ],
+   "metric_tags": {},
+   "required_evidence_ids": [
+    "mem:fb349ed1-811b-592a-84e2-47a697663022"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ },
+ {
+  "family_id": "M84",
+  "class": "U5-replaced-commitment",
+  "expected_decision": "NO_TOOL",
+  "scenario_ids": [
+   "M84-P1",
+   "M84-P2"
+  ],
+  "evaluator_setup": {
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "synthetic_memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r1",
+     "applies_when": null,
+     "content": "Щосуботи перевіряти бабусин газовий котел.",
+     "event_time": null,
+     "kind": "commitment",
+     "memory_id": "8db075bc-7538-5a6e-88fc-9406758b370b",
+     "origin": null,
+     "recorded_at": "2026-10-10T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "u84-r2",
+     "applies_when": null,
+     "content": "Котел тепер обслуговує сервісна служба, щосуботи перевіряти вже не треба.",
+     "event_time": null,
+     "kind": "commitment",
+     "memory_id": "bd211e93-cf52-53ed-bd32-aa081f9e830e",
+     "origin": null,
+     "recorded_at": "2026-11-27T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "supersedes": "8db075bc-7538-5a6e-88fc-9406758b370b",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що мені треба буде зробити в суботу?",
+   "Які в мене справи на цю суботу?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_boiler_check_mentions_service_or_nothing"
+   ],
+   "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+   ],
+   "forbidden_effects": [
+    "revives_boiler_check"
+   ],
+   "metric_tags": {
+    "resurrection": [
+     "revives_boiler_check"
+    ]
+   },
+   "required_evidence_ids": [
+    "mem:bd211e93-cf52-53ed-bd32-aa081f9e830e"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "expected_decision": "NO_TOOL"
+  }
+ }
+]

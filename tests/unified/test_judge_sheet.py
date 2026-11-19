@@ -55,6 +55,13 @@ def test_combine_needs_unanimity_and_flags_disputes():
     assert result["disputed"] == [
         {"item_id": "A", "criterion": "c2", "votes": {"j1": "met", "j2": "not_met"}}
     ]
+    assert result["criterion_results"] == {
+        "A": {
+            "c1": {"label": "met", "votes": {"j1": "met", "j2": "met"}},
+            "c2": {"label": None, "votes": {"j1": "met", "j2": "not_met"}},
+        },
+        "B": {"c1": {"label": "not_met", "votes": {"j1": "not_met", "j2": "not_met"}}},
+    }
 
 
 def test_combine_rejects_missing_or_invalid_labels():
@@ -80,3 +87,26 @@ def test_pilot_sheet_groups_identical_repeats_and_expands_verdicts(tmp_path):
     verdicts = {item["item_id"]: "SEMANTIC_FAIL" for item in sheet}
     expanded = expand(sheet, verdicts)
     assert set(expanded) == {"r1/C02-P1", "r2/C02-P1", "r3/C02-P1"}
+
+
+def test_pilot_keeps_metric_tagged_criteria_when_other_check_deterministically_fails(tmp_path):
+    from evals.unified.judge_sheet import build_pilot
+
+    write_record(
+        tmp_path / "out" / "r1",
+        "M64-P1",
+        "Можливо, правило про PDF вже не діє.",
+        calls=[{"name": "memory_forget", "status": "completed", "arguments": {}}],
+    )
+    sheet = build_pilot(
+        ROOT / "evals/unified/scenario_sets/u5-application-v3.json",
+        tmp_path / "out",
+        ROOT,
+        track="memory",
+    )
+    item = next(item for item in sheet if item["item_id"].startswith("M64-P1#"))
+    assert "applies_revoked_pdf_rule" in item["criteria"]
+    assert item["criterion_polarity"] == {
+        "no_current_format_rule_or_asks": "required",
+        "applies_revoked_pdf_rule": "prohibited",
+    }

@@ -1,0 +1,42 @@
+{
+  "family_id": "M81",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u81-p1",
+        "applies_when": "коли вдома гостюють діти",
+        "content": "Коли в гостях діти, не вмикай гучну музику.",
+        "event_time": null,
+        "kind": "preference",
+        "memory_id": "3c99ce9e-f958-5a76-aa68-8c9e9a2140b4",
+        "origin": "explicit",
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

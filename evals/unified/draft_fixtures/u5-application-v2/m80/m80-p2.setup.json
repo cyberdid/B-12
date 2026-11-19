@@ -1,0 +1,57 @@
+{
+  "family_id": "M80",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u80-p1",
+        "applies_when": "субота й неділя",
+        "content": "У вихідні не нагадуй мені про спорт.",
+        "event_time": null,
+        "kind": "preference",
+        "memory_id": "4f95134b-632d-54b8-90a1-10a4fd1bcfba",
+        "origin": "explicit",
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u80-r1",
+        "applies_when": null,
+        "content": "Тренування з бадмінтону — щовівторка о 19:00.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "d3de2796-07fc-5e63-9c68-7fd28ecf1aed",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

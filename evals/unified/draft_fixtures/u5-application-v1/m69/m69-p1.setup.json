@@ -1,0 +1,58 @@
+{
+  "family_id": "M69",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u69-r1",
+        "applies_when": null,
+        "content": "Пароль гостьового Wi-Fi — синтетичний «сосна-27».",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "842775db-f266-51d7-b16b-a8290d3dff69",
+        "origin": null,
+        "recorded_at": "2026-11-20T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u69-r2",
+        "applies_when": null,
+        "content": "Новий пароль гостьового Wi-Fi — синтетичний «ялина-41».",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "f9869a91-1a7c-57f9-a311-621d3b1b349d",
+        "origin": null,
+        "recorded_at": "2026-11-29T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "supersedes": "842775db-f266-51d7-b16b-a8290d3dff69",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

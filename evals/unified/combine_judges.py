@@ -51,7 +51,7 @@ def repair_ids(sheet, labels):
     return sorted(fixes)
 
 
-def finalize(sheet, labels_by_judge, adjudication=None):
+def finalize(sheet, labels_by_judge, adjudication=None, criterion_adjudication=None):
     corrections = {judge: repair_ids(sheet, labels) for judge, labels in labels_by_judge.items()}
     result = combine(sheet, labels_by_judge)
     result["item_id_corrections"] = {k: v for k, v in corrections.items() if v}
@@ -68,6 +68,40 @@ def finalize(sheet, labels_by_judge, adjudication=None):
             )
             final[item] = verdict
         result["adjudicated"] = adjudicated
+    if criterion_adjudication is not None:
+        valid_labels = {"met", "not_met", "unclear"}
+        if not isinstance(criterion_adjudication, dict):
+            raise ValueError("criterion adjudication must be a JSON object")
+        used = set()
+        for item_id, criteria in result["criterion_results"].items():
+            scenario_id = item_id.split("#", 1)[0]
+            family_id = scenario_id.split("-", 1)[0]
+            for key in (family_id, scenario_id, item_id):
+                selected = criterion_adjudication.get(key)
+                if selected is None:
+                    continue
+                if not isinstance(selected, dict):
+                    raise ValueError(f"criterion adjudication for {key} must be an object")
+                for criterion, label in selected.items():
+                    if criterion not in criteria:
+                        continue
+                    if label not in valid_labels:
+                        raise ValueError(
+                            f"bad criterion adjudication label for {key}/{criterion}: {label!r}"
+                        )
+                    criteria[criterion]["label"] = label
+                    criteria[criterion]["adjudicated_by"] = "owner"
+                    used.add((key, criterion))
+        requested = {
+            (key, criterion)
+            for key, criteria in criterion_adjudication.items()
+            for criterion in criteria
+        }
+        if requested - used:
+            raise ValueError(
+                f"unknown criterion adjudication entries: {sorted(requested - used)[:5]}"
+            )
+        result["criterion_adjudication"] = criterion_adjudication
     result["final_verdicts"] = final
     return result
 
@@ -78,6 +112,11 @@ def main(argv=None):
     parser.add_argument("out_dir", type=Path)
     parser.add_argument("--labels", action="append", required=True, help="judge=path[,path]")
     parser.add_argument("--adjudication", type=Path)
+    parser.add_argument(
+        "--criterion-adjudication",
+        type=Path,
+        help="JSON mapping family/scenario/item IDs to criterion labels (met/not_met/unclear)",
+    )
     parser.add_argument(
         "--stale-sheet",
         type=Path,
@@ -97,9 +136,14 @@ def main(argv=None):
     adjudication = (
         json.loads(args.adjudication.read_text(encoding="utf-8")) if args.adjudication else None
     )
+    criterion_adjudication = (
+        json.loads(args.criterion_adjudication.read_text(encoding="utf-8"))
+        if args.criterion_adjudication
+        else None
+    )
     disputes_only = adjudication is None
     try:
-        result = finalize(sheet, labels, adjudication)
+        result = finalize(sheet, labels, adjudication, criterion_adjudication)
     except ValueError as exc:
         parser.exit(2, f"{exc}\n")
     args.out_dir.mkdir(parents=True, exist_ok=True)

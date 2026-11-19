@@ -3,9 +3,10 @@
 The sheet holds, per executed scenario: the user prompt, the evaluator-only synthetic
 facts the answer must rest on, what the assistant observably did (tool calls with
 arguments and status, evidence count) and its reply, plus the prose items left by the
-deterministic scorer (`semantic_pending`). It carries no model name, no deterministic
-verdict and no author verdict. Each judge labels every item `met`, `not_met` or
-`unclear`. `combine` keeps unanimous labels and lists disagreements for the owner.
+deterministic scorer (`semantic_pending`). It carries each criterion's required/prohibited
+polarity, but no model name, deterministic verdict or author verdict. Each judge labels
+every item `met`, `not_met` or `unclear`. `combine` keeps unanimous labels and lists
+disagreements for the owner.
 """
 
 import json
@@ -14,6 +15,24 @@ from pathlib import Path
 from evals.unified.score_u2_u3 import score
 
 LABELS = {"met", "not_met", "unclear"}
+
+
+def _criterion_polarity(oracle, criteria):
+    """Expose whether a semantic criterion is required or describes a forbidden effect."""
+    required = set(oracle.get("accepted_outcomes", []))
+    prohibited = set(oracle.get("forbidden_effects", []))
+    overlap = required & prohibited
+    if overlap:
+        raise ValueError(f"criteria are both accepted and forbidden: {sorted(overlap)}")
+    result = {}
+    for criterion in criteria:
+        if criterion in required:
+            result[criterion] = "required"
+        elif criterion in prohibited:
+            result[criterion] = "prohibited"
+        else:
+            raise ValueError(f"semantic criterion has no polarity in oracle: {criterion}")
+    return result
 
 
 def _facts(setup):
@@ -62,6 +81,9 @@ def build(manifest, records_dir, root):
                 "memory_evidence_offered_by_runtime": len(record.get("evidence_ids", [])),
                 "assistant_reply": record["reply"],
                 "criteria": result["semantic_pending"],
+                "criterion_polarity": _criterion_polarity(
+                    oracle, result["semantic_pending"]
+                ),
             }
         )
     return sheet
@@ -79,13 +101,19 @@ def combine(sheet, labels_by_judge):
     missing = expected - set(table)
     if missing:
         raise ValueError(f"unlabelled criteria: {sorted(missing)[:5]}")
-    agreed, disputed = {}, []
+    agreed, disputed, criterion_results = {}, [], {}
     for key in sorted(expected):
         votes = table[key]
         if len(votes) == len(labels_by_judge) and len(set(votes.values())) == 1:
-            agreed[key] = next(iter(votes.values()))
+            label = next(iter(votes.values()))
+            agreed[key] = label
         else:
+            label = None
             disputed.append({"item_id": key[0], "criterion": key[1], "votes": votes})
+        criterion_results.setdefault(key[0], {})[key[1]] = {
+            "label": label,
+            "votes": votes,
+        }
     per_item = {}
     for (item, _), label in agreed.items():
         per_item.setdefault(item, set()).add(label)
@@ -101,7 +129,12 @@ def combine(sheet, labels_by_judge):
         )
         for item, found in per_item.items()
     }
-    return {"agreed": len(agreed), "disputed": disputed, "verdicts": verdicts}
+    return {
+        "agreed": len(agreed),
+        "disputed": disputed,
+        "verdicts": verdicts,
+        "criterion_results": criterion_results,
+    }
 
 
 def main(argv=None):
@@ -152,8 +185,19 @@ def build_pilot(manifest, out_dir, root, *, track=None):
         row = rows[sid]
         oracle = json.loads((Path(root) / row["oracle_fixture"]).read_text(encoding="utf-8"))
         result = score(record, oracle)
-        if result["verdict"] in {"BLOCKED", "RUN_FAILED", "FAIL"} or not result["semantic_pending"]:
-            continue  # deterministic FAIL already decides; nothing semantic to judge
+        tagged_criteria = {
+            criterion
+            for criteria in oracle.get("metric_tags", {}).values()
+            for criterion in criteria
+        }
+        has_tagged_criterion = bool(tagged_criteria & set(result["semantic_pending"]))
+        if (
+            result["verdict"] in {"BLOCKED", "RUN_FAILED"}
+            or (result["verdict"] == "FAIL" and not has_tagged_criterion)
+            or not result["semantic_pending"]
+        ):
+            # Keep tagged adverse criteria for U5 even when another deterministic check fails.
+            continue
         setup = json.loads((Path(root) / row["setup_fixture"]).read_text(encoding="utf-8"))
         prompt = json.loads((Path(root) / row["input_fixture"]).read_text(encoding="utf-8"))
         sheet.append(
@@ -169,6 +213,9 @@ def build_pilot(manifest, out_dir, root, *, track=None):
                 "memory_evidence_offered_by_runtime": len(record.get("evidence_ids", [])),
                 "assistant_reply": record["reply"],
                 "criteria": result["semantic_pending"],
+                "criterion_polarity": _criterion_polarity(
+                    oracle, result["semantic_pending"]
+                ),
             }
         )
     return sheet

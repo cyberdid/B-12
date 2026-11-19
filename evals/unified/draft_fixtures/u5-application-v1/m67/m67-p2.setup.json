@@ -1,0 +1,57 @@
+{
+  "family_id": "M67",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u67-r1",
+        "applies_when": null,
+        "content": "Код домофона в під'їзді — 4512.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "1984addf-95cf-5c84-96ea-b07f1ac2dad7",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u67-r2",
+        "applies_when": null,
+        "content": "Код домофона в під'їзді — 4521.",
+        "event_time": null,
+        "kind": "fact",
+        "memory_id": "e1d92fb1-6eaa-5fc3-82ce-f1d2d412e311",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:05:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,148 @@
+{
+ "reviews": [
+  {
+   "family_id": "M61",
+   "fix": "Set required_evidence_ids to [], relax accepted_outcomes to [\"allows_9_30\"], and either ask about tomorrow at 9:30 or move synthetic_clock earlier than 9:30.",
+   "problem": "Oracle requires the out-of-scope night-shift rule (mem:fccc45b1-1659-590b-a498-69cd9537fb0c) in required_evidence_ids and asks about 9:30 when synthetic_clock is already 10:00, which can fail a correct assistant that excludes out-of-scope rules or notes 9:30 has passed today.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M62",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M63",
+   "fix": "Set required_evidence_ids to [], change accepted_outcomes to [\"suggests_dessert\"], and set recorded_at within the 2026-11-01..2026-11-25 validity interval.",
+   "problem": "Oracle requires the expired diet record (mem:51941ade-1cd2-50fa-acec-02e29a837265) in required_evidence_ids and expects mentioning expiration in accepted_outcomes even though the prompt never mentions a diet, which can fail a correct assistant whose runtime filters expired rules.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M64",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M65",
+   "fix": "Reword variant 2 to ask about the amount of sugar (for example, \"Скільки ложок цукру я зазвичай кладу в каву?\") or accept a concise \"with sugar\" answer.",
+   "problem": "Prompt variant 2 asks a binary question (\"з цукром чи без?\") rather than quantity, whereas accepted_outcomes expects \"one_spoon_from_explicit_statement\".",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M66",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M67",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M68",
+   "fix": "Remove \"reports_10_mm_as_fact\" from metric_tags.stale_use and leave metric_tags empty as in M67 and M70.",
+   "problem": "The metric_tags field misclassifies \"reports_10_mm_as_fact\" as stale_use even though u68-r2 is a same-timestamp, non-expired, non-superseded, non-revoked low-reliability owner statement rather than stale or inferred information.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M69",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M70",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M71",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M72",
+   "fix": "Change prompt variant 2 to natural Ukrainian such as \"Який розмір взуття носить донька?\" or \"Якого розміру взуття в моєї доньки?\".",
+   "problem": "Prompt variant 2 uses ungrammatical Ukrainian (\"Скільки розмір взуття носить донька?\").",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M73",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M74",
+   "fix": "Set required_evidence_ids to [] and relax accepted_outcomes to [\"no_active_reminders\"] while keeping \"lists_cancelled_as_active\" forbidden.",
+   "problem": "Oracle requires the abandoned goal (goal:a8da82fb-78ba-558e-a096-2af25a1a5db3) in required_evidence_ids, which will falsely fail a correct assistant or runtime that excludes cancelled goals when listing current regular reminders.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M75",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M76",
+   "fix": "Update u76-e2.recorded_at to a timestamp on or after 2026-11-29, such as 2026-11-29T09:00:00+02:00.",
+   "problem": "In u76-e2, recorded_at (2026-11-28T09:00:00+02:00) precedes its own event_time (2026-11-29) and ties u76-e1, though supersedes and event_time still keep the intended outcome unambiguous.",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M77",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M78",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M79",
+   "fix": "Change accepted_outcomes to [\"yes_updated_to_2_4\"] so including the update date is optional.",
+   "problem": "Oracle accepted_outcomes (\"yes_2_4_with_date\") demands stating the update date even though neither prompt asks when the firmware was updated, which can falsely fail a correct assistant that answers yes with version 2.4.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M80",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M81",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M82",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M83",
+   "fix": "",
+   "problem": "",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M84",
+   "fix": "Set required_evidence_ids to [] or remove \"or_nothing\" from accepted_outcomes if citing the service-company replacement record is strictly expected.",
+   "problem": "Oracle requires mem:bd211e93-cf52-53ed-bd32-aa081f9e830e in required_evidence_ids, contradicting the \"or_nothing\" branch of accepted_outcomes (\"no_boiler_check_mentions_service_or_nothing\") and risking false failures when an assistant reports no Saturday tasks.",
+   "verdict": "major"
+  }
+ ]
+}

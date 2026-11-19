@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "mentions_badminton_19_00_today"
+  ],
+  "catalog_class": "U5-overapply-weekend",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M80",
+  "forbidden_effects": [
+    "omits_training_due_to_weekend_rule"
+  ],
+  "metric_tags": {
+    "overapplication": [
+      "omits_training_due_to_weekend_rule"
+    ]
+  },
+  "required_evidence_ids": [
+    "mem:d3de2796-07fc-5e63-9c68-7fd28ecf1aed"
+  ],
+  "review_status": "REVIEWED 2026-11-19: two independent blind local-model reviews by Gemma 4 12B (4eb23ef187e2) and Nemotron Bolt E4B (7eaa0c0553b8); unanimous ok on 24 families.",
+  "scenario_id": "M80-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

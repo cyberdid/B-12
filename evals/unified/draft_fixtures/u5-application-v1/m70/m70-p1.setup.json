@@ -1,0 +1,57 @@
+{
+  "family_id": "M70",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u70-r1",
+        "applies_when": null,
+        "content": "Стоматолог — 3 грудня о 10:00.",
+        "event_time": "2026-12-03",
+        "kind": "fact",
+        "memory_id": "c5d46c7a-ef38-5aa5-8aa7-9272cb319c91",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u70-r2",
+        "applies_when": null,
+        "content": "Стоматолог — 3 грудня о 15:00.",
+        "event_time": "2026-12-03",
+        "kind": "fact",
+        "memory_id": "5d24f2ac-a9b3-504c-82e7-aa62bfce3171",
+        "origin": null,
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

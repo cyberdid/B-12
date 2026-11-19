@@ -1,0 +1,75 @@
+{
+  "review_type": "independent blind local-model oracle review",
+  "date": "2026-11-19",
+  "source_set": "evals/unified/scenario_sets/u5-application-v3.json",
+  "source_set_sha256": "b6aee9bdfbe4d686de9e65207f403e0c9429378b146e7b7ab810e4eb6fa6ec5d",
+  "method": "Each reviewer received the same rubric and evaluator-only synthetic setups, prompts, and proposed oracles. Calls were separate and no prior review outputs, arm labels, or evaluated model responses were included.",
+  "family_count": 24,
+  "verdicts_per_reviewer": {
+    "ok": 24,
+    "minor": 0,
+    "major": 0,
+    "blocker": 0
+  },
+  "agreement": "24/24 verdicts; no disagreements",
+  "human_review": false,
+  "scope_limit": "This checks scenario/oracle coherence, not Capri task performance. The second reviewer shares the Nemotron family with the target model; the cross-family Gemma review is independent. Neither result is a human oracle certification.",
+  "ollama_server": "0.33.3",
+  "host": {
+    "os": "Linux-7.0.0-43-generic-x86_64-with-glibc2.39",
+    "kernel": "7.0.0-43-generic",
+    "cpu": "Intel Core i9-14900HX",
+    "ram_gib": 31,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "vram_mib": 8188,
+    "power_profile": "performance"
+  },
+  "prompt_shards_sha256": {
+    "gemma4-12b/batch-01": "de907575bd20040e4587e2e447120741d63cf4a8b9e9b5522b63315c6ad5610e",
+    "gemma4-12b/batch-02": "c26735780b5dfa2d4ddf1222b1666928216625e9fd136077b005511a4ddd362d",
+    "gemma4-12b/batch-03": "b82b0a12e0559e5dc66b78077de777a20f8fd7b61b42e1834c5d2c714ba6fd9b",
+    "nemotron-bolt-e4b/batch-01": "de907575bd20040e4587e2e447120741d63cf4a8b9e9b5522b63315c6ad5610e",
+    "nemotron-bolt-e4b/batch-02": "c26735780b5dfa2d4ddf1222b1666928216625e9fd136077b005511a4ddd362d",
+    "nemotron-bolt-e4b/batch-03": "b82b0a12e0559e5dc66b78077de777a20f8fd7b61b42e1834c5d2c714ba6fd9b"
+  },
+  "reviewers": [
+    {
+      "display_name": "Gemma 4 12B",
+      "model": "gemma4:12b",
+      "ollama_digest": "4eb23ef187e2",
+      "quantization": "Q4_K_M",
+      "temperature": 0,
+      "seed": 781,
+      "num_ctx": 8192,
+      "num_predict": 1400,
+      "processor": "17% CPU / 83% GPU",
+      "family_verdict_counts": {
+        "ok": 24
+      },
+      "batch_durations_seconds": [
+        41.3,
+        26.7,
+        26.8
+      ]
+    },
+    {
+      "display_name": "Nemotron Bolt E4B",
+      "model": "b12-bolt-e4b:q4km",
+      "ollama_digest": "7eaa0c0553b8",
+      "quantization": "Q4_K_M",
+      "temperature": 0,
+      "seed": 781,
+      "num_ctx": 8192,
+      "num_predict": 1400,
+      "processor": "100% GPU",
+      "family_verdict_counts": {
+        "ok": 24
+      },
+      "batch_durations_seconds": [
+        19.0,
+        8.3,
+        8.4
+      ]
+    }
+  ]
+}

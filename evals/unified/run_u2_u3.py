@@ -176,6 +176,7 @@ def run_scenario(
         files_root=files_root,
         existing_files_root=existing_files_root,
         temporal=memory_temporal,
+        scoped="memory_scoped" in runtime_flags,
     )
     from b12.runtime import open_runtime
 
@@ -246,7 +247,10 @@ def run_scenario(
             "ttft_ms": round(ttft * 1000, 2) if ttft is not None else None,
             "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
             "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
-            "seed_report": {k: report[k] for k in ("dropped_fields", "applied_relations")},
+            "seed_report": {
+                k: report[k]
+                for k in ("dropped_fields", "applied_relations", "revoked_memories")
+            },
             "tool_policy": tool_policy,
         }
     )
@@ -280,6 +284,9 @@ def main(argv=None):
     parser.add_argument("--arm", choices=ARMS, default="A0", help="U2 style arm")
     parser.add_argument(
         "--memory-temporal", action="store_true", help="ADR-015 temporal memory (U4 arm)"
+    )
+    parser.add_argument(
+        "--memory-scoped", action="store_true", help="ADR-016 scoped memory (U5 arm)"
     )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
@@ -345,6 +352,7 @@ def main(argv=None):
                 for flag, on in (
                     ("verify_writes", args.verify_writes),
                     ("goals_in_context", args.goals_in_context),
+                    ("memory_scoped", args.memory_scoped),
                 )
                 if on
             ),

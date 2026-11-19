@@ -40,6 +40,7 @@ def test_adjudication_sets_every_item_with_a_dispute():
     result = finalize(SHEET, disputed, adjudication={"C39": ["PARTIAL (owner +-)", "precedent"]})
     assert result["final_verdicts"]["C39-P1#aaa"] == "PARTIAL (owner +-)"
     assert result["adjudicated"][0]["before"] == "NEEDS_OWNER"
+    assert result["criterion_results"]["C39-P1#aaa"]["c2"]["label"] is None
 
 
 def test_item_id_key_overrides_the_family():
@@ -53,6 +54,30 @@ def test_item_id_key_overrides_the_family():
         },
     )
     assert result["final_verdicts"]["C39-P1#aaa"] == "SEMANTIC_FAIL (-)"
+
+
+def test_criterion_adjudication_resolves_only_the_named_effect():
+    disputed = {"a": labels(), "b": labels(i1={"label": "not_met"})}
+    result = finalize(
+        SHEET,
+        disputed,
+        adjudication={"C39": ["SEMANTIC_PASS", "whole-response precedent"]},
+        criterion_adjudication={"C39": {"c2": "met"}},
+    )
+    assert result["criterion_results"]["C39-P1#aaa"]["c2"] == {
+        "label": "met",
+        "votes": {"a": "met", "b": "not_met"},
+        "adjudicated_by": "owner",
+    }
+
+
+def test_criterion_adjudication_validates_labels():
+    with pytest.raises(ValueError, match="bad criterion adjudication"):
+        finalize(
+            SHEET[:1],
+            {"a": labels()[:2], "b": labels()[:2]},
+            criterion_adjudication={"C39": {"c1": "yes"}},
+        )
 
 
 def test_stale_labels_of_rerun_items_are_dropped_not_remapped(tmp_path):

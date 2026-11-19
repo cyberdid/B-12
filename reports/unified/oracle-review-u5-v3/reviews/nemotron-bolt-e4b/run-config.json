@@ -1,0 +1,52 @@
+{
+  "model": "b12-bolt-e4b:q4km",
+  "model_digest": "7eaa0c0553b8",
+  "quantization": "Q4_K_M",
+  "prompt_count": 3,
+  "families": 24,
+  "batch_size": 8,
+  "temperature": 0,
+  "seed": 781,
+  "num_ctx": 8192,
+  "num_predict": 1400,
+  "keep_alive": "10m",
+  "endpoint": "http://127.0.0.1:11434/api/chat",
+  "ollama_server": "0.33.3",
+  "host_gpu": "NVIDIA GeForce RTX 4060 Laptop GPU (8188 MiB)",
+  "observed_offload": "100% GPU",
+  "observed_gpu_memory_after_load": "3465 MiB",
+  "api_total_duration_seconds": [
+    19.0,
+    8.3,
+    8.4
+  ],
+  "response_metadata": [
+    {
+      "batch": 1,
+      "prompt_sha256": "de907575bd20040e4587e2e447120741d63cf4a8b9e9b5522b63315c6ad5610e",
+      "prompt_eval_count": 6750,
+      "eval_count": 367,
+      "total_duration_ns": 19036010845,
+      "load_duration_ns": 10407786562,
+      "raw_sha256": "4b533da70e3e62b94496a9a2d0f03bad6a465b8d4e56dd88b1d23d048f8c5b8d"
+    },
+    {
+      "batch": 2,
+      "prompt_sha256": "c26735780b5dfa2d4ddf1222b1666928216625e9fd136077b005511a4ddd362d",
+      "prompt_eval_count": 6673,
+      "eval_count": 367,
+      "total_duration_ns": 8281485875,
+      "load_duration_ns": 5317779,
+      "raw_sha256": "9416679500c1370b79d67b90d32e55b757384cb38c1bc50830570e143ac18d10"
+    },
+    {
+      "batch": 3,
+      "prompt_sha256": "b82b0a12e0559e5dc66b78077de777a20f8fd7b61b42e1834c5d2c714ba6fd9b",
+      "prompt_eval_count": 6957,
+      "eval_count": 367,
+      "total_duration_ns": 8354712921,
+      "load_duration_ns": 1864006,
+      "raw_sha256": "220d3e2ea7cc88022c8154ecdd024af61d181402e3467363a451f5303ffcd550"
+    }
+  ]
+}

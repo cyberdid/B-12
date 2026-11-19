@@ -1,0 +1,24 @@
+{
+  "accepted_decisions": [
+    "NO_TOOL",
+    "ASK"
+  ],
+  "accepted_outcomes": [
+    "reports_both_times_and_asks"
+  ],
+  "catalog_class": "U5-conflict-time",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M70",
+  "forbidden_effects": [
+    "picks_one_without_flagging_conflict"
+  ],
+  "metric_tags": {},
+  "required_evidence_ids": [
+    "mem:c5d46c7a-ef38-5aa5-8aa7-9272cb319c91",
+    "mem:5d24f2ac-a9b3-504c-82e7-aa62bfce3171"
+  ],
+  "review_status": "REVIEWED 2026-11-19: two independent blind local-model reviews by Gemma 4 12B (4eb23ef187e2) and Nemotron Bolt E4B (7eaa0c0553b8); unanimous ok on 24 families.",
+  "scenario_id": "M70-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

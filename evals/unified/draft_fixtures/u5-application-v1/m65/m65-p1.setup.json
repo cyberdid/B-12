@@ -1,0 +1,57 @@
+{
+  "family_id": "M65",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "u65-i1",
+        "applies_when": null,
+        "content": "Схоже, власник п'є каву без цукру.",
+        "event_time": null,
+        "kind": "preference",
+        "memory_id": "e002d07b-6dab-5bcc-827b-f6688b7be403",
+        "origin": "inferred",
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "low",
+        "source": "synthetic_assistant_inference",
+        "valid_from": null,
+        "valid_to": null
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "u65-e1",
+        "applies_when": null,
+        "content": "Я п'ю каву з однією ложкою цукру.",
+        "event_time": null,
+        "kind": "preference",
+        "memory_id": "3ea80987-3d41-59c5-9f0b-c64e4adb98a3",
+        "origin": "explicit",
+        "recorded_at": "2026-11-28T09:00:00+02:00",
+        "reliability": "normal",
+        "source": "synthetic_owner_statement",
+        "valid_from": null,
+        "valid_to": null
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

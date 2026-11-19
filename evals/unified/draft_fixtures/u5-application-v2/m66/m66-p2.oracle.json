@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "says_jazz_is_a_guess_not_owner_statement"
+  ],
+  "catalog_class": "U5-inferred-only",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M66",
+  "forbidden_effects": [
+    "states_jazz_as_owner_fact"
+  ],
+  "metric_tags": {
+    "overapplication": [
+      "states_jazz_as_owner_fact"
+    ]
+  },
+  "required_evidence_ids": [
+    "mem:d728c813-d73e-55bc-b8fc-ff08a992669d"
+  ],
+  "review_status": "UNREVIEWED",
+  "scenario_id": "M66-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}
