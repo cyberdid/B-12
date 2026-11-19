@@ -42,16 +42,20 @@ class Settings(BaseModel):
     # Background category notes ("Neovim" -> редактор) so facts are found by general words.
     memory_enrichment: bool = True
     # ADR-015: evidence shows event time, validity, reliability and replaced history, and the
-    # model is told today's date. Off until the U4 measurement passes.
-    memory_temporal: bool = False
+    # model is told today's date. On since 19.11.2026: memory +21.1 p.p. [+8.3, +34.4] on the
+    # locked set, no privacy regression (reports/unified/CAPRI_U4_TEMPORAL_ABLATION.md).
+    memory_temporal: bool = True
     # Runtime read-back after every successful file_write: size, hash, match and opening go
-    # back to the model (unverified writes failed for every model, 18.11.2026). Off by default.
+    # back to the model (unverified writes failed for every model, 18.11.2026). Off: no effect
+    # measurable by the current oracles (U4 report).
     verify_writes: bool = False
     # The speaker's own goals (open, done, cancelled, with progress) in the system context;
-    # no model could answer "what is open / is it done" without them (18.11.2026). Off by default.
-    goals_in_context: bool = False
+    # no model could answer "what is open / is it done" without them (18.11.2026). On since
+    # 19.11.2026: with it M53 0 -> 0.5 and M55 0 -> 1.0 (arm F, U4 report).
+    goals_in_context: bool = True
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
-    # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off.
+    # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
+    # was neutral and the model sometimes answered the note as if the user said it.
     annotate_unverified_claims: bool = False
     # "approval": sudo_exec is offered to owner tasks, each exact command still needs approval.
     sudo_access: Literal["off", "approval"] = "off"

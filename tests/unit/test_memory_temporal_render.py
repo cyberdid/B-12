@@ -64,7 +64,7 @@ def test_superseded_record_is_marked():
     assert "замінено новішим записом" in line
 
 
-def test_settings_flag_defaults_off_and_reads_env(tmp_path):
-    assert Settings(state_dir=tmp_path).memory_temporal is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TEMPORAL": "1"}
-    assert Settings.from_env(env).memory_temporal is True
+def test_settings_flag_defaults_on_and_reads_env(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_temporal is True  # on since 19.11.2026 (U4)
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TEMPORAL": "0"}
+    assert Settings.from_env(env).memory_temporal is False

@@ -1482,7 +1482,7 @@ async def test_memory_store_supersedes_an_old_fact_and_recall_skips_it(runtime_f
     from uuid import uuid4
 
     state, factory = runtime_factory
-    runtime = factory()
+    runtime = factory(memory_temporal=False)  # legacy: superseded stays out
     who = owner(runtime)
     old = runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
     state["script"] = [
@@ -1598,7 +1598,7 @@ async def test_recalled_facts_carry_their_date_and_the_newer_wins_rule(runtime_f
     from b12.agent import SYSTEM_PROMPT
 
     state, factory = runtime_factory
-    runtime = factory()
+    runtime = factory(memory_temporal=False)  # legacy "[date] text"; see render tests
     who = owner(runtime)
     runtime.memory.remember("Власник живе у Києві на Подолі.", who.actor)
     state["script"] = [{"content": "У Києві."}]
