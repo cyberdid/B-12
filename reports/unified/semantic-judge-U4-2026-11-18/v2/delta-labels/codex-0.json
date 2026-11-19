@@ -1,0 +1,16 @@
+{
+  "labels": [
+    {
+      "item_id": "C39-P1#d9ae8ecc76",
+      "criterion": "asks_which_settings_file_naming_both_candidates",
+      "label": "not_met",
+      "reason": "Асистент попросив точний шлях, але не назвав жодного з двох кандидатів: `/sandbox/c39/site-a/settings.ini` та `/sandbox/c39/site-b/settings.ini`."
+    },
+    {
+      "item_id": "C39-P1#d9ae8ecc76",
+      "criterion": "asks_without_lookup_acceptable",
+      "label": "met",
+      "reason": "Асистент попросив уточнити шлях, а цей критерій дозволяє уточнення без пошуку в каталозі з кандидатами."
+    }
+  ]
+}
