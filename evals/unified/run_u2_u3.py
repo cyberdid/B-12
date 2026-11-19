@@ -144,6 +144,9 @@ def _calls(result):
     return calls
 
 
+RUNTIME_FLAGS = ("verify_writes", "goals_in_context", "memory_scoped")
+
+
 def run_scenario(
     row,
     root,
@@ -185,8 +188,10 @@ def run_scenario(
             update={
                 "state_dir": work_dir / "state",
                 "memory_temporal": memory_temporal,
-                **{flag: True for flag in runtime_flags},
-                **({"annotate_unverified_claims": True} if arm == "D3" else {}),
+                # Every arm flag explicit: Settings defaults change over time (goals_in_context
+                # became on by default on 19.11.2026), an arm must not inherit them silently.
+                **{flag: flag in runtime_flags for flag in RUNTIME_FLAGS},
+                "annotate_unverified_claims": arm == "D3",
             }
         )
     )

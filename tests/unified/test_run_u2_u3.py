@@ -290,3 +290,14 @@ def test_unified_sandbox_hides_answer_material():
         assert hidden in script
     assert '--tmpfs "$EVAL/artifacts"' in script and "--tmpfs /var/log" in script
     assert "ENTRY=(-m evals.unified.sandbox_probe)" in script
+
+
+async def test_an_arm_without_flags_does_not_inherit_settings_defaults(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Батарейки."}]
+    defaults_on = base.model_copy(update={"goals_in_context": True})
+    record = await asyncio.to_thread(
+        run_scenario, row("C01-P1"), ROOT, defaults_on, tmp_path / "w", files_root=tmp_path / "fs"
+    )
+    assert record["runtime_flags"] == []
+    assert "Задачі співрозмовника" not in json.dumps(state["requests"][0], ensure_ascii=False)
