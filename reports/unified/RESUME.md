@@ -74,3 +74,10 @@ To continue, in this order:
   D2 neutral; A1/E1/D unchanged (rejected). Haiku memory 0.483, gpt-6-luna control 0.769.
 - Next: A0b finishes → judge (`launch_judges.sh A0b … codex gemini`) → compare A0b with A0
   (drift) → D3 → defaults decision.
+
+## Checkpoint — 19.11.2026, ~11:30: U2–U4 closed
+
+Nothing is running except Ollama. Everything is committed on `feat/unified-dr2-dr3` (not pushed).
+Read `CAPRI_COGNITIVE_CONTROL_AB.md`, `CAPRI_MEMORY_BASELINE.md`, `CAPRI_U4_TEMPORAL_ABLATION.md`
+and roadmap section H. Defaults changed: `memory_temporal` and `goals_in_context` are on.
+Open: per-actor file scope (security, postponed), U5 next per the master plan.

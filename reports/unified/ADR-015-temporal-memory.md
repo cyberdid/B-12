@@ -1,7 +1,7 @@
 ---
 type: decision
-updated: 2026-11-18
-status: accepted_by_delegation_implementation_behind_flag
+updated: 2026-11-19
+status: accepted_by_delegation_enabled_by_default
 sources: [raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/semantic-judge-locked-pilot-2026-11-18/README.md, src/b12/migrations.py, src/b12/memory.py, src/b12/agent.py]
 tags: [adr, U4, memory, temporal, provenance]
 ---
@@ -57,3 +57,7 @@ These failures do not depend on the model: the needed information never reaches 
 1. Superseded history is offered **only together with its replacement**, marked `замінено <date>`; never alone, so an old fact is never presented as current.
 2. The model **may** fill `event_time` / `valid_*` from conversation; such values are stored with `temporal_source='conversation'` and rendered with `(з розмови)`, distinct from owner statements or documents.
 3. Reliability vocabulary `high / normal / low / unverified` is kept.
+
+## Status update — 19.11.2026
+
+Measured on the frozen locked set ([CAPRI_U4_TEMPORAL_ABLATION.md](CAPRI_U4_TEMPORAL_ABLATION.md)): memory +21.1 p.p. [+8.3, +34.4] vs A0, +18.9 vs the A0 re-run; control within noise; no privacy regression (C55 × 10 repeats, 19/20 vs 20/20). `memory_temporal` and `goals_in_context` are **on by default** (commit d0edda9). Restore now re-purges forgotten superseded records (commit 7beddee). Not implemented from the master plan's U4 list: separate `episode`/`claim` entities and conflict links (this ADR chose additive columns; conflict links are the next extension).

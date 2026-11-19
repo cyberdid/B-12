@@ -21,7 +21,10 @@
 | U1 telemetry | partial | `evals/unified/trace.py`, `tool_oracles.py`, `on_policy_decision` in `ToolRegistry`, runtime trace observer | classification proposal and typed retrieval evidence per step; trace correlation across approval resume |
 | U2 control pilot | protocol + draft corpus v2 + setup adapter | `U2_BREVITY_REPRODUCTION.md`, `u2-u3-draft-v2` (C01–C30) | oracle review, setup runner adapter, frozen arms, runs, keep/rollback report |
 | U3 memory baseline | protocol + draft corpus | `U3_MEMORY_BASELINE_PROTOCOL.md`, `u2-u3-draft-v2` (M01–M30), `runtime_snapshot.py` | store coverage audit, setup adapter seeding memory and goals, runs, report |
-| U4–U10 | not started | — | per master plan §10 |
+| U2 control pilot | **closed 19.11** | `CAPRI_COGNITIVE_CONTROL_AB.md` | keep A0; A1/E1/D/D2/D3 rollback; E2 not run |
+| U3 memory baseline | **closed 19.11** | `CAPRI_MEMORY_BASELINE.md` | retrieval/application separate; optional arms open |
+| U4 temporal memory | **closed 19.11** (partial scope) | `CAPRI_U4_TEMPORAL_ABLATION.md`, ADR-015 | on by default; episode/claim entities and conflict links deferred |
+| U5–U10 | not started | — | per master plan §10 |
 
 ## Next items, in order
 
@@ -86,4 +89,15 @@
 - [ ] Open (security, postponed by the owner): no per-actor file scope — an owner-run model can read a guest's private files on disk (C55 in U4). Needs a permissions design, not a prompt fix.
 - [x] D2 neutral (no false positives, no gain); D3 = D2 + runtime note added (`annotate_unverified_claims`).
 - [x] F run complete (360/360); goals in context visibly fix M53/M55. **Judging of F stopped** — see `reports/unified/RESUME.md` checkpoint 22:30.
-- [ ] Resume: F judges → A0b (51/360) → D3 → aligned comparison → decide defaults.
+- [x] Resume: F judges → A0b → D3 → aligned comparison → decide defaults (19.11).
+
+### H. U2–U4 closed (19.11.2026; owner: «закривай U2–U4»)
+- [x] Sandbox leak fixed (worker saw judge sheets/oracle review); 13 records re-run and re-judged (c17b0aa).
+- [x] A0b = A0 (control 0.731/0.731, memory 0.422/0.400): run-to-run drift within ±5 p.p.
+- [x] D3 neutral → off. F judged: memory +26.7 p.p.
+- [x] U3 exit: retrieval 0.75 vs application 0.51 measured separately (`retrieval_application.py`); no model-identity claims.
+- [x] U4 exit: temporal endpoints improved; privacy check C55 × 10 repeats shows no regression; restore resurrection bug fixed (7beddee).
+- [x] Defaults: `memory_temporal`, `goals_in_context` on (d0edda9); `verify_writes`, `annotate_unverified_claims` off.
+- [x] Reports: `CAPRI_COGNITIVE_CONTROL_AB.md`, `CAPRI_MEMORY_BASELINE.md`, `CAPRI_U4_TEMPORAL_ABLATION.md`.
+- [ ] Left open on purpose: E2 arm; U3 no-memory/persona-only/oracle/filler arms; U4 `episode`/`claim` entities and conflict links; per-actor file scope (security, postponed by the owner — Bolt reads a guest's private file 19/20 on request).
+- [ ] Next stage per master plan: U5 (decision quality without more stale-use/resurrection), U6/U7 need owner review first.
