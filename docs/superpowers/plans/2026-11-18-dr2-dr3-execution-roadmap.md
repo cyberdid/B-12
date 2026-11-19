@@ -120,5 +120,12 @@ Read-only `evals/unified/resume_runs.sh --status` confirms the scheduled run dir
 ### J. U5 measured (19.11.2026, Claude after Codex hit its usage limit)
 - [x] Codex froze `u5-application-locked-v1` (from v3) after Gemma 4 12B + Bolt oracle reviews and ran B0/U5 (144 each). The blind Codex/Gemini reviews of v1 (launched by Claude, found later in `reports/unified/.judge-work-oracle-u5/`) are now in `oracle-review-u5-v1/reviews/`; their unresolved findings are handled by a sensitivity split, not by editing the frozen oracles.
 - [x] Judging finished, disputes decided by oracle wording for both arms, analysed: +12.5 p.p. [+1.4, +26.4]; no stale-use/resurrection; over-application 4/36 → 0/36 (`CAPRI_U5_DECISION_REPORT.md`, commit 29acf9b).
-- [ ] Non-regression: U5 on `u2-u3-locked-v2` (running, `unified-locked-U5scoped-2026-11-19`) → judge → compare with F and U4 → decide the `memory_scoped` default.
+- [x] Non-regression: FAILED — control −7.1 p.p. [−14.7, −0.6] vs F; `memory_scoped` stays off (86e47a7).
+- [x] U5.1: rules only in turns with memory evidence (600a292).
+- [ ] Re-measure U5.1 on both sets when the GPU is free (commands in RESUME).
+
+### K. U6 (19.11.2026)
+- [x] ADR-017 (proposed) and implementation behind `task_ledger`: cross-turn effect keys, trusted state checks, needs-owner pause, plan revision (4d6155a).
+- [x] Crash-injection suite 7/7; runbook `CAPRI_WORKFLOW_RECOVERY.md`.
+- [ ] Owner review of ADR-017; then decide the `task_ledger` default.
 - [ ] Next U5 set version: apply the blind reviewers' fixes before freezing; two strong blind reviews (never the evaluated model).

@@ -130,3 +130,15 @@ Open: per-actor file scope (security, postponed), U5 next per the master plan.
 ## Checkpoint — 19.11.2026, ~15:30 (Claude): U5 measured, regression run going
 
 Codex stopped on its usage limit while combining judges. Committed: ADR-016 implementation (80527e1), U5 eval tooling and sets (5a589bf), U5 results (29acf9b). Running on the GPU: `memory_scoped` on `u2-u3-locked-v2` (`evals/capri_comprehensive/artifacts/unified-locked-U5scoped-2026-11-19`, flags temporal + goals + scoped). Next: `launch_judges.sh U5scoped <run> codex gemini` → combine/adjudicate → `consistent_verdicts` with F/U4/A0 → decide the `memory_scoped` default (roadmap section J).
+
+## Checkpoint — 19.11.2026, ~16:50 (Claude; owner is gaming, GPU left free)
+
+- U5: `memory_scoped` failed the non-regression gate (control −7.1 p.p. vs F on `u2-u3-locked-v2`), stays off (86e47a7). U5.1 (600a292) adds the rules only to turns with memory evidence.
+- U6: ADR-017 goal step ledger implemented behind `task_ledger` (off), crash-injection suite 7/7, runbook `CAPRI_WORKFLOW_RECOVERY.md` (4d6155a). Needs owner review of ADR-017 before turning it on.
+- **Waiting for a free GPU** (ask the owner first), U5.1 re-measurement, ~45 min:
+  ```
+  A=evals/capri_comprehensive/artifacts
+  EXTRA_RUNNER_ARGS='--memory-temporal --goals-in-context --memory-scoped' evals/unified/run_locked_pilot.sh evals/unified/scenario_sets/u5-application-locked-v1.json $A/unified-u5-application-locked-v1-U51-2026-11-19 3 A0
+  EXTRA_RUNNER_ARGS='--memory-temporal --goals-in-context --memory-scoped' evals/unified/run_locked_pilot.sh evals/unified/scenario_sets/u2-u3-locked-v2.json $A/unified-locked-U51scoped-2026-11-19 3 A0
+  ```
+  Then judges as for U5/U5scoped, adjudicate by oracle text, compare with B0 and F.
