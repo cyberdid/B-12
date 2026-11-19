@@ -12,6 +12,7 @@ def register_host_tools(
     sudo=False,
     sudo_path=None,
     memory_temporal=False,
+    memory_scoped=False,
     verify_writes=False,
 ):
     """Register all 13 concrete host tools; caller owns/closes injected stores.
@@ -36,4 +37,5 @@ def register_host_tools(
         purge=purge,
         memory_revision=memory_revision,
         temporal=memory_temporal,
+        scoped=memory_scoped,
     )

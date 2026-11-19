@@ -130,12 +130,51 @@ class ContextBuilder:
             _json_value(data)
             data = json.loads(canonical(data))
             for item in data["evidence"]:
-                if (
-                    set(item) != {"id", "text"}
-                    or not isinstance(item["id"], str)
-                    or not isinstance(item["text"], str)
-                ):
+                if not isinstance(item, dict) or set(item) not in (
+                    {"id", "text"},
+                    {"id", "text", "meta"},
+                ) or not isinstance(item["id"], str) or not isinstance(item["text"], str):
                     raise ValueError("evidence requires id and text")
+                if "meta" in item:
+                    meta = item["meta"]
+                    allowed = {
+                        "kind", "event", "recorded", "valid", "state", "applies_when",
+                        "origin", "reliability", "source", "source_refs", "conflicts_with",
+                    }
+                    if not isinstance(meta, dict) or not set(meta) <= allowed:
+                        raise ValueError("invalid evidence metadata")
+                    if any(
+                        meta.get(key) is not None and not isinstance(meta.get(key), str)
+                        for key in allowed - {"valid", "source_refs", "conflicts_with"}
+                    ):
+                        raise ValueError("evidence metadata fields must be strings or null")
+                    valid = meta.get("valid")
+                    if valid is not None and (
+                        not isinstance(valid, dict)
+                        or set(valid) != {"from", "to"}
+                        or any(
+                            value is not None and not isinstance(value, str)
+                            for value in valid.values()
+                        )
+                    ):
+                        raise ValueError("invalid evidence validity interval")
+                    refs = meta.get("source_refs")
+                    if refs is not None and (
+                        not isinstance(refs, list)
+                        or any(
+                            not isinstance(ref, dict)
+                            or set(ref) != {"kind", "id", "revision"}
+                            or any(not isinstance(value, str) for value in ref.values())
+                            for ref in refs
+                        )
+                    ):
+                        raise ValueError("invalid evidence source references")
+                    conflicts = meta.get("conflicts_with")
+                    if conflicts is not None and (
+                        not isinstance(conflicts, list)
+                        or any(not isinstance(value, str) for value in conflicts)
+                    ):
+                        raise ValueError("invalid evidence conflict candidates")
         except (ValueError, TypeError, KeyError) as exc:
             raise ModelError("invalid_request", "invalid messages, evidence or tools") from exc
         groups = _validate_structure(

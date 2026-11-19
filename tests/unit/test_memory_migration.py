@@ -38,7 +38,7 @@ def test_upgrade_keeps_every_memory_and_evidence_link(tmp_path):
     store = MemoryStore(path)
     try:
         version = store._connection.execute("PRAGMA user_version").fetchone()[0]
-        assert version == SCHEMA_VERSION == 3  # v1 upgrades straight to the current schema
+        assert version == SCHEMA_VERSION == 4  # v1 upgrades straight to the current schema
         count = store._connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
         links = store._connection.execute(
             "SELECT COUNT(*) FROM memory_sources WHERE kind='memory'"

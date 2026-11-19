@@ -622,10 +622,12 @@ def create_app(
     async def goal_status(request: Request, goal_id: str, body: GoalStatusBody, who: Identity):
         try:
             return runtime_of(request).goals.set_status(
-                goal_id, who.actor.id, body.status, "owner_control"
+                goal_id, who.actor.id, body.status, "owner_control", reopen=who.actor.owner
             )
         except KeyError:
             raise HTTPException(404, "goal_not_found") from None
+        except PermissionError:
+            raise HTTPException(403, "goal_reopen_requires_owner") from None
 
     @app.get("/api/attention")
     async def attention_state(request: Request, who: Identity):

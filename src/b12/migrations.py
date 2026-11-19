@@ -13,7 +13,7 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 _SCHEMA_V1 = (
     """CREATE TABLE memories (
@@ -111,6 +111,15 @@ _UPGRADE_V1_TO_V2 = (
 
 RELIABILITY = ("high", "normal", "low", "unverified")
 TEMPORAL_SOURCES = ("owner", "conversation", "document")
+ORIGINS = ("explicit", "inferred")
+
+# ADR-016 (schema v4): when a preference or rule applies, and whether the owner stated it or the
+# assistant inferred it. Additive and nullable; unknown stays NULL.
+_UPGRADE_V3_TO_V4 = (
+    "ALTER TABLE memories ADD COLUMN applies_when TEXT",
+    "ALTER TABLE memories ADD COLUMN origin TEXT CHECK(origin IS NULL OR origin IN "
+    "('explicit', 'inferred'))",
+)
 
 _UPGRADE_V2_TO_V3 = (
     "ALTER TABLE memories ADD COLUMN event_time TEXT",
@@ -127,7 +136,7 @@ _UPGRADE_V2_TO_V3 = (
 
 def check_schema(connection: sqlite3.Connection) -> int:
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version not in (0, 1, 2, SCHEMA_VERSION):
+    if version not in (0, 1, 2, 3, SCHEMA_VERSION):
         raise RuntimeError(f"unsupported memory schema version: {version}")
     return version
 
@@ -191,6 +200,13 @@ def migrate(connection: sqlite3.Connection) -> None:
                 connection.execute(statement)
             if connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0] != before:
                 raise RuntimeError("v3 migration changed the number of memories; rolled back")
+            version = 3
+        if version == 3:
+            before = connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+            for statement in _UPGRADE_V3_TO_V4:
+                connection.execute(statement)
+            if connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0] != before:
+                raise RuntimeError("v4 migration changed the number of memories; rolled back")
         connection.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
         connection.commit()
     except BaseException:

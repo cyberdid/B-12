@@ -278,7 +278,7 @@ def test_remember_is_refused_before_any_write_when_disk_is_below_reserve(tmp_pat
     store.close()
 
 
-def test_supersede_retires_an_old_fact_without_erasing_it(tmp_path):
+def test_supersede_without_replacement_revokes_without_erasing(tmp_path):
     from b12.memory import MemoryStore
 
     store = MemoryStore(tmp_path / "memory.sqlite3")
@@ -289,7 +289,7 @@ def test_supersede_retires_an_old_fact_without_erasing_it(tmp_path):
     assert store.supersede(old.id, owner)
     assert not store.is_live(old.id, owner)
     kept = store.get(old.id, owner)
-    assert kept is not None and kept.status == "stale" and kept.status_reason == "superseded"
+    assert kept is not None and kept.status == "stale" and kept.status_reason == "revoked"
     assert not store.supersede(old.id, owner)  # idempotent
     assert store.verify_full() > 0
     store.close()

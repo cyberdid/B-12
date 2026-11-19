@@ -87,6 +87,9 @@ class MemoryRecord(_Contract):
     source_locator: str | None = None
     temporal_source: Literal["owner", "conversation", "document"] | None = None
     superseded_by: str | None = None
+    # ADR-016 (schema v4): the condition a preference/rule applies under, and who stated it.
+    applies_when: str | None = None
+    origin: Literal["explicit", "inferred"] | None = None
 
     _validate_id = field_validator("id")(_uuid)
     _validate_identifiers = field_validator("owner_id", "kind", "source")(_identifier)

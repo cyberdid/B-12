@@ -199,12 +199,21 @@ class GoalStore:
             )
         return self.get(goal_id, actor_id)
 
-    def set_status(self, goal_id: str, actor_id: str, status: str, reason: str):
+    def set_status(
+        self, goal_id: str, actor_id: str, status: str, reason: str, *, reopen: bool = False
+    ):
         if status not in STATUSES - {"achieved"}:
             raise ValueError("use complete() for achieved")
         with self._atomic():
-            if not self.get(goal_id, actor_id):
+            goal = self.get(goal_id, actor_id)
+            if not goal:
                 raise KeyError("goal not found")
+            if (
+                goal["status"] in {"achieved", "abandoned"}
+                and status != goal["status"]
+                and not reopen
+            ):
+                raise PermissionError("reopening a closed goal requires explicit owner control")
             self.db.execute(
                 "UPDATE goals SET status=?, status_reason=?, updated_at=? WHERE id=?",
                 (status, reason[:200], _now(), goal_id),
@@ -212,6 +221,11 @@ class GoalStore:
         return self.get(goal_id, actor_id)
 
     def complete(self, goal_id: str, actor, evidence_ids, live) -> dict:
+        goal = self.get(goal_id, actor.id)
+        if goal is None:
+            raise KeyError("goal not found")
+        if goal["status"] == "abandoned":
+            raise PermissionError("an abandoned goal requires explicit owner reopening")
         evidence = _ids(evidence_ids)
         if not evidence or not all(live(e) for e in evidence):
             raise PermissionError("achieved requires live verified evidence")
@@ -219,6 +233,8 @@ class GoalStore:
             goal = self.get(goal_id, actor.id)
             if goal is None:
                 raise KeyError("goal not found")
+            if goal["status"] == "abandoned":
+                raise PermissionError("an abandoned goal requires explicit owner reopening")
             self.db.execute(
                 "UPDATE goals SET status='achieved', status_reason='verified_evidence', "
                 "evidence_ids=?, updated_at=? WHERE id=?",

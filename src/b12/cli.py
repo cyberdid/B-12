@@ -417,7 +417,11 @@ async def cmd_goals(args, settings) -> int:
         else:
             status = {"pause": "paused", "resume": "active", "abandon": "abandoned"}[args.action]
             try:
-                emit_json(goals.set_status(args.value, owner.actor_id, status, "owner_control"))
+                emit_json(
+                    goals.set_status(
+                        args.value, owner.actor_id, status, "owner_control", reopen=True
+                    )
+                )
             except KeyError:
                 emit_json({"error": "goal_not_found"})
                 return 1

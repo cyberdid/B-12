@@ -237,6 +237,8 @@ _TEMPORAL_COLUMNS = (
     "source_locator",
     "temporal_source",
     "superseded_by",
+    "applies_when",
+    "origin",
 )
 
 
@@ -283,6 +285,19 @@ def _temporal_fields(event_time, valid_from, valid_to, reliability, locator, tem
         "source_locator": locator,
         "temporal_source": temporal_source,
     }
+
+
+def _scope_fields(applies_when, origin):
+    """Validate ADR-016 fields before anything is written; unknown values stay None."""
+    from b12.migrations import ORIGINS
+
+    if applies_when is not None and (
+        not isinstance(applies_when, str) or not applies_when.strip() or len(applies_when) > 200
+    ):
+        raise ValueError("applies_when must be a short nonblank condition")
+    if origin is not None and origin not in ORIGINS:
+        raise ValueError(f"origin must be one of {ORIGINS}")
+    return {"applies_when": applies_when, "origin": origin}
 
 
 def _now() -> str:
@@ -550,11 +565,14 @@ class MemoryStore:
         reliability: str | None = None,
         source_locator: str | None = None,
         temporal_source: str | None = None,
+        applies_when: str | None = None,
+        origin: str | None = None,
     ) -> MemoryRecord:
         self._consent(actor)
         temporal = _temporal_fields(
             event_time, valid_from, valid_to, reliability, source_locator, temporal_source
         )
+        temporal.update(_scope_fields(applies_when, origin))
         if expected_deletion_revision is not None and (
             type(expected_deletion_revision) is not int or expected_deletion_revision < 0
         ):
@@ -606,8 +624,8 @@ class MemoryStore:
             self._connection.execute(
                 """INSERT INTO memories(id, actor_id, kind, text, source, created_at,
                        event_time, valid_from, valid_to, reliability, source_locator,
-                       temporal_source)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                       temporal_source, applies_when, origin)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (record_id, actor.id, kind, text, source, created, *temporal.values()),
             )
             links = [(record_id, "memory", item, "", i) for i, item in enumerate(evidence_ids)]
@@ -671,10 +689,11 @@ class MemoryStore:
         return [row["id"] for row in rows]
 
     def supersede(self, memory_id: str, actor: Actor, *, replaced_by: str | None = None) -> bool:
-        """Retire an older fact that a newer one replaces (a new address, a new editor).
+        """Retire a live record in this actor's namespace.
 
-        The record stays (the owner can see and forget it) but is no longer live, like a
-        stale memory; nothing is erased. Only a live record in this actor's namespace."""
+        With ``replaced_by``, keep it as superseded history. Without a replacement, mark it
+        revoked; scoped recall never offers a revoked record, even for historical queries. Neither
+        operation erases payload bytes; use the purge path for forgetting."""
         self._consent(actor)
         with self._transaction(write=True):
             row = self._connection.execute(
@@ -693,10 +712,10 @@ class MemoryStore:
                 ).fetchone()
             ):
                 raise ValueError("replacement must be another live memory of the same actor")
+            # ADR-016: retired with a replacement = superseded; without one = revoked.
             self._connection.execute(
-                "UPDATE memories SET status='stale', status_reason='superseded', superseded_by=?"
-                " WHERE id=?",
-                (replaced_by, memory_id),
+                "UPDATE memories SET status='stale', status_reason=?, superseded_by=? WHERE id=?",
+                ("superseded" if replaced_by is not None else "revoked", replaced_by, memory_id),
             )
             self._audit(actor, "stale", memory_id=memory_id)
         return True

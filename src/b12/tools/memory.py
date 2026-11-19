@@ -105,6 +105,38 @@ class TemporalStoreArgs(StoreArgs):
     )
 
 
+class ScopedStoreArgs(StoreArgs):
+    """ADR-016 scope fields; blank means unknown."""
+
+    applies_when: str = Field(
+        default="", max_length=200,
+        description="Condition when this preference/rule applies; blank if unknown",
+    )
+    origin: Literal["", "explicit", "inferred"] = Field(
+        default="",
+        description=(
+            "Whether the owner stated this directly (explicit) or this is an assistant inference "
+            "(inferred); blank if unknown"
+        ),
+    )
+
+
+class ScopedTemporalStoreArgs(TemporalStoreArgs):
+    """Combined temporal and scoped fields when both runtime features are enabled."""
+
+    applies_when: str = Field(
+        default="", max_length=200,
+        description="Condition when this preference/rule applies; blank if unknown",
+    )
+    origin: Literal["", "explicit", "inferred"] = Field(
+        default="",
+        description=(
+            "Whether the owner stated this directly (explicit) or this is an assistant inference "
+            "(inferred); blank if unknown"
+        ),
+    )
+
+
 class ForgetArgs(Args):
     memory_id: str
 
@@ -150,6 +182,29 @@ class SupersedeArgs(Args):
         return value
 
 
+class ScopedSupersedeArgs(Args):
+    """An empty replacement explicitly revokes the record under ADR-016."""
+
+    memory_id: str = Field(description="Id of the memory to retire")
+    replaced_by: str = Field(
+        default="",
+        description="Id of the live replacement; leave empty only to revoke/withdraw this record",
+    )
+
+    @field_validator("memory_id")
+    @classmethod
+    def _memory_id(cls, value):
+        UUID(value)
+        return value
+
+    @field_validator("replaced_by")
+    @classmethod
+    def _replacement_id(cls, value):
+        if value:
+            UUID(value)
+        return value
+
+
 def _temporal_from_args(args) -> dict:
     """ADR-015 fields the model supplied; marked as coming from conversation."""
     names = ("event_time", "valid_from", "valid_to", "reliability", "source_locator")
@@ -161,7 +216,8 @@ def _temporal_from_args(args) -> dict:
 
 
 def register(
-    registry, *, memory=None, knowledge=None, purge=None, memory_revision=None, temporal=False
+    registry, *, memory=None, knowledge=None, purge=None, memory_revision=None,
+    temporal=False, scoped=False,
 ):
     async def memory_search(args, guard):
         if memory is None:
@@ -169,6 +225,26 @@ def register(
         guard.check()
         actor = guard.store.resolve_actor(guard.context.actor_id)
         records = memory.search(args.query, actor, limit=args.limit)
+        if scoped:
+            # A secondary recall path follows the same evidence rules as automatic recall:
+            # revoked and source-invalid records are hidden; replacements are labelled history.
+            records = [
+                record
+                for record in records
+                if record.status == "active"
+                or (record.status == "stale" and record.status_reason == "superseded")
+            ]
+            from b12.memory_packet import evidence_packet
+
+            packet = evidence_packet(
+                [(record, record.status == "stale") for record in records], datetime.now(UTC)
+            )
+            rows, truncated = [], False
+            for item in packet:
+                item["text"], cut = clip(item["text"], 512)
+                truncated |= cut
+                rows.append(item)
+            return HandlerOutcome(content={"records": rows}, truncated=truncated)
         rows, truncated = [], False
         for record in records:
             text, cut = clip(record.text, 512)
@@ -203,6 +279,10 @@ def register(
         if any(not memory.is_live(old, actor) for old in args.supersedes):
             return failure("unsupported")  # checked before any write: nothing to undo
         try:
+            scope = {
+                "applies_when": getattr(args, "applies_when", "") or None,
+                "origin": getattr(args, "origin", "") or None,
+            } if scoped else {}
             record = memory.remember(
                 args.text,
                 actor,
@@ -212,6 +292,7 @@ def register(
                 documents=tuple(args.document_evidence_ids),
                 expected_deletion_revision=expected_revision,
                 **_temporal_from_args(args),
+                **scope,
             )
         except PermissionError:
             return failure("permission_denied")
@@ -249,13 +330,25 @@ def register(
             return failure("coordinator_unavailable")
         guard.check()
         actor = guard.store.resolve_actor(guard.context.actor_id)
-        if args.memory_id == args.replaced_by or not memory.is_live(args.replaced_by, actor):
+        replaced_by = args.replaced_by or None
+        if replaced_by is not None and (
+            args.memory_id == replaced_by or not memory.is_live(replaced_by, actor)
+        ):
             return failure("unsupported")
         guard.check()
-        if not memory.supersede(args.memory_id, actor, replaced_by=args.replaced_by):
+        if not memory.supersede(args.memory_id, actor, replaced_by=replaced_by):
             return failure("unsupported")
+        if replaced_by is None:
+            return HandlerOutcome(
+                content={"revoked": args.memory_id},
+                side_effects=(
+                    SideEffect(
+                        kind="memory_write", state="completed", evidence_ids=(args.memory_id,)
+                    ),
+                ),
+            )
         return HandlerOutcome(
-            content={"superseded": args.memory_id, "replaced_by": args.replaced_by},
+            content={"superseded": args.memory_id, "replaced_by": replaced_by},
             side_effects=(
                 SideEffect(kind="memory_write", state="completed", evidence_ids=(args.memory_id,)),
             ),
@@ -329,6 +422,27 @@ def register(
             truncated=truncated or len(receipts) > 4,
         )
 
+    store_args = (
+        ScopedTemporalStoreArgs if temporal and scoped
+        else TemporalStoreArgs if temporal
+        else ScopedStoreArgs if scoped
+        else StoreArgs
+    )
+    store_description = (
+        "Remember a fact about the owner. Arguments: text (the fact, required); "
+        "kind (a short type such as fact or user_preference)."
+    )
+    if temporal:
+        store_description += (
+            " Optional when the user stated them: event_time, valid_from, valid_to (ISO dates), "
+            "reliability, source_locator."
+        )
+    if scoped:
+        store_description += (
+            " Optional: applies_when for a preference/rule condition, and origin=explicit only "
+            "when the owner directly stated it, origin=inferred for an assistant inference; "
+            "leave either blank if unknown."
+        )
     registry.register(
         "memory_search",
         "Find facts in memory by a word or phrase. Argument: query (what to search for).",
@@ -338,23 +452,24 @@ def register(
     )
     registry.register(
         "memory_store",
-        "Remember a fact about the owner. Arguments: text (the fact, required); "
-        "kind (a short type such as fact or user_preference)."
-        + (
-            " Optional when the user stated them: event_time, valid_from, valid_to (ISO dates), "
-            "reliability, source_locator."
-            if temporal
-            else ""
-        ),
-        TemporalStoreArgs if temporal else StoreArgs,
+        store_description,
+        store_args,
         memory_store,
         "memory.write",
     )
+    supersede_description = (
+        "Mark an older memory as outdated because a newer memory replaces it (it is kept, "
+        "not erased). Arguments: memory_id (old), replaced_by (new)."
+    )
+    if scoped:
+        supersede_description += (
+            " Leave replaced_by empty only when the owner explicitly withdraws the record; "
+            "revoked records are not returned as memory evidence."
+        )
     registry.register(
         "memory_supersede",
-        "Mark an older memory as outdated because a newer memory replaces it (it is kept, "
-        "not erased). Arguments: memory_id (old), replaced_by (new).",
-        SupersedeArgs,
+        supersede_description,
+        ScopedSupersedeArgs if scoped else SupersedeArgs,
         memory_supersede,
         "memory.write",
     )

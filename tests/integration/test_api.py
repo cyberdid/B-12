@@ -274,6 +274,44 @@ async def test_goals_attention_and_proposals_over_api(api):
     assert (await client.get("/api/proposals", headers=auth(token))).json() == []
 
 
+async def test_only_owner_control_can_reopen_a_closed_goal(api):
+    _, client, token, app, _ = api
+    owner_goal = (
+        await client.post(
+            "/api/goals",
+            json={"intent": "Власницька ціль", "criteria": "перевірка"},
+            headers=auth(token),
+        )
+    ).json()
+    endpoint = f"/api/goals/{owner_goal['id']}/status"
+    closed = await client.post(endpoint, json={"status": "abandoned"}, headers=auth(token))
+    assert closed.json()["status"] == "abandoned"
+    reopened = await client.post(endpoint, json={"status": "active"}, headers=auth(token))
+    assert reopened.status_code == 200 and reopened.json()["status"] == "active"
+
+    guest = (
+        await client.post(
+            "/api/guests",
+            json={"consent": True, "capabilities": ["time.read"]},
+            headers=auth(token),
+        )
+    ).json()
+    guest_headers = auth(guest["token"])
+    runtime = app.state.runtime
+    guest_session = runtime.control.create_session(guest["actor_id"])
+    guest_goal = runtime.goals.create(
+        guest["actor_id"], guest_session, "Гостьова ціль", "перевірка"
+    )
+    guest_endpoint = f"/api/goals/{guest_goal['id']}/status"
+    assert (
+        await client.post(guest_endpoint, json={"status": "abandoned"}, headers=guest_headers)
+    ).status_code == 200
+    denied = await client.post(
+        guest_endpoint, json={"status": "active"}, headers=guest_headers
+    )
+    assert denied.status_code == 403
+
+
 async def test_server_runs_and_stops_the_maintenance_loop(scripted_ollama, tmp_path, monkeypatch):
     from b12 import maintenance
     from b12.api import create_app

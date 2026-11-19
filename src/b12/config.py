@@ -53,6 +53,8 @@ class Settings(BaseModel):
     # no model could answer "what is open / is it done" without them (18.11.2026). On since
     # 19.11.2026: with it M53 0 -> 0.5 and M55 0 -> 1.0 (arm F, U4 report).
     goals_in_context: bool = True
+    # ADR-016: experimental structured memory/context contract; off preserves the pre-U5 shapes.
+    memory_scoped: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -178,6 +180,7 @@ class Settings(BaseModel):
                 "memory_temporal",
                 "verify_writes",
                 "goals_in_context",
+                "memory_scoped",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

@@ -132,6 +132,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         memory_revision=agent.memory_revision,
         sudo=settings.host_access == "full" and settings.sudo_access == "approval",
         memory_temporal=settings.memory_temporal,
+        memory_scoped=settings.memory_scoped,
         verify_writes=settings.verify_writes,
     )
     if not settings.forget_requires_approval:

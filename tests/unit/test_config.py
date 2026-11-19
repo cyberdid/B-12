@@ -140,6 +140,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_temporal": True,
         "verify_writes": False,
         "goals_in_context": True,
+        "memory_scoped": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -207,3 +208,11 @@ def test_default_context_leaves_room_for_the_capri_prompt(tmp_path):
 
     settings = Settings(state_dir=tmp_path)
     assert settings.num_ctx - settings.output_tokens >= 3300 + 2048
+
+
+def test_memory_scoped_is_opt_in_and_environment_configurable(tmp_path):
+    from b12.config import Settings
+
+    assert Settings(state_dir=tmp_path).memory_scoped is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_SCOPED": "true"}
+    assert Settings.from_env(env).memory_scoped

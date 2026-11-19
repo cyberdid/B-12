@@ -24,11 +24,11 @@ def _make_v2(path):
     connection.close()
 
 
-def test_new_store_is_v3(tmp_path):
+def test_new_store_is_v3_or_later(tmp_path):
     store = MemoryStore(tmp_path / "m.sqlite3")
     try:
-        assert SCHEMA_VERSION == 3
-        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert SCHEMA_VERSION >= 3
+        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
     finally:
         store.close()
 
@@ -38,7 +38,7 @@ def test_v2_store_upgrades_losslessly_with_unknown_times_left_unknown(tmp_path):
     _make_v2(path)
     store = MemoryStore(path)
     try:
-        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
         record = store.get("00000000-0000-4000-8000-000000000001", OWNER)
         assert record.text == "старий факт"
         assert (record.event_time, record.valid_from, record.valid_to) == (None, None, None)
