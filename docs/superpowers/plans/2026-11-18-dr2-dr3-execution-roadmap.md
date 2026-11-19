@@ -101,3 +101,24 @@
 - [x] Reports: `CAPRI_COGNITIVE_CONTROL_AB.md`, `CAPRI_MEMORY_BASELINE.md`, `CAPRI_U4_TEMPORAL_ABLATION.md`.
 - [ ] Left open on purpose: E2 arm; U3 no-memory/persona-only/oracle/filler arms; U4 `episode`/`claim` entities and conflict links; per-actor file scope (security, postponed by the owner — Bolt reads a guest's private file 19/20 on request).
 - [ ] Next stage per master plan: U5 (decision quality without more stale-use/resurrection), U6/U7 need owner review first.
+
+#### Run-status reconciliation (19.11.2026)
+
+Read-only `evals/unified/resume_runs.sh --status` confirms the scheduled run directories are complete: A0, A1, E1, D, U4, D2, F, A0b, and D3 are 360/360; Haiku and Luna are 120/120. No frozen U2–U4 model run is pending. The GPU was reported free by the owner and measured at 15 MiB used during a 6% utilization snapshot. This does not open the U5 gate: active `u5-application-v3` remains DRAFT until two independent blind oracle reviews and a new frozen version exist.
+
+### I. U5 implementation checkpoint (19.11.2026)
+- [x] ADR-016 accepted by delegation. Schema v4 adds nullable preference scope and origin; `memory_scoped` is opt-in and off by default.
+- [x] Runtime implementation: scoped structured evidence packet, explicit no-evidence instruction, explicit-vs-inferred prompt policy with unverified-origin caveat, revoked/source-invalid recall filtering, open/closed goal context, stale retained evidence annotation, and owner-only explicit reopen of closed goals.
+- [x] Focused ADR-016 compatibility/regression suite: **297 passed**; changed-file Ruff and `git diff --check` pass. Verification report: `reports/unified/ADR-016-implementation-check-2026-11-19.md`.
+- [x] Internal corpus preflight corrected M68 (surface both reliability-conflicting records and ask), M83 (disjoint scopes), M75 (advice request), and later M61/M62/M83 action-language ambiguity. v1 and v2 are RETIRED; v3 is DRAFT with a separate review pack and validated fixture hashes. See `reports/unified/U5-author-preflight-2026-11-19.md`.
+- [x] U5 setup adapter and runner support scoped + temporal memory, scope/origin fields, superseded and revoked lifecycle state, and the `--memory-scoped` arm. Adapter seeds goals before later retirement so historic completion with subsequently stale evidence is representable. **49 selected no-model evaluator tests passed across five modules** (35 adapter/scripted-runner tests); all 24 v3 P1 setups seed without dropping nonempty memory fields; v1/v2/v3 manifests pass structural/hash validation.
+- [x] U5 criterion-level metric path: judge combination preserves each criterion's labels/votes; owner can adjudicate a tagged criterion independently; judge sheets keep metric-tagged criteria after unrelated deterministic failures; `analyze_u5_metrics.py` reports adverse-effect rates and paired family-cluster intervals. The selected judge/scorer tests pass; metric semantics still require blind-review confirmation.
+- [ ] Obtain two independent blind oracle reviews of `u5-application-v3`; then correct as needed and publish a new immutable FROZEN set with hashes. The v3 review pack is prepared; do not run any DRAFT.
+- [ ] After oracle review, confirm criterion labels and metric tags match the approved rubric, then freeze a new set version. Only afterward run paired B0/U5 Bolt arms (3 repeats) and U5 on `u2-u3-locked-v2`; preserve host/model/runtime/config/raw records and report decision quality, stale-use and resurrection with clustered uncertainty.
+- [ ] Decide whether `memory_scoped` should remain opt-in or become default only after the owner margin (+10 p.p.) and non-regression gates are evaluated. No model-level U5 result exists yet.
+
+### J. U5 measured (19.11.2026, Claude after Codex hit its usage limit)
+- [x] Codex froze `u5-application-locked-v1` (from v3) after Gemma 4 12B + Bolt oracle reviews and ran B0/U5 (144 each). The blind Codex/Gemini reviews of v1 (launched by Claude, found later in `reports/unified/.judge-work-oracle-u5/`) are now in `oracle-review-u5-v1/reviews/`; their unresolved findings are handled by a sensitivity split, not by editing the frozen oracles.
+- [x] Judging finished, disputes decided by oracle wording for both arms, analysed: +12.5 p.p. [+1.4, +26.4]; no stale-use/resurrection; over-application 4/36 → 0/36 (`CAPRI_U5_DECISION_REPORT.md`, commit 29acf9b).
+- [ ] Non-regression: U5 on `u2-u3-locked-v2` (running, `unified-locked-U5scoped-2026-11-19`) → judge → compare with F and U4 → decide the `memory_scoped` default.
+- [ ] Next U5 set version: apply the blind reviewers' fixes before freezing; two strong blind reviews (never the evaluated model).

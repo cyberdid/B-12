@@ -81,3 +81,52 @@ Nothing is running except Ollama. Everything is committed on `feat/unified-dr2-d
 Read `CAPRI_COGNITIVE_CONTROL_AB.md`, `CAPRI_MEMORY_BASELINE.md`, `CAPRI_U4_TEMPORAL_ABLATION.md`
 and roadmap section H. Defaults changed: `memory_temporal` and `goals_in_context` are on.
 Open: per-actor file scope (security, postponed), U5 next per the master plan.
+
+## Checkpoint — 19.11.2026, U5 implementation in progress
+
+- Worktree: `.worktrees/unified-dr2-dr3`, branch `feat/unified-dr2-dr3`, base `891f564`.
+- ADR-016 implementation is present but uncommitted. Read `reports/unified/ADR-016-scoped-memory-to-action.md`, `reports/unified/ADR-016-implementation-check-2026-11-19.md`, and roadmap section I before continuing.
+- Current changes include schema v4; opt-in `memory_scoped` (default off); scope/origin tool fields; shared structured evidence packets; no-evidence instruction; revoked-record filtering; split open/closed goal context; stale retained-evidence label; and closed-goal reopen protection in GoalStore/CLI/API.
+- Targeted relevant suite: **296 passed**; Ruff and `git diff --check` passed. No live model, GPU benchmark, client, or service was started in this checkpoint.
+- U5 set `u5-application-v1` is still `DRAFT`. `reports/unified/oracle-review-u5-v1/` currently contains only the review prompt, rubric, schema and blank sheet; no completed independent Codex/Gemini reviews were found. **Do not run this draft.** First complete two independent blind reviews, revise to a new version, validate fixture hashes, and freeze; only then follow ADR-016's B0/U5 benchmark protocol.
+- Preserve other existing uncommitted files (SIM/CRSI ingest, F judgement files, and U5 draft fixtures). Do not stage or commit the whole worktree.
+
+## Checkpoint — 19.11.2026, U5 author preflight
+
+- Added the explicit-vs-inferred application rule to the scoped-memory system prompt. `origin` is still explicitly described as a model annotation, not independently verified provenance. A regression test checks that rule and that other unresolved current conflicts still request clarification.
+- Internal corpus preflight found inconsistencies in M68 (unresolved reliability conflict), M83 (overlapping default and trip-specific scope), and M75 (imperative wording with an ask-before-resume oracle). Corrected M68/M83 and made M75 a genuine advice/ambiguity request; details in `reports/unified/U5-author-preflight-2026-11-19.md`.
+- v1 fixtures and review pack are preserved; manifest status is `RETIRED` because it was superseded before independent review. Active candidate `u5-application-v2` has 24 families / 48 variants, status `DRAFT`, and passes `evals.unified.validate_scenarios`. Review pack: `reports/unified/oracle-review-u5-v2/`; it contains no model outputs.
+- No model, benchmark, GPU process, client, or service was started. Do not run the draft. Two independent blind reviews remain necessary before any frozen set or model arm.
+- The exact focused regression suite has since been rerun: **297 passed**. U5 evaluator setup and scripted-runner tests: **35 passed**; both U5 manifests validate structurally and by fixture hashes. See the latest checkpoint below.
+
+## Checkpoint — 19.11.2026, U5 evaluator bridge verified
+
+- Updated `setup_adapter.py` to seed temporal metadata, scoped fields (`applies_when`, `origin`), superseded history and revocations; unhandled nonempty fixture fields remain visible in `dropped_fields`. Updated `run_u2_u3.py` to pass scoped mode consistently during seed and runtime, expose `--memory-scoped`, and include revocations in the seed report.
+- Seed order preserves history: goals are created/completed while their evidence is live, then later supersession/revocation transitions are applied. A no-model test verifies the U5 M76 case where a completed goal retains evidence that later becomes stale.
+- Verification: 35 adapter/scripted-runner tests passed; all 24 U5 v2 P1 setups seed without dropping nonempty memory fields; v1/v2 structural/hash validation, targeted Ruff, and `git diff --check` pass. The focused ADR-016 regression suite is 297 passed.
+- No live model, GPU benchmark, desktop client, or service was started. U5 v2 remains DRAFT. Two independent blind oracle reviews, scorer semantics review, version freeze, and only then any model experiment remain outstanding.
+- Preserve the existing uncommitted worktree and do not stage or commit unrelated files.
+
+## Checkpoint — 19.11.2026, U5 criterion-level evaluator verified
+
+- `judge_sheet.combine` now preserves per-criterion labels and votes in `combined.json`; optional criterion-level owner adjudication is supported without changing the overall response verdict. Tagged adverse criteria remain in blind sheets even if a different deterministic check already failed.
+- Added `evals/unified/analyze_u5_metrics.py` for tagged adverse outcomes, unknown handling, pooled and complete-family rates, and paired family-cluster bootstrap intervals. Expected missing repeats count as unknown; unexpected repeat directories are rejected.
+- Verification: selected suite across five modules **49 passed in 11.50 s**; changed-file Ruff passed; `git diff --check` passed; v1/v2 scenario manifests validated and v2 review-pack checksums passed. The 49 are evaluator/tooling tests, not model results.
+- No model, GPU, client, or service was started. U5 v2 remains `DRAFT`; two independent blind oracle reviews, scorer-semantics confirmation, and a new frozen set remain prerequisites. No commit was made.
+
+## Checkpoint — 19.11.2026, GPU/run status reconciliation
+
+- Read-only `evals/unified/resume_runs.sh --status` reports all scheduled local arms complete: A0, A1, E1, D, U4, D2, F, A0b, and D3 at 360/360 each; Haiku and Luna at 120/120 each. No pending frozen run remains to resume.
+- Snapshot from `nvidia-smi`: RTX 4060 Laptop at 6% utilization and 15 MiB / 8188 MiB; the owner confirmed the GPU is free. This is a transient status check, not a benchmark.
+- No evaluation was launched. The next planned experiment is the U5 B0/U5 comparison, still gated on two independent blind reviews of the active v3 set, scorer-semantics confirmation, and a new frozen corpus. Do not run DRAFT fixtures.
+
+## Checkpoint — 19.11.2026, U5 v3 author preflight
+
+- A static pass found that M61/M62 reminder prompts and M83 wake-up wording could be read as action requests, although the oracle expected `NO_TOOL`. Rephrased them as questions about which time applies; this preserves the scope/validity task while removing the scheduling/alarm interpretation.
+- Preserved v2 and its review pack, marked its 48 scenarios `RETIRED`, and generated v3 from `author_u5_application_v3.py`: 24 families / 48 variants, all `DRAFT`. Prepared a new pack at `reports/unified/oracle-review-u5-v3/`, including the exact manifest SHA-256. v2 pack is marked superseded and its checksums refreshed.
+- v1/v2/v3 scenario validators pass. Both v2 and v3 review-pack SHA-256 checks pass. The active v3 pack contains no model outputs or arm labels.
+- This is author preflight, not independent review. No GPU/model run was started; two independent blind oracle reviews of v3 remain required before freezing or running it.
+
+## Checkpoint — 19.11.2026, ~15:30 (Claude): U5 measured, regression run going
+
+Codex stopped on its usage limit while combining judges. Committed: ADR-016 implementation (80527e1), U5 eval tooling and sets (5a589bf), U5 results (29acf9b). Running on the GPU: `memory_scoped` on `u2-u3-locked-v2` (`evals/capri_comprehensive/artifacts/unified-locked-U5scoped-2026-11-19`, flags temporal + goals + scoped). Next: `launch_judges.sh U5scoped <run> codex gemini` → combine/adjudicate → `consistent_verdicts` with F/U4/A0 → decide the `memory_scoped` default (roadmap section J).
