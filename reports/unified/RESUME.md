@@ -56,3 +56,21 @@ To continue, in this order:
 2. **A0b and D3 runs**: `evals/unified/resume_runs.sh` (resumes A0b; D3 is listed too — run it after A0b to keep the GPU single-tenant).
 3. Re-run `consistent_verdicts.py` over all arms and compare with A0 and A0b.
 4. Decide defaults: candidates `memory_temporal` (measured +20.6 p.p.), `goals_in_context` (F: M53/M55 now correct), `verify_writes`, `annotate_unverified_claims` — after A0b settles the control-track drift.
+
+## Update — 19.11.2026, morning (resumed after a reboot)
+
+- **Sandbox leak found and fixed** (commit c17b0aa): the unified worker bound the whole repository,
+  so a model searching the home directory reached judge sheets and the oracle review (Haiku
+  M42-P1 read a sheet with `sed`; Bolt U4 C39-P1 opened `oracle-review-locked-v1/sheet.json`).
+  The worker now sees only its scenario's input/setup fixtures; reports, paper, raw, wiki,
+  research, docs, tests, draft sources, other records and `/var/log` are empty tmpfs.
+  `B12_EVAL_ENTRY=unified-probe` checks this from inside. Audit and the 13 set-aside records:
+  `sandbox-leak-audit-2026-11-19.json`; re-run, judged with `launch_delta_judges.sh` and
+  combined with `combine_judges --stale-sheet`. Residual: the runtime source and README stay
+  readable (needed to run); they hold no answers.
+- **F judged** (adjudication by delegation, owner precedents) and all arms re-aligned:
+  `consistent-verdicts-2026-11-19/` (`compare_arms.py`). Vs A0: **F memory +0.267
+  [+0.150, +0.394]**, control −0.038 [−0.115, +0.038]; U4 memory +0.211 [+0.083, +0.344];
+  D2 neutral; A1/E1/D unchanged (rejected). Haiku memory 0.483, gpt-6-luna control 0.769.
+- Next: A0b finishes → judge (`launch_judges.sh A0b … codex gemini`) → compare A0b with A0
+  (drift) → D3 → defaults decision.
