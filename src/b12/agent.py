@@ -1138,10 +1138,14 @@ class Agent:
                             goals_line = _goals_context(goal_rows)
                         if goals_line:
                             system += "\n" + goals_line
-                if getattr(self.settings, "memory_scoped", False) and actor.consent:
+                # U5.1: the rules only in turns that carry memory evidence. Added to every turn
+                # they cost file tasks 7 p.p. on u2-u3-locked-v2 (19.11.2026, U5 report).
+                if (
+                    getattr(self.settings, "memory_scoped", False)
+                    and actor.consent
+                    and state.get("evidence")
+                ):
                     system += _SCOPED_MEMORY_RULES
-                    if not state.get("evidence"):
-                        system += "\nДоказів із пам'яті для цього запиту немає."
                 if state.get("language"):
                     system += "\n" + state["language"]
                 request = self._admit(system, history, state, tools, persist)

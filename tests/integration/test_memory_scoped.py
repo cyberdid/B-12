@@ -134,7 +134,10 @@ async def _turn(runtime, state, text):
     return actor, session, task, grant
 
 
-async def test_prompt_has_rules_no_evidence_note_and_split_goals(scripted_ollama, tmp_path):
+async def test_turn_without_memory_evidence_gets_no_rules_text_but_split_goals(
+    scripted_ollama, tmp_path
+):
+    """U5.1: the rules text cost file tasks 7 p.p. when added to every turn (19.11.2026)."""
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(update={"state_dir": tmp_path / "s", "memory_scoped": True})
@@ -147,8 +150,8 @@ async def test_prompt_has_rules_no_evidence_note_and_split_goals(scripted_ollama
         state["script"] = [{"content": "Паркан."}]
         await runtime.agent.turn(session, grant, "Що ще фарбувати?", task_id=task, timeout_s=60)
         system = state["requests"][-1]["messages"][0]["content"]
-        assert "state «чинне»" in system
-        assert "Доказів із пам'яті для цього запиту немає" in system
+        assert "state «чинне»" not in system
+        assert "Доказів із пам'яті" not in system
         assert "Відкриті задачі співрозмовника" in system and "Пофарбувати паркан." in system
         assert "не відновлювати без прямої вказівки власника" in system
         opened = system.split("Закриті")[0]
@@ -166,6 +169,8 @@ async def test_prompt_prefers_explicit_owner_memory_over_assistant_inference(
     )
     try:
         actor, session, task, grant = await _turn(runtime, state, "")
+        runtime.memory.remember("Я п'ю каву з однією ложкою цукру.", actor, origin="explicit")
+        runtime.memory.remember("Схоже, власник п'є каву без цукру.", actor, origin="inferred")
         state["script"] = [{"content": "Одна ложка."}]
         await runtime.agent.turn(
             session, grant, "Скільки цукру класти в каву?", task_id=task, timeout_s=60
