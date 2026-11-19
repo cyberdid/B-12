@@ -48,3 +48,5 @@ The opt-in path is implemented through configuration, tool schemas, memory retri
 ## Status update — 19.11.2026 (measured)
 
 Measured on the frozen `u5-application-locked-v1` ([CAPRI_U5_DECISION_REPORT.md](CAPRI_U5_DECISION_REPORT.md)): decision quality 0.618 → 0.743, +12.5 p.p. [+1.4, +26.4]; stale-use 0/30 and resurrection 0/24 in both arms; over-application 4/36 → 0/36. The freeze relied on Gemma 4 12B and Bolt oracle reviews; the stronger blind Codex/Gemini reviews of v1 found issues that partly remain, and a sensitivity split shows the same +12.5 p.p. on the uncontested half. `memory_scoped` stays off until the non-regression run on `u2-u3-locked-v2` is judged.
+
+**Non-regression (19.11.2026, ~16:30):** on `u2-u3-locked-v2` the flag costs control −7.1 p.p. [−14.7, −0.6] against F (memory +3.9, n.s.). `memory_scoped` stays **off**; U5.1 will scope the rules text to turns that carry memory evidence and re-measure both sets.

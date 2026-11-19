@@ -333,6 +333,45 @@
    }
   }
  },
+ "U5S": {
+  "tracks": {
+   "control": {
+    "families_fully_decided": 26,
+    "mean_family_acceptable_rate": 0.622,
+    "cluster_bootstrap_95ci": [
+     0.449,
+     0.782
+    ]
+   },
+   "memory": {
+    "families_fully_decided": 30,
+    "mean_family_acceptable_rate": 0.706,
+    "cluster_bootstrap_95ci": [
+     0.55,
+     0.839
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_A0": {
+   "control": {
+    "families": 26,
+    "mean_diff": -0.109,
+    "cluster_bootstrap_95ci": [
+     -0.224,
+     -0.019
+    ]
+   },
+   "memory": {
+    "families": 30,
+    "mean_diff": 0.306,
+    "cluster_bootstrap_95ci": [
+     0.178,
+     0.439
+    ]
+   }
+  }
+ },
  "haiku": {
   "tracks": {
    "control": {
