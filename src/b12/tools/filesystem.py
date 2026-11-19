@@ -750,6 +750,16 @@ def _read_back(parent_fd, name, raw):
     }
 
 
+def _write_landed(raw, context):
+    """ADR-017 trusted check: the target holds exactly the intended text (else absent)."""
+    try:
+        return Path(raw["path"]).read_bytes() == raw["text"].encode()
+    except FileNotFoundError:
+        return False
+    except (OSError, KeyError, TypeError, AttributeError):
+        return None
+
+
 def register(registry, backups, *, verify_writes=False):
     registry.register(
         "file_list", "List bounded directory entries", ListArgs, file_list, "filesystem.read"
@@ -778,4 +788,5 @@ def register(registry, backups, *, verify_writes=False):
         WriteArgs,
         write,
         "filesystem.write",
+        verify=_write_landed,
     )

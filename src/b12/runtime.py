@@ -138,6 +138,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")
     registry.network_allow = settings.network_allow
+    registry.ledger = settings.task_ledger
     config_home = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
     registry.protected_paths = tuple(
         os.path.realpath(path) for path in (settings.state_dir, config_home / "b12")

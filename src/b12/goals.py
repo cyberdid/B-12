@@ -65,6 +65,8 @@ class GoalStore:
         columns = {row[1] for row in self.db.execute("PRAGMA table_info(goals)")}
         if "priority" not in columns:  # databases created before goal priorities
             self.db.execute("ALTER TABLE goals ADD COLUMN priority INTEGER NOT NULL DEFAULT 0")
+        if "plan_revision" not in columns:  # ADR-017: effects are keyed per plan revision
+            self.db.execute("ALTER TABLE goals ADD COLUMN plan_revision INTEGER NOT NULL DEFAULT 1")
 
     def close(self):
         self.db.close()
@@ -117,8 +119,12 @@ class GoalStore:
         goal_id, now = str(uuid4()), _now()
         with self._atomic():
             self.db.execute(
-                "INSERT INTO goals VALUES "
-                "(?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?,?)",
+                # Named columns: priority and plan_revision may sit in any order in older files.
+                "INSERT INTO goals(id, actor_id, session_id, intent, criteria, check_spec, "
+                "allowed_tools, status, status_reason, checkpoint, budget_turns, consumed_turns, "
+                "evidence_ids, tags, created_at, updated_at, next_review, review_interval_s, "
+                "priority, plan_revision) VALUES "
+                "(?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?,?,1)",
                 (
                     goal_id,
                     actor_id,
@@ -214,9 +220,12 @@ class GoalStore:
                 and not reopen
             ):
                 raise PermissionError("reopening a closed goal requires explicit owner control")
+            # ADR-017: an owner reopening is a replan; effects of the old plan are not reused.
+            replan = 1 if reopen and goal["status"] in {"achieved", "abandoned"} else 0
             self.db.execute(
-                "UPDATE goals SET status=?, status_reason=?, updated_at=? WHERE id=?",
-                (status, reason[:200], _now(), goal_id),
+                "UPDATE goals SET status=?, status_reason=?, updated_at=?, "
+                "plan_revision=plan_revision+? WHERE id=?",
+                (status, reason[:200], _now(), replan, goal_id),
             )
         return self.get(goal_id, actor_id)
 

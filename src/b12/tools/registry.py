@@ -91,6 +91,14 @@ class _Tool:
     timeout_s: float | None = None
     # Per-call approval on top of the risk class (e.g. a command that reaches the network).
     approval_when: Callable[[dict], bool] | None = None
+    # ADR-017 trusted state verifier: (arguments, context) -> True (effect present),
+    # False (absent) or None (cannot tell). Runtime code, never model text.
+    verify: Callable[[dict, ExecutionContext], bool | None] | None = None
+
+
+def _effectful(capability: str) -> bool:
+    """Capabilities whose calls change something outside the turn (ADR-017 ledger scope)."""
+    return not capability.endswith(".read") and not capability.startswith("turn.")
 
 
 class ToolRegistry:
@@ -105,6 +113,8 @@ class ToolRegistry:
         self.network_allow: tuple[str, ...] | None = None
         # Resolved roots (owner state/config) that filesystem/process arguments may not name.
         self.protected_paths: tuple[str, ...] = ()
+        # ADR-017: settings.task_ledger; goal turns consult the cross-turn step ledger.
+        self.ledger = False
 
     def register(
         self,
@@ -117,7 +127,10 @@ class ToolRegistry:
         risk: Risk | str = Risk.TYPED,
         timeout_s: float | None = None,
         approval_when: Callable[[dict], bool] | None = None,
+        verify: Callable[[dict, ExecutionContext], bool | None] | None = None,
     ):
+        if verify is not None and not callable(verify):
+            raise ValueError("verifier must be callable")
         if timeout_s is not None and (
             type(timeout_s) not in (int, float) or not math.isfinite(timeout_s) or timeout_s <= 0
         ):
@@ -180,6 +193,7 @@ class ToolRegistry:
             schema,
             timeout_s,
             approval_when,
+            verify,
         )
 
     def catalog(self) -> list[dict]:
@@ -297,6 +311,43 @@ class ToolRegistry:
             call = call.model_copy(
                 update={"arguments": raw, "turn_id": context.turn_id, "task_id": context.task_id}
             )
+            step = None
+            if self.ledger and _effectful(tool.capability):
+                link = self.control.task_goal(context.task_id)
+                if link is not None:
+                    goal_id, plan_revision = link
+                    key = self.control.effect_key(goal_id, plan_revision, tool.name, raw)
+                    step = (goal_id, key)
+                    earlier = self.control.last_step(goal_id, key)
+                    state = earlier["state"] if earlier else None
+                    if state in ("unknown", "needs_owner", "started"):
+                        present = None
+                        if tool.verify is not None:
+                            try:
+                                present = tool.verify(copy.deepcopy(raw), context)
+                            except Exception:
+                                present = None
+                        if present is True:
+                            self.control.reconcile_step(earlier["sequence"], "reconciled_completed")
+                            state = "reconciled_completed"
+                        elif present is False:
+                            self.control.reconcile_step(earlier["sequence"], "reconciled_absent")
+                        else:
+                            self.control.reconcile_step(earlier["sequence"], "needs_owner")
+                            raise ControlError("unknown_outcome_needs_owner")
+                    if state in ("completed", "reconciled_completed"):
+                        await report_policy(
+                            "allowed", "goal_ledger_dedupe", capability=tool.capability
+                        )
+                        return result(
+                            "completed",
+                            content={
+                                "already_done": True,
+                                "earlier_operation_id": earlier["operation_id"],
+                                "note": "This exact effect already happened in an earlier run "
+                                "of this goal; it was not repeated.",
+                            },
+                        )
             operation, state = self.control.prepare(
                 context,
                 call,
@@ -314,6 +365,8 @@ class ToolRegistry:
             )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})
+            if step is not None:
+                self.control.add_step(step[0], step[1], operation, context.turn_id)
             deadline = min(context.deadline, start + (tool.timeout_s or self.timeout_s))
             guard = EffectGuard(self.control, context, tool.capability, operation, deadline)
 

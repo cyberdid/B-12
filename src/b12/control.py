@@ -101,6 +101,12 @@ CREATE TABLE IF NOT EXISTS api_tokens(digest TEXT PRIMARY KEY, actor_id TEXT NOT
  capabilities TEXT NOT NULL, revoked INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS audit(sequence INTEGER PRIMARY KEY,
  operation_id TEXT NOT NULL, name TEXT NOT NULL, state TEXT NOT NULL, error_code TEXT);
+CREATE TABLE IF NOT EXISTS task_goals(task_id TEXT PRIMARY KEY, goal_id TEXT NOT NULL,
+ plan_revision INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS goal_steps(sequence INTEGER PRIMARY KEY, goal_id TEXT NOT NULL,
+ effect_key TEXT NOT NULL, operation_id TEXT NOT NULL, reconciled TEXT,
+ turn_id TEXT NOT NULL, updated_at REAL NOT NULL);
+CREATE INDEX IF NOT EXISTS goal_steps_key ON goal_steps(goal_id, effect_key);
 CREATE TRIGGER IF NOT EXISTS audit_no_update BEFORE UPDATE ON audit
  BEGIN SELECT RAISE(ABORT, 'append only'); END;
 CREATE TRIGGER IF NOT EXISTS audit_no_delete BEFORE DELETE ON audit
@@ -613,6 +619,75 @@ class ControlStore:
             (self._call_key(ctx, call),),
         ).fetchone()
         return dict(row) if row else None
+
+    # ADR-017 goal step ledger: effects of a goal are keyed across turns, so a restart never
+    # repeats one blindly. The key binds goal, plan revision, tool and exact arguments.
+    def link_task_goal(self, task_id: str, goal_id: str, plan_revision: int) -> None:
+        with self._atomic():
+            self.db.execute(
+                "INSERT OR REPLACE INTO task_goals VALUES (?,?,?)",
+                (task_id, goal_id, int(plan_revision)),
+            )
+
+    def task_goal(self, task_id: str | None) -> tuple[str, int] | None:
+        if not task_id:
+            return None
+        row = self.db.execute(
+            "SELECT goal_id, plan_revision FROM task_goals WHERE task_id=?", (task_id,)
+        ).fetchone()
+        return (row[0], row[1]) if row else None
+
+    def effect_key(self, goal_id: str, plan_revision: int, name: str, arguments: dict) -> str:
+        identity = json.dumps(
+            [goal_id, int(plan_revision), name, arguments_digest(arguments)],
+            separators=(",", ":"),
+        ).encode()
+        return hmac.new(self._key, identity, hashlib.sha256).hexdigest()
+
+    def last_step(self, goal_id: str, effect_key: str) -> dict | None:
+        """The latest recorded step for this effect; `state` is the reconciliation when one
+        was made, otherwise the operation's own state (unknown after a crash)."""
+        row = self.db.execute(
+            "SELECT s.sequence, s.operation_id, s.reconciled, o.state FROM goal_steps s "
+            "JOIN operations o ON o.id=s.operation_id "
+            "WHERE s.goal_id=? AND s.effect_key=? ORDER BY s.sequence DESC LIMIT 1",
+            (goal_id, effect_key),
+        ).fetchone()
+        if row is None:
+            return None
+        return {
+            "sequence": row["sequence"],
+            "operation_id": row["operation_id"],
+            "state": row["reconciled"] or row["state"],
+        }
+
+    def add_step(self, goal_id: str, effect_key: str, operation_id: str, turn_id: str) -> None:
+        with self._atomic():
+            self.db.execute(
+                "INSERT INTO goal_steps(goal_id,effect_key,operation_id,reconciled,turn_id,"
+                "updated_at) VALUES (?,?,?,NULL,?,?)",
+                (goal_id, effect_key, operation_id, turn_id, time.time()),
+            )
+
+    def reconcile_step(self, sequence: int, outcome: str) -> None:
+        if outcome not in ("reconciled_completed", "reconciled_absent", "needs_owner"):
+            raise ValueError("unsupported reconciliation")
+        with self._atomic():
+            self.db.execute(
+                "UPDATE goal_steps SET reconciled=?, updated_at=? WHERE sequence=?",
+                (outcome, time.time(), sequence),
+            )
+
+    def steps_needing_owner(self, goal_id: str) -> list[dict]:
+        return [
+            dict(row)
+            for row in self.db.execute(
+                "SELECT s.sequence, s.operation_id, o.name FROM goal_steps s "
+                "JOIN operations o ON o.id=s.operation_id "
+                "WHERE s.goal_id=? AND s.reconciled='needs_owner'",
+                (goal_id,),
+            )
+        ]
 
     def audit_events(self) -> list[dict]:
         return [

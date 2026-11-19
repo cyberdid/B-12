@@ -55,6 +55,8 @@ class Settings(BaseModel):
     goals_in_context: bool = True
     # ADR-016: experimental structured memory/context contract; off preserves the pre-U5 shapes.
     memory_scoped: bool = False
+    # ADR-017: background goal effects keyed across turns; a crash never repeats one blindly.
+    task_ledger: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -181,6 +183,7 @@ class Settings(BaseModel):
                 "verify_writes",
                 "goals_in_context",
                 "memory_scoped",
+                "task_ledger",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

@@ -109,7 +109,8 @@ class ScopedStoreArgs(StoreArgs):
     """ADR-016 scope fields; blank means unknown."""
 
     applies_when: str = Field(
-        default="", max_length=200,
+        default="",
+        max_length=200,
         description="Condition when this preference/rule applies; blank if unknown",
     )
     origin: Literal["", "explicit", "inferred"] = Field(
@@ -125,7 +126,8 @@ class ScopedTemporalStoreArgs(TemporalStoreArgs):
     """Combined temporal and scoped fields when both runtime features are enabled."""
 
     applies_when: str = Field(
-        default="", max_length=200,
+        default="",
+        max_length=200,
         description="Condition when this preference/rule applies; blank if unknown",
     )
     origin: Literal["", "explicit", "inferred"] = Field(
@@ -216,8 +218,14 @@ def _temporal_from_args(args) -> dict:
 
 
 def register(
-    registry, *, memory=None, knowledge=None, purge=None, memory_revision=None,
-    temporal=False, scoped=False,
+    registry,
+    *,
+    memory=None,
+    knowledge=None,
+    purge=None,
+    memory_revision=None,
+    temporal=False,
+    scoped=False,
 ):
     async def memory_search(args, guard):
         if memory is None:
@@ -279,10 +287,14 @@ def register(
         if any(not memory.is_live(old, actor) for old in args.supersedes):
             return failure("unsupported")  # checked before any write: nothing to undo
         try:
-            scope = {
-                "applies_when": getattr(args, "applies_when", "") or None,
-                "origin": getattr(args, "origin", "") or None,
-            } if scoped else {}
+            scope = (
+                {
+                    "applies_when": getattr(args, "applies_when", "") or None,
+                    "origin": getattr(args, "origin", "") or None,
+                }
+                if scoped
+                else {}
+            )
             record = memory.remember(
                 args.text,
                 actor,
@@ -423,9 +435,12 @@ def register(
         )
 
     store_args = (
-        ScopedTemporalStoreArgs if temporal and scoped
-        else TemporalStoreArgs if temporal
-        else ScopedStoreArgs if scoped
+        ScopedTemporalStoreArgs
+        if temporal and scoped
+        else TemporalStoreArgs
+        if temporal
+        else ScopedStoreArgs
+        if scoped
         else StoreArgs
     )
     store_description = (
@@ -443,6 +458,15 @@ def register(
             "when the owner directly stated it, origin=inferred for an assistant inference; "
             "leave either blank if unknown."
         )
+
+    def stored_already(raw, context):
+        """ADR-017 trusted check: a live record of this actor with exactly this text."""
+        try:
+            actor = registry.control.resolve_actor(context.actor_id)
+            return any(record.text == raw["text"] for record in memory.recent(actor, limit=200))
+        except Exception:
+            return None
+
     registry.register(
         "memory_search",
         "Find facts in memory by a word or phrase. Argument: query (what to search for).",
@@ -456,6 +480,7 @@ def register(
         store_args,
         memory_store,
         "memory.write",
+        verify=stored_already,
     )
     supersede_description = (
         "Mark an older memory as outdated because a newer memory replaces it (it is kept, "

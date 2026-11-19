@@ -78,6 +78,8 @@ class Scheduler:
         owner_caps = set(owner_capabilities(rt.settings))
         caps = tuple(sorted(set(goal["allowed_tools"]) & owner_caps)) or ("time.read",)
         task = rt.control.create_task(goal["session_id"])
+        if getattr(rt.settings, "task_ledger", False):
+            rt.control.link_task_goal(task, goal["id"], goal.get("plan_revision", 1))
         grant = rt.control.issue_grant(
             actor.id,
             goal["session_id"],
@@ -104,7 +106,8 @@ class Scheduler:
                     cancel.set()
                     return
                 higher = [
-                    g["id"] for g in rt.goals.due(self.clock())
+                    g["id"]
+                    for g in rt.goals.due(self.clock())
                     if g["id"] != goal["id"] and g["priority"] > goal["priority"]
                 ]
                 if higher:
@@ -137,6 +140,14 @@ class Scheduler:
             outcome["preempted_by"] = preempted_by[0]
         if result.state == "awaiting_approval":
             rt.goals.set_status(goal["id"], actor.id, "paused", "approval_pending")
+            outcome["status"] = "paused"
+        if getattr(rt.settings, "task_ledger", False) and rt.control.steps_needing_owner(
+            goal["id"]
+        ):
+            # ADR-017: an effect whose outcome is unknown and cannot be checked is never
+            # retried blindly; the goal waits for the owner.
+            if rt.goals.get(goal["id"], actor.id)["status"] == "active":
+                rt.goals.set_status(goal["id"], actor.id, "paused", "unknown_outcome_needs_owner")
             outcome["status"] = "paused"
         if goal["check_spec"] and check_passes(goal["check_spec"]) and actor.consent:
             evidence = rt.memory.remember(
