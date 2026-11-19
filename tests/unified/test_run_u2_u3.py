@@ -86,7 +86,7 @@ def test_cli_refuses_to_run_outside_the_sandbox(tmp_path, monkeypatch):
 
 def test_sandbox_script_offers_the_unified_entry_with_fresh_mounts():
     script = (ROOT / "evals/capri_comprehensive/runners/sandboxed_suite.sh").read_text()
-    assert "unified-u2u3)" in script
+    assert "unified-u2u3|unified-probe)" in script
     assert "EXTRA+=(--tmpfs /sandbox --tmpfs /actors)" in script
     assert 'ROOT_ARGS+=(--ro-bind "$top" "$top")' in script
     assert "ENTRY=(-m evals.unified.run_u2_u3)" in script
@@ -235,9 +235,9 @@ def test_narrow_pattern_catches_document_claims_but_not_recalled_facts():
 
 
 def test_runtime_flags_reach_the_record(tmp_path):
-    from evals.unified.run_u2_u3 import main
-
     import pytest
+
+    from evals.unified.run_u2_u3 import main
 
     with pytest.raises(SystemExit):  # outside the sandbox; parsing must accept the flags
         main(
@@ -250,3 +250,11 @@ def test_runtime_flags_reach_the_record(tmp_path):
                 "--memory-temporal",
             ]
         )
+
+
+def test_unified_sandbox_hides_answer_material():
+    script = (ROOT / "evals/capri_comprehensive/runners/sandboxed_suite.sh").read_text()
+    for hidden in ("reports", "paper", "raw", "wiki", "tests", "evals/unified/draft_sources"):
+        assert hidden in script
+    assert '--tmpfs "$EVAL/artifacts"' in script and "--tmpfs /var/log" in script
+    assert "ENTRY=(-m evals.unified.sandbox_probe)" in script

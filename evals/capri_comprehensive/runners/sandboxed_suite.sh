@@ -28,6 +28,7 @@ cleanup() {
     wait "$BROKER_PID" 2>/dev/null || true
   fi
   rm -rf -- "$BROKER_DIR"
+  [ -n "${STAGE:-}" ] && rm -rf -- "${STAGE:?}"
   rm -f -- "$BROKER_LOG"
 }
 trap cleanup EXIT
@@ -87,8 +88,9 @@ ENTRY=(-m evals.capri_comprehensive.runners.run_networkless_runtime_suite)
 ROOT_ARGS=(--ro-bind / /)
 case "${B12_EVAL_ENTRY:-suite}" in
   suite) ;;
-  unified-u2u3)
+  unified-u2u3|unified-probe)
     ENTRY=(-m evals.unified.run_u2_u3)
+    [ "$B12_EVAL_ENTRY" = unified-probe ] && ENTRY=(-m evals.unified.sandbox_probe)
     # bwrap 0.9 cannot create /sandbox under a read-only bind of /, so bind each top-level
     # host entry read-only (symlinks recreated) over the fresh root instead; the mount
     # points /sandbox and /actors then become empty writable tmpfs.
@@ -102,6 +104,32 @@ case "${B12_EVAL_ENTRY:-suite}" in
       fi
     done
     EXTRA+=(--tmpfs /sandbox --tmpfs /actors)
+    # Leak fix (19.11.2026): a model searching the home directory found judge sheets and the
+    # oracle review in the repository. The worker now sees only this scenario's input and setup
+    # fixtures; answers, reviews, reports, other runs' records and host logs are hidden.
+    OUT_ARG="${3:?unified entry needs: manifest scenario_id out_dir}"
+    mkdir -p "$OUT_ARG"
+    OUT_ABS="$(cd "$OUT_ARG" && pwd)"
+    STAGE="$(mktemp -d /tmp/b12-u2u3-stage.XXXXXX)"
+    "$VENV/bin/python" - "$1" "$2" "$STAGE" <<'PY'
+import json, shutil, sys
+from pathlib import Path
+manifest, scenario, stage = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+row = next(r for r in json.loads(manifest.read_text(encoding="utf-8"))["scenarios"]
+           if r["scenario_id"] == scenario)
+for key in ("input_fixture", "setup_fixture"):
+    if row.get(key):
+        target = stage / row[key]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(row[key], target)
+PY
+    for hidden in reports paper raw wiki research docs tests evals/unified/draft_sources; do
+      [ -d "$REPO/$hidden" ] && EXTRA+=(--tmpfs "$REPO/$hidden")
+    done
+    mkdir -p "$STAGE/evals/unified/draft_fixtures"
+    EXTRA+=(--ro-bind "$STAGE/evals/unified/draft_fixtures" "$REPO/evals/unified/draft_fixtures")
+    EXTRA+=(--tmpfs "$EVAL/artifacts" --tmpfs "$EVAL/reports" --bind "$OUT_ABS" "$OUT_ABS")
+    [ -d /var/log ] && EXTRA+=(--tmpfs /var/log)
     ;;
   *) echo "unsupported B12_EVAL_ENTRY: ${B12_EVAL_ENTRY}" >&2; exit 2 ;;
 esac
