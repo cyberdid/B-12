@@ -155,3 +155,36 @@ Codex stopped on its usage limit while combining judges. Committed: ADR-016 impl
 ## Checkpoint — 20.11.2026, ~17:00
 
 Everything committed; Colab stopped by the orchestrator (queue empty); the laptop orchestrator idles (`~/b12-queue-local`, restart with `B12_REPO=<worktree> B12_QUEUE=~/b12-queue-local B12_ASSETS=~/b12-assets-local setsid nohup ops/remote/orchestrator.sh &`; add jobs to `jobs.tsv`). Results: `CAPRI_INTEGRATED_ACCEPTANCE.md` (U9/U8 on gemma). Waiting for the owner: ADR-017 (`task_ledger`) and ADR-018 (`initiative_gate`).
+
+## Handoff — 20.11.2026 ~20:45: plan `2026-11-20-hermes-market-ports.md` (for agy or any agent)
+
+**State:** branch `feat/unified-dr2-dr3`, worktree `.worktrees/unified-dr2-dr3`. Last commit is the plan (`63f24a2`). All work is committed. Uncommitted edits in `wiki/index.md`, `wiki/project/{open-questions,status}.md`, `wiki/topics/{evals,memory,operations}.md` belong to Codex (19.11): never stage, revert or rewrite them. Colab is stopped.
+
+**Read first:** `AGENTS.md`, `wiki/index.md`, `wiki/project/status.md`, the last entries of `wiki/log.md`, then the plan and its spec (`wiki/sources/hermes-agent-2026-11-20.md`, `wiki/sources/market-landscape-2026-11-20.md`).
+
+**Do:** the plan's tasks in order A1 → A2 → A3 → A4 → B1 → D1 → E1 → H3 → H1 → H2 → H5. Each task follows the same loop:
+1. Write the failing test and see it fail.
+2. Implement.
+3. Run the task's tests plus `.venv/bin/python -m pytest -q tests/unit tests/integration tests/unified -p no:cacheprovider` (849 passed, 1 skipped at handoff) and `.venv/bin/ruff check` + `ruff format --check` on the changed files.
+4. Commit with explicit paths.
+
+Every new behaviour is a `Settings` flag, default False (see Global Constraints in the plan).
+
+**Do not:**
+- push;
+- force-push;
+- run a bare `git stash`;
+- stage whole wiki files carrying others' edits;
+- run model evaluations or touch `ops/remote/*` / Colab (phase G is for the owner + Claude);
+- load the owner's local GPU;
+- open a file for writing in the same expression that reads it (this emptied `wiki/index.md` once — read into a variable first);
+- write secrets into docs.
+
+**Stop and ask the owner** before:
+- any schema migration beyond the plan;
+- any new dependency or download (wake-word model H6);
+- turning any flag on by default.
+
+**Prompt surface:** a task that changes what the model sees with flags off must regenerate `tests/fixtures/prompt_surface/owner_default.json` (`B12_UPDATE_PROMPT_SURFACE=1`) and say so in the commit. With flags off it should not change.
+
+**Log:** append one `## [YYYY-MM-DD] lint | …` entry to `wiki/log.md` per finished phase (append only).
