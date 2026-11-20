@@ -67,18 +67,22 @@ run_job() {
   local name="$1" manifest="$2" out="$3" repeats="$4" arm="$5" model="$6" extra="$7" profile
   profile="$(profile_for "$model")" || { log "$name: no profile for $model"; return 1; }
   log "$name: running ($model, profile $profile)"
-  (cd "$REPO" && setsid env B12_EVAL_MODEL="$model" B12_EVAL_PROFILE_FILE="$profile" \
-     B12_EVAL_OLLAMA_URL=http://127.0.0.1:11435 B12_EVAL_VARIANT=deployed \
-     B12_EVAL_EMBED_SOCKET="$SOCK" NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed $extra" \
-     evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm" >>"$Q/$name.log" 2>&1) &
-  local driver=$!
+  # setsid makes the driver the leader of its own process group (pgid = $driver), so a stop
+  # kills the driver and its sandboxes, never this loop (the 20.11.2026 bug).
+  cd "$REPO" || return 1
+  setsid env B12_EVAL_MODEL="$model" B12_EVAL_PROFILE_FILE="$profile" \
+    B12_EVAL_OLLAMA_URL=http://127.0.0.1:11435 B12_EVAL_VARIANT=deployed \
+    B12_EVAL_EMBED_SOCKET="$SOCK" NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed $extra" \
+    evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm" >>"$Q/$name.log" 2>&1 &
+  local driver=$! misses=0
   while kill -0 "$driver" 2>/dev/null; do
     sleep 30
-    if ! tunnel_ok || ! session_alive; then
-      log "$name: Colab lost, stopping the driver to resume after reconnect"
-      pkill -TERM -g "$(ps -o pgid= "$driver" | tr -d ' ')" 2>/dev/null; wait "$driver" 2>/dev/null
-      return 1
-    fi
+    if tunnel_ok && session_alive; then misses=0; continue; fi
+    misses=$((misses + 1))
+    [ "$misses" -lt 3 ] && continue  # one failed listing is not a lost session
+    log "$name: Colab lost (3 checks), stopping the driver to resume after reconnect"
+    kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null
+    return 1
   done
   wait "$driver"; grep -qs DONE "$REPO/$out/pilot.log"
 }
