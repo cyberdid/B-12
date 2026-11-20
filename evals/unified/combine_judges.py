@@ -44,10 +44,21 @@ def repair_ids(sheet, labels):
             for item in unlabelled
             if item.startswith(prefix) and label["criterion"] in criteria[item]
         ]
+        if not candidates and all(
+            label["criterion"] in labelled[item]
+            for item in criteria
+            if item.startswith(prefix) and label["criterion"] in criteria[item]
+        ):
+            # A phantom id (the judge invented it) next to the real, already labelled item:
+            # dropped and recorded, never mapped (gemma A0 judging, 20.11.2026).
+            fixes.add((label["item_id"], "dropped_phantom"))
+            label["item_id"] = None
+            continue
         if len(candidates) != 1:
             raise ValueError(f"cannot map {label['item_id']}: {candidates}")
         fixes.add((label["item_id"], candidates[0]))
         label["item_id"] = candidates[0]
+    labels[:] = [label for label in labels if label["item_id"] is not None]
     return sorted(fixes)
 
 

@@ -123,3 +123,16 @@ def test_stale_labels_of_rerun_items_are_dropped_not_remapped(tmp_path):
     )
     result = json.loads((tmp_path / "out/combined.json").read_text())
     assert result["final_verdicts"] == {"C39-P1#new": "SEMANTIC_FAIL"}
+
+
+def test_a_phantom_item_id_next_to_the_labelled_real_item_is_dropped():
+    from evals.unified.combine_judges import repair_ids
+
+    sheet = [{"item_id": "M36-P2#real", "criteria": ["c1"]}]
+    labels = [
+        {"item_id": "M36-P2#real", "criterion": "c1", "label": "met"},
+        {"item_id": "M36-P2#phantom", "criterion": "c1", "label": "not_met"},
+    ]
+    fixes = repair_ids(sheet, labels)
+    assert fixes == [("M36-P2#phantom", "dropped_phantom")]
+    assert labels == [{"item_id": "M36-P2#real", "criterion": "c1", "label": "met"}]
