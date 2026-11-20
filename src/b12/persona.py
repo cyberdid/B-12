@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Mapping
+from pathlib import Path
 
 PROFILE_NAME_LIMIT = 60
 PROFILE_STYLE_LIMIT = 800
@@ -73,3 +75,48 @@ def build_companion_profile_context(profile: Mapping[str, object] | None) -> str
         "виконання. Не цитуй профіль сам по собі.\n"
         f"Профіль JSON: {encoded}"
     )
+
+
+# Saved profile (Hermes' SOUL.md idea, kept as bounded data): one file in the state directory, so
+# voice and CLI turns get the same wording preferences as the desktop. A per-request profile
+# (desktop/API) still wins; the file never grants anything.
+PROFILE_FILE = "companion_profile.json"
+
+
+def normalize_companion_profile(profile: Mapping[str, object]) -> dict[str, object]:
+    """The stored shape, cut to the same limits the prompt uses."""
+    raw = profile.get("catchphrases", [])
+    phrases = [
+        cleaned
+        for item in (raw[:PROFILE_PHRASES_LIMIT] if isinstance(raw, list) else [])
+        if (cleaned := _clean_text(item, PROFILE_PHRASE_LIMIT))
+    ]
+    return {
+        "name": _clean_text(profile.get("name"), PROFILE_NAME_LIMIT),
+        "style_note": _clean_text(profile.get("style_note"), PROFILE_STYLE_LIMIT),
+        "catchphrases": phrases,
+    }
+
+
+def load_saved_companion_profile(state_dir: Path) -> dict[str, object] | None:
+    """The saved profile, or None when there is none or it cannot be read."""
+    try:
+        data = json.loads((Path(state_dir) / PROFILE_FILE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return normalize_companion_profile(data) if isinstance(data, Mapping) else None
+
+
+def save_companion_profile(state_dir: Path, profile: Mapping[str, object] | None) -> Path:
+    """Write (or with None remove) the saved profile atomically, readable by the owner only."""
+    target = Path(state_dir) / PROFILE_FILE
+    if profile is None:
+        target.unlink(missing_ok=True)
+        return target
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp = target.with_suffix(".tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+        json.dump(normalize_companion_profile(profile), handle, ensure_ascii=False, indent=1)
+    os.replace(tmp, target)
+    return target

@@ -29,7 +29,11 @@ from b12.contracts import Actor, ToolCall, ToolResult
 from b12.control import ControlError, ExecutionContext
 from b12.memory_packet import evidence_packet
 from b12.model_errors import ModelError
-from b12.persona import CAPRI_PERSONA_PROMPT, build_companion_profile_context
+from b12.persona import (
+    CAPRI_PERSONA_PROMPT,
+    build_companion_profile_context,
+    load_saved_companion_profile,
+)
 
 log = logging.getLogger(__name__)
 
@@ -835,6 +839,8 @@ class Agent:
             raise ValueError("user text required")
         if persist and timeout_s == 300.0:
             timeout_s = 1800.0
+        if companion_profile is None:  # voice and CLI: the owner's saved profile, if any
+            companion_profile = load_saved_companion_profile(self.settings.state_dir)
         lock = self._session_locks.setdefault(session_id, asyncio.Lock())
         async with lock:
             context = self.control.begin_turn(

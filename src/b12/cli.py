@@ -386,6 +386,29 @@ async def cmd_tools(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_profile(args, settings) -> int:
+    """Saved companion profile: wording data for voice and CLI turns, never permissions."""
+    from b12.persona import load_saved_companion_profile, save_companion_profile
+
+    current = load_saved_companion_profile(settings.state_dir) or {}
+    if args.action == "clear":
+        save_companion_profile(settings.state_dir, None)
+        emit_json({"cleared": True})
+        return 0
+    if args.action == "set":
+        updated = dict(current)
+        if args.name is not None:
+            updated["name"] = args.name
+        if args.style is not None:
+            updated["style_note"] = args.style
+        if args.phrase is not None:
+            updated["catchphrases"] = args.phrase
+        save_companion_profile(settings.state_dir, updated)
+        current = load_saved_companion_profile(settings.state_dir) or {}
+    emit_json(current)
+    return 0
+
+
 async def cmd_goals(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
@@ -907,6 +930,13 @@ def parser() -> argparse.ArgumentParser:
     session = sub.add_parser("session", help="робоча історія CLI")
     session.add_argument("action", choices=("clear",))
     sub.add_parser("tools", help="каталог інструментів")
+    profile = sub.add_parser(
+        "profile", help="профіль компаньйона для всіх каналів (ім'я, стиль, фрази; лише дані)"
+    )
+    profile.add_argument("action", choices=("show", "set", "clear"))
+    profile.add_argument("--name")
+    profile.add_argument("--style", help="побажання щодо стилю відповідей")
+    profile.add_argument("--phrase", action="append", help="власна фраза (можна кілька разів)")
     tui = sub.add_parser("tui", help="термінальний інтерфейс (Textual) до локального API")
     tui.add_argument("--url", default="http://127.0.0.1:8712")
     tui.add_argument("--persist", action="store_true", help="початково ввімкнути «Не зупинятися»")
@@ -971,7 +1001,8 @@ def parser() -> argparse.ArgumentParser:
 
 # Commands without the runtime lock: serve takes it itself; tui and desktop use the
 # API; tui-hook writes only the independent local UI metadata spool.
-SERVER_OWNED = frozenset({"serve", "tui", "desktop", "tui-hook"})
+# profile only touches its own JSON file (atomic replace), so it needs no state lock either.
+SERVER_OWNED = frozenset({"serve", "tui", "desktop", "tui-hook", "profile"})
 EXIT_SERVER_UNAVAILABLE = 4
 EXIT_REQUIRES_STOPPED_SERVER = 5
 
@@ -1173,6 +1204,7 @@ def main(argv=None) -> int:
         "knowledge": cmd_knowledge,
         "session": cmd_session_clear,
         "tools": cmd_tools,
+        "profile": cmd_profile,
         "serve": cmd_serve,
         "tui": cmd_tui,
         "desktop": cmd_desktop,
