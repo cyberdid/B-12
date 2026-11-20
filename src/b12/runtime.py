@@ -85,6 +85,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     operations = Operations(root)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)
     model = model or OllamaModel(settings)
+    resolver = EvidenceResolver(memory, knowledge)
     agent = Agent(
         settings,
         control=control,
@@ -92,7 +93,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         model=model,
         sessions=sessions,
         memory=memory,
-        resolver=EvidenceResolver(memory, knowledge),
+        resolver=resolver,
         tool_result_bytes=settings.tool_result_bytes,
     )
     from b12.audio.speaker import SpeakerStore
@@ -138,6 +139,9 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         memory_grounding=settings.memory_grounding,
         memory_taint=settings.memory_taint,
         turn_tainted=agent.turn_tainted,
+        sessions=sessions,
+        resolver=resolver,
+        session_search=settings.session_search,
     )
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")

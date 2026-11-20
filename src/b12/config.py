@@ -76,6 +76,9 @@ class Settings(BaseModel):
     # Network taint for memory writes in the same turn (OpenClaw-derived, 20.11.2026): once any
     # network.http tool completes in a turn, memory_store marks new records unverified/network_turn.
     memory_taint: bool = False
+    # FTS5 search over the actor's own past conversation turns (`conversation_search`). Off until
+    # measured.
+    session_search: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -208,6 +211,7 @@ class Settings(BaseModel):
                 "preference_rules",
                 "memory_grounding",
                 "memory_taint",
+                "session_search",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

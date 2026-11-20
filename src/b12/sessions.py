@@ -9,6 +9,7 @@ removed only by clear_session. Checkpoints hold approval-waiting turn state.
 
 import json
 import os
+import re
 import sqlite3
 from collections.abc import Callable, Mapping
 from contextlib import contextmanager
@@ -34,6 +35,8 @@ CREATE INDEX IF NOT EXISTS tags_evidence ON tags(actor_id, evidence_id);
 CREATE TABLE IF NOT EXISTS purge_turns(operation_id TEXT NOT NULL, turn_id TEXT NOT NULL,
  PRIMARY KEY(operation_id, turn_id));
 CREATE TABLE IF NOT EXISTS applied_invalidations(operation_id TEXT PRIMARY KEY);
+CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
+ content, message_id UNINDEXED, turn_id UNINDEXED, actor_id UNINDEXED, tokenize='unicode61');
 """
 
 
@@ -80,7 +83,21 @@ class SessionStore:
         self.db.execute("PRAGMA secure_delete=ON")
         self.db.execute("PRAGMA journal_mode=DELETE")
         self.db.execute("PRAGMA synchronous=FULL")
+        fts_existed = bool(
+            self.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='messages_fts'"
+            ).fetchone()
+        )
         self.db.executescript(_SCHEMA)
+        if not fts_existed:
+            with self._atomic():
+                self.db.execute(
+                    """INSERT INTO messages_fts(content, message_id, turn_id, actor_id)
+                       SELECT m.content, m.id, m.turn_id, t.actor_id
+                       FROM messages m
+                       JOIN turns t ON t.turn_id = m.turn_id
+                       WHERE m.role IN ('user', 'assistant')"""
+                )
 
     def close(self):
         self.db.close()
@@ -124,10 +141,11 @@ class SessionStore:
             )
             for position, message in enumerate(messages):
                 calls = message.get("tool_calls")
+                message_id = _uuid(message.get("id") or str(uuid4()))
                 self.db.execute(
                     "INSERT INTO messages VALUES (?,?,?,?,?,?,?,?)",
                     (
-                        _uuid(message.get("id") or str(uuid4())),
+                        message_id,
                         turn_id,
                         position,
                         message["role"],
@@ -137,6 +155,12 @@ class SessionStore:
                         message.get("tool_call_id"),
                     ),
                 )
+                if message["role"] in ("user", "assistant"):
+                    self.db.execute(
+                        "INSERT INTO messages_fts(content, message_id, turn_id, actor_id)"
+                        " VALUES (?,?,?,?)",
+                        (message["content"], message_id, turn_id, actor_id),
+                    )
             self.db.executemany(
                 "INSERT INTO tags VALUES (?,?,?,?)",
                 ((turn_id, actor_id, evidence_id, kind) for evidence_id, kind in rows),
@@ -241,10 +265,91 @@ class SessionStore:
 
     def _delete_turns(self, turn_ids) -> None:
         for turn_id in turn_ids:
+            self.db.execute("DELETE FROM messages_fts WHERE turn_id=?", (turn_id,))
             self.db.execute("DELETE FROM messages WHERE turn_id=?", (turn_id,))
             self.db.execute("DELETE FROM checkpoints WHERE turn_id=?", (turn_id,))
             self.db.execute("DELETE FROM tags WHERE turn_id=?", (turn_id,))
             self.db.execute("DELETE FROM turns WHERE turn_id=?", (turn_id,))
+
+    def search(
+        self,
+        actor_id: str,
+        query: str,
+        *,
+        limit: int = 5,
+        live: Callable[[str, str], bool] | None = None,
+    ) -> list[dict]:
+        """Full-text search across this actor's committed user/assistant turns."""
+        if type(limit) is not int or limit < 0:
+            raise ValueError("limit must be a nonnegative integer")
+        if not isinstance(query, str):
+            raise TypeError("query must be text")
+        raw_terms = re.findall(r"[^\W_]+(?:['’ʼ][^\W_]+)*", query, flags=re.UNICODE)[:64]
+        terms = [t.replace("’", "'").replace("ʼ", "'").lower() for t in raw_terms]
+        if not terms or not limit:
+            return []
+
+        from b12.memory import _FTS_OPERATORS, _STOP_TERMS, _forms
+
+        def fts_expr(items: list[str], joiner: str = " AND ") -> str:
+            return joiner.join(
+                "(" + " OR ".join('"' + form + '"' for form in _forms(term)) + ")" for term in items
+            )
+
+        live_turn: dict[str, bool] = {}
+
+        def turn_is_live(turn_id: str) -> bool:
+            if live is None:
+                return True
+            if turn_id not in live_turn:
+                tags = {
+                    tag["evidence_id"]: tag["kind"]
+                    for tag in self.db.execute(
+                        "SELECT evidence_id, kind FROM tags WHERE turn_id=?", (turn_id,)
+                    )
+                }
+                live_turn[turn_id] = all(live(eid, kind) for eid, kind in tags.items())
+            return live_turn[turn_id]
+
+        def run(expr: str) -> list[dict]:
+            rows = self.db.execute(
+                """SELECT t.turn_id, t.session_id, t.created_at, m.role,
+                          snippet(messages_fts, 0, '', '', '…', 32) AS snippet
+                   FROM messages_fts
+                   JOIN messages m ON m.id = messages_fts.message_id
+                   JOIN turns t ON t.turn_id = messages_fts.turn_id
+                   WHERE messages_fts MATCH ? AND messages_fts.actor_id = ?
+                   ORDER BY bm25(messages_fts), t.sequence DESC, m.position DESC""",
+                (expr, actor_id),
+            ).fetchall()
+            matches: list[dict] = []
+            for row in rows:
+                if not turn_is_live(row["turn_id"]):
+                    continue
+                snippet = row["snippet"] or ""
+                if len(snippet) > 240:
+                    snippet = snippet[:239] + "…"
+                matches.append(
+                    {
+                        "turn_id": row["turn_id"],
+                        "session_id": row["session_id"],
+                        "created_at": row["created_at"],
+                        "role": row["role"],
+                        "snippet": snippet,
+                    }
+                )
+                if len(matches) >= limit:
+                    break
+            return matches
+
+        matches = run(fts_expr(terms, " AND "))
+        if not matches and not (_FTS_OPERATORS & set(terms)):
+            content = [t for t in terms if t not in _STOP_TERMS]
+            if content and len(content) < len(terms):
+                matches = run(fts_expr(content, " AND "))
+            if not matches and len(content) > 1:
+                matches = run(fts_expr(content, " OR "))
+        return matches
 
     def purge_evidence(
         self, operation_id: str, actor_id: str, evidence_ids: tuple[str, ...]

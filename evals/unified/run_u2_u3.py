@@ -152,6 +152,7 @@ RUNTIME_FLAGS = (
     "memory_grounding",
     "memory_taint",
     "memory_as_of",
+    "session_search",
 )
 
 
@@ -325,6 +326,9 @@ def main(argv=None):
     parser.add_argument(
         "--memory-as-of", action="store_true", help="historical as_of parameter on memory_search"
     )
+    parser.add_argument(
+        "--session-search", action="store_true", help="FTS5 conversation_search tool"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -395,6 +399,7 @@ def main(argv=None):
                     ("memory_grounding", args.memory_grounding),
                     ("memory_taint", args.memory_taint),
                     ("memory_as_of", args.memory_as_of),
+                    ("session_search", args.session_search),
                 )
                 if on
             ),

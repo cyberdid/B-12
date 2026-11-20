@@ -18,14 +18,17 @@ def register_host_tools(
     memory_grounding=False,
     memory_taint=False,
     turn_tainted=None,
+    sessions=None,
+    resolver=None,
+    session_search=False,
 ):
-    """Register all 13 concrete host tools; caller owns/closes injected stores.
+    """Register all concrete host tools; caller owns/closes injected stores.
 
     memory_revision resolves the ORIGINAL turn's canonical deletion revision.
     Missing memory/revision/global-purge ports return coordinator_unavailable.
     No model field can supply these ports or authorize a grant/approval.
     """
-    from b12.tools import filesystem, network, notes, process
+    from b12.tools import conversation, filesystem, network, notes, process
     from b12.tools import memory as memory_tools
 
     filesystem.register(registry, backups, verify_writes=verify_writes)
@@ -34,6 +37,8 @@ def register_host_tools(
     if sudo or sudo_path:
         process.register_sudo(registry, sudo_path)
     network.register(registry)
+    if session_search:
+        conversation.register(registry, sessions=sessions, resolver=resolver)
     memory_tools.register(
         registry,
         memory=memory,

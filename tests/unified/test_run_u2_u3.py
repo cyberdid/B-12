@@ -264,7 +264,7 @@ def test_narrow_pattern_catches_document_claims_but_not_recalled_facts():
     assert not N.search("Я ще не прочитав файл, зараз перевірю.")
 
 
-def test_runtime_flags_reach_the_record(tmp_path):
+def test_runtime_flags_reach_the_record(tmp_path, capsys):
     import pytest
 
     from evals.unified.run_u2_u3 import main
@@ -279,10 +279,13 @@ def test_runtime_flags_reach_the_record(tmp_path):
                 "--goals-in-context",
                 "--memory-temporal",
                 "--memory-as-of",
+                "--memory-taint",
+                "--session-search",
                 "--preference-placement",
                 "query",
             ]
         )
+    assert "run_u2_u3_sandboxed.sh" in capsys.readouterr().err
 
 
 async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):
