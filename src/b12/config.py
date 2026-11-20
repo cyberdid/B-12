@@ -91,6 +91,9 @@ class Settings(BaseModel):
     schedules: bool = False
     # Event-based standing intents: keyword-triggered data blocks injected before recall.
     standing_intents: bool = False
+    # Structured clarify(question, choices, allow_other) tool (Hermes-derived, 20.11.2026): pauses
+    # the turn and resumes when the speaker answers via API, CLI or voice. Off until measured.
+    clarify_tool: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -250,6 +253,7 @@ class Settings(BaseModel):
                 "goal_contract",
                 "schedules",
                 "standing_intents",
+                "clarify_tool",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

@@ -137,9 +137,9 @@ def _calls(result):
         call = started.pop(r.call_id, {"name": r.name, "arguments": None})
         calls.append({**call, "status": r.status, "error_code": r.error_code})
     for e in result.events:
-        if e.type == "approval_pending" and e.data.get("call_id") in started:
+        if e.type in ("approval_pending", "clarify_pending") and e.data.get("call_id") in started:
             call = started.pop(e.data["call_id"])
-            calls.append({**call, "status": "approval_pending", "error_code": None})
+            calls.append({**call, "status": e.type, "error_code": None})
     calls.extend({**call, "status": "no_result", "error_code": None} for call in started.values())
     return calls
 
@@ -156,6 +156,7 @@ RUNTIME_FLAGS = (
     "memory_ranking",
     "goal_contract",
     "standing_intents",
+    "clarify_tool",
 )
 
 
@@ -343,6 +344,9 @@ def main(argv=None):
     parser.add_argument(
         "--standing-intents", action="store_true", help="inject matched standing intents"
     )
+    parser.add_argument(
+        "--clarify-tool", action="store_true", help="offer clarify(question, choices) tool"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -417,6 +421,7 @@ def main(argv=None):
                     ("memory_ranking", args.memory_ranking),
                     ("goal_contract", args.goal_contract),
                     ("standing_intents", args.standing_intents),
+                    ("clarify_tool", args.clarify_tool),
                 )
                 if on
             ),

@@ -116,6 +116,7 @@ class _Tool:
     # ADR-017 trusted state verifier: (arguments, context) -> True (effect present),
     # False (absent) or None (cannot tell). Runtime code, never model text.
     verify: Callable[[dict, ExecutionContext], bool | None] | None = None
+    clarify: bool = False
 
 
 def _effectful(capability: str) -> bool:
@@ -169,6 +170,7 @@ class ToolRegistry:
         timeout_s: float | None = None,
         approval_when: Callable[[dict], bool] | None = None,
         verify: Callable[[dict, ExecutionContext], bool | None] | None = None,
+        clarify: bool = False,
     ):
         if verify is not None and not callable(verify):
             raise ValueError("verifier must be callable")
@@ -235,6 +237,7 @@ class ToolRegistry:
             timeout_s,
             approval_when,
             verify,
+            clarify,
         )
 
     def catalog(self) -> list[dict]:
@@ -413,6 +416,7 @@ class ToolRegistry:
                     tool.risk == Risk.DESTRUCTIVE and tool.name not in self.approval_exempt
                 )
                 or (tool.approval_when is not None and bool(tool.approval_when(raw))),
+                clarify_required=tool.clarify,
             )
             await report_policy(
                 "approval_required" if state == "approval_pending" else "allowed",
@@ -421,6 +425,16 @@ class ToolRegistry:
             )
             if state == "approval_pending":
                 return result(state, content={"operation_id": operation})
+            if state == "clarify_pending":
+                return result(
+                    state,
+                    content={
+                        "operation_id": operation,
+                        "question": args.question,
+                        "choices": list(args.choices),
+                        "allow_other": bool(args.allow_other),
+                    },
+                )
             if step is not None:
                 self.control.add_step(step[0], step[1], operation, context.turn_id)
             deadline = min(context.deadline, start + (tool.timeout_s or self.timeout_s))

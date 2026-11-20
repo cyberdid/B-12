@@ -20,7 +20,59 @@ from b12.audio.tts import (
     generate_earcon_pcm,
     split_sentences,
 )
+from b12.audio.voice_guards import normalize
 from b12.auth import GUEST_CAPABILITIES, owner_capabilities
+
+_ORDINALS = {
+    "1": 0,
+    "перший": 0,
+    "перше": 0,
+    "перша": 0,
+    "first": 0,
+    "one": 0,
+    "2": 1,
+    "другий": 1,
+    "друге": 1,
+    "друга": 1,
+    "second": 1,
+    "two": 1,
+    "3": 2,
+    "третій": 2,
+    "третє": 2,
+    "третя": 2,
+    "third": 2,
+    "three": 2,
+    "4": 3,
+    "четвертий": 3,
+    "четверте": 3,
+    "четверта": 3,
+    "fourth": 3,
+    "four": 3,
+}
+
+
+def _format_clarify_spoken(question: str, choices: list[str] | tuple[str, ...]) -> str:
+    clean = question.strip()
+    if not clean:
+        return ""
+    if not choices:
+        return clean
+    return f"{clean} Варіанти: {', '.join(choices)}."
+
+
+def _resolve_voice_clarify_answer(text: str, choices: list[str]) -> str | None:
+    norm = normalize(text)
+    if not norm:
+        return None
+    for choice in choices:
+        if normalize(choice) == norm:
+            return choice
+    words = norm.split()
+    if len(words) == 1 and words[0] in _ORDINALS:
+        idx = _ORDINALS[words[0]]
+        if 0 <= idx < len(choices):
+            return choices[idx]
+    return None
 
 
 @dataclass(frozen=True)
@@ -136,19 +188,41 @@ class VoicePipeline:
                 metrics=metrics,
             )
 
-        actor = self.runtime.control.resolve_actor(actor_id)
-        caps = (
-            owner_capabilities(self.runtime.settings) if actor.owner else tuple(GUEST_CAPABILITIES)
+        pending_clarify = self.runtime.control.pending_clarifications(
+            actor_id=actor_id, session_id=session_id
         )
-        task_id = self.runtime.control.create_task(session_id)
-        grant = self.runtime.control.issue_grant(
-            actor.id,
-            session_id,
-            caps or ("time.read",),
-            task_id=task_id,
-            ttl_s=timeout_s + 3600,
-            full_execution=actor.owner and self.runtime.settings.host_access == "full",
-        )
+        resumed_turn_id: str | None = None
+        reprompt_text: str | None = None
+        if pending_clarify:
+            item = pending_clarify[0]
+            if item["allow_other"]:
+                resolved_answer: str | None = transcript.text.strip()
+            else:
+                resolved_answer = _resolve_voice_clarify_answer(transcript.text, item["choices"])
+            if resolved_answer is None:
+                choices_text = ", ".join(item["choices"])
+                reprompt_text = f"Будь ласка, оберіть один із варіантів: {choices_text}."
+            else:
+                self.runtime.control.answer_clarify(
+                    item["operation_id"], resolved_answer, actor_id=actor_id
+                )
+                resumed_turn_id = item["turn_id"]
+        if not pending_clarify:
+            actor = self.runtime.control.resolve_actor(actor_id)
+            caps = (
+                owner_capabilities(self.runtime.settings)
+                if actor.owner
+                else tuple(GUEST_CAPABILITIES)
+            )
+            task_id = self.runtime.control.create_task(session_id)
+            grant = self.runtime.control.issue_grant(
+                actor.id,
+                session_id,
+                caps or ("time.read",),
+                task_id=task_id,
+                ttl_s=timeout_s + 3600,
+                full_execution=actor.owner and self.runtime.settings.host_access == "full",
+            )
 
         t_llm_start = time.perf_counter()
         first_token_at: float | None = None
@@ -157,6 +231,7 @@ class VoicePipeline:
         llm_completed_at: float | None = None
         sentence_buffer = ""
         first_clause_queued = False
+        clarify_prompt = ""
 
         sentence_queue: asyncio.Queue[str | None] = asyncio.Queue(
             maxsize=self.tts.max_queue_phrases
@@ -212,11 +287,16 @@ class VoicePipeline:
         play_task = asyncio.create_task(playback_worker()) if player is not None else None
 
         async def on_event(event) -> None:
-            nonlocal first_token_at, sentence_buffer, first_clause_queued
+            nonlocal first_token_at, sentence_buffer, first_clause_queued, clarify_prompt
             if event.type == "turn_started":
                 tid = event.data.get("turn_id")
                 if tid and on_turn_started is not None:
                     on_turn_started(str(tid))
+            elif event.type == "clarify_pending":
+                clarify_prompt = _format_clarify_spoken(
+                    str(event.data.get("question", "")),
+                    event.data.get("choices") or (),
+                )
             elif event.type == "text_delta":
                 if first_token_at is None:
                     first_token_at = time.perf_counter()
@@ -235,24 +315,54 @@ class VoicePipeline:
             elif event.type == "tool_started":
                 sentence_buffer = ""
 
+        turn_id_out: str | None = None
+        state_out = "completed"
+        reply_text = ""
         try:
-            message = f"{context_note}\n{transcript.text}" if context_note else transcript.text
-            turn_res = await self.runtime.agent.turn(
-                session_id,
-                grant,
-                message,
-                task_id=task_id,
-                on_event=on_event,
-                cancel=cancel,
-                timeout_s=timeout_s,
-                persist=persist,
-            )
-            llm_completed_at = time.perf_counter()
-            if on_turn_started is not None and turn_res.turn_id:
-                on_turn_started(str(turn_res.turn_id))
-            tail = sentence_buffer.strip() or (
-                turn_res.content.strip() if not first_clause_queued and not tts_chunks else ""
-            )
+            if reprompt_text is not None:
+                first_token_at = time.perf_counter()
+                llm_completed_at = first_token_at
+                turn_id_out = pending_clarify[0]["turn_id"]
+                state_out = "awaiting_clarify"
+                reply_text = reprompt_text
+                tail = reprompt_text
+            else:
+                if resumed_turn_id is not None:
+                    if on_turn_started is not None:
+                        on_turn_started(resumed_turn_id)
+                    turn_res = await self.runtime.agent.resume(
+                        resumed_turn_id,
+                        on_event=on_event,
+                        cancel=cancel,
+                        timeout_s=timeout_s,
+                    )
+                else:
+                    msg = f"{context_note}\n{transcript.text}" if context_note else transcript.text
+                    turn_res = await self.runtime.agent.turn(
+                        session_id,
+                        grant,
+                        msg,
+                        task_id=task_id,
+                        on_event=on_event,
+                        cancel=cancel,
+                        timeout_s=timeout_s,
+                        persist=persist,
+                    )
+                llm_completed_at = time.perf_counter()
+                turn_id_out = turn_res.turn_id
+                state_out = turn_res.state
+                reply_text = turn_res.content
+                if (
+                    turn_res.state == "awaiting_clarify"
+                    and clarify_prompt
+                    and not reply_text.strip()
+                ):
+                    reply_text = clarify_prompt
+                if on_turn_started is not None and turn_res.turn_id:
+                    on_turn_started(str(turn_res.turn_id))
+                tail = sentence_buffer.strip() or (
+                    reply_text.strip() if not first_clause_queued and not tts_chunks else ""
+                )
             if tail and (cancel is None or not cancel.is_set()):
                 for s in split_sentences(tail):
                     if cancel is not None and cancel.is_set():
@@ -305,12 +415,12 @@ class VoicePipeline:
             playback_started_before_llm_completed=started_before_done,
         )
         return VoiceTurnResult(
-            turn_id=turn_res.turn_id,
+            turn_id=turn_id_out,
             session_id=session_id,
-            state=turn_res.state,
+            state=state_out,
             transcript=transcript,
             endpoint=ep,
-            reply_text=turn_res.content,
+            reply_text=reply_text,
             tts_chunks=tuple(tts_chunks),
             metrics=metrics,
         )

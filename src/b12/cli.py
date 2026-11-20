@@ -21,7 +21,13 @@ from b12.auth import owner_capabilities
 from b12.config import Settings
 from b12.model_errors import ModelError
 
-_EXIT = {"completed": 0, "failed": 1, "awaiting_approval": 2, "cancelled": 130}
+_EXIT = {
+    "completed": 0,
+    "failed": 1,
+    "awaiting_approval": 2,
+    "awaiting_clarify": 2,
+    "cancelled": 130,
+}
 
 
 def load_settings(config: str | None = None) -> Settings:
@@ -213,13 +219,31 @@ async def run_with_interrupt(function, *args, **kwargs):
 
 
 async def interactive_approvals(runtime, result, console, timeout_s):
-    while result.state == "awaiting_approval":
-        approvals = {a["operation_id"]: a for a in runtime.control.pending_approvals()}
-        operation = result.pending_operations[0]
-        name = approvals.get(operation, {}).get("name", "?")
-        print(f"Дозволити {name}? [y/N] ", end="", file=sys.stderr, flush=True)
-        answer = (await asyncio.to_thread(sys.stdin.readline)).strip().lower()
-        runtime.control.decide_approval(operation, answer in ("y", "yes", "т", "так"))
+    while result.state in ("awaiting_approval", "awaiting_clarify"):
+        if result.state == "awaiting_approval":
+            approvals = {a["operation_id"]: a for a in runtime.control.pending_approvals()}
+            operation = result.pending_operations[0]
+            name = approvals.get(operation, {}).get("name", "?")
+            print(f"Дозволити {name}? [y/N] ", end="", file=sys.stderr, flush=True)
+            answer = (await asyncio.to_thread(sys.stdin.readline)).strip().lower()
+            runtime.control.decide_approval(operation, answer in ("y", "yes", "т", "так"))
+        else:
+            operation = result.pending_operations[0]
+            pending = {c["operation_id"]: c for c in runtime.control.pending_clarifications()}
+            info = pending.get(operation, {})
+            print(f"\n[уточнення] {info.get('question', '')}", file=sys.stderr)
+            choices = info.get("choices", [])
+            for idx, choice in enumerate(choices, 1):
+                print(f"  {idx}) {choice}", file=sys.stderr)
+            hint = "або свою відповідь" if info.get("allow_other", True) else "номер або варіант"
+            print(f"Відповідь ({hint}, Enter — пропустити): ", end="", file=sys.stderr, flush=True)
+            raw = (await asyncio.to_thread(sys.stdin.readline)).strip()
+            if not raw:
+                runtime.control.answer_clarify(operation, status="skipped")
+            else:
+                if raw.isdigit() and 1 <= int(raw) <= len(choices):
+                    raw = choices[int(raw) - 1]
+                runtime.control.answer_clarify(operation, raw)
         result = await run_with_interrupt(
             runtime.agent.resume, result.turn_id, on_event=console, timeout_s=timeout_s
         )
@@ -323,6 +347,35 @@ async def cmd_approvals(args, settings) -> int:
     try:
         require_owner(runtime)
         emit_json(runtime.control.pending_approvals())
+        return 0
+    finally:
+        runtime.close()
+
+
+async def cmd_answer(args, settings) -> int:
+    from b12.control import ControlError
+
+    text = " ".join(args.text).strip()
+    if not args.skip and not text:
+        emit_json({"error": "answer_required"})
+        return 1
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        try:
+            outcome = runtime.control.answer_clarify(
+                args.operation_id,
+                "" if args.skip else text,
+                status="skipped" if args.skip else "answered",
+                actor_id=owner.actor_id,
+            )
+        except ControlError as exc:
+            emit_json({"error": exc.code})
+            return 1
+        except ValueError as exc:
+            emit_json({"error": str(exc)})
+            return 1
+        emit_json(outcome)
         return 0
     finally:
         runtime.close()
@@ -1121,6 +1174,10 @@ def parser() -> argparse.ArgumentParser:
     for name in ("approve", "deny"):
         sub.add_parser(name).add_argument("operation_id")
     sub.add_parser("approvals", help="черга approval")
+    answer = sub.add_parser("answer", help="відповісти на активне уточнення (clarify)")
+    answer.add_argument("operation_id")
+    answer.add_argument("text", nargs="*", help="текст відповіді")
+    answer.add_argument("--skip", action="store_true", help="пропустити уточнення")
     memory = sub.add_parser("memory", help="пам’ять власника")
     memory.add_argument("action", choices=("remember", "search", "forget", "pending"))
     memory.add_argument("value", nargs="?", default="")
@@ -1279,6 +1336,10 @@ def _remote_command(args, session_id: str = "") -> tuple[str, str, dict | None, 
             {"approve": cmd == "approve"},
             "json",
         )
+    if cmd == "answer":
+        text = " ".join(args.text).strip()
+        body = {"answer": "" if args.skip else text, "skip": bool(args.skip)}
+        return ("POST", f"/api/clarify/{args.operation_id}", body, "json")
     if cmd == "knowledge":
         if args.action == "index":
             return ("POST", "/api/knowledge/index", {"path": args.value}, "json")
@@ -1338,6 +1399,10 @@ def run_remote(args, settings) -> int:
         api_url,
         read_owner_token,
     )
+
+    if args.command == "answer" and not args.skip and not " ".join(args.text).strip():
+        emit_json({"error": "answer_required"})
+        return 1
 
     try:
         client = RemoteClient(api_url(), read_owner_token(settings.state_dir))
@@ -1441,6 +1506,7 @@ def main(argv=None) -> int:
         "approve": lambda a, s: cmd_decide(a, s, True),
         "deny": lambda a, s: cmd_decide(a, s, False),
         "approvals": cmd_approvals,
+        "answer": cmd_answer,
         "memory": cmd_memory,
         "knowledge": cmd_knowledge,
         "session": cmd_session_clear,

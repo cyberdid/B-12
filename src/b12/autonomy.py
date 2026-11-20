@@ -386,8 +386,11 @@ class Scheduler:
         }
         if preempted_by:
             outcome["preempted_by"] = preempted_by[0]
-        if result.state == "awaiting_approval":
-            rt.goals.set_status(goal["id"], actor.id, "paused", "approval_pending")
+        if result.state in ("awaiting_approval", "awaiting_clarify"):
+            reason = (
+                "approval_pending" if result.state == "awaiting_approval" else "clarify_pending"
+            )
+            rt.goals.set_status(goal["id"], actor.id, "paused", reason)
             outcome["status"] = "paused"
         if getattr(rt.settings, "task_ledger", False) and rt.control.steps_needing_owner(
             goal["id"]
@@ -499,7 +502,11 @@ class Scheduler:
             for effect in item.side_effects
         )
         new_evidence = set(result.evidence_ids) - known_evidence
-        needs_owner = force_high_risk or force_needs_owner or result.state == "awaiting_approval"
+        needs_owner = (
+            force_high_risk
+            or force_needs_owner
+            or result.state in ("awaiting_approval", "awaiting_clarify")
+        )
         risk = "high" if needs_owner else "action" if effectful else "info"
         candidate_text = result.content or text
         if pause_reason and pause_reason not in candidate_text:

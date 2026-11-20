@@ -94,6 +94,8 @@ class DuplexSession:
             if sid == self.session_id:
                 target_ids.add(tid)
         for tid in target_ids:
+            if self.runtime.control.has_pending_clarification(tid):
+                continue
             self.runtime.control.cancel_turn(tid)
             handle = self.runtime.agent.active.get(tid)
             if handle is not None:

@@ -79,6 +79,12 @@ class ApprovalBody(_Body):
     approve: bool
 
 
+class ClarifyBody(_Body):
+    answer: str = Field(default="", max_length=4000)
+    skip: bool = False
+    status: str = Field(default="answered", pattern="^(answered|skipped)$")
+
+
 class GoalBody(_Body):
     intent: str = Field(min_length=1, max_length=4000)
     criteria: str = Field(min_length=1, max_length=4000)
@@ -549,6 +555,30 @@ def create_app(
         except ControlError as exc:
             raise HTTPException(409, exc.code) from None
         return {"operation_id": operation_id, "approved": body.approve}
+
+    @app.get("/api/clarify")
+    async def clarify_list(request: Request, who: Identity):
+        return runtime_of(request).control.pending_clarifications(actor_id=who.actor.id)
+
+    @app.post("/api/clarify/{operation_id}")
+    async def clarify_answer(request: Request, operation_id: str, body: ClarifyBody, who: Identity):
+        control = runtime_of(request).control
+        if control.clarification_owner(operation_id) != who.actor.id:
+            raise HTTPException(404, "clarify_not_found")
+        resolved_status = "skipped" if (body.skip or body.status == "skipped") else "answered"
+        if resolved_status == "answered" and not body.answer.strip():
+            raise HTTPException(422, "answer_required")
+        try:
+            return control.answer_clarify(
+                operation_id,
+                body.answer,
+                status=resolved_status,
+                actor_id=who.actor.id,
+            )
+        except ControlError as exc:
+            raise HTTPException(409, exc.code) from None
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
 
     @app.post("/api/guests")
     async def guests(request: Request, body: GuestBody, who: Identity):

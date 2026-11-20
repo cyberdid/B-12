@@ -46,8 +46,26 @@ _ERROR_CODES = frozenset(
         "handler_failed",
         "interrupted",
         "invalid_handler_outcome",
+        "clarify_unavailable",
     }
 )
+
+
+def _match_choice(answer: str, choices: list[str]) -> str | None:
+    from b12.audio.voice_guards import normalize
+
+    stripped = answer.strip()
+    if stripped.isdigit():
+        index = int(stripped)
+        if 1 <= index <= len(choices):
+            return choices[index - 1]
+    norm_answer = normalize(stripped)
+    if not norm_answer:
+        return None
+    for choice in choices:
+        if normalize(choice) == norm_answer:
+            return choice
+    return None
 
 
 class ControlError(Exception):
@@ -97,6 +115,11 @@ CREATE TABLE IF NOT EXISTS operations(id TEXT PRIMARY KEY, call_key TEXT UNIQUE 
 CREATE TABLE IF NOT EXISTS approvals(operation_id TEXT PRIMARY KEY, digest TEXT,
  capability TEXT NOT NULL, revision INTEGER NOT NULL, expires_at REAL NOT NULL,
  decision TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS clarifications(operation_id TEXT PRIMARY KEY,
+ turn_id TEXT NOT NULL, actor_id TEXT NOT NULL, session_id TEXT NOT NULL,
+ question TEXT, choices TEXT, allow_other INTEGER NOT NULL,
+ expires_at REAL NOT NULL, status TEXT NOT NULL, answer TEXT);
+CREATE INDEX IF NOT EXISTS clarifications_session ON clarifications(session_id, actor_id, status);
 CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS api_tokens(digest TEXT PRIMARY KEY, actor_id TEXT NOT NULL,
  capabilities TEXT NOT NULL, revoked INTEGER NOT NULL);
@@ -140,6 +163,7 @@ class ControlStore:
         os.fchmod(fd, 0o600)
         os.close(fd)
         self._runtime: dict[str, tuple[float, asyncio.Event]] = {}
+        self.clarify_ttl_s: float = 300.0
         self.db = sqlite3.connect(db_path)
         self.db.row_factory = sqlite3.Row
         self.db.execute("PRAGMA secure_delete=ON")
@@ -154,6 +178,7 @@ class ControlStore:
             for row in self.db.execute("SELECT * FROM operations WHERE state='started'").fetchall():
                 self._transition(row["id"], "unknown", "interrupted")
             self._expire_approvals()
+            self._expire_clarifications()
 
     @contextmanager
     def _atomic(self):
@@ -481,6 +506,19 @@ class ControlStore:
         with self._atomic():
             self._expire_approvals()
 
+    def _expire_clarifications(self, now: float | None = None):
+        cutoff = time.time() if now is None else now
+        self.db.execute(
+            "UPDATE clarifications SET status='timed_out', answer='', question=NULL, choices=NULL "
+            "WHERE expires_at<=? AND status='pending'",
+            (cutoff,),
+        )
+
+    def expire_clarifications(self, now: float | None = None):
+        """Mark expired pending clarifications timed_out so a resumed turn receives timed_out."""
+        with self._atomic():
+            self._expire_clarifications(now)
+
     def prepare(
         self,
         ctx: ExecutionContext,
@@ -490,12 +528,14 @@ class ControlStore:
         *,
         approval_ttl_s: float = 300,
         approval_required: bool = False,
+        clarify_required: bool = False,
     ) -> tuple[str, str]:
         """Atomic check/propose/approval consumption/start. Never invokes handlers."""
         self.expire_approvals()
         with self._atomic():
             grant = self.check(ctx, capability)
             self._expire_approvals()
+            self._expire_clarifications()
             key = self._call_key(ctx, call)
             row = self.db.execute("SELECT * FROM operations WHERE call_key=?", (key,)).fetchone()
             if row and row["state"] not in ("proposed", "approved"):
@@ -513,6 +553,31 @@ class ControlStore:
                     (operation, key, call.name, ctx.turn_id),
                 )
                 self._transition(operation, "proposed")
+            if clarify_required:
+                clar = self.db.execute(
+                    "SELECT * FROM clarifications WHERE operation_id=?", (operation,)
+                ).fetchone()
+                if clar is None:
+                    self.db.execute(
+                        "INSERT INTO clarifications VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        (
+                            operation,
+                            ctx.turn_id,
+                            ctx.actor_id,
+                            ctx.session_id,
+                            str(call.arguments["question"]),
+                            json.dumps(list(call.arguments["choices"]), ensure_ascii=False),
+                            int(bool(call.arguments.get("allow_other", True))),
+                            time.time() + self.clarify_ttl_s,
+                            "pending",
+                            None,
+                        ),
+                    )
+                    return operation, "clarify_pending"
+                if clar["status"] == "pending":
+                    return operation, "clarify_pending"
+                if clar["status"] not in ("answered", "skipped", "timed_out"):
+                    raise ControlError("clarify_unavailable")
             needs_approval = approval_required or (
                 arbitrary and not (grant["full_execution"] and ctx.task_id)
             )
@@ -577,6 +642,11 @@ class ControlStore:
                     "UPDATE approvals SET digest=NULL,decision='cancelled' WHERE operation_id=?",
                     (row["id"],),
                 )
+            self.db.execute(
+                "UPDATE clarifications SET status='cancelled', question=NULL, choices=NULL, "
+                "answer=NULL WHERE turn_id=? AND status!='consumed'",
+                (turn_id,),
+            )
         runtime = self._runtime.get(turn_id)
         if runtime:
             runtime[1].set()
@@ -602,6 +672,120 @@ class ControlStore:
                 "approved" if approve else "failed",
                 None if approve else "approval_denied",
             )
+
+    def pending_clarifications(
+        self, *, actor_id: str | None = None, session_id: str | None = None
+    ) -> list[dict]:
+        """Pending clarify questions scoped optionally by actor and session."""
+        self.expire_clarifications()
+        clauses = ["status='pending'"]
+        params: list[str] = []
+        if actor_id is not None:
+            clauses.append("actor_id=?")
+            params.append(actor_id)
+        if session_id is not None:
+            clauses.append("session_id=?")
+            params.append(session_id)
+        rows = self.db.execute(
+            "SELECT operation_id, turn_id, actor_id, session_id, question, choices, "
+            "allow_other, expires_at FROM clarifications "
+            f"WHERE {' AND '.join(clauses)} ORDER BY rowid",
+            params,
+        ).fetchall()
+        return [
+            {
+                "operation_id": row["operation_id"],
+                "turn_id": row["turn_id"],
+                "actor_id": row["actor_id"],
+                "session_id": row["session_id"],
+                "question": row["question"] or "",
+                "choices": json.loads(row["choices"] or "[]"),
+                "allow_other": bool(row["allow_other"]),
+                "expires_at": row["expires_at"],
+            }
+            for row in rows
+        ]
+
+    def has_pending_clarification(self, turn_id: str) -> bool:
+        self.expire_clarifications()
+        row = self.db.execute(
+            "SELECT 1 FROM clarifications WHERE turn_id=? AND status='pending' LIMIT 1",
+            (turn_id,),
+        ).fetchone()
+        return row is not None
+
+    def clarification_owner(self, operation_id: str) -> str | None:
+        row = self.db.execute(
+            "SELECT actor_id FROM clarifications WHERE operation_id=?", (operation_id,)
+        ).fetchone()
+        return row["actor_id"] if row else None
+
+    def answer_clarify(
+        self,
+        operation_id: str,
+        answer: str = "",
+        *,
+        status: str = "answered",
+        actor_id: str | None = None,
+    ) -> dict:
+        """Record an owner/speaker answer (or skip) for a pending clarification."""
+        if status not in ("answered", "skipped"):
+            raise ValueError("invalid clarify status")
+        self.expire_clarifications()
+        with self._atomic():
+            row = self.db.execute(
+                "SELECT * FROM clarifications WHERE operation_id=?", (operation_id,)
+            ).fetchone()
+            if row is None:
+                row = self.db.execute(
+                    "SELECT * FROM clarifications WHERE turn_id=? AND status='pending' "
+                    "ORDER BY rowid LIMIT 1",
+                    (operation_id,),
+                ).fetchone()
+            if not row or (actor_id is not None and row["actor_id"] != actor_id):
+                raise ControlError("clarify_unavailable")
+            if row["status"] != "pending":
+                raise ControlError("clarify_unavailable")
+            target_op = row["operation_id"]
+            choices = json.loads(row["choices"] or "[]")
+            allow_other = bool(row["allow_other"])
+            clean_answer = answer.strip() if status == "answered" else ""
+            if status == "answered":
+                if not clean_answer:
+                    raise ValueError("answer_required")
+                if not allow_other:
+                    matched = _match_choice(clean_answer, choices)
+                    if matched is None:
+                        raise ValueError("choice_required")
+                    clean_answer = matched
+            self.db.execute(
+                "UPDATE clarifications SET status=?, answer=?, question=NULL, choices=NULL "
+                "WHERE operation_id=?",
+                (status, clean_answer, target_op),
+            )
+            return {
+                "operation_id": target_op,
+                "turn_id": row["turn_id"],
+                "status": status,
+                "answer": clean_answer,
+            }
+
+    def consume_clarify(self, operation_id: str) -> dict:
+        """Read the resolved clarify outcome once and scrub stored text."""
+        with self._atomic():
+            row = self.db.execute(
+                "SELECT status, answer FROM clarifications WHERE operation_id=?",
+                (operation_id,),
+            ).fetchone()
+            if not row or row["status"] not in ("answered", "skipped", "timed_out"):
+                raise ControlError("clarify_unavailable")
+            result = {"answer": row["answer"] or "", "status": row["status"]}
+            self.db.execute(
+                "UPDATE clarifications SET status='consumed', question=NULL, choices=NULL, "
+                "answer=NULL WHERE operation_id=?",
+                (operation_id,),
+            )
+            return result
 
     def finish(self, operation_id: str, state: str, code: str | None = None):
         with self._atomic():

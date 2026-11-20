@@ -45,11 +45,13 @@ EVENT_TYPES = frozenset(
         "policy_decision",
         "tool_result",
         "approval_pending",
+        "clarify_pending",
         "turn_completed",
         "turn_failed",
         "turn_cancelled",
     }
 )
+_WAITING_STATES = frozenset({"awaiting_approval", "awaiting_clarify"})
 _TERMINAL = {"completed": "turn_completed", "failed": "turn_failed", "cancelled": "turn_cancelled"}
 _MESSAGE_KEYS = ("id", "role", "content", "tool_calls", "tool_name", "tool_call_id")
 
@@ -1118,7 +1120,7 @@ class Agent:
                             tags={**goal_row["tags"], **dict.fromkeys(state["tags"], "memory")},
                             decision="needs_owner",
                         )
-            elif status != "awaiting_approval":
+            elif status not in _WAITING_STATES:
                 # Work done before an unfinished end (stall, error, cancel) is kept, marked as such.
                 if len(state["turn_messages"]) > 1:
                     _drop_unanswered_calls(state["turn_messages"])
@@ -1138,7 +1140,7 @@ class Agent:
                         log.info("partial turn already recorded; skipped second commit")
                 if status == "cancelled":
                     self.control.cancel_turn(context.turn_id)
-            if status != "awaiting_approval":
+            if status not in _WAITING_STATES:
                 self._tainted.discard(context.turn_id)
                 self._drop_checkpoint(context, actor)
                 await emit(
@@ -1157,7 +1159,7 @@ class Agent:
                 ),
                 error_code=code,
                 pending_operations=(state["pending_operation"],)
-                if status == "awaiting_approval"
+                if status in _WAITING_STATES
                 else (),
                 persisted=persisted,
                 evidence_ids=tuple(state["tags"]),
@@ -1188,7 +1190,9 @@ class Agent:
                 if state["queue"]:
                     waiting = await self._run_calls(context, actor, state, emit)
                     if waiting:
-                        return await finish("awaiting_approval")
+                        return await finish(
+                            waiting if isinstance(waiting, str) else "awaiting_approval"
+                        )
                     if context.cancel.is_set() or active.invalidated:
                         return await finish("cancelled", code="cancelled")
                     if (
@@ -1884,7 +1888,22 @@ class Agent:
                         },
                     )
                     self._save_checkpoint(context, actor, state)
-                    return True
+                    return "awaiting_approval"
+                if result.status == "clarify_pending":
+                    state["pending_operation"] = result.content["operation_id"]
+                    await emit(
+                        "clarify_pending",
+                        {
+                            "call_id": call.id,
+                            "name": call.name,
+                            "operation_id": state["pending_operation"],
+                            "question": result.content.get("question", ""),
+                            "choices": result.content.get("choices", []),
+                            "allow_other": result.content.get("allow_other", True),
+                        },
+                    )
+                    self._save_checkpoint(context, actor, state)
+                    return "awaiting_clarify"
                 state["calls"] += 1
             if not policy_event_emitted[0] and not registry_dispatched:
                 await emit(

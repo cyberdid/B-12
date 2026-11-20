@@ -154,6 +154,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "goal_check_commands": (),
         "schedules": False,
         "standing_intents": False,
+        "clarify_tool": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -297,3 +298,9 @@ def test_goal_contract_and_check_commands_config(tmp_path, monkeypatch):
     loaded = load_settings(str(config))
     assert loaded.goal_contract is True
     assert loaded.goal_check_commands == (("/bin/true",),)
+
+
+def test_clarify_tool_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).clarify_tool is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_CLARIFY_TOOL": "true"}
+    assert Settings.from_env(env).clarify_tool is True

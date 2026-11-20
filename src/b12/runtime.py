@@ -150,6 +150,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         sessions=sessions,
         resolver=resolver,
         session_search=settings.session_search,
+        clarify_tool=settings.clarify_tool,
     )
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")

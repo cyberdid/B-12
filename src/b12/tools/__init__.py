@@ -22,6 +22,7 @@ def register_host_tools(
     sessions=None,
     resolver=None,
     session_search=False,
+    clarify_tool=False,
 ):
     """Register all concrete host tools; caller owns/closes injected stores.
 
@@ -29,7 +30,7 @@ def register_host_tools(
     Missing memory/revision/global-purge ports return coordinator_unavailable.
     No model field can supply these ports or authorize a grant/approval.
     """
-    from b12.tools import conversation, filesystem, network, notes, process
+    from b12.tools import clarify, conversation, filesystem, network, notes, process
     from b12.tools import memory as memory_tools
 
     filesystem.register(registry, backups, verify_writes=verify_writes)
@@ -37,6 +38,8 @@ def register_host_tools(
     process.register(registry)
     if sudo or sudo_path:
         process.register_sudo(registry, sudo_path)
+    if clarify_tool:
+        clarify.register(registry)
     network.register(registry)
     if session_search:
         conversation.register(registry, sessions=sessions, resolver=resolver)
