@@ -56,6 +56,7 @@ class DuplexSession:
         self._active_turn_id: str | None = None
         # (request, spoken beginning, stopped by a stop phrase) of the last interrupted answer
         self._interrupted: tuple[str, str, bool] | None = None
+        self._live_turn: dict | None = None  # the answer now running: request, spoken, cancel
         self.phantom_transcripts = 0
         self.stop_phrases = 0
         self._tts_queue: asyncio.Queue[SynthesizedAudio | None] = asyncio.Queue(
@@ -272,20 +273,32 @@ class DuplexSession:
         """
         if not transcript.text.strip() or self.aec.is_tts_echo_text(transcript.text):
             return None
-        if is_phantom_transcript(transcript.text):
-            self.phantom_transcripts += 1  # ASR residue of silence or noise, not a request
-            return None
-        if is_stop_phrase(transcript.text):
+        live = self._live_turn
+        if is_stop_phrase(transcript.text) and (
+            live is not None or self._interrupted is not None or self.player.is_playing
+        ):
             # Control path: the speech and any running answer stop; the model is not asked.
+            # Only while there is something to stop: an idle "досить" is an ordinary answer.
             self.stop_phrases += 1
-            if self._active_cancel is not None:
-                self._active_cancel.set()
+            if live is not None:
+                live["stopped"] = True
+                live["cancel"].set()
             self.player.stop()
             self._flush_tts_queue()
             if self._interrupted is not None:
                 request, spoken, _ = self._interrupted
                 self._interrupted = (request, spoken, True)
             return None
+        if is_phantom_transcript(transcript.text):
+            self.phantom_transcripts += 1  # ASR residue of silence or noise, not a request
+            return None
+
+        if live is not None:
+            # A caller started a new answer while the previous one still runs: that one is
+            # interrupted now, and its own cleanup must not write a note later.
+            live["superseded"] = True
+            live["cancel"].set()
+            self._interrupted = (live["request"], " ".join(live["spoken"]), live["stopped"])
 
         note = None
         if self._interrupted is not None:
@@ -294,16 +307,25 @@ class DuplexSession:
 
         cancel = asyncio.Event()
         self._active_cancel = cancel
-        spoken: list[str] = []
+        record = {
+            "request": transcript.text,
+            "spoken": [],
+            "cancel": cancel,
+            "stopped": False,
+            "superseded": False,
+        }
+        self._live_turn = record
 
         def _set_turn_id(tid: str) -> None:
-            self._active_turn_id = tid
+            if self._live_turn is record:
+                self._active_turn_id = tid
 
         def _on_chunk(chunk) -> None:
-            spoken.append(chunk.text)
+            record["spoken"].append(chunk.text)
             self.aec.record_tts_utterance(chunk.text)
 
         result = None
+        interrupted = False
         try:
             result = await self.pipeline.process_utterance(
                 session_id=self.session_id,
@@ -316,13 +338,20 @@ class DuplexSession:
                 on_turn_started=_set_turn_id,
                 context_note=note,
             )
+            interrupted = result.state == "cancelled" or cancel.is_set()
             return result
         except asyncio.CancelledError:
-            self._interrupted = (transcript.text, " ".join(spoken), False)
+            interrupted = True
             raise
         finally:
-            if result is not None and (result.state == "cancelled" or cancel.is_set()):
-                self._interrupted = (transcript.text, " ".join(spoken), False)
+            if interrupted and not record["superseded"]:
+                self._interrupted = (
+                    record["request"],
+                    " ".join(record["spoken"]),
+                    record["stopped"],
+                )
             if self._active_cancel is cancel:
                 self._active_cancel = None
-            self._active_turn_id = None
+            if self._live_turn is record:
+                self._live_turn = None
+                self._active_turn_id = None

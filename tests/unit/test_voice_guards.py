@@ -7,7 +7,16 @@ from b12.audio.voice_guards import interruption_note, is_phantom_transcript, is_
 
 @pytest.mark.parametrize(
     "text",
-    ["Стоп.", "стоп!", "Досить", "стоп, стоп", "Stop", "Капрі, стоп!", "  замовкни  "],
+    [
+        "Стоп.",
+        "стоп!",
+        "Досить",
+        "стоп, стоп",
+        "Стоп, стоп, стоп, стоп!",
+        "Stop",
+        "Капрі, стоп!",
+        "  замовкни  ",
+    ],
 )
 def test_whole_utterance_stop_phrases_stop(text):
     assert is_stop_phrase(text)
@@ -49,6 +58,12 @@ def test_known_phantoms_and_repeats_are_dropped(text):
         "Так, так, роби",
         "Який сьогодні день?",
         "thank you, now open the file",
+        "Субтитри зроби для цього відео",
+        "Субтитри створи українською",
+        "Корректор орфографии не работает",
+        "До зустрічі!",
+        "Thank you!",
+        "You.",
     ],
 )
 def test_real_requests_are_kept(text):

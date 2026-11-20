@@ -60,6 +60,7 @@ async def test_prompt_surface_matches_the_committed_snapshot(scripted_ollama, tm
     fixture = FIXTURES / f"{name}.json"
     rendered = json.dumps(surface, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
     if os.environ.get("B12_UPDATE_PROMPT_SURFACE") == "1":
+        fixture.parent.mkdir(parents=True, exist_ok=True)
         fixture.write_text(rendered, encoding="utf-8")
     assert fixture.exists(), "no snapshot yet: run with B12_UPDATE_PROMPT_SURFACE=1"
     assert rendered == fixture.read_text(encoding="utf-8"), (

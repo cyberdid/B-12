@@ -128,7 +128,11 @@ def main(argv=None) -> None:
     parser.add_argument("runs", nargs="+", type=Path)
     parser.add_argument("--json", type=Path)
     args = parser.parse_args(argv)
-    rows = {run.name: summarize(_records(run)) for run in args.runs}
+    names = [run.name for run in args.runs]
+    rows = {
+        (run.name if names.count(run.name) == 1 else str(run)): summarize(_records(run))
+        for run in args.runs
+    }
     print(markdown(rows))
     if args.json:
         args.json.write_text(json.dumps(rows, ensure_ascii=False, indent=1) + "\n", "utf-8")

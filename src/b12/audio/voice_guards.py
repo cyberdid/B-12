@@ -51,7 +51,7 @@ def is_stop_phrase(text: str, phrases: frozenset[str] = STOP_PHRASES) -> bool:
     if norm in phrases:
         return True
     words = norm.split()
-    return len(words) <= 3 and len(set(words)) == 1 and words[0] in phrases
+    return len(words) <= 8 and len(set(words)) == 1 and words[0] in phrases
 
 
 # Stock phrases Whisper emits on silence, music or noise (uk/ru/en video-subtitle residue).
@@ -67,7 +67,6 @@ _PHANTOM_EXACT = frozenset(
         "ставте лайки",
         "продовження далі",
         "продовження буде",
-        "до зустрічі",
         "до нових зустрічей",
         "спасибо за просмотр",
         "спасибо за внимание",
@@ -75,22 +74,24 @@ _PHANTOM_EXACT = frozenset(
         "подписывайтесь на канал",
         "thank you for watching",
         "thanks for watching",
-        "thank you",
         "please subscribe",
         "subscribe to the channel",
         "like and subscribe",
-        "you",
     }
 )
-_PHANTOM_PREFIX = (
-    "субтитри зроби",
-    "субтитри створ",
-    "субтитри підготув",
+_PHANTOM_PREFIX = (  # past-tense credit lines only: "субтитри зроби …" is a real request
+    "субтитри зробив",
+    "субтитри зробила",
+    "субтитри створив",
+    "субтитри створила",
+    "субтитри створено",
+    "субтитри підготував",
+    "субтитри підготувала",
     "редактор субтитрів",
     "субтитры сделал",
     "субтитры создавал",
     "редактор субтитров",
-    "корректор",
+    "корректор а егорова",
     "subtitles by",
     "transcribed by",
     "amara org",

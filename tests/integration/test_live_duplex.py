@@ -286,3 +286,71 @@ async def test_a_phantom_transcript_never_reaches_the_model(live_runtime):
     await asyncio.wait_for(LiveSession(duplex, mic).run(asyncio.Event()), 60)
     assert seen == []
     assert duplex.phantom_transcripts == 1
+
+
+# --- duplex guards called directly: overlapping answers (review findings, 20.11.2026) --------
+
+
+def _transcript(text):
+    return TranscriptResult(
+        text=text,
+        language="uk",
+        language_probability=0.99,
+        duration_s=1.0,
+        asr_latency_ms=5.0,
+        provenance_id="prov",
+    )
+
+
+def _speech():
+    return np.zeros(16000, dtype=np.float32)
+
+
+async def _wait_calls(model, n, timeout=10.0):
+    loop = asyncio.get_running_loop()
+    end = loop.time() + timeout
+    while model.calls < n:
+        assert loop.time() < end, "the model was not called"
+        await asyncio.sleep(0.05)
+
+
+async def test_an_idle_short_answer_is_not_a_stop_phrase(live_runtime):
+    _, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    await duplex.process_cleaned_utterance(_speech(), _transcript("Досить."))
+    assert seen == ["Досить."]
+    assert duplex.stop_phrases == 0
+
+
+async def test_a_stop_phrase_during_a_running_answer_is_remembered_as_a_stop(live_runtime):
+    _, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    first = asyncio.create_task(
+        duplex.process_cleaned_utterance(_speech(), _transcript("Розкажи про погоду"))
+    )
+    await _wait_calls(model, 1)
+    assert (
+        await duplex.process_cleaned_utterance(_speech(), _transcript("Стоп, стоп, стоп, стоп!"))
+        is None
+    )
+    assert (await first).state == "cancelled"
+    assert duplex.stop_phrases == 1 and duplex.phantom_transcripts == 0
+    await duplex.process_cleaned_utterance(_speech(), _transcript("А що завтра?"))
+    assert len(seen) == 2
+    assert "стоп-фразою" in seen[1] and "«Розкажи про погоду»" in seen[1]
+
+
+async def test_overlapping_answers_note_the_right_turn_once(live_runtime):
+    _, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    first = asyncio.create_task(
+        duplex.process_cleaned_utterance(_speech(), _transcript("Розкажи про погоду"))
+    )
+    await _wait_calls(model, 1)
+    # A caller starts the next answer without waiting for the first to unwind.
+    await duplex.process_cleaned_utterance(_speech(), _transcript("А що завтра?"))
+    await first
+    await duplex.process_cleaned_utterance(_speech(), _transcript("Дякую, далі"))
+    assert len(seen) == 3
+    assert seen[1].startswith("[службова примітка") and "«Розкажи про погоду»" in seen[1]
+    assert seen[2] == "Дякую, далі", "the first turn's late cleanup leaked a stale note"
