@@ -65,6 +65,16 @@ fi
 
 EXTRA=()
 case "${B12_EVAL_VARIANT:-}" in deployed*)
+  if [ -n "${B12_EVAL_EMBED_SOCKET:-}" ]; then
+    # Remote embeddings (e2-micro orchestrator): only the socket's directory is visible and the
+    # embedding "interpreter" is the stdlib shim that relays to it.
+    [ -S "$B12_EVAL_EMBED_SOCKET" ] || { echo "missing $B12_EVAL_EMBED_SOCKET" >&2; exit 1; }
+    EMB_DIR="$(dirname "$B12_EVAL_EMBED_SOCKET")"
+    EXTRA=(--ro-bind "$EMB_DIR" "$EMB_DIR" --setenv B12_EVAL_VARIANT "$B12_EVAL_VARIANT"
+           --setenv B12_EVAL_EMBED_SOCKET "$B12_EVAL_EMBED_SOCKET"
+           --setenv B12_EVAL_SEMANTIC_PYTHON "$REPO/scripts/embed_socket_shim.py")
+    [ -n "${B12_EVAL_PROFILE_FILE:-}" ] && EXTRA+=(--setenv B12_EVAL_PROFILE_FILE "$B12_EVAL_PROFILE_FILE")
+  else
   # Semantic recall: the EmbeddingGemma 2 bridge, its interpreter, package source and the
   # cached weights, all read-only. Nothing else of that project is visible.
   EMB_VENV="$HOME/.local/share/embeddinggemma2/venv"
@@ -78,6 +88,7 @@ case "${B12_EVAL_VARIANT:-}" in deployed*)
          --ro-bind "$EMB_PKG" "$EMB_PKG"
          --ro-bind "$EMB_WEIGHTS" "$EMB_WEIGHTS" --setenv B12_EVAL_VARIANT "$B12_EVAL_VARIANT")
   [ -n "${B12_EVAL_PROFILE_FILE:-}" ] && EXTRA+=(--setenv B12_EVAL_PROFILE_FILE "$B12_EVAL_PROFILE_FILE")
+  fi
   ;;
 esac
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do

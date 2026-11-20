@@ -1,0 +1,13 @@
+[Unit]
+Description=B-12 eval orchestrator (Colab GPU + local bubblewrap sandbox)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=cyberdid
+ExecStart=/home/cyberdid/Projects/B-12/ops/remote/orchestrator.sh
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

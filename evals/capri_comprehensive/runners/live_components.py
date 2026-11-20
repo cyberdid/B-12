@@ -695,7 +695,12 @@ REPEATS_LONG = 3
 CAPABILITIES_LONG = ("memory.read", "time.read")
 # Scenario model "pinned_primary" maps to b12-bolt-e4b:q4km in runners/runner.py.
 LONG_MODEL = "b12-bolt-e4b:q4km"
-SEMANTIC_PYTHON = str(Path.home() / ".local/share/embeddinggemma2/venv/bin/python")
+# A remote embedding host (e2-micro orchestrator) replaces the local interpreter with the
+# socket shim (scripts/embed_socket_shim.py) through this variable.
+SEMANTIC_PYTHON = os.environ.get(
+    "B12_EVAL_SEMANTIC_PYTHON",
+    str(Path.home() / ".local/share/embeddinggemma2/venv/bin/python"),
+)
 
 
 def _bolt_settings(state_dir: Path):
