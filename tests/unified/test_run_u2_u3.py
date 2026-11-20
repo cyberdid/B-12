@@ -282,11 +282,28 @@ def test_runtime_flags_reach_the_record(tmp_path, capsys):
                 "--memory-taint",
                 "--session-search",
                 "--memory-ranking",
+                "--goal-contract",
+                "--standing-intents",
                 "--preference-placement",
                 "query",
             ]
         )
     assert "run_u2_u3_sandboxed.sh" in capsys.readouterr().err
+
+
+async def test_standing_intents_flag_reaches_run_scenario(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Батарейки."}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C01-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        runtime_flags=("standing_intents",),
+    )
+    assert record["runtime_flags"] == ["standing_intents"]
 
 
 async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):

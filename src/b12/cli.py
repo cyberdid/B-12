@@ -615,6 +615,50 @@ async def cmd_schedule(args, settings) -> int:
         runtime.close()
 
 
+def _parse_keywords(raw: list[str] | None) -> list[str]:
+    keywords: list[str] = []
+    for chunk in raw or ():
+        for part in chunk.split(","):
+            part = part.strip()
+            if part:
+                keywords.append(part)
+    return keywords
+
+
+async def cmd_intent(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        schedules = runtime.schedules
+        if args.action == "add":
+            keywords = _parse_keywords(args.keyword)
+            text = (args.text or args.value or "").strip()
+            try:
+                created = schedules.add_intent(
+                    owner.actor_id,
+                    keywords,
+                    text,
+                    days=args.days,
+                    fires_left=args.fires,
+                    cooldown_s=args.cooldown,
+                )
+            except ValueError as exc:
+                emit_json({"error": "invalid_intent", "detail": str(exc)})
+                return 1
+            emit_json(created)
+            return 0
+        if args.action == "list":
+            emit_json(schedules.list_intents(owner.actor_id))
+            return 0
+        if not schedules.remove_intent(args.value, owner.actor_id):
+            emit_json({"error": "intent_not_found"})
+            return 1
+        emit_json({"removed": args.value})
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_flag(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
@@ -1158,6 +1202,16 @@ def parser() -> argparse.ArgumentParser:
     schedule.add_argument("--tz", help="часовий пояс (за замовчуванням settings.timezone)")
     schedule.add_argument("--tools", nargs="*")
     schedule.add_argument("--budget", type=int, default=1)
+    intent = sub.add_parser("intent", help="відкладені наміри за ключовими словами")
+    intent.add_argument("action", choices=("add", "list", "remove"))
+    intent.add_argument("value", nargs="?", default="")
+    intent.add_argument(
+        "--keyword", action="append", default=[], help="ключове слово (можна кілька)"
+    )
+    intent.add_argument("--text", default="", help="текст наміру або нагадування")
+    intent.add_argument("--days", type=int, default=90, help="термін дії в днях")
+    intent.add_argument("--fires", type=int, default=3, help="максимальна кількість спрацювань")
+    intent.add_argument("--cooldown", type=int, default=86400, help="інтервал повтору в секундах")
     for name in ("quiet", "stop"):
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
@@ -1398,6 +1452,7 @@ def main(argv=None) -> int:
         "tui-hook": cmd_tui_hook,
         "goals": cmd_goals,
         "schedule": cmd_schedule,
+        "intent": cmd_intent,
         "quiet": cmd_flag,
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,

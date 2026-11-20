@@ -17,6 +17,8 @@ from pathlib import Path
 from uuid import uuid4
 from zoneinfo import ZoneInfo
 
+from b12.audio.voice_guards import normalize
+
 _TIME_RE = re.compile(r"^([01]\d|2[0-3]):([0-5]\d)$")
 _RETRY_DELAYS_MIN = (5, 15, 30)
 _MIN_CATCHUP = timedelta(minutes=2)
@@ -69,6 +71,19 @@ CREATE TABLE IF NOT EXISTS schedule_runs(
  finished_at TEXT,
  PRIMARY KEY(schedule_id, occurrence)
 );
+CREATE TABLE IF NOT EXISTS intents(
+ id TEXT PRIMARY KEY,
+ actor_id TEXT NOT NULL,
+ keywords TEXT NOT NULL,
+ text TEXT NOT NULL,
+ expires_at TEXT NOT NULL,
+ fires_left INTEGER NOT NULL DEFAULT 3,
+ cooldown_s INTEGER NOT NULL DEFAULT 86400,
+ last_fired_at TEXT,
+ status TEXT NOT NULL DEFAULT 'active',
+ created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS intents_actor ON intents(actor_id, status);
 """
 
 
@@ -523,3 +538,141 @@ class ScheduleStore:
             self.db.execute("DELETE FROM schedule_runs WHERE schedule_id=?", (schedule_id,))
             self.db.execute("DELETE FROM schedules WHERE id=?", (schedule_id,))
             return True
+
+    @staticmethod
+    def _intent(row) -> dict:
+        item = dict(row)
+        item["keywords"] = json.loads(item["keywords"])
+        return item
+
+    @staticmethod
+    def _intent_matches(tokens: list[str], keywords: list[str]) -> bool:
+        for keyword in keywords:
+            kw_tokens = normalize(keyword).split()
+            if not kw_tokens:
+                continue
+            if len(kw_tokens) == 1:
+                if kw_tokens[0] in tokens:
+                    return True
+                continue
+            width = len(kw_tokens)
+            for idx in range(len(tokens) - width + 1):
+                if tokens[idx : idx + width] == kw_tokens:
+                    return True
+        return False
+
+    def add_intent(
+        self,
+        actor_id: str,
+        keywords: list[str] | tuple[str, ...],
+        text: str,
+        *,
+        days: int = 90,
+        fires_left: int = 3,
+        cooldown_s: int = 86400,
+        now: datetime | None = None,
+    ) -> dict:
+        cleaned_keywords = [kw.strip() for kw in keywords if isinstance(kw, str) and normalize(kw)]
+        if not cleaned_keywords:
+            raise ValueError("at least one non-empty keyword is required")
+        if not isinstance(text, str) or not text.strip() or len(text) > 4000:
+            raise ValueError("intent text must be 1..4000 characters")
+        if type(days) is not int or days < 1:
+            raise ValueError("days must be a positive integer")
+        if type(fires_left) is not int or fires_left < 1:
+            raise ValueError("fires_left must be a positive integer")
+        if type(cooldown_s) is not int or cooldown_s < 0:
+            raise ValueError("cooldown_s must be a non-negative integer")
+        ts = _aware(self.clock() if now is None else now).astimezone(UTC)
+        intent_id = str(uuid4())
+        expires_at = (ts + timedelta(days=days)).isoformat()
+        with self._atomic():
+            self.db.execute(
+                "INSERT INTO intents(id, actor_id, keywords, text, expires_at, fires_left, "
+                "cooldown_s, last_fired_at, status, created_at) "
+                "VALUES (?,?,?,?,?,?,?,NULL,'active',?)",
+                (
+                    intent_id,
+                    actor_id,
+                    json.dumps(cleaned_keywords, ensure_ascii=False),
+                    text.strip(),
+                    expires_at,
+                    fires_left,
+                    cooldown_s,
+                    ts.isoformat(),
+                ),
+            )
+            row = self.db.execute("SELECT * FROM intents WHERE id=?", (intent_id,)).fetchone()
+        return self._intent(row)
+
+    def list_intents(self, actor_id: str | None = None) -> list[dict]:
+        if actor_id is None:
+            rows = self.db.execute("SELECT * FROM intents ORDER BY created_at")
+        else:
+            rows = self.db.execute(
+                "SELECT * FROM intents WHERE actor_id=? ORDER BY created_at", (actor_id,)
+            )
+        return [self._intent(row) for row in rows]
+
+    def remove_intent(self, intent_id: str, actor_id: str | None = None) -> bool:
+        with self._atomic():
+            if actor_id is None:
+                cur = self.db.execute("DELETE FROM intents WHERE id=?", (intent_id,))
+            else:
+                cur = self.db.execute(
+                    "DELETE FROM intents WHERE id=? AND actor_id=?", (intent_id, actor_id)
+                )
+            return cur.rowcount > 0
+
+    def match_intents(
+        self,
+        actor_id: str,
+        user_text: str,
+        *,
+        now: datetime | None = None,
+        limit: int = 3,
+    ) -> list[dict]:
+        """Rule-based whole-word keyword match; updates budget and cooldown atomically."""
+        if not isinstance(user_text, str):
+            return []
+        tokens = normalize(user_text).split()
+        if not tokens or limit < 1:
+            return []
+        ts = _aware(self.clock() if now is None else now).astimezone(UTC)
+        ts_iso = ts.isoformat()
+        matched: list[dict] = []
+        with self._atomic():
+            rows = self.db.execute(
+                "SELECT * FROM intents WHERE actor_id=? AND status='active' ORDER BY created_at",
+                (actor_id,),
+            ).fetchall()
+            for row in rows:
+                exp_dt = datetime.fromisoformat(row["expires_at"]).astimezone(UTC)
+                if ts >= exp_dt:
+                    self.db.execute("UPDATE intents SET status='expired' WHERE id=?", (row["id"],))
+                    continue
+                if row["fires_left"] <= 0:
+                    self.db.execute(
+                        "UPDATE intents SET status='exhausted' WHERE id=?", (row["id"],)
+                    )
+                    continue
+                if row["last_fired_at"]:
+                    last_dt = datetime.fromisoformat(row["last_fired_at"]).astimezone(UTC)
+                    if (ts - last_dt).total_seconds() < row["cooldown_s"]:
+                        continue
+                keywords = json.loads(row["keywords"])
+                if not self._intent_matches(tokens, keywords):
+                    continue
+                fires_left = row["fires_left"] - 1
+                new_status = "active" if fires_left > 0 else "exhausted"
+                self.db.execute(
+                    "UPDATE intents SET fires_left=?, last_fired_at=?, status=? WHERE id=?",
+                    (fires_left, ts_iso, new_status, row["id"]),
+                )
+                updated = self.db.execute(
+                    "SELECT * FROM intents WHERE id=?", (row["id"],)
+                ).fetchone()
+                matched.append(self._intent(updated))
+                if len(matched) >= limit:
+                    break
+        return matched

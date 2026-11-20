@@ -155,6 +155,7 @@ RUNTIME_FLAGS = (
     "session_search",
     "memory_ranking",
     "goal_contract",
+    "standing_intents",
 )
 
 
@@ -339,6 +340,9 @@ def main(argv=None):
     parser.add_argument(
         "--goal-contract", action="store_true", help="ADR-019 goal completion contract"
     )
+    parser.add_argument(
+        "--standing-intents", action="store_true", help="inject matched standing intents"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -412,6 +416,7 @@ def main(argv=None):
                     ("session_search", args.session_search),
                     ("memory_ranking", args.memory_ranking),
                     ("goal_contract", args.goal_contract),
+                    ("standing_intents", args.standing_intents),
                 )
                 if on
             ),

@@ -118,6 +118,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     )
     agent.purge = purge
     agent.goals = goals  # current preferences of the speaker are shown to the model
+    agent.schedules = schedules
     if settings.embedding_python:
         from b12.semantic import BridgeEmbedder, SemanticIndex
 
