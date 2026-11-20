@@ -70,6 +70,7 @@ tags: [navigation]
 |---|---|
 | [Огляд Capri-подібних desktop companions](sources/capri-desktop-companions-2026-11-07.md) | Чотири pinned репозиторії, придатні ідеї та ліцензійні межі |
 | [Lifecycle hooks для coding agents](sources/agent-hooks-2026-11-08.md) | Офіційні hooks Claude Code, Codex та Antigravity; schema boundaries і межі інтеграції |
+| [Hermes Agent (Nous Research), 20.11.2026](sources/hermes-agent-2026-11-20.md) | Детальне вивчення агентної частини Hermes і чесне порівняння з B-12: що краще в них, що в нас, пріоритети перенесення в Capri |
 | [Master brief](sources/master-brief.md) | Походження, контрольна сума, охоплення документа |
 | [Unified master plan DR2/DR3](sources/capri-dr2-dr3-master-plan-2026-11-15.md) | Власницький план U0–U10; розмежування proposed roadmap і перевірених артефактів |
 | [Self-Improvement Memory / CRSI (2026)](sources/self-improvement-memory-2026-11-18.md) | Аудит arXiv:2611.18856v1: метод, результати, межі та відповідність до U2/U3/U8 |
