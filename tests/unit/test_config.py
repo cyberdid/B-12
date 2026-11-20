@@ -155,6 +155,8 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "schedules": False,
         "standing_intents": False,
         "clarify_tool": False,
+        "stable_prefix": False,
+        "parallel_reads": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -304,3 +306,18 @@ def test_clarify_tool_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).clarify_tool is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_CLARIFY_TOOL": "true"}
     assert Settings.from_env(env).clarify_tool is True
+
+
+def test_h5_flags_are_opt_in_and_environment_configurable(tmp_path):
+    s = Settings(state_dir=tmp_path)
+    assert s.stable_prefix is False
+    assert s.parallel_reads is False
+    env = Settings.from_env(
+        {
+            "B12_STATE_DIR": str(tmp_path),
+            "B12_STABLE_PREFIX": "true",
+            "B12_PARALLEL_READS": "1",
+        }
+    )
+    assert env.stable_prefix is True
+    assert env.parallel_reads is True

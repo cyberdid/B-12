@@ -157,6 +157,8 @@ RUNTIME_FLAGS = (
     "goal_contract",
     "standing_intents",
     "clarify_tool",
+    "stable_prefix",
+    "parallel_reads",
 )
 
 
@@ -347,6 +349,16 @@ def main(argv=None):
     parser.add_argument(
         "--clarify-tool", action="store_true", help="offer clarify(question, choices) tool"
     )
+    parser.add_argument(
+        "--stable-prefix",
+        action="store_true",
+        help="keep fixed persona/policy bytes before volatile system parts",
+    )
+    parser.add_argument(
+        "--parallel-reads",
+        action="store_true",
+        help="run consecutive *.read tool calls concurrently via asyncio.gather",
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -422,6 +434,8 @@ def main(argv=None):
                     ("goal_contract", args.goal_contract),
                     ("standing_intents", args.standing_intents),
                     ("clarify_tool", args.clarify_tool),
+                    ("stable_prefix", args.stable_prefix),
+                    ("parallel_reads", args.parallel_reads),
                 )
                 if on
             ),

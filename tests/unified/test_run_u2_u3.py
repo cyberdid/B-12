@@ -267,9 +267,9 @@ def test_narrow_pattern_catches_document_claims_but_not_recalled_facts():
 def test_runtime_flags_reach_the_record(tmp_path, capsys):
     import pytest
 
-    from evals.unified.run_u2_u3 import main
+    from evals.unified.run_u2_u3 import main, run_scenario
 
-    with pytest.raises(SystemExit):  # outside the sandbox; parsing must accept the flags
+    with pytest.raises(SystemExit) as stop:
         main(
             [
                 str(MANIFEST),
@@ -284,11 +284,18 @@ def test_runtime_flags_reach_the_record(tmp_path, capsys):
                 "--memory-ranking",
                 "--goal-contract",
                 "--standing-intents",
+                "--clarify-tool",
+                "--stable-prefix",
+                "--parallel-reads",
                 "--preference-placement",
                 "query",
             ]
         )
-    assert "run_u2_u3_sandboxed.sh" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert stop.value.code == 2
+    assert "unrecognized arguments" not in err
+    assert "run_u2_u3_sandboxed.sh" in err
+    _ = run_scenario
 
 
 async def test_standing_intents_flag_reaches_run_scenario(scripted_ollama, tmp_path):
@@ -304,6 +311,21 @@ async def test_standing_intents_flag_reaches_run_scenario(scripted_ollama, tmp_p
         runtime_flags=("standing_intents",),
     )
     assert record["runtime_flags"] == ["standing_intents"]
+
+
+async def test_h5_flags_reach_run_scenario(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Батарейки."}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C01-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        runtime_flags=("clarify_tool", "stable_prefix", "parallel_reads"),
+    )
+    assert sorted(record["runtime_flags"]) == ["clarify_tool", "parallel_reads", "stable_prefix"]
 
 
 async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):
