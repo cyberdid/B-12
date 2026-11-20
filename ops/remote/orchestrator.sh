@@ -31,21 +31,42 @@ session_alive() {
 }
 tunnel_ok() { curl -fs --max-time 10 http://127.0.0.1:11435/api/version >/dev/null; }
 
+# Colab keeps its single SSH slot "busy" (HTTP 429) after an unclean disconnect, for hours
+# (20.11.2026). The Jupyter kernel still works, so a stale sshd child is closed through it.
+free_ssh_slot() {
+  local fix; fix="$(mktemp)"
+  printf '%s\n' 'import subprocess' \
+    'subprocess.run("pkill -f \"sshd: root@\"", shell=True)' >"$fix"
+  timeout 120 colab exec -s "$SESSION" -f "$fix" >/dev/null 2>&1; rm -f "$fix"; sleep 10
+}
+
+ssh_ready() {
+  timeout 60 ssh -o ConnectTimeout=40 "$SESSION" true 2>/dev/null && return 0
+  log "SSH refused (stale slot?): freeing it through the kernel"; free_ssh_slot
+  timeout 60 ssh -o ConnectTimeout=40 "$SESSION" true 2>/dev/null
+}
+
 ensure_colab() {  # $1 = space-separated models
   if ! session_alive; then
     ssh -O exit "$SESSION" >/dev/null 2>&1
     log "creating Colab session"; colab new -s "$SESSION" --gpu L4 >>"$Q/orchestrator.log" 2>&1 || return 1
   fi
   if ! ssh -O check "$SESSION" >/dev/null 2>&1; then
+    ssh_ready || return 1
     ssh -fN -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes \
       -L 11435:127.0.0.1:11434 -L 11436:127.0.0.1:11436 "$SESSION" || return 1
   elif ! tunnel_ok; then
     # A master opened without forwards (e.g. by a manual ssh): add them to it.
     ssh -O forward -L 11435:127.0.0.1:11434 -L 11436:127.0.0.1:11436 "$SESSION" >/dev/null 2>&1
   fi
-  if ! ssh "$SESSION" test -d /root/emb/embeddinggemma-2; then
-    log "pushing embedding weights"
-    tar -C "$ASSETS" -chf - embeddinggemma-2 | ssh "$SESSION" 'mkdir -p /root/emb && tar -C /root/emb -xf -' || return 1
+  local want have
+  want="$(du -sbL "$ASSETS/embeddinggemma-2" | cut -f1)"
+  have="$(ssh "$SESSION" 'cat /root/emb/.complete 2>/dev/null')"
+  if [ "$have" != "$want" ]; then
+    log "pushing embedding weights ($want bytes)"
+    tar -C "$ASSETS" -chf - embeddinggemma-2 | ssh "$SESSION" \
+      "rm -rf /root/emb/embeddinggemma-2; mkdir -p /root/emb && tar -C /root/emb -xf - && du -sb /root/emb/embeddinggemma-2 | cut -f1 > /root/emb/.complete" || return 1
+    [ "$(ssh "$SESSION" 'cat /root/emb/.complete 2>/dev/null')" = "$want" ] || { log "weights incomplete"; return 1; }
   fi
   ssh "$SESSION" mkdir -p /root/b12/scripts
   scp -q "$REPO/scripts/st_embedder.py" "$REPO/scripts/embed_server.py" "$SESSION:/root/b12/scripts/" || return 1
@@ -74,9 +95,17 @@ run_job() {
     B12_EVAL_OLLAMA_URL=http://127.0.0.1:11435 B12_EVAL_VARIANT=deployed \
     B12_EVAL_EMBED_SOCKET="$SOCK" NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed $extra" \
     evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm" >>"$Q/$name.log" 2>&1 &
-  local driver=$! misses=0
+  local driver=$! misses=0 records last_change
+  records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' | wc -l)"; last_change=$(date +%s)
   while kill -0 "$driver" 2>/dev/null; do
     sleep 30
+    local now_records; now_records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' | wc -l)"
+    if [ "$now_records" != "$records" ]; then records="$now_records"; last_change=$(date +%s); fi
+    if [ $(( $(date +%s) - last_change )) -ge 900 ]; then
+      log "$name: no new record for 15 min, restarting the driver"
+      kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null
+      return 1
+    fi
     if tunnel_ok && session_alive; then misses=0; continue; fi
     misses=$((misses + 1))
     [ "$misses" -lt 3 ] && continue  # one failed listing is not a lost session
