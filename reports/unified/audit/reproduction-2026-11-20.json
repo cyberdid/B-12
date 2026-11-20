@@ -1,0 +1,140 @@
+{
+ "U4 on Bolt (A0 -> U4)": {
+  "issues": {
+   "base": {},
+   "arm": {}
+  },
+  "control": {
+   "base": 0.731,
+   "arm": 0.615,
+   "diff": [
+    -0.115,
+    [
+     -0.256,
+     0.006
+    ]
+   ],
+   "families": 26
+  },
+  "memory": {
+   "base": 0.406,
+   "arm": 0.611,
+   "diff": [
+    0.206,
+    [
+     0.078,
+     0.344
+    ]
+   ],
+   "families": 30
+  }
+ },
+ "F on Bolt (A0 -> F)": {
+  "issues": {
+   "base": {},
+   "arm": {}
+  },
+  "control": {
+   "base": 0.731,
+   "arm": 0.654,
+   "diff": [
+    -0.077,
+    [
+     -0.192,
+     0.019
+    ]
+   ],
+   "families": 26
+  },
+  "memory": {
+   "base": 0.406,
+   "arm": 0.633,
+   "diff": [
+    0.228,
+    [
+     0.094,
+     0.367
+    ]
+   ],
+   "families": 30
+  }
+ },
+ "drift (A0 -> A0b)": {
+  "issues": {
+   "base": {},
+   "arm": {}
+  },
+  "control": {
+   "base": 0.731,
+   "arm": 0.679,
+   "diff": [
+    -0.051,
+    [
+     -0.16,
+     0.032
+    ]
+   ],
+   "families": 26
+  },
+  "memory": {
+   "base": 0.406,
+   "arm": 0.422,
+   "diff": [
+    0.017,
+    [
+     -0.039,
+     0.078
+    ]
+   ],
+   "families": 30
+  }
+ },
+ "U4 on gemma (GA0 -> GDEF)": {
+  "issues": {
+   "base": {},
+   "arm": {}
+  },
+  "control": {
+   "base": 0.782,
+   "arm": 0.763,
+   "diff": [
+    -0.019,
+    [
+     -0.109,
+     0.064
+    ]
+   ],
+   "families": 26
+  },
+  "memory": {
+   "base": 0.389,
+   "arm": 0.772,
+   "diff": [
+    0.383,
+    [
+     0.206,
+     0.556
+    ]
+   ],
+   "families": 30
+  }
+ },
+ "U5 on U5 set (B0 -> U5)": {
+  "issues": {
+   "base": {},
+   "arm": {}
+  },
+  "memory": {
+   "base": 0.618,
+   "arm": 0.743,
+   "diff": [
+    0.125,
+    [
+     0.014,
+     0.257
+    ]
+   ],
+   "families": 24
+  }
+ }
+}
