@@ -237,6 +237,8 @@ def register(
     temporal=False,
     scoped=False,
     grounding=False,
+    taint=False,
+    turn_tainted=None,
 ):
     async def memory_search(args, guard):
         if memory is None:
@@ -309,15 +311,20 @@ def register(
                 if scoped
                 else {}
             )
+            temporal_fields = _temporal_from_args(args)
+            source = "tool:" + guard.operation_id
+            if taint and turn_tainted is not None and turn_tainted(guard.context):
+                temporal_fields["reliability"] = "unverified"
+                source = "network_turn"
             record = memory.remember(
                 args.text,
                 actor,
                 kind=args.kind,
-                source="tool:" + guard.operation_id,
+                source=source,
                 evidence_ids=tuple(args.evidence_ids),
                 documents=tuple(args.document_evidence_ids),
                 expected_deletion_revision=expected_revision,
-                **_temporal_from_args(args),
+                **temporal_fields,
                 **scope,
             )
         except PermissionError:

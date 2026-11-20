@@ -750,6 +750,7 @@ class Agent:
         self._volatile: dict[str, list[dict]] = {}
         self._waiting: dict[str, dict] = {}
         self._revisions: dict[str, int] = {}
+        self._tainted: set[str] = set()
         self.started_at = time.time()
         # Wall clock for "today" in temporal memory (ADR-015); evaluations pin it.
         self.clock = lambda: datetime.now(UTC)
@@ -758,6 +759,10 @@ class Agent:
     # Trusted port for memory_store: the ORIGINAL turn's canonical deletion revision.
     def memory_revision(self, context: ExecutionContext) -> int:
         return self._revisions[context.turn_id]
+
+    # Trusted port for memory_store: True once a network.http call completed in this turn.
+    def turn_tainted(self, context: ExecutionContext) -> bool:
+        return context.turn_id in self._tainted
 
     def history_messages(self, session_id: str, actor: Actor) -> list[dict]:
         if not actor.consent:
@@ -986,6 +991,8 @@ class Agent:
         consumer = [on_event]
         turn_started = time.monotonic()
         self._revisions[context.turn_id] = state["revision"]
+        if state.get("tainted"):
+            self._tainted.add(context.turn_id)
         active = _Active(actor.id, context.cancel)
         self.active[context.turn_id] = active
 
@@ -1040,6 +1047,7 @@ class Agent:
                 if status == "cancelled":
                     self.control.cancel_turn(context.turn_id)
             if status != "awaiting_approval":
+                self._tainted.discard(context.turn_id)
                 self._drop_checkpoint(context, actor)
                 await emit(
                     _TERMINAL[status],
@@ -1742,6 +1750,10 @@ class Agent:
                     },
                 )
             if result.status == "completed":
+                tool = self.registry._tools.get(call.name)
+                if tool is not None and tool.capability == "network.http":
+                    state["tainted"] = True
+                    self._tainted.add(context.turn_id)
                 self._track_files(state, call, result)
                 if call.name == "file_read":
                     chunks = state.setdefault("chunks", {})
@@ -1797,6 +1809,7 @@ class Agent:
         self.sessions.drop_checkpoint(context.turn_id, actor.id)
 
     def _commit(self, context, state, active) -> bool:
+        self._tainted.discard(context.turn_id)
         if active.invalidated:
             return False
         actor = self.control.resolve_actor(context.actor_id)

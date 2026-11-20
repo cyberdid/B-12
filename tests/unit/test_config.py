@@ -145,6 +145,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "initiative_gate": True,
         "preference_rules": False,
         "memory_grounding": False,
+        "memory_taint": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -220,3 +221,9 @@ def test_memory_scoped_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).memory_scoped is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_SCOPED": "true"}
     assert Settings.from_env(env).memory_scoped
+
+
+def test_memory_taint_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_taint is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TAINT": "true"}
+    assert Settings.from_env(env).memory_taint

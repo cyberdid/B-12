@@ -68,6 +68,9 @@ class Settings(BaseModel):
     # only what the owner said or a tool showed; no inferred traits; a one-off request is not a
     # standing preference. Changes the memory_store schema text, so off until measured.
     memory_grounding: bool = False
+    # Network taint for memory writes in the same turn (OpenClaw-derived, 20.11.2026): once any
+    # network.http tool completes in a turn, memory_store marks new records unverified/network_turn.
+    memory_taint: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -198,6 +201,7 @@ class Settings(BaseModel):
                 "initiative_gate",
                 "preference_rules",
                 "memory_grounding",
+                "memory_taint",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

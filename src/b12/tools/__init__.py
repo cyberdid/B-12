@@ -15,6 +15,8 @@ def register_host_tools(
     memory_scoped=False,
     verify_writes=False,
     memory_grounding=False,
+    memory_taint=False,
+    turn_tainted=None,
 ):
     """Register all 13 concrete host tools; caller owns/closes injected stores.
 
@@ -40,4 +42,6 @@ def register_host_tools(
         temporal=memory_temporal,
         scoped=memory_scoped,
         grounding=memory_grounding,
+        taint=memory_taint,
+        turn_tainted=turn_tainted,
     )
