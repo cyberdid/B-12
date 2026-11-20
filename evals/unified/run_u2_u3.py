@@ -165,6 +165,7 @@ def run_scenario(
     arm="A0",
     memory_temporal=False,
     runtime_flags=(),
+    preference_placement="system",
 ):
     """Run one manifest row; return the raw record (no scoring)."""
     record = {
@@ -198,6 +199,7 @@ def run_scenario(
                 # Every arm flag explicit: Settings defaults change over time (goals_in_context
                 # became on by default on 19.11.2026), an arm must not inherit them silently.
                 **{flag: flag in runtime_flags for flag in RUNTIME_FLAGS},
+                "preference_placement": preference_placement,
                 "annotate_unverified_claims": arm == "D3",
             }
         )
@@ -240,7 +242,12 @@ def run_scenario(
             "status": "EXECUTED",
             "u2_arm": arm,
             "memory_temporal": memory_temporal,
-            "runtime_flags": sorted(runtime_flags),
+            "runtime_flags": sorted(
+                (
+                    *runtime_flags,
+                    *(["preference_placement=query"] if preference_placement == "query" else []),
+                )
+            ),
             "environment_stub": environment_stub,
             "action_claim_pattern": {
                 "D": "broad (arm D)",
@@ -301,6 +308,12 @@ def main(argv=None):
     )
     parser.add_argument(
         "--preference-rules", action="store_true", help="answer preferences from memory as rules"
+    )
+    parser.add_argument(
+        "--preference-placement",
+        choices=("system", "query"),
+        default="system",
+        help="where preference_rules sit: system or beside the query",
     )
     parser.add_argument(
         "--memory-grounding", action="store_true", help="grounding rules for memory writes"
@@ -367,6 +380,7 @@ def main(argv=None):
             existing_files_root=True,
             arm=args.arm,
             memory_temporal=args.memory_temporal,
+            preference_placement=args.preference_placement,
             runtime_flags=tuple(
                 flag
                 for flag, on in (

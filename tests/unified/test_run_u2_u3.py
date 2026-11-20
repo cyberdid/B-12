@@ -59,9 +59,7 @@ async def test_seeded_memory_evidence_maps_back_to_declared_ids(scripted_ollama,
     assert record["seed_report"]["applied_relations"] == [{"supersedes": "m08-r1", "by": "m08-r2"}]
 
 
-async def test_u5_runner_seeds_scoped_temporal_memory_consistently(
-    scripted_ollama, tmp_path
-):
+async def test_u5_runner_seeds_scoped_temporal_memory_consistently(scripted_ollama, tmp_path):
     state, base = scripted_ollama
     state["script"] = [{"content": "Нагадування о 9:30 може підійти."}]
 
@@ -280,8 +278,26 @@ def test_runtime_flags_reach_the_record(tmp_path):
                 "--verify-writes",
                 "--goals-in-context",
                 "--memory-temporal",
+                "--preference-placement",
+                "query",
             ]
         )
+
+
+async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Батарейки."}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C01-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        runtime_flags=("preference_rules",),
+        preference_placement="query",
+    )
+    assert sorted(record["runtime_flags"]) == ["preference_placement=query", "preference_rules"]
 
 
 def test_unified_sandbox_hides_answer_material():

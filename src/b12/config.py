@@ -64,6 +64,8 @@ class Settings(BaseModel):
     # The speaker's stated answer preferences from memory as rules for the reply's form
     # (INTG-08/M88: models ignored "explain briefly" offered only as evidence). Off until measured.
     preference_rules: bool = False
+    # Where preference_rules sit in the prompt ("system" vs prepended beside the user query).
+    preference_placement: Literal["system", "query"] = "system"
     # Grounding rules for memory writes (from Hermes Agent's review prompt, 20.11.2026): store
     # only what the owner said or a tool showed; no inferred traits; a one-off request is not a
     # standing preference. Changes the memory_store schema text, so off until measured.

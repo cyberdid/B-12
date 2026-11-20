@@ -144,6 +144,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "task_ledger": True,
         "initiative_gate": True,
         "preference_rules": False,
+        "preference_placement": "system",
         "memory_grounding": False,
         "memory_taint": False,
         "annotate_unverified_claims": False,
@@ -227,3 +228,11 @@ def test_memory_taint_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).memory_taint is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TAINT": "true"}
     assert Settings.from_env(env).memory_taint
+
+
+def test_preference_placement_defaults_to_system_and_validates_literal(tmp_path):
+    assert Settings(state_dir=tmp_path).preference_placement == "system"
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_PREFERENCE_PLACEMENT": "query"}
+    assert Settings.from_env(env).preference_placement == "query"
+    with pytest.raises(ValidationError):
+        Settings(state_dir=tmp_path, preference_placement="invalid")
