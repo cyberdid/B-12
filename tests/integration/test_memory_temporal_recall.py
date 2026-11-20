@@ -115,3 +115,63 @@ async def test_memory_store_offers_temporal_fields_only_with_the_flag(scripted_o
                 assert record.event_time is None
         finally:
             runtime.close()
+
+
+async def test_memory_search_exposes_as_of_only_when_temporal_and_as_of_are_on(
+    scripted_ollama, tmp_path
+):
+    from b12.auth import owner_capabilities
+
+    state, base = scripted_ollama
+    combos = (
+        (False, False, False),
+        (False, True, False),
+        (True, False, False),
+        (True, True, True),
+    )
+    for temporal, as_of_flag, expected_prop in combos:
+        state["requests"].clear()
+        state["script"] = (
+            [
+                {"tool_calls": [("memory_search", {"query": "Тариф", "as_of": "2026-10-15"})]},
+                {"tool_calls": [("memory_search", {"query": "Тариф", "as_of": "вчора"})]},
+                {"content": "Тоді діяв 100 грн."},
+            ]
+            if expected_prop
+            else [{"content": "Гаразд."}]
+        )
+        runtime = open_runtime(
+            base.model_copy(
+                update={
+                    "state_dir": tmp_path / f"t-{temporal}-a-{as_of_flag}",
+                    "memory_temporal": temporal,
+                    "memory_as_of": as_of_flag,
+                }
+            )
+        )
+        try:
+            actor = runtime.control.create_actor(owner=True, consent=True)
+            old = runtime.memory.remember(
+                "Тариф: 100 грн.", actor, valid_from="2026-01-01", valid_to="2026-10-31"
+            )
+            new = runtime.memory.remember("Тариф: 200 грн.", actor, valid_from="2026-11-01")
+            runtime.memory.supersede(old.id, actor, replaced_by=new.id)
+            session = runtime.control.create_session(actor.id)
+            task = runtime.control.create_task(session)
+            grant = runtime.control.issue_grant(
+                actor.id, session, owner_capabilities(runtime.settings), task_id=task, ttl_s=600
+            )
+            await runtime.agent.turn(session, grant, "Привіт", task_id=task, timeout_s=60)
+        finally:
+            runtime.close()
+
+        search_tool = next(
+            t for t in state["requests"][0]["tools"] if t["function"]["name"] == "memory_search"
+        )
+        assert ("as_of" in search_tool["function"]["parameters"]["properties"]) is expected_prop
+        if expected_prop:
+            tool_msg = next(m for m in state["requests"][1]["messages"] if m["role"] == "tool")
+            assert "100 грн" in tool_msg["content"]
+            assert "200 грн" not in tool_msg["content"]
+            bad_msg = [m for m in state["requests"][2]["messages"] if m["role"] == "tool"][-1]
+            assert "unsupported" in bad_msg["content"]

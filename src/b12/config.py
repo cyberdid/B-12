@@ -45,6 +45,9 @@ class Settings(BaseModel):
     # model is told today's date. On since 19.11.2026: memory +21.1 p.p. [+8.3, +34.4] on the
     # locked set, no privacy regression (reports/unified/CAPRI_U4_TEMPORAL_ABLATION.md).
     memory_temporal: bool = True
+    # Historical point-in-time search parameter (`as_of`) on memory_search when memory_temporal
+    # is also enabled. Off until measured.
+    memory_as_of: bool = False
     # Runtime read-back after every successful file_write: size, hash, match and opening go
     # back to the model (unverified writes failed for every model, 18.11.2026). Off: no effect
     # measurable by the current oracles (U4 report).
@@ -196,6 +199,7 @@ class Settings(BaseModel):
                 "forget_requires_approval",
                 "memory_enrichment",
                 "memory_temporal",
+                "memory_as_of",
                 "verify_writes",
                 "goals_in_context",
                 "memory_scoped",

@@ -138,6 +138,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "forget_requires_approval": True,
         "memory_enrichment": True,
         "memory_temporal": True,
+        "memory_as_of": False,
         "verify_writes": False,
         "goals_in_context": True,
         "memory_scoped": False,
@@ -236,3 +237,9 @@ def test_preference_placement_defaults_to_system_and_validates_literal(tmp_path)
     assert Settings.from_env(env).preference_placement == "query"
     with pytest.raises(ValidationError):
         Settings(state_dir=tmp_path, preference_placement="invalid")
+
+
+def test_memory_as_of_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_as_of is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_AS_OF": "true"}
+    assert Settings.from_env(env).memory_as_of

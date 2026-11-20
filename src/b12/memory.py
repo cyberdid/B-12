@@ -254,6 +254,35 @@ def _iso_day_or_time(value, name):
     return value, parsed
 
 
+def _parse_time_bound(value: str, *, end: bool = False) -> datetime:
+    parsed = datetime.fromisoformat(value)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    if len(value) == 10 and end:
+        parsed = parsed.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return parsed
+
+
+def _as_of_cutoff(as_of: str) -> datetime:
+    value, _ = _iso_day_or_time(as_of, "as_of")
+    return _parse_time_bound(value, end=True)
+
+
+def _valid_as_of(record: MemoryRecord, target: datetime) -> bool:
+    if not (
+        record.status == "active"
+        or (record.status == "stale" and record.status_reason == "superseded")
+    ):
+        return False
+    if record.valid_from and target < _parse_time_bound(record.valid_from):
+        return False
+    if record.valid_to and target > _parse_time_bound(record.valid_to, end=True):
+        return False
+    if record.event_time and _parse_time_bound(record.event_time) > target:
+        return False
+    return True
+
+
 def _temporal_fields(event_time, valid_from, valid_to, reliability, locator, temporal_source):
     """Validate ADR-015 fields before anything is written; unknown values stay None."""
     from b12.migrations import RELIABILITY, TEMPORAL_SOURCES
@@ -804,14 +833,18 @@ class MemoryStore:
             **{key: row[key] for key in _TEMPORAL_COLUMNS},
         )
 
-    def search(self, query: str, actor: Actor, *, limit: int = 8) -> list[MemoryRecord]:
+    def search(
+        self, query: str, actor: Actor, *, limit: int = 8, as_of: str | None = None
+    ) -> list[MemoryRecord]:
         self._consent(actor)
         self._limit(limit)
         if not isinstance(query, str):
             raise TypeError("query must be text")
+        target = _as_of_cutoff(as_of) if as_of is not None else None
         # Only literal Unicode alphanumeric tokens (keeping internal apostrophes); no FTS syntax.
         raw_terms = re.findall(r"[^\W_]+(?:['’ʼ][^\W_]+)*", query, flags=re.UNICODE)[:64]
         terms = [t.replace("’", "'").replace("ʼ", "'").lower() for t in raw_terms]
+        sql_limit = -1 if target is not None else limit
 
         def fts_expr(items: list[str], joiner: str = " AND ") -> str:
             return joiner.join(
@@ -824,20 +857,26 @@ class MemoryStore:
                    WHERE memory_fts MATCH ? AND m.actor_id=?
                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
                    ORDER BY bm25(memory_fts), m.rowid DESC LIMIT ?""",
-                (expr, actor.id, limit),
+                (expr, actor.id, sql_limit),
             ).fetchall()
+
+        def filter_rows(raw_rows):
+            records = [self._record(row) for row in raw_rows]
+            if target is not None:
+                records = [record for record in records if _valid_as_of(record, target)]
+            return records[:limit]
 
         with self._transaction():
             if not terms or not limit:
                 return []
-            rows = query_rows(fts_expr(terms, " AND "))
-            if not rows and not (_FTS_OPERATORS & set(terms)):
+            records = filter_rows(query_rows(fts_expr(terms, " AND ")))
+            if not records and not (_FTS_OPERATORS & set(terms)):
                 content = [t for t in terms if t not in _STOP_TERMS]
                 if content and len(content) < len(terms):
-                    rows = query_rows(fts_expr(content, " AND "))
-                if not rows and len(content) > 1:
-                    rows = query_rows(fts_expr(content, " OR "))
-            return [self._record(row) for row in rows]
+                    records = filter_rows(query_rows(fts_expr(content, " AND ")))
+                if not records and len(content) > 1:
+                    records = filter_rows(query_rows(fts_expr(content, " OR ")))
+            return records
 
     def find_duplicate(self, text: str, actor: Actor) -> MemoryRecord | None:
         """Return a live record of the actor with the same normalised text, if any."""

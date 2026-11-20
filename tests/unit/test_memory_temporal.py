@@ -117,3 +117,47 @@ def test_supersede_refuses_a_replacement_from_another_actor(tmp_path):
             store.supersede(old.id, OWNER, replaced_by=foreign.id)
     finally:
         store.close()
+
+
+def test_as_of_returns_the_value_that_held_then(tmp_path):
+    store = MemoryStore(tmp_path / "m.sqlite3")
+    try:
+        old = store.remember("Адреса: Київ.", OWNER, valid_from="2026-01-01", valid_to="2026-10-31")
+        new = store.remember("Адреса: Львів.", OWNER, valid_from="2026-11-01")
+        assert store.supersede(old.id, OWNER, replaced_by=new.id)
+        future = store.remember(
+            "Адреса: Одеса.",
+            OWNER,
+            event_time="2026-12-10",
+            valid_from="2026-12-10",
+        )
+        revoked = store.remember("Адреса: фейк.", OWNER, valid_from="2026-01-01")
+        assert store.supersede(revoked.id, OWNER)
+        open_fact = store.remember("Адреса офісу: Поділ.", OWNER)
+
+        assert {r.id for r in store.search("Адреса", OWNER, as_of="2026-10-15")} == {
+            open_fact.id,
+            old.id,
+        }
+        assert {r.id for r in store.search("Адреса", OWNER, as_of="2026-11-15")} == {
+            open_fact.id,
+            new.id,
+        }
+        # Newer non-matching rows must not crowd out an older valid match before limit.
+        for i in range(6):
+            store.remember(f"Адреса філії {i}: Тернопіль.", OWNER, valid_from="2026-11-01")
+        bounded = store.search("Адреса", OWNER, limit=2, as_of="2026-10-31")
+        assert {r.id for r in bounded} == {open_fact.id, old.id}
+        assert len(store.search("Адреса", OWNER, limit=1, as_of="2026-10-31")) == 1
+        # Event time in the future relative to as_of is excluded even with open valid_from/valid_to.
+        later_event = store.remember("Адреса складу: Харків.", OWNER, event_time="2026-11-20")
+        before = [r.id for r in store.search("складу", OWNER, as_of="2026-11-15")]
+        after = [r.id for r in store.search("складу", OWNER, as_of="2026-11-20")]
+        assert before == []
+        assert after == [later_event.id]
+        # Default as_of=None keeps existing search behavior.
+        assert {r.id for r in store.search("Адреса", OWNER)} >= {old.id, new.id, future.id}
+        with pytest.raises(ValueError):
+            store.search("Адреса", OWNER, as_of="вчора")
+    finally:
+        store.close()

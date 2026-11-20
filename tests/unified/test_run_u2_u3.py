@@ -278,6 +278,7 @@ def test_runtime_flags_reach_the_record(tmp_path):
                 "--verify-writes",
                 "--goals-in-context",
                 "--memory-temporal",
+                "--memory-as-of",
                 "--preference-placement",
                 "query",
             ]

@@ -151,6 +151,7 @@ RUNTIME_FLAGS = (
     "preference_rules",
     "memory_grounding",
     "memory_taint",
+    "memory_as_of",
 )
 
 
@@ -321,6 +322,9 @@ def main(argv=None):
     parser.add_argument(
         "--memory-taint", action="store_true", help="taint memory writes after network calls"
     )
+    parser.add_argument(
+        "--memory-as-of", action="store_true", help="historical as_of parameter on memory_search"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -390,6 +394,7 @@ def main(argv=None):
                     ("preference_rules", args.preference_rules),
                     ("memory_grounding", args.memory_grounding),
                     ("memory_taint", args.memory_taint),
+                    ("memory_as_of", args.memory_as_of),
                 )
                 if on
             ),

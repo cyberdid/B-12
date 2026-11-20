@@ -44,6 +44,17 @@ class SearchArgs(Args):
     limit: int = Field(default=5, ge=1, le=10)
 
 
+class TemporalSearchArgs(SearchArgs):
+    as_of: str = Field(
+        default="",
+        max_length=32,
+        description=(
+            "Optional ISO date or timestamp (e.g. 2026-10-15) to filter facts valid at that "
+            "time, including superseded historical values"
+        ),
+    )
+
+
 class StoreArgs(Args):
     text: str = Field(min_length=1, max_length=8192)
     kind: str = Field(default="fact", min_length=1, max_length=64)
@@ -235,6 +246,7 @@ def register(
     purge=None,
     memory_revision=None,
     temporal=False,
+    as_of=False,
     scoped=False,
     grounding=False,
     taint=False,
@@ -245,7 +257,11 @@ def register(
             return failure("coordinator_unavailable")
         guard.check()
         actor = guard.store.resolve_actor(guard.context.actor_id)
-        records = memory.search(args.query, actor, limit=args.limit)
+        as_of_value = getattr(args, "as_of", "") if (temporal and as_of) else ""
+        try:
+            records = memory.search(args.query, actor, limit=args.limit, as_of=as_of_value or None)
+        except ValueError:
+            return failure("unsupported")
         if scoped:
             # A secondary recall path follows the same evidence rules as automatic recall:
             # revoked and source-invalid records are hidden; replacements are labelled history.
@@ -490,10 +506,18 @@ def register(
         except Exception:
             return None
 
+    use_as_of = temporal and as_of
+    search_description = (
+        "Find facts in memory by a word or phrase. Argument: query (what to search for)."
+    )
+    if use_as_of:
+        search_description += (
+            " Optional argument: as_of (ISO date or timestamp to filter facts valid then)."
+        )
     registry.register(
         "memory_search",
-        "Find facts in memory by a word or phrase. Argument: query (what to search for).",
-        SearchArgs,
+        search_description,
+        TemporalSearchArgs if use_as_of else SearchArgs,
         memory_search,
         "memory.read",
     )
