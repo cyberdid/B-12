@@ -131,7 +131,9 @@ async def test_quiet_mode_silences_proposals_but_not_execution(rig):
     [outcome] = await scheduler.tick()
     assert outcome["state"] == "completed" and outcome["delivered"] is False
     [proposal] = runtime.goals.proposals(actor.id)
-    assert (proposal["delivered"], proposal["reason"]) == (0, "quiet_mode")
+    # With the ADR-018 gate (on since 20.11.2026) a review with nothing new is dropped before
+    # the quiet check; either way nothing is spoken and the work itself went on.
+    assert proposal["delivered"] == 0 and proposal["reason"] in ("quiet_mode", "not_novel")
     assert runtime.goals.get(goal["id"], actor.id)["consumed_turns"] == 1
 
 

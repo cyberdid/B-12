@@ -1,7 +1,7 @@
 ---
 type: decision
 updated: 2026-11-19
-status: proposed_draft
+status: accepted_by_owner_enabled_by_default
 sources: [raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, src/b12/attention.py, src/b12/autonomy.py, src/b12/goals.py, src/b12/api.py]
 tags: [adr, U7, initiative, attention, inbox]
 ---
@@ -46,3 +46,7 @@ An offline replay set of synthetic candidates with expected decisions, at least 
 ## Rollback
 
 `initiative_gate` off keeps the current behaviour: every review becomes a proposal, filtered only by attention. The new columns are additive.
+
+## Owner decision — 20.11.2026
+
+The owner approved the ADR; the flag is on by default.

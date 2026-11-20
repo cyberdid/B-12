@@ -1,7 +1,7 @@
 ---
 type: decision
 updated: 2026-11-19
-status: proposed_draft
+status: accepted_by_owner_enabled_by_default
 sources: [raw/CAPRI_DR2_DR3_MASTER_PLAN_2026-11-15.md, src/b12/control.py, src/b12/tools/registry.py, src/b12/autonomy.py, src/b12/goals.py, src/b12/sessions.py]
 tags: [adr, U6, workflow, recovery, idempotency]
 ---
@@ -38,3 +38,7 @@ Crash-injection suite with a scripted model that repeats the same effect after a
 ## Rollback
 
 `task_ledger` off restores current behaviour. The new tables are additive in `control.sqlite3`; they are ignored when the flag is off.
+
+## Owner decision — 20.11.2026
+
+The owner approved the ADR; the flag is on by default.
