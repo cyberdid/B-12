@@ -83,6 +83,7 @@ class VoicePipeline:
         player: AudioPlayer | None = None,
         on_tts_chunk: Callable[[SynthesizedAudio], None] | None = None,
         on_turn_started: Callable[[str], None] | None = None,
+        context_note: str | None = None,
     ) -> VoiceTurnResult:
         """Обробити записану репліку користувача (16 кГц) від VAD до потокового TTS і live playback.
 
@@ -235,10 +236,11 @@ class VoicePipeline:
                 sentence_buffer = ""
 
         try:
+            message = f"{context_note}\n{transcript.text}" if context_note else transcript.text
             turn_res = await self.runtime.agent.turn(
                 session_id,
                 grant,
-                transcript.text,
+                message,
                 task_id=task_id,
                 on_event=on_event,
                 cancel=cancel,

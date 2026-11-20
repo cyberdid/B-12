@@ -21,6 +21,12 @@ PROMPT = (
     "спираючись лише на ці спостереження. Не вигадуй фактів. Відповідай тільки JSON: "
     '{"hypothesis": "...", "evidence_ids": ["id", ...]}'
 )
+# memory_grounding: the same limits as for memory writes (Hermes-derived, 20.11.2026).
+GROUNDING = (
+    " Не роби висновків про риси, настрій, рівень чи вподобання власника лише з теми або тону; "
+    "разове прохання не є постійним вподобанням, якщо власник не сказав «завжди», «відтепер» "
+    "чи «запам’ятай». Якщо спостережень замало — поверни порожню гіпотезу."
+)
 
 
 class Reflector:
@@ -54,7 +60,9 @@ class Reflector:
             return {"state": "skipped", "reason": "insufficient_evidence"}
         offered = {record.id for record in observations}
         lines = "\n".join(f"{r.id}: {r.text[:300]}" for r in observations)
-        request = agent.builder.build(PROMPT, [{"role": "user", "content": lines}], [], [])
+        grounded = getattr(self.runtime.settings, "memory_grounding", False)
+        prompt = PROMPT + (GROUNDING if grounded else "")
+        request = agent.builder.build(prompt, [{"role": "user", "content": lines}], [], [])
         # Registered as the actor's active work so a purge can cancel it promptly.
         active = _Active(actor.id, cancel or asyncio.Event())
         key = f"reflection-{uuid4()}"
@@ -79,6 +87,8 @@ class Reflector:
                 raise ValueError("uncited or foreign evidence")
         except (TypeError, KeyError, ValueError):
             return {"state": "rejected", "reason": "invalid_output"}
+        if isinstance(hypothesis, str) and not hypothesis.strip():
+            return {"state": "skipped", "reason": "no_hypothesis"}  # too little to say: fine
         try:
             record = self.record(actor, hypothesis, cited, expected_revision=revision)
         except PermissionError:

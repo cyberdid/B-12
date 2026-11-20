@@ -206,3 +206,83 @@ def _mic(runtime):
     from b12.audio.capture import MicController
 
     return MicController(runtime.control)
+
+
+# --- voice guards on the live path (Hermes-derived, 20.11.2026) ------------------------------
+
+
+def _record_user_messages(model):
+    seen = []
+    original = model.chat
+
+    async def chat(admitted, **kwargs):
+        users = [m for m in admitted.payload()["messages"] if m["role"] == "user"]
+        seen.append(users[-1]["content"] if users else "")
+        return await original(admitted, **kwargs)
+
+    model.chat = chat
+    return seen
+
+
+def _scripted_transcripts(duplex, texts):
+    queue = list(texts)
+    base = duplex.pipeline.asr.transcribe
+
+    def transcribe(audio_16k, *, language="auto"):
+        result = base(audio_16k, language=language)
+        text = queue.pop(0) if queue else result.text
+        return result.__class__(**{**result.__dict__, "text": text})
+
+    duplex.pipeline.asr.transcribe = transcribe
+
+
+async def test_after_an_interruption_the_next_request_carries_a_data_note(live_runtime):
+    runtime, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    _scripted_transcripts(duplex, ["Розкажи коротко про погоду", "А що завтра?"])
+    mic = ScriptedMic(
+        _mic(runtime),
+        script=[
+            _frames(_voice_signal(0.8)),
+            _silence(1.1),
+            _frames(_voice_signal(0.8, f0=190.0)),  # the user interrupts the answer
+            _silence(1.0),
+        ],
+    )
+    await asyncio.wait_for(LiveSession(duplex, mic).run(asyncio.Event()), 60)
+    assert len(seen) == 2
+    assert not seen[0].startswith("[службова примітка")
+    assert seen[1].startswith("[службова примітка"), seen[1]
+    assert "«Розкажи коротко про погоду»" in seen[1]
+    assert seen[1].rstrip().endswith("А що завтра?")
+
+
+async def test_a_stop_phrase_stops_speech_without_asking_the_model(live_runtime):
+    runtime, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    _scripted_transcripts(duplex, ["Розкажи коротко про погоду", "Стоп!"])
+    mic = ScriptedMic(
+        _mic(runtime),
+        script=[
+            _frames(_voice_signal(0.8)),
+            _silence(1.1),
+            _frames(_voice_signal(0.8, f0=190.0)),
+            _silence(1.0),
+        ],
+    )
+    events = []
+    session = LiveSession(duplex, mic, on_event=events.append)
+    await asyncio.wait_for(session.run(asyncio.Event()), 60)
+    assert len(seen) == 1, "the stop phrase must not become a model request"
+    assert duplex.stop_phrases == 1
+    assert duplex._interrupted is not None and duplex._interrupted[2] is True
+
+
+async def test_a_phantom_transcript_never_reaches_the_model(live_runtime):
+    runtime, duplex, model, _ = live_runtime
+    seen = _record_user_messages(model)
+    _scripted_transcripts(duplex, ["Дякую за перегляд!"])
+    mic = ScriptedMic(_mic(runtime), script=[_frames(_voice_signal(0.8)), _silence(1.0)])
+    await asyncio.wait_for(LiveSession(duplex, mic).run(asyncio.Event()), 60)
+    assert seen == []
+    assert duplex.phantom_transcripts == 1

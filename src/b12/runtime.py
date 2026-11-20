@@ -134,6 +134,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         memory_temporal=settings.memory_temporal,
         memory_scoped=settings.memory_scoped,
         verify_writes=settings.verify_writes,
+        memory_grounding=settings.memory_grounding,
     )
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")

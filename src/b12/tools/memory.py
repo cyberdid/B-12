@@ -29,6 +29,16 @@ class GlobalPurge(Protocol):
 MemoryRevision = Callable[[ExecutionContext], int]
 
 
+# Hermes Agent's background-review rule, adapted (memory_grounding): what may become memory.
+GROUNDING_RULE = (
+    "Store only what the owner said or a tool result showed in this conversation. Never infer "
+    "the owner's traits, mood, skill or preferences from the topic or tone, and never turn a "
+    "one-off request into a standing preference unless the owner marked it as general "
+    "(завжди, відтепер, запам'ятай, always). Do not store that a tool or feature does not work. "
+    "If unsure, do not store. Call this tool to store; saying 'I will remember' stores nothing."
+)
+
+
 class SearchArgs(Args):
     query: str = Field(min_length=1, max_length=256)
     limit: int = Field(default=5, ge=1, le=10)
@@ -226,6 +236,7 @@ def register(
     memory_revision=None,
     temporal=False,
     scoped=False,
+    grounding=False,
 ):
     async def memory_search(args, guard):
         if memory is None:
@@ -458,6 +469,8 @@ def register(
             "when the owner directly stated it, origin=inferred for an assistant inference; "
             "leave either blank if unknown."
         )
+    if grounding:
+        store_description += " " + GROUNDING_RULE
 
     def stored_already(raw, context):
         """ADR-017 trusted check: a live record of this actor with exactly this text."""

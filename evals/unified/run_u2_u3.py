@@ -144,7 +144,13 @@ def _calls(result):
     return calls
 
 
-RUNTIME_FLAGS = ("verify_writes", "goals_in_context", "memory_scoped", "preference_rules")
+RUNTIME_FLAGS = (
+    "verify_writes",
+    "goals_in_context",
+    "memory_scoped",
+    "preference_rules",
+    "memory_grounding",
+)
 
 
 def run_scenario(
@@ -295,6 +301,9 @@ def main(argv=None):
     parser.add_argument(
         "--preference-rules", action="store_true", help="answer preferences from memory as rules"
     )
+    parser.add_argument(
+        "--memory-grounding", action="store_true", help="grounding rules for memory writes"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -361,6 +370,7 @@ def main(argv=None):
                     ("goals_in_context", args.goals_in_context),
                     ("memory_scoped", args.memory_scoped),
                     ("preference_rules", args.preference_rules),
+                    ("memory_grounding", args.memory_grounding),
                 )
                 if on
             ),

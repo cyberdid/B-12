@@ -11,6 +11,7 @@ from b12.audio.aec import AcousticEchoCanceller, AecStats, PulseAudioWebRtcAec
 from b12.audio.pipeline import VoicePipeline, VoiceTurnResult
 from b12.audio.speaker import SpeakerMatch, SpeakerStore, SpeakerVerifier
 from b12.audio.tts import AudioPlayer, SynthesizedAudio, split_sentences
+from b12.audio.voice_guards import interruption_note, is_phantom_transcript, is_stop_phrase
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,10 @@ class DuplexSession:
         self.barge_in_vad_threshold = barge_in_vad_threshold
         self._active_cancel: asyncio.Event | None = None
         self._active_turn_id: str | None = None
+        # (request, spoken beginning, stopped by a stop phrase) of the last interrupted answer
+        self._interrupted: tuple[str, str, bool] | None = None
+        self.phantom_transcripts = 0
+        self.stop_phrases = 0
         self._tts_queue: asyncio.Queue[SynthesizedAudio | None] = asyncio.Queue(
             maxsize=self.pipeline.tts.max_queue_phrases
         )
@@ -267,25 +272,57 @@ class DuplexSession:
         """
         if not transcript.text.strip() or self.aec.is_tts_echo_text(transcript.text):
             return None
+        if is_phantom_transcript(transcript.text):
+            self.phantom_transcripts += 1  # ASR residue of silence or noise, not a request
+            return None
+        if is_stop_phrase(transcript.text):
+            # Control path: the speech and any running answer stop; the model is not asked.
+            self.stop_phrases += 1
+            if self._active_cancel is not None:
+                self._active_cancel.set()
+            self.player.stop()
+            self._flush_tts_queue()
+            if self._interrupted is not None:
+                request, spoken, _ = self._interrupted
+                self._interrupted = (request, spoken, True)
+            return None
+
+        note = None
+        if self._interrupted is not None:
+            note = interruption_note(*self._interrupted[:2], stopped=self._interrupted[2])
+            self._interrupted = None
 
         cancel = asyncio.Event()
         self._active_cancel = cancel
+        spoken: list[str] = []
 
         def _set_turn_id(tid: str) -> None:
             self._active_turn_id = tid
 
+        def _on_chunk(chunk) -> None:
+            spoken.append(chunk.text)
+            self.aec.record_tts_utterance(chunk.text)
+
+        result = None
         try:
-            return await self.pipeline.process_utterance(
+            result = await self.pipeline.process_utterance(
                 session_id=self.session_id,
                 actor_id=self.actor_id,
                 audio_16k=cleaned,
                 cancel=cancel,
                 precomputed_transcript=transcript,
                 player=self.player if live_playback else None,
-                on_tts_chunk=lambda ch: self.aec.record_tts_utterance(ch.text),
+                on_tts_chunk=_on_chunk,
                 on_turn_started=_set_turn_id,
+                context_note=note,
             )
+            return result
+        except asyncio.CancelledError:
+            self._interrupted = (transcript.text, " ".join(spoken), False)
+            raise
         finally:
+            if result is not None and (result.state == "cancelled" or cancel.is_set()):
+                self._interrupted = (transcript.text, " ".join(spoken), False)
             if self._active_cancel is cancel:
                 self._active_cancel = None
             self._active_turn_id = None
