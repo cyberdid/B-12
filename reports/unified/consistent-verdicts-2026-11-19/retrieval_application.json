@@ -1,22 +1,4 @@
 {
- "A0": {
-  "retrieval_rate": 0.75,
-  "application_rate_given_retrieval": 0.509,
-  "application_partial_given_retrieval": 0.093,
-  "no_retrieval_families_pass_rate": 0.472,
-  "counts": {
-   "missed_fail": 36,
-   "no_retrieval_needed": 36,
-   "no_retrieval_needed_fail": 18,
-   "no_retrieval_needed_partial": 1,
-   "no_retrieval_needed_pass": 17,
-   "retrieval_needed": 144,
-   "retrieved": 108,
-   "retrieved_fail": 43,
-   "retrieved_partial": 10,
-   "retrieved_pass": 55
-  }
- },
  "GA0": {
   "retrieval_rate": 0.889,
   "application_rate_given_retrieval": 0.406,
@@ -32,6 +14,24 @@
    "retrieved_fail": 60,
    "retrieved_partial": 16,
    "retrieved_pass": 52
+  }
+ },
+ "GDEF": {
+  "retrieval_rate": 0.979,
+  "application_rate_given_retrieval": 0.794,
+  "application_partial_given_retrieval": 0.05,
+  "no_retrieval_families_pass_rate": 0.75,
+  "counts": {
+   "missed_fail": 3,
+   "no_retrieval_needed": 36,
+   "no_retrieval_needed_fail": 6,
+   "no_retrieval_needed_partial": 3,
+   "no_retrieval_needed_pass": 27,
+   "retrieval_needed": 144,
+   "retrieved": 141,
+   "retrieved_fail": 22,
+   "retrieved_partial": 7,
+   "retrieved_pass": 112
   }
  }
 }
