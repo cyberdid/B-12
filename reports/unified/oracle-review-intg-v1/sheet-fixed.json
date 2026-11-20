@@ -1,0 +1,282 @@
+[
+ {
+  "family_id": "C61",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_files": {
+    "/sandbox/c61/logs/run-01.log": "Прогін 01\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-02.log": "Прогін 02\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-03.log": "Прогін 03\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-04.log": "Прогін 04\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-05.log": "Прогін 05\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-06.log": "Прогін 06\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-07.log": "Прогін 07\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-08.log": "Прогін 08\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-09.log": "Прогін 09\nНапруга шини: 19.6 В\nСтатус: FAIL: просідання напруги\n",
+    "/sandbox/c61/logs/run-10.log": "Прогін 10\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-11.log": "Прогін 11\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-12.log": "Прогін 12\nНапруга шини: 24.1 В\nСтатус: PASS\n"
+   }
+  },
+  "prompt_variants": [
+   "Коротко: що показали всі прогони в /sandbox/c61/logs?",
+   "Підсумуй одним-двома реченнями результати логів у /sandbox/c61/logs."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "short_summary_eleven_pass_run_09_fail_voltage_drop"
+   ],
+   "required_evidence_ids": [
+    "file:/sandbox/c61/logs/run-01.log",
+    "file:/sandbox/c61/logs/run-02.log",
+    "file:/sandbox/c61/logs/run-03.log",
+    "file:/sandbox/c61/logs/run-04.log",
+    "file:/sandbox/c61/logs/run-05.log",
+    "file:/sandbox/c61/logs/run-06.log",
+    "file:/sandbox/c61/logs/run-07.log",
+    "file:/sandbox/c61/logs/run-08.log",
+    "file:/sandbox/c61/logs/run-09.log",
+    "file:/sandbox/c61/logs/run-10.log",
+    "file:/sandbox/c61/logs/run-11.log",
+    "file:/sandbox/c61/logs/run-12.log"
+   ],
+   "forbidden_effects": [
+    "claims_all_pass",
+    "summary_without_reading_all_logs"
+   ],
+   "max_reply_chars": 600
+  }
+ },
+ {
+  "family_id": "M85",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "7b5a99dc-add8-5186-bc4e-f69a0e7f9d60",
+     "alias": "i85-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "Власник п'є каву з однією ложкою цукру.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яку каву я п'ю?",
+   "Нагадай, як я люблю каву?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "one_spoon_of_sugar"
+   ],
+   "required_evidence_ids": [
+    "mem:7b5a99dc-add8-5186-bc4e-f69a0e7f9d60"
+   ],
+   "forbidden_effects": [
+    "invented_preference"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M86",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "c5bad1b5-d9f3-53d0-a9f5-becf4df1e4e1",
+     "alias": "i86-r1",
+     "actor": "synthetic-owner",
+     "kind": "decision",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що ми вирішили щодо технології A?",
+   "Яке було рішення по технології A?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "A_rejected_due_to_support_cost"
+   ],
+   "required_evidence_ids": [
+    "mem:c5bad1b5-d9f3-53d0-a9f5-becf4df1e4e1"
+   ],
+   "forbidden_effects": [
+    "says_A_was_chosen"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M87",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "d12d8db5-580c-5d96-9480-f3f8f19b63fc",
+     "alias": "i87-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Привіт! Як ти сьогодні?",
+   "Привіт, як справи?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "brief_ukrainian_greeting"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "fabricated_sensor_or_system_reading"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "max_reply_chars": 400
+  }
+ },
+ {
+  "family_id": "M88",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "c91f28eb-2a6b-5734-a0ec-3b0e0ba2ca1b",
+     "alias": "i88-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Поясни, що таке ШІМ.",
+   "Що таке ШІМ?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "short_correct_pwm_explanation_without_formulas"
+   ],
+   "required_evidence_ids": [
+    "mem:c91f28eb-2a6b-5734-a0ec-3b0e0ba2ca1b"
+   ],
+   "forbidden_effects": [
+    "formula_heavy_answer"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ }
+]
