@@ -7,7 +7,9 @@
 # A job is done when <out_dir>/pilot.log contains DONE (run_locked_pilot.sh is resumable).
 # Log: ~/b12-queue/orchestrator.log. Run as a systemd service (ops/remote/b12-orchestrator.service).
 set -uo pipefail
-REPO="$HOME/Projects/B-12"; Q="$HOME/b12-queue"; ASSETS="$HOME/b12-assets"
+# Overridable so the same loop runs on the owner's laptop (CPU sandbox) as well as on a VM.
+REPO="${B12_REPO:-$HOME/Projects/B-12}"; Q="${B12_QUEUE:-$HOME/b12-queue}"
+ASSETS="${B12_ASSETS:-$HOME/b12-assets}"
 SESSION=b12eval; SOCK_DIR="$HOME/b12-embed"; SOCK="$SOCK_DIR/embed.sock"
 export PATH="$HOME/.local/bin:$PATH"
 mkdir -p "$Q" "$SOCK_DIR"; touch "$Q/jobs.tsv"
@@ -21,7 +23,12 @@ pending_jobs() {
   done <"$Q/jobs.tsv"
 }
 
-session_alive() { colab sessions 2>/dev/null | grep -q "$SESSION"; }
+# `colab sessions` lists endpoints, not names; the name -> endpoint map is local to this host.
+session_alive() {
+  local endpoint
+  endpoint="$(python3 -c "import json,os; print(json.load(open(os.path.expanduser('~/.config/colab-cli/sessions.json'))).get('$SESSION', {}).get('endpoint', ''))" 2>/dev/null)"
+  [ -n "$endpoint" ] && colab sessions 2>/dev/null | grep -q "$endpoint"
+}
 tunnel_ok() { curl -fs --max-time 10 http://127.0.0.1:11435/api/version >/dev/null; }
 
 ensure_colab() {  # $1 = space-separated models
@@ -32,10 +39,13 @@ ensure_colab() {  # $1 = space-separated models
   if ! ssh -O check "$SESSION" >/dev/null 2>&1; then
     ssh -fN -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes \
       -L 11435:127.0.0.1:11434 -L 11436:127.0.0.1:11436 "$SESSION" || return 1
+  elif ! tunnel_ok; then
+    # A master opened without forwards (e.g. by a manual ssh): add them to it.
+    ssh -O forward -L 11435:127.0.0.1:11434 -L 11436:127.0.0.1:11436 "$SESSION" >/dev/null 2>&1
   fi
   if ! ssh "$SESSION" test -d /root/emb/embeddinggemma-2; then
     log "pushing embedding weights"
-    tar -C "$ASSETS" -cf - embeddinggemma-2 | ssh "$SESSION" 'mkdir -p /root/emb && tar -C /root/emb -xf -' || return 1
+    tar -C "$ASSETS" -chf - embeddinggemma-2 | ssh "$SESSION" 'mkdir -p /root/emb && tar -C /root/emb -xf -' || return 1
   fi
   ssh "$SESSION" mkdir -p /root/b12/scripts
   scp -q "$REPO/scripts/st_embedder.py" "$REPO/scripts/embed_server.py" "$SESSION:/root/b12/scripts/" || return 1

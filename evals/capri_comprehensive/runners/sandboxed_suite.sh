@@ -91,6 +91,11 @@ case "${B12_EVAL_VARIANT:-}" in deployed*)
   fi
   ;;
 esac
+# A venv made by uv points at an interpreter under ~/.local/share/uv (hidden by the /home
+# tmpfs): bind that interpreter's install root read-only (found on the e2-micro, 20.11.2026).
+# The directory holding the installs (uv links versions through cpython-3.12-… symlinks).
+PY_ROOT="$(dirname "$(dirname "$(dirname "$(readlink -f "$VENV/bin/python")")")")"
+case "$PY_ROOT" in "$HOME"/*) EXTRA+=(--ro-bind "$PY_ROOT" "$PY_ROOT") ;; esac
 for path in "$B12_SHARE" "$BOLT_TOKENIZER" "$VENV"; do
   [ -d "$path" ] || { echo "missing $path" >&2; exit 1; }
 done
