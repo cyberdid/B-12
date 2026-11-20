@@ -61,6 +61,9 @@ class Settings(BaseModel):
     # ADR-018: background proposals pass a deterministic five-way gate (drop, needs_owner,
     # deliver, defer, inbox) instead of attention alone. On since 20.11.2026 (owner approved).
     initiative_gate: bool = True
+    # The speaker's stated answer preferences from memory as rules for the reply's form
+    # (INTG-08/M88: models ignored "explain briefly" offered only as evidence). Off until measured.
+    preference_rules: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -189,6 +192,7 @@ class Settings(BaseModel):
                 "memory_scoped",
                 "task_ledger",
                 "initiative_gate",
+                "preference_rules",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

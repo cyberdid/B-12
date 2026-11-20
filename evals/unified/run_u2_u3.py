@@ -144,7 +144,7 @@ def _calls(result):
     return calls
 
 
-RUNTIME_FLAGS = ("verify_writes", "goals_in_context", "memory_scoped")
+RUNTIME_FLAGS = ("verify_writes", "goals_in_context", "memory_scoped", "preference_rules")
 
 
 def run_scenario(
@@ -253,8 +253,7 @@ def run_scenario(
             "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
             "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
             "seed_report": {
-                k: report[k]
-                for k in ("dropped_fields", "applied_relations", "revoked_memories")
+                k: report[k] for k in ("dropped_fields", "applied_relations", "revoked_memories")
             },
             "tool_policy": tool_policy,
         }
@@ -292,6 +291,9 @@ def main(argv=None):
     )
     parser.add_argument(
         "--memory-scoped", action="store_true", help="ADR-016 scoped memory (U5 arm)"
+    )
+    parser.add_argument(
+        "--preference-rules", action="store_true", help="answer preferences from memory as rules"
     )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
@@ -358,6 +360,7 @@ def main(argv=None):
                     ("verify_writes", args.verify_writes),
                     ("goals_in_context", args.goals_in_context),
                     ("memory_scoped", args.memory_scoped),
+                    ("preference_rules", args.preference_rules),
                 )
                 if on
             ),

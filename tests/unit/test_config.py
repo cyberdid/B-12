@@ -143,6 +143,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_scoped": False,
         "task_ledger": True,
         "initiative_gate": True,
+        "preference_rules": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
