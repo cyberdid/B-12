@@ -518,6 +518,103 @@ async def cmd_goals(args, settings) -> int:
         runtime.close()
 
 
+def _parse_weekdays(raw: list[str] | None) -> list[int]:
+    if not raw:
+        return [0, 1, 2, 3, 4, 5, 6]
+    days: list[int] = []
+    for chunk in raw:
+        for part in chunk.split(","):
+            part = part.strip()
+            if part:
+                days.append(int(part))
+    return days
+
+
+async def cmd_schedule(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        owner = require_owner(runtime)
+        schedules = runtime.schedules
+        if args.action == "add":
+            prompt = (args.prompt or args.value or "").strip()
+            kind = args.kind
+            if not kind:
+                if args.at:
+                    kind = "once"
+                elif args.minutes is not None:
+                    kind = "interval"
+                else:
+                    kind = "daily"
+            if kind == "daily":
+                if not args.time:
+                    emit_json({"error": "invalid_schedule", "detail": "--time required for daily"})
+                    return 1
+                spec = {
+                    "kind": "daily",
+                    "time": args.time,
+                    "weekdays": _parse_weekdays(args.weekdays),
+                }
+            elif kind == "once":
+                if not args.at:
+                    emit_json({"error": "invalid_schedule", "detail": "--at required for once"})
+                    return 1
+                spec = {"kind": "once", "at": args.at}
+            else:
+                if args.minutes is None:
+                    emit_json(
+                        {"error": "invalid_schedule", "detail": "--minutes required for interval"}
+                    )
+                    return 1
+                spec = {"kind": "interval", "minutes": args.minutes}
+            session = runtime.control.create_session(owner.actor_id)
+            try:
+                created = schedules.add(
+                    owner.actor_id,
+                    session,
+                    spec,
+                    prompt,
+                    tz=args.tz or settings.timezone,
+                    allowed_tools=tuple(
+                        args.tools
+                        or (
+                            c
+                            for c in owner_capabilities(settings)
+                            if c != "process.sudo" and not c.startswith(("schedule.", "schedules."))
+                        )
+                    ),
+                    budget_turns=args.budget,
+                )
+            except (ValueError, KeyError) as exc:
+                emit_json({"error": "invalid_schedule", "detail": str(exc)})
+                return 1
+            emit_json(created)
+            return 0
+        if args.action == "list":
+            emit_json(schedules.list(owner.actor_id))
+            return 0
+        if args.action == "pause":
+            try:
+                emit_json(schedules.pause(args.value, owner.actor_id))
+            except KeyError:
+                emit_json({"error": "schedule_not_found"})
+                return 1
+            return 0
+        if args.action == "resume":
+            try:
+                emit_json(schedules.resume(args.value, owner.actor_id))
+            except KeyError:
+                emit_json({"error": "schedule_not_found"})
+                return 1
+            return 0
+        if not schedules.remove(args.value, owner.actor_id):
+            emit_json({"error": "schedule_not_found"})
+            return 1
+        emit_json({"removed": args.value})
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_flag(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
@@ -1049,6 +1146,18 @@ def parser() -> argparse.ArgumentParser:
     goals.add_argument("--boundary-tool", action="append", default=[])
     goals.add_argument("--boundary-path", action="append", default=[])
     goals.add_argument("--stop-when")
+    schedule = sub.add_parser("schedule", help="розклади власника")
+    schedule.add_argument("action", choices=("add", "list", "pause", "resume", "remove"))
+    schedule.add_argument("value", nargs="?", default="")
+    schedule.add_argument("--prompt", default="")
+    schedule.add_argument("--kind", choices=("daily", "once", "interval"))
+    schedule.add_argument("--time", help="час HH:MM для щоденного розкладу")
+    schedule.add_argument("--weekdays", nargs="*", help="дні тижня 0-6 (пн=0)")
+    schedule.add_argument("--at", help="ISO час для одноразового розкладу")
+    schedule.add_argument("--minutes", type=int, help="інтервал у хвилинах")
+    schedule.add_argument("--tz", help="часовий пояс (за замовчуванням settings.timezone)")
+    schedule.add_argument("--tools", nargs="*")
+    schedule.add_argument("--budget", type=int, default=1)
     for name in ("quiet", "stop"):
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
@@ -1288,6 +1397,7 @@ def main(argv=None) -> int:
         "desktop": cmd_desktop,
         "tui-hook": cmd_tui_hook,
         "goals": cmd_goals,
+        "schedule": cmd_schedule,
         "quiet": cmd_flag,
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,

@@ -18,6 +18,7 @@ from b12.memory import MemoryStore
 from b12.model import OllamaModel
 from b12.purge import PurgeCoordinator
 from b12.retrieval import KnowledgeIndex
+from b12.schedules import ScheduleStore
 from b12.service import Operations
 from b12.sessions import SessionStore
 from b12.tools import register_host_tools
@@ -40,6 +41,7 @@ class Runtime:
     goals: GoalStore
     attention: AttentionPolicy
     operations: Operations
+    schedules: ScheduleStore | None = None
     mcp_servers: list = field(default_factory=list)
     speakers: object = None
 
@@ -52,6 +54,7 @@ class Runtime:
             self.speakers.close()
         for store in (
             self.attention,
+            self.schedules,
             self.goals,
             self.backups,
             self.knowledge,
@@ -59,6 +62,8 @@ class Runtime:
             self.memory,
             self.control,
         ):
+            if store is None:
+                continue
             try:
                 store.close()
             except Exception:  # noqa: BLE001 - closing must continue for every store
@@ -81,6 +86,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     backups = BackupStore(root / "backups")
     sessions = SessionStore(root / "sessions")
     goals = GoalStore(root / "goals")
+    schedules = ScheduleStore(root / "goals")
     attention = AttentionPolicy(root / "attention", settings)
     operations = Operations(root)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)
@@ -168,5 +174,6 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         goals,
         attention,
         operations,
+        schedules=schedules,
         speakers=speakers,
     )

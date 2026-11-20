@@ -87,6 +87,8 @@ class Settings(BaseModel):
     goal_contract: bool = False
     # Owner-allowlisted exact argv tuples for command_exit_zero goal checks.
     goal_check_commands: tuple[tuple[str, ...], ...] = ()
+    # ADR-022: wall-clock owner schedules through the initiative gate.
+    schedules: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -244,6 +246,7 @@ class Settings(BaseModel):
                 "session_search",
                 "memory_ranking",
                 "goal_contract",
+                "schedules",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

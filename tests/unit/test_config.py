@@ -152,6 +152,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_ranking": False,
         "goal_contract": False,
         "goal_check_commands": (),
+        "schedules": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -233,6 +234,12 @@ def test_memory_taint_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).memory_taint is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TAINT": "true"}
     assert Settings.from_env(env).memory_taint
+
+
+def test_schedules_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).schedules is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_SCHEDULES": "true"}
+    assert Settings.from_env(env).schedules
 
 
 def test_preference_placement_defaults_to_system_and_validates_literal(tmp_path):

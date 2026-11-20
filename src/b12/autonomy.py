@@ -23,11 +23,13 @@ import httpx
 
 from b12.agent import extract_goal_blocked_reason
 from b12.auth import owner_capabilities
+from b12.schedules import catchup_window
 from b12.tools.network import host_allowed
 from b12.tools.process import reaches_network
 
 log = logging.getLogger(__name__)
 STOP_POLL_S = 0.1  # how quickly an owner stop cancels a background turn in flight
+_TRANSPORT_ERROR_CODES = frozenset({"transport_error", "transport_timeout", "http_error"})
 
 
 def _clock():
@@ -450,6 +452,43 @@ class Scheduler:
         self, goal, actor, result, text, *, force_needs_owner: bool = False, pause_reason=None
     ) -> dict:
         """ADR-018: a deterministic five-way decision instead of attention alone."""
+        rt = self.runtime
+        current = rt.goals.get(goal["id"], actor.id)
+        # A goal this run paused (budget, approval) or completed still reports; only a
+        # goal the owner closed meanwhile is silent.
+        goal_status = (
+            "active"
+            if current and current["status"] not in ("abandoned", "failed")
+            else (current or {}).get("status")
+        )
+        return self._gate_candidate(
+            actor=actor,
+            goal_id=goal["id"],
+            goal_status=goal_status,
+            known_evidence=set(goal["evidence_ids"]),
+            tags=goal["tags"],
+            result=result,
+            text=text,
+            force_needs_owner=force_needs_owner,
+            pause_reason=pause_reason,
+        )
+
+    def _gate_candidate(
+        self,
+        *,
+        actor,
+        goal_id: str,
+        goal_status: str | None,
+        known_evidence: set[str],
+        tags: dict,
+        result,
+        text: str,
+        always_novel: bool = False,
+        force_high_risk: bool = False,
+        force_needs_owner: bool = False,
+        pause_reason: str | None = None,
+    ) -> dict:
+        """ADR-018: run InitiativeCandidate through initiative.decide and store proposal."""
         from b12.attention import Decision
         from b12.initiative import GateContext, InitiativeCandidate, decide
 
@@ -459,34 +498,29 @@ class Scheduler:
             for item in result.tool_results
             for effect in item.side_effects
         )
-        new_evidence = set(result.evidence_ids) - set(goal["evidence_ids"])
-        needs_owner = force_needs_owner or result.state == "awaiting_approval"
+        new_evidence = set(result.evidence_ids) - known_evidence
+        needs_owner = force_high_risk or force_needs_owner or result.state == "awaiting_approval"
         risk = "high" if needs_owner else "action" if effectful else "info"
         candidate_text = result.content or text
         if pause_reason and pause_reason not in candidate_text:
             candidate_text = f"[{pause_reason}] {candidate_text}"
         candidate = InitiativeCandidate(
             actor_id=actor.id,
-            goal_id=goal["id"],
+            goal_id=goal_id,
             trigger="goal_review",
             text=candidate_text,
             risk=risk,
             evidence_ids=tuple(result.evidence_ids),
-            novel=effectful or bool(new_evidence) or needs_owner,
+            novel=always_novel or effectful or bool(new_evidence) or needs_owner,
         )
-        current = rt.goals.get(goal["id"], actor.id)
         attention = rt.attention.decide(actor.id)
         context = GateContext(
-            # A goal this run paused (budget, approval) or completed still reports; only a
-            # goal the owner closed meanwhile is silent.
-            goal_status="active"
-            if current and current["status"] not in ("abandoned", "failed")
-            else (current or {}).get("status"),
+            goal_status=goal_status,
             evidence_live={
                 e: bool(rt.agent.resolver.live(e, "memory", actor)) for e in result.evidence_ids
             },
             recent_keys=rt.goals.recent_proposal_keys(actor.id, now - timedelta(hours=24)),
-            muted=rt.goals.is_muted(goal["id"]),
+            muted=rt.goals.is_muted(goal_id),
             attention_reason=attention.reason,
             attention_allowed=attention.allowed,
         )
@@ -496,12 +530,12 @@ class Scheduler:
             attention_id = rt.attention.record(actor.id, Decision(True, gate.reason, gate.urgent))
         proposal = rt.goals.add_proposal(
             actor.id,
-            goal["id"],
+            goal_id,
             text,
             delivered=gate.decision == "deliver",
             reason=gate.reason,
             attention_id=attention_id,
-            tags={**goal["tags"], **dict.fromkeys(result.evidence_ids, "memory")},
+            tags={**tags, **dict.fromkeys(result.evidence_ids, "memory")},
             decision=gate.decision,
             dedupe_key=gate.dedupe_key,
             not_before=gate.not_before,
@@ -513,6 +547,235 @@ class Scheduler:
             "initiative_decision": gate.decision,
             "initiative_reason": gate.reason,
         }
+
+    async def _run_schedule(self, sched: dict, occ_str: str, actor) -> dict:
+        rt = self.runtime
+        owner_caps = set(owner_capabilities(rt.settings))
+        allowed = set(sched["allowed_tools"]) & owner_caps
+        caps = tuple(
+            sorted(c for c in allowed if not c.startswith(("schedule.", "schedules.")))
+        ) or ("time.read",)
+        task = rt.control.create_task(sched["session_id"])
+        step_goal_id = f"schedule:{sched['id']}:{occ_str}"
+        if getattr(rt.settings, "task_ledger", False):
+            rt.control.link_task_goal(task, step_goal_id, 1)
+        grant = rt.control.issue_grant(
+            actor.id,
+            sched["session_id"],
+            caps,
+            task_id=task,
+            ttl_s=900,
+            full_execution=False,
+        )
+        prompt = (
+            f"Заплановане завдання власника: {sched['prompt']}\n"
+            "Виконай необхідні дії доступними інструментами і стисло звітуй. "
+            "У цьому ході заборонено створювати або змінювати розклади. "
+            "Якщо повідомляти нічого, відповідай точно: [SILENT]"
+        )
+        cancel = asyncio.Event()
+
+        async def watch_owner_stop():
+            while not cancel.is_set():
+                if not rt.attention.execution_allowed(actor.id):
+                    cancel.set()
+                    return
+                await asyncio.sleep(STOP_POLL_S)
+
+        watcher = asyncio.create_task(watch_owner_stop())
+        try:
+            result = await rt.agent.turn(
+                sched["session_id"], grant, prompt, task_id=task, timeout_s=300, cancel=cancel
+            )
+        finally:
+            watcher.cancel()
+            await asyncio.gather(watcher, return_exceptions=True)
+
+        needs_owner_step = getattr(rt.settings, "task_ledger", False) and bool(
+            rt.control.steps_needing_owner(step_goal_id)
+        )
+        if (
+            result.state == "failed"
+            and result.error_code in _TRANSPORT_ERROR_CODES
+            and not result.model_metrics
+            and not result.tool_results
+        ):
+            updated = rt.schedules.finish(
+                sched["id"],
+                occ_str,
+                "transport_failed",
+                now=self.clock(),
+                turn_id=result.turn_id,
+                error_code=result.error_code,
+            )
+            return {
+                "schedule_id": sched["id"],
+                "occurrence": occ_str,
+                "state": "failed",
+                "error_code": result.error_code,
+                "retry_scheduled": updated["retry_at"] is not None,
+                "status": updated["status"],
+            }
+
+        reply_text = (result.content or "").strip()
+        if result.state == "completed" and reply_text == "[SILENT]":
+            updated = rt.schedules.finish(
+                sched["id"], occ_str, "silent", now=self.clock(), turn_id=result.turn_id
+            )
+            tags = {**sched["tags"], **dict.fromkeys(result.evidence_ids, "memory")}
+            proposal = rt.goals.add_proposal(
+                actor.id,
+                f"schedule:{sched['id']}",
+                "[SILENT]",
+                delivered=False,
+                reason="silent",
+                attention_id=None,
+                tags=tags,
+                decision="drop",
+            )
+            return {
+                "schedule_id": sched["id"],
+                "occurrence": occ_str,
+                "state": "completed",
+                "status": updated["status"],
+                "proposal_id": proposal,
+                "delivered": False,
+                "initiative_decision": "drop",
+                "initiative_reason": "silent",
+            }
+
+        if result.state == "awaiting_approval" or needs_owner_step:
+            run_outcome = "paused"
+            err = "unknown_outcome_needs_owner" if needs_owner_step else "approval_pending"
+        elif result.state == "cancelled":
+            run_outcome = "cancelled"
+            err = result.error_code
+        elif result.state == "failed":
+            run_outcome = "failed"
+            err = result.error_code
+        else:
+            run_outcome = "completed"
+            err = None
+        updated = rt.schedules.finish(
+            sched["id"],
+            occ_str,
+            run_outcome,
+            now=self.clock(),
+            turn_id=result.turn_id,
+            error_code=err,
+        )
+        outcome = {
+            "schedule_id": sched["id"],
+            "occurrence": occ_str,
+            "state": result.state,
+            "error_code": result.error_code,
+            "status": updated["status"],
+        }
+        goal_key = f"schedule:{sched['id']}"
+        text = result.content or f"Розклад «{sched['prompt'][:80]}»: {result.state}"
+        if getattr(rt.settings, "initiative_gate", False):
+            current = rt.schedules.get(sched["id"], actor.id)
+            if current is None:
+                gate_status = None
+            elif current["status"] == "paused" and current.get("status_reason") == "owner_control":
+                gate_status = "paused"
+            else:
+                gate_status = "active"
+            outcome.update(
+                self._gate_candidate(
+                    actor=actor,
+                    goal_id=goal_key,
+                    goal_status=gate_status,
+                    known_evidence=set(),
+                    tags=sched["tags"],
+                    result=result,
+                    text=text,
+                    always_novel=True,
+                    force_high_risk=result.state in ("awaiting_approval", "failed")
+                    or needs_owner_step,
+                )
+            )
+            return outcome
+        decision = rt.attention.decide(actor.id)
+        attention_id = rt.attention.record(actor.id, decision) if decision.allowed else None
+        outcome["proposal_id"] = rt.goals.add_proposal(
+            actor.id,
+            goal_key,
+            text,
+            delivered=decision.allowed,
+            reason=decision.reason,
+            attention_id=attention_id,
+            tags={**sched["tags"], **dict.fromkeys(result.evidence_ids, "memory")},
+        )
+        outcome["delivered"] = decision.allowed
+        return outcome
+
+    async def run_schedules(self) -> list[dict]:
+        """ADR-022: run due owner schedules through the initiative gate."""
+        rt = self.runtime
+        if not getattr(rt.settings, "schedules", False) or getattr(rt, "schedules", None) is None:
+            return []
+        outcomes = []
+        for sched in list(rt.schedules.due(self.clock())):
+            now = self.clock()
+            now_iso = now.astimezone(UTC).isoformat()
+            next_run = sched["next_run"]
+            retry_at = sched["retry_at"]
+            if next_run is not None and next_run <= now_iso:
+                occ_str = next_run
+                occ_dt = datetime.fromisoformat(occ_str).astimezone(UTC)
+                if now.astimezone(UTC) - occ_dt > catchup_window(sched["spec"]):
+                    if rt.schedules.skip_missed(sched["id"], occ_str, now=now):
+                        outcomes.append(
+                            {
+                                "schedule_id": sched["id"],
+                                "occurrence": occ_str,
+                                "state": "missed",
+                            }
+                        )
+                    refreshed = rt.schedules.get(sched["id"], sched["actor_id"])
+                    if (
+                        not refreshed
+                        or refreshed["status"] != "active"
+                        or not refreshed["next_run"]
+                        or refreshed["next_run"] > now_iso
+                    ):
+                        continue
+                    sched = refreshed
+                    occ_str = sched["next_run"]
+            elif retry_at is not None and retry_at <= now_iso:
+                occ_str = f"retry:{retry_at}"
+            else:
+                continue
+
+            actor = rt.control.resolve_actor(sched["actor_id"])
+            if not rt.attention.execution_allowed(actor.id):
+                outcomes.append(
+                    {"schedule_id": sched["id"], "state": "skipped", "reason": "owner_stop"}
+                )
+                continue
+            if self._busy(actor.id):
+                outcomes.append(
+                    {"schedule_id": sched["id"], "state": "skipped", "reason": "user_active"}
+                )
+                continue
+            if not rt.schedules.claim(sched["id"], occ_str, now=now):
+                continue
+            try:
+                outcomes.append(await self._run_schedule(sched, occ_str, actor))
+            except Exception:
+                log.exception("scheduled run failed")
+                rt.schedules.finish(
+                    sched["id"],
+                    occ_str,
+                    "failed",
+                    now=self.clock(),
+                    error_code="scheduler_error",
+                )
+                outcomes.append(
+                    {"schedule_id": sched["id"], "occurrence": occ_str, "state": "failed"}
+                )
+        return outcomes
 
     def redecide_deferred(self) -> list[dict]:
         """ADR-018: deferred proposals get one more attention decision once their window opens;
@@ -545,6 +808,8 @@ class Scheduler:
         outcomes, ran = [], set()
         if getattr(self.runtime.settings, "initiative_gate", False):
             outcomes.extend(self.redecide_deferred())
+        if getattr(self.runtime.settings, "schedules", False):
+            outcomes.extend(await self.run_schedules())
         while len(ran) < self.max_goals:
             # Re-read the due list each step: a goal that preempted the last one runs next.
             goal = next(
