@@ -298,6 +298,9 @@ def register(
         if any(not memory.is_live(old, actor) for old in args.supersedes):
             return failure("unsupported")  # checked before any write: nothing to undo
         try:
+            duplicate = memory.find_duplicate(args.text, actor)
+            if duplicate is not None:
+                return HandlerOutcome(content={"duplicate_of": duplicate.id, "stored": False})
             scope = (
                 {
                     "applies_when": getattr(args, "applies_when", "") or None,

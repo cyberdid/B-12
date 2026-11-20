@@ -839,6 +839,28 @@ class MemoryStore:
                     rows = query_rows(fts_expr(content, " OR "))
             return [self._record(row) for row in rows]
 
+    def find_duplicate(self, text: str, actor: Actor) -> MemoryRecord | None:
+        """Return a live record of the actor with the same normalised text, if any."""
+        self._consent(actor)
+        if not isinstance(text, str):
+            raise TypeError("text must be text")
+        from b12.audio.voice_guards import normalize
+
+        target = normalize(text)
+        if not target:
+            return None
+        words = target.split()[:3]
+        query = " ".join(words)
+        candidates = (
+            self.search(query, actor, limit=200)
+            if re.search(r"[^\W_]", query, flags=re.UNICODE)
+            else self.recent(actor, limit=200)
+        )
+        for record in candidates:
+            if record.status == "active" and normalize(record.text) == target:
+                return record
+        return None
+
     def audit_events(self, actor: Actor, *, limit: int = 100) -> list[dict]:
         self._limit(limit)
         with self._transaction():
