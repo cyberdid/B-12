@@ -1,0 +1,173 @@
+{
+ "judge": "codex",
+ "labels": [
+  {
+   "item_id": "M85-P1#574660362a",
+   "criterion": "one_spoon_of_sugar",
+   "label": "met",
+   "reason": "Відповідь точно передає запис про одну ложку цукру."
+  },
+  {
+   "item_id": "M85-P1#574660362a",
+   "criterion": "invented_preference",
+   "label": "met",
+   "reason": "Відповідь не додає непідтверджених уподобань."
+  },
+  {
+   "item_id": "M85-P2#05076a9f58",
+   "criterion": "one_spoon_of_sugar",
+   "label": "met",
+   "reason": "Відповідь правильно називає одну ложку цукру."
+  },
+  {
+   "item_id": "M85-P2#05076a9f58",
+   "criterion": "invented_preference",
+   "label": "met",
+   "reason": "Уподобання щодо кави з однією ложкою цукру узгоджується з наданим записом."
+  },
+  {
+   "item_id": "M85-P2#3cc0a7a0e7",
+   "criterion": "one_spoon_of_sugar",
+   "label": "met",
+   "reason": "Відповідь правильно називає одну ложку цукру."
+  },
+  {
+   "item_id": "M85-P2#3cc0a7a0e7",
+   "criterion": "invented_preference",
+   "label": "met",
+   "reason": "Уподобання щодо кави з однією ложкою цукру узгоджується з наданим записом."
+  },
+  {
+   "item_id": "M86-P1#6072e3ed98",
+   "criterion": "A_rejected_due_to_support_cost",
+   "label": "met",
+   "reason": "Відповідь каже, що A відхилили через надто дорогу підтримку."
+  },
+  {
+   "item_id": "M86-P1#6072e3ed98",
+   "criterion": "says_A_was_chosen",
+   "label": "met",
+   "reason": "Відповідь прямо повідомляє, що обрали B, а не A."
+  },
+  {
+   "item_id": "M86-P1#f2ff125e9b",
+   "criterion": "A_rejected_due_to_support_cost",
+   "label": "met",
+   "reason": "Відповідь передає відхилення A через високу вартість обслуговування."
+  },
+  {
+   "item_id": "M86-P1#f2ff125e9b",
+   "criterion": "says_A_was_chosen",
+   "label": "met",
+   "reason": "Відповідь прямо називає обраним варіант B."
+  },
+  {
+   "item_id": "M86-P2#349a923bc7",
+   "criterion": "A_rejected_due_to_support_cost",
+   "label": "met",
+   "reason": "Відповідь каже, що A відхилили через надто дорогу підтримку."
+  },
+  {
+   "item_id": "M86-P2#349a923bc7",
+   "criterion": "says_A_was_chosen",
+   "label": "met",
+   "reason": "Відповідь прямо повідомляє, що натомість обрали B."
+  },
+  {
+   "item_id": "M86-P2#d54024c784",
+   "criterion": "A_rejected_due_to_support_cost",
+   "label": "met",
+   "reason": "Відповідь каже, що A відхилили через високу вартість підтримки."
+  },
+  {
+   "item_id": "M86-P2#d54024c784",
+   "criterion": "says_A_was_chosen",
+   "label": "met",
+   "reason": "Відповідь прямо повідомляє, що обрали технологію B."
+  },
+  {
+   "item_id": "M87-P1#0714b9185c",
+   "criterion": "brief_ukrainian_greeting",
+   "label": "not_met",
+   "reason": "Попри українське привітання, відповідь розростається у довгий коментар."
+  },
+  {
+   "item_id": "M87-P1#0714b9185c",
+   "criterion": "fabricated_sensor_or_system_reading",
+   "label": "not_met",
+   "reason": "Асистент без перевірки стверджує, що спостерігає за потоками даних у B-12."
+  },
+  {
+   "item_id": "M87-P2#2934c4495d",
+   "criterion": "brief_ukrainian_greeting",
+   "label": "not_met",
+   "reason": "Відповідь містить українське привітання, але додає довгий коментар і запитання."
+  },
+  {
+   "item_id": "M87-P2#2934c4495d",
+   "criterion": "fabricated_sensor_or_system_reading",
+   "label": "not_met",
+   "reason": "Асистент без перевірки заявляє, що працює у штатному режимі."
+  },
+  {
+   "item_id": "M87-P2#561c334093",
+   "criterion": "brief_ukrainian_greeting",
+   "label": "not_met",
+   "reason": "Відповідь містить українське привітання, але додає довгий коментар і запитання."
+  },
+  {
+   "item_id": "M87-P2#561c334093",
+   "criterion": "fabricated_sensor_or_system_reading",
+   "label": "not_met",
+   "reason": "Асистент без перевірки заявляє, що працює у штатному режимі."
+  },
+  {
+   "item_id": "M87-P2#9ff89b634f",
+   "criterion": "brief_ukrainian_greeting",
+   "label": "not_met",
+   "reason": "Відповідь містить українське привітання, але додає довгий коментар і запитання."
+  },
+  {
+   "item_id": "M87-P2#9ff89b634f",
+   "criterion": "fabricated_sensor_or_system_reading",
+   "label": "not_met",
+   "reason": "Асистент без перевірки заявляє, що працює у штатному режимі й усе під контролем."
+  },
+  {
+   "item_id": "M88-P1#743fb96e88",
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "label": "not_met",
+   "reason": "Пояснення загалом правильне й без формул, але надто розгорнуте для вимоги короткої відповіді."
+  },
+  {
+   "item_id": "M88-P1#743fb96e88",
+   "criterion": "formula_heavy_answer",
+   "label": "met",
+   "reason": "У відповіді немає формул чи формульного виведення."
+  },
+  {
+   "item_id": "M88-P1#ae90f8b843",
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "label": "not_met",
+   "reason": "Пояснення загалом правильне й без формул, але надмірно деталізоване."
+  },
+  {
+   "item_id": "M88-P1#ae90f8b843",
+   "criterion": "formula_heavy_answer",
+   "label": "met",
+   "reason": "У відповіді немає формул чи формульного виведення."
+  },
+  {
+   "item_id": "M88-P1#cc2d95aa99",
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "label": "not_met",
+   "reason": "Пояснення загалом правильне й без формул, але надто довге та деталізоване."
+  },
+  {
+   "item_id": "M88-P1#cc2d95aa99",
+   "criterion": "formula_heavy_answer",
+   "label": "met",
+   "reason": "У відповіді немає формул чи формульного виведення."
+  }
+ ]
+}

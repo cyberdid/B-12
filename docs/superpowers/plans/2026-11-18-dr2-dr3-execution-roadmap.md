@@ -129,3 +129,11 @@ Read-only `evals/unified/resume_runs.sh --status` confirms the scheduled run dir
 - [x] Crash-injection suite 7/7; runbook `CAPRI_WORKFLOW_RECOVERY.md`.
 - [ ] Owner review of ADR-017; then decide the `task_ledger` default.
 - [ ] Next U5 set version: apply the blind reviewers' fixes before freezing; two strong blind reviews (never the evaluated model).
+
+### L. U8/U9 on the deployed model (20.11.2026)
+- [x] Orchestrator: CPU sandbox on the laptop, model + embeddings on Colab (owner); e2-micro too small (969 MB). Fixes for Colab's stale SSH slot (429), duplicate drivers, self-kill (`ops/remote/`).
+- [x] gemma4:12b A0 and current defaults on `u2-u3-locked-v2`: memory +38.3 p.p. [+21.7, +55.6]; model-vs-framework repeated on a fourth model.
+- [x] INTG-01..04, 06, 07 deterministic journeys pass (`tests/integration/test_intg_journeys.py`).
+- [x] INTG-05/INTG-08 live (`intg-live-v1`, frozen after two blind reviews) on gemma4:12b and 26b; style-preference from memory not applied (M88); full log coverage via shell globs (`CAPRI_INTEGRATED_ACCEPTANCE.md`).
+- [ ] Skipped by the owner: Day 7 / Day 30 real-time checks.
+- [ ] Open: writer→reader swap; style preferences as rules; owner decisions on ADR-017/018.

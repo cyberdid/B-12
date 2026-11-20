@@ -1,8 +1,8 @@
 ---
 type: log
-updated: 2026-11-18
+updated: 2026-11-19
 status: append-only
-sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md, reports/unified/MVP_ACCEPTANCE_LEDGER.md, reports/unified/U0_BASELINE_AUDIT.md, reports/unified/SCENARIO_EXECUTION_PATH_AUDIT.md, reports/unified/baseline/networkless-transport-check-2026-11-18.json, reports/unified/baseline/mem01-rel08-oracle-retests-2026-11-18.json, reports/unified/baseline/pytest-full-mvp-mem01-rel08-final2-2026-11-18.log, evals/capri_comprehensive/scenarios/group_a_memory/MEM-01.yaml, evals/capri_comprehensive/scenarios/group_i_reliability/REL-08.yaml, evals/capri_comprehensive/runners/live_components.py, evals/capri_comprehensive/tests/test_framework.py, tests/integration/test_live_component_evaluators.py, tests/test_m3_gate_challenger2.py, reports/unified/baseline/pytest-full-mvp-networkless-docker-2026-11-18.log, evals/capri_comprehensive/runners/runner.py, evals/capri_comprehensive/runners/run_networkless_runtime_suite.py, evals/capri_comprehensive/runners/sandboxed_suite.sh, evals/capri_comprehensive/README.md, evals/capri_comprehensive/reports/CAPRI_COMPREHENSIVE_EVALUATION.md, evals/ollama_broker.py, evals/socket_bridge.py, tests/unit/test_runtime_eval_cli_guard.py, tests/integration/test_eval_model_transport.py, tests/integration/test_networkless_runtime_entrypoint.py, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md]
+sources: [wiki/sources/master-brief.md, wiki/sources/llm-wiki.md, reports/unified/MVP_ACCEPTANCE_LEDGER.md, reports/unified/U0_BASELINE_AUDIT.md, reports/unified/SCENARIO_EXECUTION_PATH_AUDIT.md, reports/unified/baseline/networkless-transport-check-2026-11-18.json, reports/unified/baseline/mem01-rel08-oracle-retests-2026-11-18.json, reports/unified/baseline/pytest-full-mvp-mem01-rel08-final2-2026-11-18.log, evals/capri_comprehensive/scenarios/group_a_memory/MEM-01.yaml, evals/capri_comprehensive/scenarios/group_i_reliability/REL-08.yaml, evals/capri_comprehensive/runners/live_components.py, evals/capri_comprehensive/tests/test_framework.py, tests/integration/test_live_component_evaluators.py, tests/test_m3_gate_challenger2.py, reports/unified/baseline/pytest-full-mvp-networkless-docker-2026-11-18.log, evals/capri_comprehensive/runners/runner.py, evals/capri_comprehensive/runners/run_networkless_runtime_suite.py, evals/capri_comprehensive/runners/sandboxed_suite.sh, evals/capri_comprehensive/README.md, evals/capri_comprehensive/reports/CAPRI_COMPREHENSIVE_EVALUATION.md, evals/ollama_broker.py, evals/socket_bridge.py, tests/unit/test_runtime_eval_cli_guard.py, tests/integration/test_eval_model_transport.py, tests/integration/test_networkless_runtime_entrypoint.py, reports/unified/U2_BREVITY_REPRODUCTION.md, reports/unified/U3_MEMORY_BASELINE_PROTOCOL.md, reports/unified/U2_U3_SCENARIO_CATALOG.md, evals/unified/judge_sheet.py, evals/unified/combine_judges.py, evals/unified/analyze_u5_metrics.py, evals/unified/setup_adapter.py, evals/unified/run_u2_u3.py, tests/unified/test_judge_sheet.py, tests/unified/test_combine_judges.py, tests/unified/test_analyze_u5_metrics.py, reports/unified/ADR-016-implementation-check-2026-11-19.md, reports/unified/U5-author-preflight-2026-11-19.md, evals/unified/scenario_sets/u5-application-v3.json, evals/unified/draft_sources/author_u5_application_v3.py, reports/unified/oracle-review-u5-v3/README.md, wiki/topics/operations.md]
 tags: [history]
 ---
 # Журнал знань B-12
@@ -263,7 +263,7 @@ Ledger скопійовано в `docs/superpowers/sdd/`. Lint wiki нижче.
 
 ## [2026-10-27] verification | Soak R14 завершено: 8,007 год активно, 4 сегменти, не безперервно
 
-**Перевірений факт** ([events](../artifacts/task15-soak-2026-10-26-run2/events.jsonl), локально): `soak_finished` о 19:09 EET — `active_h` 8,007, `segments` 4, `continuous: false` (три паузи за проханням власника), 15 циклів, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Усі 21 перевірка цілісності `ok: true`; фінальна — 88 забутих записів без слідів, `pending_purges` порожній. Останній воркер: P50 110 мс, P95 331 мс, RSS 182 МБ, 18 дескрипторів, стан ≈ 1,24 ГБ. Сума останніх метрик по воркерах (нижня межа): ≈ 111 тис. ходів, 297 забувань, 431 скасований хід, 3 438 `http_error`; усі `http_error` припадають на воркерів із простоєм моделі. **Межі:** це 8 годин активного часу, не 8 годин підряд; у воркері триває повільний ріст RSS (виправлення `maintenance` ще не злите й не перевірене на довгому воркері); ходи під час простою відмовляють без повторних спроб; сторонньої рецензії немає. Гілки `feat/b12-access` і `feat/b12-runtime` ще не злиті.
+**За історичним записом прогону** (`artifacts/task15-soak-2026-10-26-run2/events.jsonl` нині відсутній у базовій теці й worktree; зведені метрики залишено в журналі): `soak_finished` о 19:09 EET — `active_h` 8,007, `segments` 4, `continuous: false` (три паузи за проханням власника), 15 циклів, 19 запусків воркера, 14 навмисних 60-секундних простоїв моделі. Історичний запис повідомляє про 21 успішну перевірку цілісності; фінальна — 88 забутих записів без слідів, `pending_purges` порожній. Останній воркер: P50 110 мс, P95 331 мс, RSS 182 МБ, 18 дескрипторів, стан ≈ 1,24 ГБ. Сума останніх метрик по воркерах (нижня межа): ≈ 111 тис. ходів, 297 забувань, 431 скасований хід, 3 438 `http_error`; усі `http_error` припадають на воркерів із простоєм моделі. **Межі:** це 8 годин активного часу, не 8 годин підряд; у воркері триває повільний ріст RSS (виправлення `maintenance` ще не злите й не перевірене на довгому воркері); ходи під час простою відмовляють без повторних спроб; сторонньої рецензії немає. Гілки `feat/b12-access` і `feat/b12-runtime` ще не злиті.
 
 ## [2026-10-28] verification | Persist: живий тест на engine (7 .py) пройшов
 
@@ -1332,3 +1332,56 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - **Рішення (за делегуванням власника):** `memory_temporal` і `goals_in_context` увімкнено за замовчуванням; `verify_writes` і `annotate_unverified_claims` вимкнено. ADR-015 оновлено.
 - **Перевірений факт:** приватність без регресії (C55, 10 повторів: 19/20 без прапорця, 20/20 з ним), але Bolt майже завжди читає чужий приватний файл на прохання власника — прогалина доступу на рівні актора, відкладена власником.
 - Виправлено воскресіння забутого заміненого запису після відновлення снапшота (коміт 7beddee). Тести: 1021 passed, 3 skipped.
+
+## [2026-11-19] implementation | ADR-016 U5: scoped memory and protected commitments
+
+- **Перевірений факт:** у worktree `feat/unified-dr2-dr3` від бази `891f564` реалізовано schema v4 (`applies_when`, `origin`), opt-in `memory_scoped=false`, спільний `{id,text,meta}` packet для agent recall та `memory_search`, revoked-record filtering, no-evidence rules, розділений контекст goals і захист закритих commitments.
+- **Перевірений факт:** targeted migration/config/context/agent/memory/goal/API/recovery/CLI regression set: **296 passed**; Ruff та `git diff --check` пройшли. Звіт: [ADR-016 implementation check](../reports/unified/ADR-016-implementation-check-2026-11-19.md).
+- **Не є результатом benchmark:** модель не запускалась; U5 corpus ще `DRAFT`, oracle-review pack створено, завершених незалежних оцінок немає. Feature лишається вимкненою типово, доки не буде freeze й вимірювання.
+- **Обмеження, уточнене під час ревізії:** `conflicts_with` — евристичний lexical candidate list, а не доказ суперечності. `origin` у tool write є моделлю-запропонованою міткою. Забутий evidence каскадно видаляє dependent goal згідно з purge contract, тому stale marker зберігається лише для stale, не забутого evidence.
+
+## [2026-11-19] lint | ADR-016 implementation and knowledge links
+
+- **Перевірений факт:** точний targeted regression set повторно пройшов на поточному дереві: 296 passed за 51.72 с. Ruff для змінених Python-файлів і `git diff --check` пройшли. Repo-wide Ruff має 32 знахідки поза цими файлами (29 `E501`, 3 `F401`).
+- **Перевірений факт:** wiki lint охопив 63 Markdown-сторінки: 0 неіндексованих; усі нові U5-посилання справні. У старіших сторінках залишаються 12 битих локальних посилань і 13 відсутніх source paths; у межах U5 їх не змінювали.
+- Перед запуском U5 corpus потрібні два blind oracle reviews і freeze. Див. [RESUME checkpoint](../reports/unified/RESUME.md), [roadmap section I](../docs/superpowers/plans/2026-11-18-dr2-dr3-execution-roadmap.md) та [U5 open question Q24](project/open-questions.md).
+
+## [2026-11-19] lint | U5 evaluator adapter and fixture bridge
+
+- **Перевірений факт:** setup adapter тепер seed-ить applies_when/origin і temporal fields за відповідними прапорцями, застосовує supersedes/revoked через memory lifecycle API та повідомляє про неперенесені поля. Цілі створюються до retirement переходів, тож тест відтворює досягнуту ціль, чиє evidence стало stale пізніше.
+- **Перевірений факт:** run_u2_u3.py --memory-scoped передає прапорець однаково в seed і агент. У scripted runtime metadata scope доходить до prompt. 35 no-model tests пройшли; всі 24 U5 v2 P1 setup fixtures засіялись без втрати непорожніх memory fields.
+- Повторний focused ADR-016 набір: 297 passed; сценарні hash/schema перевірки v1 та v2, Ruff для змінених Python-файлів і git diff --check пройшли.
+- **Межі:** це структурна/runner перевірка, не оцінка якості моделі. U5 v2 — DRAFT; немає двох незалежних blind oracle reviews, scorer sign-off чи model runs. memory_scoped лишається вимкненим типово. Подробиці: [implementation check](../reports/unified/ADR-016-implementation-check-2026-11-19.md), [preflight](../reports/unified/U5-author-preflight-2026-11-19.md), [checkpoint](../reports/unified/RESUME.md).
+
+## [2026-11-19] lint | U5 criterion-level metrics
+
+- **Перевірений факт:** виявлено втрату per-criterion labels у judge combiner, а також те, що unrelated deterministic FAIL міг вилучити з blind sheet критерій для U5 adverse metric. Combiner тепер зберігає мітки/голоси окремо, підтримує owner adjudication критерію, а judge sheet зберігає tagged criterion.
+- **Перевірений факт:** `analyze_u5_metrics.py` зіставляє criterion labels із `metric_tags`, рахує pooled і complete-family rates та paired family-cluster bootstrap. Disputed/unclear/missing/failed-run cases залишаються unknown. Пройшли **49 вибраних no-model evaluator tests**; Ruff, `git diff --check`, v1/v2 manifest validation і SHA-256 review-pack validation також пройшли.
+- **Межі:** оцінювач ще не обробляв відповіді моделі; 49 тестів не підтверджують якість oracle чи семантику метрик. v2 залишається `DRAFT`, очікує два незалежні blind reviews і замороження; GPU та модель не запускалися. Перевірка 13 змінених Markdown-файлів охопила 390 локальних посилань; лишився один старий битий artifact URL у попередньому записі `task15-soak`, поза цим diff.
+- Деталі: [implementation check](../reports/unified/ADR-016-implementation-check-2026-11-19.md), [U5 preflight](../reports/unified/U5-author-preflight-2026-11-19.md), [roadmap](../docs/superpowers/plans/2026-11-18-dr2-dr3-execution-roadmap.md).
+
+## [2026-11-19] checkpoint | Відновлювані GPU-прогони завершені
+
+- **Перевірений факт:** read-only `evals/unified/resume_runs.sh --status` показав A0/A1/E1/D/U4/D2/F/A0b/D3 як 360/360 кожен, Haiku/Luna — 120/120. Немає незавершеного frozen run для відновлення. Історичні raw records та результати залишаються в наявних artifacts/reports.
+- **Перевірений факт (миттєвий стан):** власник підтвердив, що GPU вільна; snapshot `nvidia-smi` показав 6% utilization і 15 MiB / 8188 MiB. Це лише стан обладнання на час перевірки, не benchmark.
+- **Рішення/обмеження:** U5 v2 не запускається, бо corpus досі DRAFT. Спочатку два незалежні blind oracle reviews, підтвердження metric semantics і окрема frozen версія. Під час перевірки нові model runs не стартували.
+- Деталі handoff: [RESUME checkpoint](../reports/unified/RESUME.md); результати попереднього етапу: [U2](../reports/unified/CAPRI_COGNITIVE_CONTROL_AB.md), [U3](../reports/unified/CAPRI_MEMORY_BASELINE.md), [U4](../reports/unified/CAPRI_U4_TEMPORAL_ABLATION.md).
+
+## [2026-11-19] preflight | U5 v3 усуває неоднозначність action requests
+
+- **Перевірений факт (внутрішній аналіз):** у M61/M62 слова про «надіслати/нагадати» і в M83 формулювання про будильник могли означати реальне планування дії, хоча oracle очікував лише відповідь `NO_TOOL`. Переформульовано три сімейства як запит про чинний/прийнятний час; memory state і oracle не змінені.
+- **Зміна версії:** v2 manifests позначені `RETIRED`, а попередній pack — superseded; початкові файли збережені. Згенеровано v3 (24 сімейства, 48 `DRAFT` сценаріїв) і окремий pack з manifest SHA-256 та локальними checksums. Набір тестів переключено на активні v3 fixtures.
+- **Перевірено:** v1/v2/v3 structural/hash validators успішні; checksums v2/v3 packs успішні. Це авторський preflight, не незалежна оцінка семантики. Два незалежні blind reviews v3 досі потрібні; жодного model run не виконано.
+- Деталі: [U5 author preflight](../reports/unified/U5-author-preflight-2026-11-19.md), [v3 review pack](../reports/unified/oracle-review-u5-v3/README.md), [roadmap](../docs/superpowers/plans/2026-11-18-dr2-dr3-execution-roadmap.md).
+
+## [2026-11-19] lint | Уточнено доказовий статус старого soak artifact
+
+- Перевірив відсутню ціль `artifacts/task15-soak-2026-10-26-run2/events.jsonl` у worktree та базовій теці: raw file немає. Історичний журнал містить зведені метрики й раніше зазначав, що raw log не перенесений.
+- Прибрав відсутнє Markdown-посилання з повторного історичного запису та змінив [operations topic](topics/operations.md), щоб відрізняти записані тоді результати від даних, які можна повторно перевірити зараз. Показники не перераховувалися.
+- Це виправляє межу відтворюваності й локальний link lint; первісний журнал і відомості про те, чого бракує, залишаються збереженими.
+
+## [2026-11-20] lint | U8/U9 на моделі власника (gemma4:12b)
+
+- **Перевірений факт:** на gemma4:12b (ревізія з Colab) поточні налаштування (`memory_temporal`, `goals_in_context`) дають пам'яті +38,3 п.п. [+21,7; +55,6], поведінка без значущої зміни. Звіт: `reports/unified/CAPRI_INTEGRATED_ACCEPTANCE.md`.
+- **Перевірений факт:** INTG-01..04, 06, 07 проходять як детерміновані тести рантайму; INTG-05: повне покриття логів, правильність висновку залежить від моделі (26b 6/6, 12b 1/6); INTG-08/M88: вподобання щодо стилю з пам'яті не впливає на відповідь.
+- Day 7 / Day 30 пропущено за рішенням власника. Прогони: CPU на ноутбуці, GPU на Colab (оркестратор `ops/remote/`).
