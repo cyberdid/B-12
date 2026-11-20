@@ -8,6 +8,8 @@ or control-revision checks (the application coordinator supplies those).
 import hashlib
 import hmac
 import json
+from collections.abc import Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -16,8 +18,35 @@ import numpy as np
 from b12._vendor.archive_index.lexical import index_terms
 from b12._vendor.archive_index.search import VectorCache, hybrid
 from b12._vendor.archive_index.store import ChunkRecord
-from b12.contracts import Actor, EvidenceRef
+from b12.contracts import Actor, EvidenceRef, MemoryRecord
 from b12.retrieval_storage import VISIBLE, ActorStore, ScopeRegistry, atomic
+
+
+def memory_score(
+    relevance: float, *, age_days: float = 0.0, importance: int | None = None
+) -> float:
+    """Score a memory candidate by relevance, 30-day recency half-life, and importance (1..10)."""
+    decay = 0.5 ** (max(0.0, age_days) / 30.0)
+    weight = 1.0 if importance is None else (0.5 + importance / 10.0)
+    return relevance * decay * weight
+
+
+def rank_memory_candidates(
+    candidates: Sequence[tuple[MemoryRecord, float]], *, now: datetime
+) -> list[MemoryRecord]:
+    """Sort `(MemoryRecord, relevance)` descending by recency- and importance-weighted score."""
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=UTC)
+    scored: list[tuple[float, int, MemoryRecord]] = []
+    for index, (record, relevance) in enumerate(candidates):
+        created = datetime.fromisoformat(record.created_at)
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=UTC)
+        age_days = max(0.0, (now - created).total_seconds() / 86400.0)
+        score = memory_score(relevance, age_days=age_days, importance=record.importance)
+        scored.append((score, -index, record))
+    scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return [item[2] for item in scored]
 
 
 class KnowledgeIndex:

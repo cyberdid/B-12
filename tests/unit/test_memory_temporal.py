@@ -161,3 +161,72 @@ def test_as_of_returns_the_value_that_held_then(tmp_path):
             store.search("Адреса", OWNER, as_of="вчора")
     finally:
         store.close()
+
+
+def test_recent_important_outranks_old_trivial(tmp_path):
+    from datetime import UTC, datetime
+
+    from b12.retrieval import memory_score, rank_memory_candidates
+
+    assert memory_score(1.0, age_days=0.0, importance=10) == pytest.approx(1.5)
+    assert memory_score(1.0, age_days=30.0, importance=5) == pytest.approx(0.5)
+    assert memory_score(1.0, age_days=0.0, importance=9) > memory_score(
+        1.0, age_days=60.0, importance=2
+    )
+
+    store = MemoryStore(tmp_path / "m.sqlite3")
+    try:
+        old_trivial = store.remember("Коротка примітка про каву.", OWNER, importance=1)
+        recent_important = store.remember("Критичний пароль резерву кави.", OWNER, importance=10)
+        store._connection.execute(
+            "UPDATE memories SET created_at=? WHERE id=?",
+            ("2026-09-01T12:00:00+00:00", old_trivial.id),
+        )
+        store._connection.execute(
+            "UPDATE memories SET created_at=? WHERE id=?",
+            ("2026-11-19T12:00:00+00:00", recent_important.id),
+        )
+        old_row = store.get(old_trivial.id, OWNER)
+        new_row = store.get(recent_important.id, OWNER)
+        assert old_row.importance == 1 and new_row.importance == 10
+        ranked = rank_memory_candidates(
+            [(old_row, 1.0), (new_row, 1.0)], now=datetime(2026, 11, 20, 12, 0, tzinfo=UTC)
+        )
+        assert [r.id for r in ranked] == [recent_important.id, old_trivial.id]
+        with pytest.raises(ValueError):
+            store.remember("погано", OWNER, importance=0)
+        with pytest.raises(ValueError):
+            store.remember("погано", OWNER, importance=11)
+    finally:
+        store.close()
+
+
+def test_unknown_importance_is_neutral(tmp_path):
+    from datetime import datetime
+
+    from b12.retrieval import memory_score, rank_memory_candidates
+
+    assert memory_score(1.0, age_days=0.0, importance=None) == pytest.approx(1.0)
+    assert memory_score(1.0, age_days=0.0, importance=None) == pytest.approx(
+        memory_score(1.0, age_days=0.0, importance=5)
+    )
+
+    store = MemoryStore(tmp_path / "m.sqlite3")
+    try:
+        unknown = store.remember("Факт без оцінки.", OWNER)
+        assert unknown.importance is None
+        low = store.remember("Дрібний факт.", OWNER, importance=1)
+        high = store.remember("Важливий факт.", OWNER, importance=9)
+        ts = "2026-11-20T12:00:00+00:00"
+        store._connection.execute("UPDATE memories SET created_at=?", (ts,))
+        ranked = rank_memory_candidates(
+            [
+                (store.get(low.id, OWNER), 1.0),
+                (store.get(unknown.id, OWNER), 1.0),
+                (store.get(high.id, OWNER), 1.0),
+            ],
+            now=datetime.fromisoformat(ts),
+        )
+        assert [r.id for r in ranked] == [high.id, unknown.id, low.id]
+    finally:
+        store.close()

@@ -914,14 +914,25 @@ class Agent:
             return _render_dated(record, temporal=temporal, now=now)
 
         found: dict[str, str] = {}
+        ranking = getattr(self.settings, "memory_ranking", False)
+        ranked_pool: dict[str, tuple[object, float]] = {}
         if self.semantic is not None:
             from b12.semantic import EmbeddingUnavailable
 
             try:
-                for memory_id, _ in await self.semantic.search(text, actor, k=limit):
+                sem_k = max(limit * 3, limit) if ranking else limit
+                for memory_id, sim_score in await self.semantic.search(text, actor, k=sem_k):
                     record = self.memory.get(memory_id, actor)
                     if record is not None and record.status == "active":
-                        found[record.id] = _dated(record)
+                        if ranking:
+                            prev = ranked_pool.get(record.id)
+                            rel = max(0.0, float(sim_score))
+                            ranked_pool[record.id] = (
+                                record,
+                                max(prev[1], rel) if prev else rel,
+                            )
+                        else:
+                            found[record.id] = _dated(record)
             except EmbeddingUnavailable:
                 log.warning("semantic recall unavailable; lexical fallback")
         from b12.memory import _STOP_TERMS
@@ -932,11 +943,22 @@ class Agent:
             if len(w) >= 3
         ]
         filtered = [w for w in words if w not in _STOP_TERMS] or words
-        for term in list(dict.fromkeys(filtered))[:8]:
-            for record in self.memory.search(term, actor, limit=3):
-                # Stale or superseded facts are kept for the owner, not offered as evidence.
-                if len(found) < limit and record.status == "active":
-                    found.setdefault(record.id, _dated(record))
+        if ranking:
+            from b12.retrieval import rank_memory_candidates
+
+            for term in list(dict.fromkeys(filtered))[:8]:
+                for record, rel in self.memory.search_scored(term, actor, limit=max(limit * 2, 6)):
+                    if record.status == "active":
+                        prev = ranked_pool.get(record.id)
+                        ranked_pool[record.id] = (record, (prev[1] + rel) if prev else rel)
+            for record in rank_memory_candidates(list(ranked_pool.values()), now=now)[:limit]:
+                found[record.id] = _dated(record)
+        else:
+            for term in list(dict.fromkeys(filtered))[:8]:
+                for record in self.memory.search(term, actor, limit=3):
+                    # Stale or superseded facts are kept for the owner, not offered as evidence.
+                    if len(found) < limit and record.status == "active":
+                        found.setdefault(record.id, _dated(record))
         scoped = getattr(self.settings, "memory_scoped", False)
         if (temporal or scoped) and found:
             # ADR-015: replaced history is offered only right after its replacement, marked,

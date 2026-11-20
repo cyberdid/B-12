@@ -27,8 +27,8 @@ def _make_v3(path):
 def test_new_store_is_v4(tmp_path):
     store = MemoryStore(tmp_path / "m.sqlite3")
     try:
-        assert SCHEMA_VERSION == 4
-        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == 4
+        assert SCHEMA_VERSION >= 4
+        assert store._connection.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
     finally:
         store.close()
 

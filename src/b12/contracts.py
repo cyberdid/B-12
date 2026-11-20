@@ -90,9 +90,18 @@ class MemoryRecord(_Contract):
     # ADR-016 (schema v4): the condition a preference/rule applies under, and who stated it.
     applies_when: str | None = None
     origin: Literal["explicit", "inferred"] | None = None
+    # Schema v5: optional importance 1..10; unknown stays None.
+    importance: int | None = None
 
     _validate_id = field_validator("id")(_uuid)
     _validate_identifiers = field_validator("owner_id", "kind", "source")(_identifier)
+
+    @field_validator("importance")
+    @classmethod
+    def _importance_range(cls, value: int | None) -> int | None:
+        if value is not None and (type(value) is not int or not (1 <= value <= 10)):
+            raise ValueError("importance must be an integer between 1 and 10")
+        return value
 
     @field_validator("text")
     @classmethod

@@ -175,3 +175,84 @@ async def test_memory_search_exposes_as_of_only_when_temporal_and_as_of_are_on(
             assert "200 грн" not in tool_msg["content"]
             bad_msg = [m for m in state["requests"][2]["messages"] if m["role"] == "tool"][-1]
             assert "unsupported" in bad_msg["content"]
+
+
+async def test_memory_ranking_flag_exposes_importance_and_ranks_recall(scripted_ollama, tmp_path):
+    from datetime import UTC, datetime
+
+    from b12.auth import owner_capabilities
+
+    state, base = scripted_ollama
+    for ranking in (False, True):
+        state["requests"].clear()
+        state["script"] = (
+            [
+                {
+                    "tool_calls": [
+                        (
+                            "memory_store",
+                            {"text": "Резервний ключ у сейфі.", "kind": "fact", "importance": 9},
+                        )
+                    ]
+                },
+                {
+                    "tool_calls": [
+                        (
+                            "memory_store",
+                            {"text": "Незначна деталь про ключ.", "kind": "fact", "importance": 0},
+                        )
+                    ]
+                },
+                {"content": "Запам'ятала."},
+            ]
+            if ranking
+            else [{"content": "Гаразд."}]
+        )
+        runtime = open_runtime(
+            base.model_copy(
+                update={
+                    "state_dir": tmp_path / f"rank-{ranking}",
+                    "memory_temporal": True,
+                    "memory_ranking": ranking,
+                }
+            )
+        )
+        try:
+            runtime.agent.clock = lambda: datetime(2026, 11, 20, 12, 0, tzinfo=UTC)
+            actor = runtime.control.create_actor(owner=True, consent=True)
+            # Seed old trivial & recent important records matching "ліхтар" with limit=1 check.
+            old_trivial = runtime.memory.remember(
+                "Старий ліхтар лежав у коморі.", actor, importance=1
+            )
+            recent_important = runtime.memory.remember(
+                "Аварійний ліхтар біля виходу.", actor, importance=9
+            )
+            runtime.memory._connection.execute(
+                "UPDATE memories SET created_at=? WHERE id=?",
+                ("2026-08-01T12:00:00+00:00", old_trivial.id),
+            )
+            runtime.memory._connection.execute(
+                "UPDATE memories SET created_at=? WHERE id=?",
+                ("2026-11-19T12:00:00+00:00", recent_important.id),
+            )
+            recalled = await runtime.agent._recall("Де ліхтар?", actor, limit=1)
+            if ranking:
+                assert [item["id"] for item in recalled] == [recent_important.id]
+
+            session = runtime.control.create_session(actor.id)
+            task = runtime.control.create_task(session)
+            grant = runtime.control.issue_grant(
+                actor.id, session, owner_capabilities(runtime.settings), task_id=task, ttl_s=600
+            )
+            await runtime.agent.turn(session, grant, "Привіт", task_id=task, timeout_s=60)
+            store_tool = next(
+                t for t in state["requests"][0]["tools"] if t["function"]["name"] == "memory_store"
+            )
+            assert ("importance" in store_tool["function"]["parameters"]["properties"]) is ranking
+            if ranking:
+                [important_rec] = runtime.memory.search("сейфі", actor)
+                [unknown_rec] = runtime.memory.search("Незначна", actor)
+                assert important_rec.importance == 9
+                assert unknown_rec.importance is None
+        finally:
+            runtime.close()

@@ -19,7 +19,7 @@ from pathlib import Path
 from uuid import UUID, uuid4
 
 from b12.contracts import Actor, MemoryRecord, PurgeReceipt, _identifier
-from b12.migrations import backup_before_upgrade, check_schema, migrate
+from b12.migrations import SCHEMA_VERSION, backup_before_upgrade, check_schema, migrate
 
 _FTS_OPERATORS = frozenset({"and", "or", "not", "near"})
 _STOP_TERMS = frozenset(
@@ -239,6 +239,7 @@ _TEMPORAL_COLUMNS = (
     "superseded_by",
     "applies_when",
     "origin",
+    "importance",
 )
 
 
@@ -329,6 +330,12 @@ def _scope_fields(applies_when, origin):
     return {"applies_when": applies_when, "origin": origin}
 
 
+def _importance_field(importance: int | None) -> int | None:
+    if importance is not None and (type(importance) is not int or not (1 <= importance <= 10)):
+        raise ValueError("importance must be an integer between 1 and 10")
+    return importance
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -380,8 +387,8 @@ class MemoryStore:
         try:
             # Reject future schema before journal, schema, permissions or payload mutation.
             version = check_schema(self._connection)
-            if version == 1:
-                # The upgrade rewrites the evidence table: keep a verified copy first.
+            if 1 <= version < SCHEMA_VERSION:
+                # Keep a verified backup before any live schema upgrade (v1->v5, v4->v5, etc.).
                 backup_before_upgrade(self._connection, self.path)
             os.chmod(self.path, 0o600)
             self._connection.execute("PRAGMA foreign_keys=ON")
@@ -596,12 +603,14 @@ class MemoryStore:
         temporal_source: str | None = None,
         applies_when: str | None = None,
         origin: str | None = None,
+        importance: int | None = None,
     ) -> MemoryRecord:
         self._consent(actor)
         temporal = _temporal_fields(
             event_time, valid_from, valid_to, reliability, source_locator, temporal_source
         )
         temporal.update(_scope_fields(applies_when, origin))
+        checked_importance = _importance_field(importance)
         if expected_deletion_revision is not None and (
             type(expected_deletion_revision) is not int or expected_deletion_revision < 0
         ):
@@ -653,9 +662,18 @@ class MemoryStore:
             self._connection.execute(
                 """INSERT INTO memories(id, actor_id, kind, text, source, created_at,
                        event_time, valid_from, valid_to, reliability, source_locator,
-                       temporal_source, applies_when, origin)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (record_id, actor.id, kind, text, source, created, *temporal.values()),
+                       temporal_source, applies_when, origin, importance)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    record_id,
+                    actor.id,
+                    kind,
+                    text,
+                    source,
+                    created,
+                    *temporal.values(),
+                    checked_importance,
+                ),
             )
             links = [(record_id, "memory", item, "", i) for i, item in enumerate(evidence_ids)]
             links += [
@@ -683,6 +701,7 @@ class MemoryStore:
                     for item, revision in cited_documents
                 ]
             ),
+            importance=checked_importance,
             **temporal,
         )
 
@@ -836,6 +855,11 @@ class MemoryStore:
     def search(
         self, query: str, actor: Actor, *, limit: int = 8, as_of: str | None = None
     ) -> list[MemoryRecord]:
+        return [record for record, _ in self.search_scored(query, actor, limit=limit, as_of=as_of)]
+
+    def search_scored(
+        self, query: str, actor: Actor, *, limit: int = 8, as_of: str | None = None
+    ) -> list[tuple[MemoryRecord, float]]:
         self._consent(actor)
         self._limit(limit)
         if not isinstance(query, str):
@@ -853,7 +877,8 @@ class MemoryStore:
 
         def query_rows(expr: str):
             return self._connection.execute(
-                """SELECT m.* FROM memory_fts JOIN memories m ON m.rowid=memory_fts.rowid
+                """SELECT m.*, bm25(memory_fts) AS bm25_score
+                   FROM memory_fts JOIN memories m ON m.rowid=memory_fts.rowid
                    WHERE memory_fts MATCH ? AND m.actor_id=?
                    AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
                    ORDER BY bm25(memory_fts), m.rowid DESC LIMIT ?""",
@@ -861,10 +886,10 @@ class MemoryStore:
             ).fetchall()
 
         def filter_rows(raw_rows):
-            records = [self._record(row) for row in raw_rows]
+            pairs = [(self._record(row), max(1e-6, -float(row["bm25_score"]))) for row in raw_rows]
             if target is not None:
-                records = [record for record in records if _valid_as_of(record, target)]
-            return records[:limit]
+                pairs = [(record, rel) for record, rel in pairs if _valid_as_of(record, target)]
+            return pairs[:limit]
 
         with self._transaction():
             if not terms or not limit:

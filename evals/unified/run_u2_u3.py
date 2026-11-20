@@ -153,6 +153,7 @@ RUNTIME_FLAGS = (
     "memory_taint",
     "memory_as_of",
     "session_search",
+    "memory_ranking",
 )
 
 
@@ -329,6 +330,11 @@ def main(argv=None):
     parser.add_argument(
         "--session-search", action="store_true", help="FTS5 conversation_search tool"
     )
+    parser.add_argument(
+        "--memory-ranking",
+        action="store_true",
+        help="recency/importance memory ranking and importance field",
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -400,6 +406,7 @@ def main(argv=None):
                     ("memory_taint", args.memory_taint),
                     ("memory_as_of", args.memory_as_of),
                     ("session_search", args.session_search),
+                    ("memory_ranking", args.memory_ranking),
                 )
                 if on
             ),

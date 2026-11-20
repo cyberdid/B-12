@@ -6,6 +6,7 @@ v1: спогади з evidence на спогади. v2: типізовані д�
 v3 (ADR-015): лише додаткові nullable-колонки — час події, інтервал чинності, надійність
 джерела, локатор, походження часових полів і заміна (`superseded_by`). Невідомі значення
 лишаються NULL; жоден наявний рядок не змінюється.
+v5: nullable `importance` (`INTEGER CHECK(importance BETWEEN 1 AND 10)`).
 """
 
 import os
@@ -13,7 +14,7 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 _SCHEMA_V1 = (
     """CREATE TABLE memories (
@@ -121,6 +122,11 @@ _UPGRADE_V3_TO_V4 = (
     "('explicit', 'inferred'))",
 )
 
+# H2 (schema v5): nullable importance 1..10; unknown stays NULL.
+_UPGRADE_V4_TO_V5 = (
+    "ALTER TABLE memories ADD COLUMN importance INTEGER CHECK(importance BETWEEN 1 AND 10)",
+)
+
 _UPGRADE_V2_TO_V3 = (
     "ALTER TABLE memories ADD COLUMN event_time TEXT",
     "ALTER TABLE memories ADD COLUMN valid_from TEXT",
@@ -136,29 +142,33 @@ _UPGRADE_V2_TO_V3 = (
 
 def check_schema(connection: sqlite3.Connection) -> int:
     version = connection.execute("PRAGMA user_version").fetchone()[0]
-    if version not in (0, 1, 2, 3, SCHEMA_VERSION):
+    if version not in (0, 1, 2, 3, 4, SCHEMA_VERSION):
         raise RuntimeError(f"unsupported memory schema version: {version}")
     return version
 
 
 def _counts(connection: sqlite3.Connection) -> dict:
-    return {
-        "memories": connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0],
-        "evidence": connection.execute("SELECT COUNT(*) FROM evidence").fetchone()[0],
-    }
+    counts = {"memories": connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0]}
+    for table in ("evidence", "memory_sources"):
+        if connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)
+        ).fetchone():
+            counts[table] = connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+    return counts
 
 
 def backup_before_upgrade(
     connection: sqlite3.Connection, path: Path, *, expected: dict | None = None
 ) -> Path:
-    """Copy a v1 store next to itself and verify the copy before any change is made.
+    """Copy a store next to itself and verify the copy before any upgrade is made.
 
     The copy must pass integrity_check and carry the same row counts as the source; otherwise
     the upgrade is refused and the source is left as it was.
     """
     expected = expected if expected is not None else _counts(connection)
+    version = connection.execute("PRAGMA user_version").fetchone()[0]
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
-    target = Path(path).with_name(f"{Path(path).stem}.v1-{stamp}.sqlite3")
+    target = Path(path).with_name(f"{Path(path).stem}.v{version}-{stamp}.sqlite3")
     copy = sqlite3.connect(target)
     try:
         connection.backup(copy)
@@ -207,6 +217,13 @@ def migrate(connection: sqlite3.Connection) -> None:
                 connection.execute(statement)
             if connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0] != before:
                 raise RuntimeError("v4 migration changed the number of memories; rolled back")
+            version = 4
+        if version == 4:
+            before = connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+            for statement in _UPGRADE_V4_TO_V5:
+                connection.execute(statement)
+            if connection.execute("SELECT COUNT(*) FROM memories").fetchone()[0] != before:
+                raise RuntimeError("v5 migration changed the number of memories; rolled back")
         connection.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
         connection.commit()
     except BaseException:

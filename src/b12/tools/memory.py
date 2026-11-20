@@ -160,6 +160,31 @@ class ScopedTemporalStoreArgs(TemporalStoreArgs):
     )
 
 
+class _ImportanceArg(Args):
+    importance: int = Field(
+        default=0,
+        ge=0,
+        le=10,
+        description="Importance from 1 (trivial) to 10 (critical); 0 if unknown",
+    )
+
+
+class RankedStoreArgs(StoreArgs, _ImportanceArg):
+    pass
+
+
+class RankedTemporalStoreArgs(TemporalStoreArgs, _ImportanceArg):
+    """memory_store with ADR-015 fields and importance; offered when memory_ranking is on."""
+
+
+class RankedScopedStoreArgs(ScopedStoreArgs, _ImportanceArg):
+    """ADR-016 scope fields and importance; 0/blank means unknown."""
+
+
+class RankedScopedTemporalStoreArgs(ScopedTemporalStoreArgs, _ImportanceArg):
+    """Combined temporal, scoped and importance fields when all are enabled."""
+
+
 class ForgetArgs(Args):
     memory_id: str
 
@@ -248,6 +273,7 @@ def register(
     temporal=False,
     as_of=False,
     scoped=False,
+    ranking=False,
     grounding=False,
     taint=False,
     turn_tainted=None,
@@ -328,6 +354,8 @@ def register(
                 else {}
             )
             temporal_fields = _temporal_from_args(args)
+            raw_importance = getattr(args, "importance", 0)
+            importance = raw_importance if (ranking and raw_importance) else None
             source = "tool:" + guard.operation_id
             if taint and turn_tainted is not None and turn_tainted(guard.context):
                 temporal_fields["reliability"] = "unverified"
@@ -340,6 +368,7 @@ def register(
                 evidence_ids=tuple(args.evidence_ids),
                 documents=tuple(args.document_evidence_ids),
                 expected_deletion_revision=expected_revision,
+                importance=importance,
                 **temporal_fields,
                 **scope,
             )
@@ -471,15 +500,26 @@ def register(
             truncated=truncated or len(receipts) > 4,
         )
 
-    store_args = (
-        ScopedTemporalStoreArgs
-        if temporal and scoped
-        else TemporalStoreArgs
-        if temporal
-        else ScopedStoreArgs
-        if scoped
-        else StoreArgs
-    )
+    if ranking:
+        store_args = (
+            RankedScopedTemporalStoreArgs
+            if temporal and scoped
+            else RankedTemporalStoreArgs
+            if temporal
+            else RankedScopedStoreArgs
+            if scoped
+            else RankedStoreArgs
+        )
+    else:
+        store_args = (
+            ScopedTemporalStoreArgs
+            if temporal and scoped
+            else TemporalStoreArgs
+            if temporal
+            else ScopedStoreArgs
+            if scoped
+            else StoreArgs
+        )
     store_description = (
         "Remember a fact about the owner. Arguments: text (the fact, required); "
         "kind (a short type such as fact or user_preference)."
@@ -495,6 +535,8 @@ def register(
             "when the owner directly stated it, origin=inferred for an assistant inference; "
             "leave either blank if unknown."
         )
+    if ranking:
+        store_description += " Optional: importance (1-10; 0 if unknown)."
     if grounding:
         store_description += " " + GROUNDING_RULE
 

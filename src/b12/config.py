@@ -79,6 +79,9 @@ class Settings(BaseModel):
     # FTS5 search over the actor's own past conversation turns (`conversation_search`). Off until
     # measured.
     session_search: bool = False
+    # Recency (30d half-life) and importance (1..10) ranking for recalled memories + importance
+    # field on memory_store. Off until measured.
+    memory_ranking: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -212,6 +215,7 @@ class Settings(BaseModel):
                 "memory_grounding",
                 "memory_taint",
                 "session_search",
+                "memory_ranking",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

@@ -149,6 +149,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_grounding": False,
         "memory_taint": False,
         "session_search": False,
+        "memory_ranking": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -250,3 +251,9 @@ def test_session_search_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).session_search is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_SESSION_SEARCH": "true"}
     assert Settings.from_env(env).session_search
+
+
+def test_memory_ranking_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_ranking is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_RANKING": "true"}
+    assert Settings.from_env(env).memory_ranking

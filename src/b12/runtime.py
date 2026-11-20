@@ -135,6 +135,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         memory_temporal=settings.memory_temporal,
         memory_as_of=settings.memory_as_of,
         memory_scoped=settings.memory_scoped,
+        memory_ranking=settings.memory_ranking,
         verify_writes=settings.verify_writes,
         memory_grounding=settings.memory_grounding,
         memory_taint=settings.memory_taint,
