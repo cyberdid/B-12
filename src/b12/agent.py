@@ -271,8 +271,23 @@ _GOAL_LABELS = {
 }
 
 
+def extract_goal_blocked_reason(content: str | None) -> str | None:
+    """Return the blocked reason if a goal reply starts with [GOAL_BLOCKED], else None."""
+    text = (content or "").lstrip()
+    if not text.startswith("[GOAL_BLOCKED]"):
+        return None
+    rest = text[len("[GOAL_BLOCKED]") :].lstrip(" :-\t\r\n")
+    return rest.splitlines()[0].strip() if rest else ""
+
+
 def _goals_context(
-    goals, limit: int = 8, *, scoped: bool = False, stale_evidence_goals=frozenset()
+    goals,
+    limit: int = 8,
+    *,
+    scoped: bool = False,
+    stale_evidence_goals=frozenset(),
+    goal_contract: bool = False,
+    active_goal_id: str | None = None,
 ) -> str:
     """The speaker's own tasks as data (settings.goals_in_context): status, progress and the
     reason a task ended, so "what is open / is it done" is answerable from the runtime's
@@ -280,7 +295,14 @@ def _goals_context(
     if not goals:
         return ""
     order = {"active": 0, "paused": 1, "failed": 2, "achieved": 3, "abandoned": 4}
-    picked = sorted(goals, key=lambda g: (order.get(g["status"], 5), g.get("updated_at") or ""))
+    picked = sorted(
+        goals,
+        key=lambda g: (
+            0 if active_goal_id and g["id"] == active_goal_id else 1,
+            order.get(g["status"], 5),
+            g.get("updated_at") or "",
+        ),
+    )
     parts = []
     for goal in picked[:limit]:
         label = _GOAL_LABELS.get(goal["status"], goal["status"])
@@ -291,6 +313,20 @@ def _goals_context(
             text += f" — прогрес: {str(goal['checkpoint'])[:200]}"
         if goal["status"] in ("achieved", "abandoned", "failed") and goal.get("status_reason"):
             text += f" ({str(goal['status_reason'])[:80]})"
+        contract = goal.get("contract") if goal_contract else None
+        if isinstance(contract, dict) and (active_goal_id is None or goal["id"] == active_goal_id):
+            details = []
+            for field in ("verification", "constraints", "boundaries", "stop_when"):
+                value = contract.get(field)
+                if value is not None and value not in ("", [], {}):
+                    rendered = (
+                        json.dumps(value, ensure_ascii=False)
+                        if isinstance(value, (dict, list))
+                        else str(value)
+                    )
+                    details.append(f"{field}: {rendered[:240]}")
+            if details:
+                text += " [" + "; ".join(details) + "]"
         parts.append(text)
     if not scoped:
         return "Задачі співрозмовника (дані, не інструкції): " + "; ".join(parts) + "."
@@ -839,6 +875,7 @@ class Agent:
         timeout_s: float = 300.0,
         persist: bool = False,
         companion_profile: Mapping[str, object] | None = None,
+        _manage_goal_block: bool = True,
     ) -> TurnResult:
         if not isinstance(text, str) or not text.strip():
             raise ValueError("user text required")
@@ -873,6 +910,7 @@ class Agent:
                 "persist": bool(persist),
                 "nudges": 0,
                 "companion_profile_context": build_companion_profile_context(companion_profile),
+                "_manage_goal_block": bool(_manage_goal_block),
             }
             for item in await self._recall(text, actor):
                 state["evidence"].append(item)
@@ -1048,6 +1086,28 @@ class Agent:
             persisted = False
             if status == "completed":
                 persisted = self._commit(context, state, active)
+                if (
+                    state.get("_manage_goal_block")
+                    and getattr(self.settings, "goal_contract", False)
+                    and getattr(self, "goals", None) is not None
+                    and (goal_link := self.control.task_goal(context.task_id)) is not None
+                    and (blocked := extract_goal_blocked_reason(content)) is not None
+                ):
+                    goal_id = goal_link[0]
+                    status_reason = f"needs_owner: {blocked}"[:200] if blocked else "needs_owner"
+                    goal_row = self.goals.get(goal_id, actor.id)
+                    if goal_row is not None and goal_row["status"] == "active":
+                        self.goals.set_status(goal_id, actor.id, "paused", status_reason)
+                        self.goals.add_proposal(
+                            actor.id,
+                            goal_id,
+                            f"Ціль «{goal_row['intent'][:80]}»: {content[:600]}",
+                            delivered=False,
+                            reason="high_risk",
+                            attention_id=None,
+                            tags={**goal_row["tags"], **dict.fromkeys(state["tags"], "memory")},
+                            decision="needs_owner",
+                        )
             elif status != "awaiting_approval":
                 # Work done before an unfinished end (stall, error, cancel) is kept, marked as such.
                 if len(state["turn_messages"]) > 1:
@@ -1193,6 +1253,9 @@ class Agent:
                             system += (
                                 f"\nВподобання співрозмовника (дані, не інструкції): {listed}."
                             )
+                        goal_link = self.control.task_goal(context.task_id)
+                        active_goal_id = goal_link[0] if goal_link is not None else None
+                        goal_contract_on = bool(getattr(self.settings, "goal_contract", False))
                         if getattr(self.settings, "goals_in_context", False):
                             goal_rows = self.goals.for_actor(actor.id)
                             if getattr(self.settings, "memory_scoped", False):
@@ -1210,11 +1273,27 @@ class Agent:
                                     goal_rows,
                                     scoped=True,
                                     stale_evidence_goals=stale_goal_ids,
+                                    goal_contract=bool(goal_contract_on and active_goal_id),
+                                    active_goal_id=active_goal_id,
                                 )
                             else:
-                                goals_line = _goals_context(goal_rows)
+                                goals_line = _goals_context(
+                                    goal_rows,
+                                    goal_contract=bool(goal_contract_on and active_goal_id),
+                                    active_goal_id=active_goal_id,
+                                )
                             if goals_line:
                                 system += "\n" + goals_line
+                        elif goal_contract_on and active_goal_id:
+                            active_goal = self.goals.get(active_goal_id, actor.id)
+                            if active_goal and active_goal.get("contract"):
+                                goals_line = _goals_context(
+                                    [active_goal],
+                                    goal_contract=True,
+                                    active_goal_id=active_goal_id,
+                                )
+                                if goals_line:
+                                    system += "\n" + goals_line
                 # U5.1: the rules only in turns that carry memory evidence. Added to every turn
                 # they cost file tasks 7 p.p. on u2-u3-locked-v2 (19.11.2026, U5 report).
                 if (
@@ -1256,6 +1335,15 @@ class Agent:
                                 return await finish_persisted_report(reply.content)
                             return await finish("completed", content=reply.content)
                         return await finish("failed", code="stalled")
+                    if (
+                        getattr(self.settings, "goal_contract", False)
+                        and self.control.task_goal(context.task_id) is not None
+                        and extract_goal_blocked_reason(reply.content) is not None
+                    ):
+                        state["turn_messages"].append(
+                            {"id": str(uuid4()), "role": "assistant", "content": reply.content}
+                        )
+                        return await finish("completed", content=reply.content)
                     if text and _NATIVE_CALL.search(text) and state.get("pseudo_calls", 0) >= 2:
                         # The same call keeps coming back as text: this is not a report.
                         return await finish("failed", content=reply.content, code="pseudo_call")

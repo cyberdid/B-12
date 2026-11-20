@@ -60,6 +60,28 @@ def _names_protected(value, roots) -> bool:
     return False
 
 
+def _outside_goal_paths(raw: dict, capability: str, roots: tuple[str, ...]) -> bool:
+    """True when a filesystem/process call targets a path outside the goal's allowed roots."""
+    candidates: list[str] = []
+    if capability.startswith("filesystem.") and isinstance(raw.get("path"), str):
+        candidates.append(raw["path"])
+    elif capability.startswith("process."):
+        if isinstance(raw.get("cwd"), str):
+            candidates.append(raw["cwd"])
+        argv = raw.get("argv")
+        if isinstance(argv, (list, tuple)):
+            for item in argv:
+                if isinstance(item, str) and item.startswith("/") and item != "/dev/null":
+                    candidates.append(item)
+    for value in candidates:
+        real = os.path.realpath(value)
+        if not any(
+            root == os.sep or real == root or real.startswith(root + os.sep) for root in roots
+        ):
+            return True
+    return False
+
+
 def _state_limits(node) -> None:
     """Append numeric limits to descriptions: the pinned chat template renders only
     type/description, so a model never sees `maximum` and asks for e.g. 10000 > 8192."""
@@ -115,6 +137,25 @@ class ToolRegistry:
         self.protected_paths: tuple[str, ...] = ()
         # ADR-017: settings.task_ledger; goal turns consult the cross-turn step ledger.
         self.ledger = False
+        # ADR-019: settings.goal_contract; goal turns enforce contract["boundaries"].
+        self.goal_contract = False
+        self.goals = None
+        self.goal_boundaries: Callable[[str, str], dict | None] | None = None
+
+    def _active_boundaries(self, context: ExecutionContext) -> dict | None:
+        if not self.goal_contract or not getattr(context, "task_id", None):
+            return None
+        link = self.control.task_goal(context.task_id)
+        if link is None:
+            return None
+        goal_id = link[0]
+        if self.goal_boundaries is not None:
+            return self.goal_boundaries(goal_id, context.actor_id)
+        if self.goals is not None:
+            goal = self.goals.get(goal_id, context.actor_id)
+            if goal and isinstance(goal.get("contract"), dict):
+                return goal["contract"].get("boundaries")
+        return None
 
     def register(
         self,
@@ -212,8 +253,15 @@ class ToolRegistry:
         # run_command takes a whole terminal line; offering shell_exec beside it made the model
         # send one tool's fields to the other. shell_exec stays registered for direct use.
         hidden = {"shell_exec"} if "run_command" in self._tools else set()
+        boundaries = self._active_boundaries(context)
+        allowed_tools = (
+            set(boundaries["tools"])
+            if isinstance(boundaries, dict) and boundaries.get("tools") is not None
+            else None
+        )
         for tool in self._tools.values():
-            if tool.schema["function"]["name"] in hidden:
+            name = tool.schema["function"]["name"]
+            if name in hidden or (allowed_tools is not None and name not in allowed_tools):
                 continue
             try:
                 self.control.check(context, tool.capability)
@@ -287,6 +335,10 @@ class ToolRegistry:
             if tool is None:
                 raise ControlError("unknown_tool")
             self.control.check(context, tool.capability)
+            boundaries = self._active_boundaries(context)
+            if isinstance(boundaries, dict) and boundaries.get("tools") is not None:
+                if tool.name not in set(boundaries["tools"]):
+                    raise ControlError("outside_goal_boundaries")
             # Snapshot before await; mutable model arguments cannot change approved action.
             raw = copy.deepcopy(call.arguments)
             if tool.capability == "filesystem.read" and isinstance(raw, dict):
@@ -308,6 +360,10 @@ class ToolRegistry:
             if self.protected_paths and tool.capability.startswith(("filesystem.", "process.")):
                 if _names_protected(raw, self.protected_paths):
                     raise ControlError("path_protected")
+            if isinstance(boundaries, dict) and boundaries.get("paths") is not None:
+                roots = tuple(os.path.realpath(str(p)) for p in boundaries["paths"])
+                if _outside_goal_paths(raw, tool.capability, roots):
+                    raise ControlError("outside_goal_boundaries")
             call = call.model_copy(
                 update={"arguments": raw, "turn_id": context.turn_id, "task_id": context.task_id}
             )

@@ -154,6 +154,7 @@ RUNTIME_FLAGS = (
     "memory_as_of",
     "session_search",
     "memory_ranking",
+    "goal_contract",
 )
 
 
@@ -335,6 +336,9 @@ def main(argv=None):
         action="store_true",
         help="recency/importance memory ranking and importance field",
     )
+    parser.add_argument(
+        "--goal-contract", action="store_true", help="ADR-019 goal completion contract"
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -407,6 +411,7 @@ def main(argv=None):
                     ("memory_as_of", args.memory_as_of),
                     ("session_search", args.session_search),
                     ("memory_ranking", args.memory_ranking),
+                    ("goal_contract", args.goal_contract),
                 )
                 if on
             ),

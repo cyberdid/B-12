@@ -40,6 +40,7 @@ _ERROR_CODES = frozenset(
         "unknown_tool",
         "invalid_arguments",
         "path_protected",
+        "outside_goal_boundaries",
         "cancel_mismatch",
         "operation_not_active",
         "handler_failed",

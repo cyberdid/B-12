@@ -150,6 +150,8 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_taint": False,
         "session_search": False,
         "memory_ranking": False,
+        "goal_contract": False,
+        "goal_check_commands": (),
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -257,3 +259,27 @@ def test_memory_ranking_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).memory_ranking is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_RANKING": "true"}
     assert Settings.from_env(env).memory_ranking
+
+
+def test_goal_contract_and_check_commands_config(tmp_path, monkeypatch):
+    from b12.cli import load_settings
+
+    assert Settings(state_dir=tmp_path).goal_contract is False
+    assert Settings(state_dir=tmp_path).goal_check_commands == ()
+    env = {
+        "B12_STATE_DIR": str(tmp_path),
+        "B12_GOAL_CONTRACT": "true",
+        "B12_GOAL_CHECK_COMMANDS": '[["/usr/bin/pytest", "-q"]]',
+    }
+    parsed = Settings.from_env(env)
+    assert parsed.goal_contract is True
+    assert parsed.goal_check_commands == (("/usr/bin/pytest", "-q"),)
+
+    config = tmp_path / "c.toml"
+    config.write_text('goal_contract = true\ngoal_check_commands = [["/bin/true"]]\n')
+    monkeypatch.delenv("B12_GOAL_CONTRACT", raising=False)
+    monkeypatch.delenv("B12_GOAL_CHECK_COMMANDS", raising=False)
+    monkeypatch.setenv("B12_STATE_DIR", str(tmp_path))
+    loaded = load_settings(str(config))
+    assert loaded.goal_contract is True
+    assert loaded.goal_check_commands == (("/bin/true",),)

@@ -9,14 +9,18 @@ versions (history keeps version numbers and dates, not the forgotten payload).
 
 import json
 import os
+import re
 import sqlite3
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 from uuid import UUID, uuid4
 
 STATUSES = frozenset({"active", "paused", "achieved", "abandoned", "failed"})
-CHECKS = frozenset({"file_contains"})
+CHECKS = frozenset({"file_contains", "file_sha256", "command_exit_zero", "http_status"})
+_CONTRACT_KEYS = frozenset({"verification", "constraints", "boundaries", "stop_when"})
+_BOUNDARY_KEYS = frozenset({"tools", "paths"})
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS goals(id TEXT PRIMARY KEY, actor_id TEXT NOT NULL,
@@ -24,7 +28,8 @@ CREATE TABLE IF NOT EXISTS goals(id TEXT PRIMARY KEY, actor_id TEXT NOT NULL,
  allowed_tools TEXT NOT NULL, status TEXT NOT NULL, status_reason TEXT,
  checkpoint TEXT, budget_turns INTEGER NOT NULL, consumed_turns INTEGER NOT NULL,
  evidence_ids TEXT NOT NULL, tags TEXT NOT NULL, created_at TEXT NOT NULL,
- updated_at TEXT NOT NULL, next_review TEXT NOT NULL, review_interval_s REAL NOT NULL);
+ updated_at TEXT NOT NULL, next_review TEXT NOT NULL, review_interval_s REAL NOT NULL,
+ contract TEXT, failure_streak INTEGER NOT NULL DEFAULT 0);
 CREATE TRIGGER IF NOT EXISTS goals_intent_immutable BEFORE UPDATE OF intent, criteria,
  actor_id ON goals BEGIN SELECT RAISE(ABORT, 'original intent is immutable'); END;
 CREATE TABLE IF NOT EXISTS proposals(id TEXT PRIMARY KEY, actor_id TEXT NOT NULL,
@@ -35,6 +40,123 @@ CREATE TABLE IF NOT EXISTS preferences(id TEXT PRIMARY KEY, actor_id TEXT NOT NU
  evidence_ids TEXT NOT NULL, created_at TEXT NOT NULL, redacted INTEGER NOT NULL,
  UNIQUE(actor_id, key, version));
 """
+
+
+def _validate_check(check: dict) -> dict:
+    if not isinstance(check, dict):
+        raise ValueError("unsupported trusted check")
+    kind = check.get("kind")
+    if kind not in CHECKS:
+        raise ValueError("unsupported trusted check")
+    if kind == "file_contains":
+        if (
+            set(check) != {"kind", "path", "text"}
+            or not isinstance(check["path"], str)
+            or not check["path"].startswith("/")
+            or "\x00" in check["path"]
+            or not isinstance(check["text"], str)
+        ):
+            raise ValueError("unsupported trusted check")
+        return dict(check)
+    if kind == "file_sha256":
+        if (
+            set(check) != {"kind", "path", "sha256"}
+            or not isinstance(check["path"], str)
+            or not check["path"].startswith("/")
+            or "\x00" in check["path"]
+            or not isinstance(check["sha256"], str)
+            or not re.fullmatch(r"[0-9a-fA-F]{64}", check["sha256"])
+        ):
+            raise ValueError("unsupported trusted check")
+        return {"kind": "file_sha256", "path": check["path"], "sha256": check["sha256"].lower()}
+    if kind == "command_exit_zero":
+        argv = check.get("argv")
+        if (
+            set(check) != {"kind", "argv"}
+            or not isinstance(argv, (list, tuple))
+            or not argv
+            or not all(isinstance(arg, str) and "\x00" not in arg for arg in argv)
+            or not argv[0]
+        ):
+            raise ValueError("unsupported trusted check")
+        return {"kind": "command_exit_zero", "argv": list(argv)}
+    # http_status
+    url = check.get("url")
+    status = check.get("status")
+    if (
+        set(check) != {"kind", "url", "status"}
+        or not isinstance(url, str)
+        or any(ord(c) < 32 or ord(c) == 127 for c in url)
+        or type(status) is not int
+        or not 100 <= status <= 599
+    ):
+        raise ValueError("unsupported trusted check")
+    parsed = urlsplit(url)
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.fragment
+    ):
+        raise ValueError("unsupported trusted check")
+    _ = parsed.port
+    return {"kind": "http_status", "url": url, "status": status}
+
+
+def _validate_contract(contract: dict) -> dict:
+    if not isinstance(contract, dict) or not set(contract) <= _CONTRACT_KEYS:
+        raise ValueError("unsupported goal contract")
+    normalized: dict = {}
+    if "verification" in contract and contract["verification"] is not None:
+        verification = contract["verification"]
+        if isinstance(verification, dict):
+            normalized["verification"] = _validate_check(verification)
+        elif isinstance(verification, str) and len(verification) <= 2000:
+            normalized["verification"] = verification
+        else:
+            raise ValueError("invalid contract verification")
+    if "constraints" in contract and contract["constraints"] is not None:
+        constraints = contract["constraints"]
+        if isinstance(constraints, str) and len(constraints) <= 2000:
+            normalized["constraints"] = constraints
+        elif isinstance(constraints, (list, tuple)) and all(
+            isinstance(item, str) and len(item) <= 2000 for item in constraints
+        ):
+            normalized["constraints"] = list(constraints)
+        else:
+            raise ValueError("invalid contract constraints")
+    if "boundaries" in contract and contract["boundaries"] is not None:
+        boundaries = contract["boundaries"]
+        if not isinstance(boundaries, dict) or not set(boundaries) <= _BOUNDARY_KEYS:
+            raise ValueError("invalid contract boundaries")
+        clean_bounds: dict = {}
+        if "tools" in boundaries and boundaries["tools"] is not None:
+            tools = boundaries["tools"]
+            if not isinstance(tools, (list, tuple)) or not all(
+                isinstance(name, str) and name for name in tools
+            ):
+                raise ValueError("invalid boundary tools")
+            clean_bounds["tools"] = list(tools)
+        if "paths" in boundaries and boundaries["paths"] is not None:
+            paths = boundaries["paths"]
+            if not isinstance(paths, (list, tuple)) or not all(
+                isinstance(p, str) and p.startswith("/") and "\x00" not in p for p in paths
+            ):
+                raise ValueError("invalid boundary paths")
+            clean_bounds["paths"] = list(paths)
+        normalized["boundaries"] = clean_bounds
+    if "stop_when" in contract and contract["stop_when"] is not None:
+        stop_when = contract["stop_when"]
+        if isinstance(stop_when, str) and len(stop_when) <= 2000:
+            normalized["stop_when"] = stop_when
+        elif isinstance(stop_when, (list, tuple)) and all(
+            isinstance(item, str) and len(item) <= 2000 for item in stop_when
+        ):
+            normalized["stop_when"] = list(stop_when)
+        else:
+            raise ValueError("invalid contract stop_when")
+    return normalized
 
 
 def _now() -> str:
@@ -75,6 +197,22 @@ class GoalStore:
         )
         if "plan_revision" not in columns:  # ADR-017: effects are keyed per plan revision
             self.db.execute("ALTER TABLE goals ADD COLUMN plan_revision INTEGER NOT NULL DEFAULT 1")
+        if "contract" not in columns:  # ADR-019: immutable goal completion contract
+            self.db.execute("ALTER TABLE goals ADD COLUMN contract TEXT")
+        if "failure_streak" not in columns:  # ADR-019: consecutive check failure streak
+            self.db.execute(
+                "ALTER TABLE goals ADD COLUMN failure_streak INTEGER NOT NULL DEFAULT 0"
+            )
+        trigger = self.db.execute(
+            "SELECT sql FROM sqlite_master WHERE type='trigger' AND name='goals_intent_immutable'"
+        ).fetchone()
+        if trigger is None or "contract" not in trigger[0]:
+            self.db.execute("DROP TRIGGER IF EXISTS goals_intent_immutable")
+            self.db.execute(
+                "CREATE TRIGGER goals_intent_immutable BEFORE UPDATE OF intent, criteria, "
+                "actor_id, contract ON goals BEGIN SELECT RAISE(ABORT, "
+                "'original intent is immutable'); END"
+            )
 
     def close(self):
         self.db.close()
@@ -95,6 +233,8 @@ class GoalStore:
         for key in ("allowed_tools", "evidence_ids", "tags"):
             goal[key] = json.loads(goal[key])
         goal["check_spec"] = json.loads(goal["check_spec"]) if goal["check_spec"] else None
+        goal["contract"] = json.loads(goal["contract"]) if goal.get("contract") else None
+        goal.setdefault("failure_streak", 0)
         return goal
 
     def create(
@@ -110,6 +250,7 @@ class GoalStore:
         check: dict | None = None,
         tags: dict | None = None,
         priority: int = 0,
+        contract: dict | None = None,
     ) -> dict:
         if not intent.strip() or len(intent) > 4000 or len(criteria) > 4000:
             raise ValueError("intent/criteria size")
@@ -117,29 +258,25 @@ class GoalStore:
             raise ValueError("budget must be 1..100 turns")
         if type(priority) is not int or not 0 <= priority <= 10:
             raise ValueError("priority must be 0..10")
-        if check is not None and (
-            not isinstance(check, dict)
-            or check.get("kind") not in CHECKS
-            or set(check) != {"kind", "path", "text"}
-            or not str(check["path"]).startswith("/")
-        ):
-            raise ValueError("unsupported trusted check")
+        normalized_check = _validate_check(check) if check is not None else None
+        normalized_contract = _validate_contract(contract) if contract is not None else None
         goal_id, now = str(uuid4()), _now()
         with self._atomic():
             self.db.execute(
-                # Named columns: priority and plan_revision may sit in any order in older files.
+                # Named columns: priority, plan_revision, contract and failure_streak may sit in
+                # any order in older files.
                 "INSERT INTO goals(id, actor_id, session_id, intent, criteria, check_spec, "
                 "allowed_tools, status, status_reason, checkpoint, budget_turns, consumed_turns, "
                 "evidence_ids, tags, created_at, updated_at, next_review, review_interval_s, "
-                "priority, plan_revision) VALUES "
-                "(?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?,?,1)",
+                "priority, plan_revision, contract, failure_streak) VALUES "
+                "(?,?,?,?,?,?,?,'active',NULL,NULL,?,0,'[]',?,?,?,?,?,?,1,?,0)",
                 (
                     goal_id,
                     actor_id,
                     session_id,
                     intent,
                     criteria,
-                    json.dumps(check) if check else None,
+                    json.dumps(normalized_check) if normalized_check is not None else None,
                     json.dumps(list(allowed_tools)),
                     budget_turns,
                     json.dumps(tags or {}),
@@ -148,6 +285,7 @@ class GoalStore:
                     now,
                     float(review_interval_s),
                     priority,
+                    json.dumps(normalized_contract) if normalized_contract is not None else None,
                 ),
             )
         return self.get(goal_id, actor_id)
@@ -230,12 +368,41 @@ class GoalStore:
                 raise PermissionError("reopening a closed goal requires explicit owner control")
             # ADR-017: an owner reopening is a replan; effects of the old plan are not reused.
             replan = 1 if reopen and goal["status"] in {"achieved", "abandoned"} else 0
-            self.db.execute(
-                "UPDATE goals SET status=?, status_reason=?, updated_at=?, "
-                "plan_revision=plan_revision+? WHERE id=?",
-                (status, reason[:200], _now(), replan, goal_id),
-            )
+            reset_streak = status == "active" and goal["status"] != "active"
+            if reset_streak:
+                self.db.execute(
+                    "UPDATE goals SET status=?, status_reason=?, updated_at=?, "
+                    "plan_revision=plan_revision+?, failure_streak=0 WHERE id=?",
+                    (status, reason[:200], _now(), replan, goal_id),
+                )
+            else:
+                self.db.execute(
+                    "UPDATE goals SET status=?, status_reason=?, updated_at=?, "
+                    "plan_revision=plan_revision+? WHERE id=?",
+                    (status, reason[:200], _now(), replan, goal_id),
+                )
         return self.get(goal_id, actor_id)
+
+    def record_check(self, goal_id: str, passed: bool, *, actor_id: str | None = None) -> int:
+        """Record a trusted check outcome and return the updated consecutive failure streak."""
+        with self._atomic():
+            if actor_id is not None:
+                row = self.db.execute(
+                    "SELECT failure_streak FROM goals WHERE id=? AND actor_id=?",
+                    (goal_id, actor_id),
+                ).fetchone()
+            else:
+                row = self.db.execute(
+                    "SELECT failure_streak FROM goals WHERE id=?", (goal_id,)
+                ).fetchone()
+            if row is None:
+                raise KeyError("goal not found")
+            streak = 0 if passed else int(row["failure_streak"]) + 1
+            self.db.execute(
+                "UPDATE goals SET failure_streak=?, updated_at=? WHERE id=?",
+                (streak, _now(), goal_id),
+            )
+        return streak
 
     def complete(self, goal_id: str, actor, evidence_ids, live) -> dict:
         goal = self.get(goal_id, actor.id)

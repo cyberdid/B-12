@@ -1,5 +1,6 @@
 """Перевірка runtime configuration без створення стану чи мережевих запитів."""
 
+import json
 import os
 import re
 from collections.abc import Mapping
@@ -82,6 +83,10 @@ class Settings(BaseModel):
     # Recency (30d half-life) and importance (1..10) ranking for recalled memories + importance
     # field on memory_store. Off until measured.
     memory_ranking: bool = False
+    # ADR-019: structured goal completion contract, extra trusted checks and boundaries.
+    goal_contract: bool = False
+    # Owner-allowlisted exact argv tuples for command_exit_zero goal checks.
+    goal_check_commands: tuple[tuple[str, ...], ...] = ()
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -174,6 +179,16 @@ class Settings(BaseModel):
             raise ValueError("output_tokens must leave input capacity within num_ctx")
         return self
 
+    @field_validator("goal_check_commands")
+    @classmethod
+    def _validate_goal_check_commands(
+        cls, value: tuple[tuple[str, ...], ...]
+    ) -> tuple[tuple[str, ...], ...]:
+        for cmd in value:
+            if not cmd or not cmd[0] or any("\x00" in arg for arg in cmd):
+                raise ValueError("goal_check_commands entries must be non-empty argv tuples")
+        return value
+
     @classmethod
     def from_env(cls, environ: Mapping[str, str] | None = None) -> "Settings":
         """B12_* values override defaults; the supplied mapping isolates ambient env."""
@@ -201,6 +216,18 @@ class Settings(BaseModel):
                 value = float(value)
             elif field == "network_allow":
                 value = tuple(item.strip() for item in value.split(",") if item.strip())
+            elif field == "goal_check_commands":
+                raw = value.strip()
+                if not raw:
+                    value = ()
+                else:
+                    parsed = json.loads(raw)
+                    if not isinstance(parsed, list) or not all(
+                        isinstance(cmd, list) and cmd and all(isinstance(arg, str) for arg in cmd)
+                        for cmd in parsed
+                    ):
+                        raise ValueError("goal_check_commands must be a JSON array of argv arrays")
+                    value = tuple(tuple(cmd) for cmd in parsed)
             elif field in (
                 "forget_requires_approval",
                 "memory_enrichment",
@@ -216,6 +243,7 @@ class Settings(BaseModel):
                 "memory_taint",
                 "session_search",
                 "memory_ranking",
+                "goal_contract",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

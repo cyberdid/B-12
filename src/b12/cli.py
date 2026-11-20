@@ -30,7 +30,14 @@ def load_settings(config: str | None = None) -> Settings:
     path = Path(config) if config else base / "b12" / "config.toml"
     if config or path.exists():
         for key, value in tomllib.loads(path.read_text()).items():
-            text = ",".join(map(str, value)) if isinstance(value, list) else str(value)
+            if isinstance(value, list):
+                text = (
+                    json.dumps(value)
+                    if any(isinstance(item, list) for item in value)
+                    else ",".join(map(str, value))
+                )
+            else:
+                text = str(value)
             environ.setdefault(f"B12_{key.upper()}", text)
     return Settings.from_env(environ)
 
@@ -409,32 +416,90 @@ async def cmd_profile(args, settings) -> int:
     return 0
 
 
+def _build_goal_check(args) -> dict | None:
+    if args.check_file and args.verify_kind:
+        raise ValueError("use either --check-file or --verify-kind")
+    if args.check_file:
+        return {"kind": "file_contains", "path": args.check_file, "text": args.check_text}
+    kind = args.verify_kind
+    if not kind:
+        return None
+    raw = list(args.verify_arg or [])
+    kv = {}
+    if raw and all("=" in item for item in raw) and kind != "command_exit_zero":
+        for item in raw:
+            k, v = item.split("=", 1)
+            kv[k] = v
+    if kind == "file_contains":
+        if kv:
+            return {"kind": kind, "path": kv.get("path", ""), "text": kv.get("text", "")}
+        if not raw:
+            raise ValueError("file_contains requires path and text")
+        return {"kind": kind, "path": raw[0], "text": raw[1] if len(raw) > 1 else ""}
+    if kind == "file_sha256":
+        if kv:
+            return {"kind": kind, "path": kv.get("path", ""), "sha256": kv.get("sha256", "")}
+        if len(raw) != 2:
+            raise ValueError("file_sha256 requires path and sha256")
+        return {"kind": kind, "path": raw[0], "sha256": raw[1]}
+    if kind == "command_exit_zero":
+        if len(raw) == 1 and raw[0].startswith("["):
+            argv = json.loads(raw[0])
+        else:
+            argv = raw
+        return {"kind": kind, "argv": argv}
+    if kind == "http_status":
+        if kv:
+            return {"kind": kind, "url": kv.get("url", ""), "status": int(kv.get("status", "200"))}
+        if not raw or len(raw) > 2:
+            raise ValueError("http_status requires url and optional status")
+        return {"kind": kind, "url": raw[0], "status": int(raw[1]) if len(raw) == 2 else 200}
+    raise ValueError("unsupported verification kind")
+
+
 async def cmd_goals(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
         owner = require_owner(runtime)
         goals = runtime.goals
         if args.action == "add":
-            check = None
-            if args.check_file:
-                check = {"kind": "file_contains", "path": args.check_file, "text": args.check_text}
-            session = runtime.control.create_session(owner.actor_id)
-            emit_json(
-                goals.create(
-                    owner.actor_id,
-                    session,
-                    args.value,
-                    args.criteria,
-                    allowed_tools=tuple(
-                        args.tools
-                        or (c for c in owner_capabilities(settings) if c != "process.sudo")
-                    ),
-                    budget_turns=args.budget,
-                    review_interval_s=args.interval,
-                    check=check,
-                    priority=args.priority,
+            try:
+                check = _build_goal_check(args)
+                contract: dict = {}
+                if check is not None and args.verify_kind:
+                    contract["verification"] = check
+                if args.constraints:
+                    contract["constraints"] = list(args.constraints)
+                if args.boundary_tool or args.boundary_path:
+                    boundaries: dict = {}
+                    if args.boundary_tool:
+                        boundaries["tools"] = list(args.boundary_tool)
+                    if args.boundary_path:
+                        boundaries["paths"] = list(args.boundary_path)
+                    contract["boundaries"] = boundaries
+                if args.stop_when:
+                    contract["stop_when"] = args.stop_when
+                session = runtime.control.create_session(owner.actor_id)
+                emit_json(
+                    goals.create(
+                        owner.actor_id,
+                        session,
+                        args.value,
+                        args.criteria,
+                        allowed_tools=tuple(
+                            args.tools
+                            or (c for c in owner_capabilities(settings) if c != "process.sudo")
+                        ),
+                        budget_turns=args.budget,
+                        review_interval_s=args.interval,
+                        check=check,
+                        priority=args.priority,
+                        contract=contract or None,
+                    )
                 )
-            )
+            except (ValueError, json.JSONDecodeError) as exc:
+                emit_json({"error": "invalid_goal", "detail": str(exc)})
+                return 1
         elif args.action == "list":
             emit_json(goals.for_actor(owner.actor_id))
         else:
@@ -965,12 +1030,25 @@ def parser() -> argparse.ArgumentParser:
     goals.add_argument("--budget", type=int, default=5)
     goals.add_argument("--interval", type=float, default=3600)
     goals.add_argument(
-        "--priority", type=int, default=0, choices=range(11), metavar="0-10",
+        "--priority",
+        type=int,
+        default=0,
+        choices=range(11),
+        metavar="0-10",
         help="вища ціль іде першою й витісняє нижчу",
     )
     goals.add_argument("--tools", nargs="*")
     goals.add_argument("--check-file")
     goals.add_argument("--check-text", default="")
+    goals.add_argument(
+        "--verify-kind",
+        choices=("file_contains", "file_sha256", "command_exit_zero", "http_status"),
+    )
+    goals.add_argument("--verify-arg", action="append", default=[])
+    goals.add_argument("--constraints", action="append", default=[])
+    goals.add_argument("--boundary-tool", action="append", default=[])
+    goals.add_argument("--boundary-path", action="append", default=[])
+    goals.add_argument("--stop-when")
     for name in ("quiet", "stop"):
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
