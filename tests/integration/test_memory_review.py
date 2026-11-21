@@ -834,3 +834,43 @@ async def test_approval_mode_stages_instead_of_writing(
         assert reopened.memory.list_review_pending(owner) == []
     finally:
         reopened.close()
+
+
+def test_session_clear_spares_model_records_with_a_turn_locator(scripted_ollama, tmp_path):
+    """A model may pass any source_locator to memory_store; clearing a session must not forget
+    such a record, only the reviewer's own records of the cleared turns."""
+    state, base = scripted_ollama
+    runtime = open_runtime(base.model_copy(update={"state_dir": tmp_path / "state"}))
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        session = runtime.control.create_session(actor.id)
+        turn = str(uuid4())
+        runtime.sessions.commit_turn(
+            session,
+            actor.id,
+            turn,
+            [
+                {"role": "user", "content": "Пам'ятай кота Мурка."},
+                {"role": "assistant", "content": "Добре."},
+            ],
+            tags={},
+        )
+        model_record = runtime.memory.remember(
+            "Кіт Мурко живе з власником",
+            actor,
+            source="model_store",
+            source_locator=f"turn:{turn}",
+        )
+        reviewed = runtime.memory.remember(
+            "Кіт на ім'я Мурка",
+            actor,
+            source="post_turn_review",
+            origin="explicit",
+            source_locator=f"turn:{turn}",
+        )
+        runtime.sessions.clear_session(session, actor.id)
+        live = {record.id for record in runtime.memory.recent(actor, limit=20)}
+        assert model_record.id in live, "a model-written record must survive a session clear"
+        assert reviewed.id not in live, "the reviewer's record of the cleared turn is forgotten"
+    finally:
+        runtime.close()

@@ -1117,19 +1117,26 @@ class MemoryStore:
             return False
         return created
 
-    def forget_by_locator(self, actor: Actor, prefix: str) -> int:
-        """Forget non-tombstoned memories of `actor` whose source_locator starts with `prefix`."""
+    def forget_by_locator(self, actor: Actor, prefix: str, *, source: str | None = None) -> int:
+        """Forget non-tombstoned memories of `actor` whose source_locator starts with `prefix`.
+
+        `source` restricts the match to records written with that source. A session clear passes
+        "post_turn_review": a model-written record may carry any locator, so only the reviewer's
+        own records are removed with the turns they came from.
+        """
         if not isinstance(actor, Actor):
             raise TypeError("actor must be a trusted Actor")
         if not isinstance(prefix, str) or not prefix.strip():
             raise ValueError("prefix must be a nonblank string")
+        source_clause = "" if source is None else "AND m.source = ?"
+        params = (actor.id,) if source is None else (actor.id, source)
         with self._transaction():
             rows = self._connection.execute(
-                """SELECT id, source_locator FROM memories m
-                   WHERE actor_id=? AND source_locator IS NOT NULL
+                f"""SELECT id, source_locator FROM memories m
+                   WHERE actor_id=? AND source_locator IS NOT NULL {source_clause}
                      AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
                    ORDER BY m.rowid""",
-                (actor.id,),
+                params,
             ).fetchall()
             target_ids = [
                 row["id"]
