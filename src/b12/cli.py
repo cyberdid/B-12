@@ -430,7 +430,11 @@ async def cmd_session_clear(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
         owner = require_owner(runtime)
-        runtime.sessions.clear_session(owner.session_id, owner.actor_id)
+        cleared_turns = runtime.sessions.clear_session(owner.session_id, owner.actor_id)
+        actor = owner.actor()
+        for turn_id in cleared_turns:
+            runtime.memory.forget_by_locator(actor, f"turn:{turn_id}")
+        runtime.memory.forget_by_locator(actor, f"session:{owner.session_id}")
         emit_json({"cleared": owner.session_id})
         return 0
     finally:

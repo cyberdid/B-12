@@ -501,3 +501,211 @@ async def test_review_caps_batch_at_6_turns_and_5_candidates(scripted_ollama, tm
         assert len(runtime.memory.recent(actor)) == 6
     finally:
         runtime.close()
+
+
+async def test_review_does_not_run_while_actor_is_busy(scripted_ollama, tmp_path):
+    from b12.agent import _Active
+    from b12.autonomy import Scheduler
+
+    state, base = scripted_ollama
+    off_runtime = open_runtime(
+        base.model_copy(update={"state_dir": tmp_path / "off", "memory_review": False})
+    )
+    off_scheduler = Scheduler(off_runtime)
+    try:
+        off_actor = off_runtime.control.create_actor(owner=True, consent=True)
+        off_sess = off_runtime.control.create_session(off_actor.id)
+        off_runtime.sessions.commit_turn(
+            off_sess,
+            off_actor.id,
+            str(uuid4()),
+            [{"role": "user", "content": "Привіт"}, {"role": "assistant", "content": "Вітаю"}],
+            tags={},
+        )
+        assert await off_scheduler.review_memory_idle() == []
+        assert state["requests"] == []
+    finally:
+        off_scheduler.close()
+        off_runtime.close()
+
+    runtime = open_runtime(
+        base.model_copy(update={"state_dir": tmp_path / "on", "memory_review": True})
+    )
+    scheduler = Scheduler(runtime)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        session = runtime.control.create_session(actor.id)
+        turn_id = str(uuid4())
+        runtime.sessions.commit_turn(
+            session,
+            actor.id,
+            turn_id,
+            [
+                {"role": "user", "content": "Запам'ятай: улюблена мова Python."},
+                {"role": "assistant", "content": "Добре."},
+            ],
+            tags={},
+        )
+        runtime.agent.active["active-user-turn"] = _Active(actor.id, asyncio.Event())
+        busy_outcomes = await scheduler.review_memory_idle()
+        assert len(busy_outcomes) == 1
+        assert busy_outcomes[0]["state"] == "skipped"
+        assert busy_outcomes[0]["reason"] == "actor_busy"
+        assert state["requests"] == []
+        del runtime.agent.active["active-user-turn"]
+
+        runtime.attention.set_stopped(actor.id, True)
+        stopped_outcomes = await scheduler.review_memory_idle()
+        assert state["requests"] == []
+        assert all(o["state"] == "skipped" for o in stopped_outcomes)
+        runtime.attention.set_stopped(actor.id, False)
+
+        state["script"] = [
+            {
+                "content": json.dumps(
+                    {
+                        "candidates": [
+                            {
+                                "text": "Улюблена мова власника — Python",
+                                "kind": "preference",
+                                "turn_id": turn_id,
+                            }
+                        ]
+                    },
+                    ensure_ascii=False,
+                )
+            }
+        ]
+        outcomes = await scheduler.review_memory_idle()
+        assert len(outcomes) == 1
+        assert outcomes[0]["state"] == "recorded"
+        assert [r.text for r in runtime.memory.recent(actor)] == ["Улюблена мова власника — Python"]
+    finally:
+        scheduler.close()
+        runtime.close()
+
+
+async def test_clearing_session_forgets_reviewed_records(scripted_ollama, tmp_path):
+    from b12.memory_review import MemoryReviewer
+
+    state, base = scripted_ollama
+    runtime = open_runtime(
+        base.model_copy(update={"state_dir": tmp_path / "state", "memory_review": True})
+    )
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        sess1 = runtime.control.create_session(actor.id)
+        sess2 = runtime.control.create_session(actor.id)
+        t1, t2 = str(uuid4()), str(uuid4())
+        runtime.sessions.commit_turn(
+            sess1,
+            actor.id,
+            t1,
+            [
+                {"role": "user", "content": "Мій секретний код двері 8844."},
+                {"role": "assistant", "content": "Зафіксувала."},
+            ],
+            tags={},
+        )
+        runtime.sessions.commit_turn(
+            sess2,
+            actor.id,
+            t2,
+            [
+                {"role": "user", "content": "Я живу в Одесі."},
+                {"role": "assistant", "content": "Зрозуміло."},
+            ],
+            tags={},
+        )
+        state["script"] = [
+            {
+                "content": json.dumps(
+                    {
+                        "candidates": [
+                            {"text": "Код двері 8844", "kind": "fact", "turn_id": t1},
+                            {"text": "Власник живе в Одесі", "kind": "fact", "turn_id": t2},
+                        ]
+                    },
+                    ensure_ascii=False,
+                )
+            }
+        ]
+        outcome = await MemoryReviewer(runtime).review(actor)
+        assert outcome["state"] == "recorded"
+        assert outcome["count"] == 2
+
+        cleared = runtime.sessions.clear_session(sess1, actor.id)
+        assert cleared == [t1]
+        remaining = runtime.memory.recent(actor)
+        assert [r.text for r in remaining] == ["Власник живе в Одесі"]
+        assert runtime.memory.search("8844", actor) == []
+    finally:
+        runtime.close()
+
+
+async def test_scheduler_run_invokes_review_memory_idle_after_reflect_idle(
+    scripted_ollama, tmp_path, monkeypatch
+):
+    from b12.autonomy import Scheduler
+
+    state, base = scripted_ollama
+    runtime = open_runtime(
+        base.model_copy(
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "scheduler_tick_s": 0.01,
+            }
+        )
+    )
+    scheduler = Scheduler(runtime)
+    order: list[str] = []
+    stop = asyncio.Event()
+
+    async def fake_tick():
+        order.append("tick")
+        return []
+
+    async def fake_reflect():
+        order.append("reflect")
+        return []
+
+    original_review = scheduler.review_memory_idle
+
+    async def spy_review():
+        order.append("review")
+        res = await original_review()
+        stop.set()
+        return res
+
+    monkeypatch.setattr(scheduler, "tick", fake_tick)
+    monkeypatch.setattr(scheduler, "reflect_idle", fake_reflect)
+    monkeypatch.setattr(scheduler, "review_memory_idle", spy_review)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        session = runtime.control.create_session(actor.id)
+        tid = str(uuid4())
+        runtime.sessions.commit_turn(
+            session,
+            actor.id,
+            tid,
+            [
+                {"role": "user", "content": "Запам'ятай: сервер у Києві."},
+                {"role": "assistant", "content": "Добре."},
+            ],
+            tags={},
+        )
+        state["script"] = [
+            {
+                "content": json.dumps(
+                    {"candidates": [{"text": "Сервер у Києві", "kind": "fact", "turn_id": tid}]},
+                    ensure_ascii=False,
+                )
+            }
+        ]
+        await asyncio.wait_for(scheduler.run(stop), timeout=5)
+        assert order == ["tick", "reflect", "review"]
+        assert [r.text for r in runtime.memory.recent(actor)] == ["Сервер у Києві"]
+    finally:
+        scheduler.close()
+        runtime.close()

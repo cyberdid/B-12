@@ -62,7 +62,13 @@ def _tags(tags: Mapping[str, str]) -> list[tuple[str, str]]:
 class SessionStore:
     """Dedicated private directory, same-thread API, physical delete on purge."""
 
-    def __init__(self, path: Path):
+    def __init__(
+        self,
+        path: Path,
+        *,
+        on_clear_turns: Callable[[str, list[str]], None] | None = None,
+    ):
+        self.on_clear_turns = on_clear_turns
         self.path = Path(path).absolute()
         if self.path.is_symlink():
             raise ValueError("session directory cannot be a symlink")
@@ -425,7 +431,7 @@ class SessionStore:
                 )
             ]
 
-    def clear_session(self, session_id: str, actor_id: str) -> None:
+    def clear_session(self, session_id: str, actor_id: str) -> list[str]:
         with self._atomic():
             turns = [
                 row[0]
@@ -436,6 +442,9 @@ class SessionStore:
                 )
             ]
             self._delete_turns(turns)
+        if self.on_clear_turns is not None and turns:
+            self.on_clear_turns(actor_id, list(turns))
+        return turns
 
     def invalidation_applied(self, operation_id: str) -> bool:
         return bool(

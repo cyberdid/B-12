@@ -293,3 +293,33 @@ def test_supersede_without_replacement_revokes_without_erasing(tmp_path):
     assert not store.supersede(old.id, owner)  # idempotent
     assert store.verify_full() > 0
     store.close()
+
+
+def test_forget_by_locator_matches_prefix_actor_scoped_and_returns_count(tmp_path):
+    from b12.memory import MemoryStore
+
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    actor = Actor(id="owner", owner=True, consent=True)
+    other = Actor(id="other", owner=False, consent=True)
+    turn_prefix = "turn:11111111-1111-4111-8111-111111111111"
+    r1 = store.remember("Факт з ходу 1", actor, source_locator=turn_prefix)
+    r2 = store.remember("Факт з підлокатором", actor, source_locator=f"{turn_prefix}:part2")
+    r_sess = store.remember("Факт сесії", actor, source_locator="session:sess-1")
+    r_keep = store.remember("Факт іншого ходу", actor, source_locator="turn:22222222")
+    r_plain = store.remember("Факт без локатора", actor)
+    r_other = store.remember("Факт чужого актора", other, source_locator=turn_prefix)
+
+    with pytest.raises(ValueError):
+        store.forget_by_locator(actor, "")
+
+    assert store.forget_by_locator(actor, turn_prefix) == 2
+    assert store.forget_by_locator(actor, turn_prefix) == 0
+    assert not store.is_live(r1.id, actor)
+    assert not store.is_live(r2.id, actor)
+    assert {r.id for r in store.recent(actor)} == {r_sess.id, r_keep.id, r_plain.id}
+    assert store.is_live(r_other.id, other)
+
+    assert store.forget_by_locator(actor, "session:sess-1") == 1
+    assert not store.is_live(r_sess.id, actor)
+    assert store.verify_full() > 0
+    store.close()

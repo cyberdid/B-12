@@ -152,11 +152,16 @@ def test_drop_checkpoint_and_clear_session(tmp_path):
 
     actor, session, turn_id = new_ids(3)
     store = SessionStore(tmp_path / "sessions")
+    seen: list[tuple[str, list[str]]] = []
+    store.on_clear_turns = lambda actor_id, turns: seen.append((actor_id, list(turns)))
     store.save_checkpoint(turn_id, session, actor, {"sequence": 1}, tags={})
     store.drop_checkpoint(turn_id, actor)
     assert store.load_checkpoint(turn_id, actor) is None
-    store.commit_turn(session, actor, str(uuid4()), turn(), tags={})
-    store.clear_session(session, actor)
+    committed_id = str(uuid4())
+    store.commit_turn(session, actor, committed_id, turn(), tags={})
+    cleared = store.clear_session(session, actor)
+    assert cleared == [committed_id]
+    assert seen == [(actor, [committed_id])]
     assert store.history(session, actor) == []
     store.close()
 

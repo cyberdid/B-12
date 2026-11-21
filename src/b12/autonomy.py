@@ -861,6 +861,28 @@ class Scheduler:
             rt.control.set_meta(key, now.isoformat())
         return outcomes
 
+    async def review_memory_idle(self) -> list[dict]:
+        """ADR-020: review recent unreviewed turns for idle consented actors."""
+        rt = self.runtime
+        if not getattr(rt.settings, "memory_review", False):
+            return []
+        from b12.memory_review import MemoryReviewer
+
+        reviewer = MemoryReviewer(rt)
+        outcomes: list[dict] = []
+        for actor_id in rt.control.actor_ids():
+            actor = rt.control.resolve_actor(actor_id)
+            if not actor.consent:
+                continue
+            if self._busy(actor_id):
+                outcomes.append({"actor_id": actor_id, "state": "skipped", "reason": "actor_busy"})
+                continue
+            if not rt.attention.execution_allowed(actor_id):
+                outcomes.append({"actor_id": actor_id, "state": "skipped", "reason": "owner_stop"})
+                continue
+            outcomes.append({"actor_id": actor_id, **await reviewer.review(actor)})
+        return outcomes
+
     async def run(self, stop: asyncio.Event):
         while not stop.is_set():
             await self.tick()
@@ -868,6 +890,10 @@ class Scheduler:
                 await self.reflect_idle()
             except Exception:
                 log.exception("idle reflection failed")
+            try:
+                await self.review_memory_idle()
+            except Exception:
+                log.exception("idle memory review failed")
             try:
                 await asyncio.wait_for(stop.wait(), self.runtime.settings.scheduler_tick_s)
             except TimeoutError:

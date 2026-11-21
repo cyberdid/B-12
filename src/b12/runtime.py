@@ -85,6 +85,13 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     memory.document_resolver = knowledge.resolve_evidence  # citations are checked at write time
     backups = BackupStore(root / "backups")
     sessions = SessionStore(root / "sessions")
+
+    def _on_clear_turns(actor_id: str, turn_ids: list[str]) -> None:
+        actor = control.resolve_actor(actor_id)
+        for turn_id in turn_ids:
+            memory.forget_by_locator(actor, f"turn:{turn_id}")
+
+    sessions.on_clear_turns = _on_clear_turns
     goals = GoalStore(root / "goals")
     schedules = ScheduleStore(root / "goals")
     attention = AttentionPolicy(root / "attention", settings)

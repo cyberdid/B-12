@@ -1108,6 +1108,31 @@ class MemoryStore:
             return False
         return created
 
+    def forget_by_locator(self, actor: Actor, prefix: str) -> int:
+        """Forget non-tombstoned memories of `actor` whose source_locator starts with `prefix`."""
+        if not isinstance(actor, Actor):
+            raise TypeError("actor must be a trusted Actor")
+        if not isinstance(prefix, str) or not prefix.strip():
+            raise ValueError("prefix must be a nonblank string")
+        with self._transaction():
+            rows = self._connection.execute(
+                """SELECT id, source_locator FROM memories m
+                   WHERE actor_id=? AND source_locator IS NOT NULL
+                     AND NOT EXISTS (SELECT 1 FROM tombstones WHERE memory_id=m.id)
+                   ORDER BY m.rowid""",
+                (actor.id,),
+            ).fetchall()
+            target_ids = [
+                row["id"]
+                for row in rows
+                if row["source_locator"] == prefix or row["source_locator"].startswith(prefix)
+            ]
+        forgotten = 0
+        for record_id in target_ids:
+            if self.forget(record_id, actor):
+                forgotten += 1
+        return forgotten
+
     def acknowledge_purge(
         self,
         operation_id: str,
