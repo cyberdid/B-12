@@ -323,3 +323,49 @@ def test_forget_by_locator_matches_prefix_actor_scoped_and_returns_count(tmp_pat
     assert not store.is_live(r_sess.id, actor)
     assert store.verify_full() > 0
     store.close()
+
+
+def test_review_pending_lifecycle_and_cleanup(tmp_path):
+    from b12.memory import MemoryStore
+    from b12.migrations import SCHEMA_VERSION
+
+    store = MemoryStore(tmp_path / "memory.sqlite3")
+    actor = Actor(id="owner", owner=True, consent=True)
+    other = Actor(id="other", owner=False, consent=True)
+    t1, t2, t3 = str(uuid4()), str(uuid4()), str(uuid4())
+
+    assert store._connection.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION == 5
+
+    p1 = store.stage_review_candidate(actor, "Факт 1", "fact", t1)
+    p2 = store.stage_review_candidate(actor, "Вподобання 2", "preference", t2)
+    p3 = store.stage_review_candidate(actor, "Факт з ходу 3", "fact", t3)
+    p_other = store.stage_review_candidate(other, "Чужий факт", "fact", t1)
+
+    assert [item["id"] for item in store.list_review_pending(actor)] == [
+        p1["id"],
+        p2["id"],
+        p3["id"],
+    ]
+    assert [item["id"] for item in store.list_review_pending(other)] == [p_other["id"]]
+
+    # Foreign actor cannot approve or reject.
+    with pytest.raises(KeyError):
+        store.approve_review_pending(p1["id"], other)
+    assert store.reject_review_pending(p2["id"], other) is False
+
+    approved = store.approve_review_pending(p1["id"], actor)
+    assert approved.text == "Факт 1"
+    assert approved.kind == "fact"
+    assert approved.source == "post_turn_review"
+    assert approved.origin == "explicit"
+    assert approved.source_locator == f"turn:{t1}"
+
+    assert store.reject_review_pending(p2["id"], actor) is True
+    assert store.reject_review_pending(p2["id"], actor) is False
+
+    # forget_by_locator also removes review_pending rows for matching turn_id.
+    assert store.forget_by_locator(actor, f"turn:{t3}") == 0
+    assert store.list_review_pending(actor) == []
+    assert [item["id"] for item in store.list_review_pending(other)] == [p_other["id"]]
+    assert [r.id for r in store.recent(actor)] == [approved.id]
+    store.close()

@@ -398,8 +398,17 @@ class MemoryStore:
             self._connection.execute("PRAGMA synchronous=FULL")
             migrate(self._connection)
             self._disable_fts_secure_delete()
-            with self._transaction():
-                pass
+            with self._transaction(write=True):
+                self._connection.execute(
+                    """CREATE TABLE IF NOT EXISTS review_pending(
+                           id TEXT PRIMARY KEY,
+                           actor_id TEXT NOT NULL,
+                           text TEXT NOT NULL,
+                           kind TEXT NOT NULL,
+                           turn_id TEXT NOT NULL,
+                           created_at TEXT NOT NULL
+                       )"""
+                )
         except BaseException:
             self._connection.close()
             raise
@@ -1131,7 +1140,117 @@ class MemoryStore:
         for record_id in target_ids:
             if self.forget(record_id, actor):
                 forgotten += 1
+        with self._transaction(write=True):
+            pending_rows = self._connection.execute(
+                "SELECT id, turn_id FROM review_pending WHERE actor_id=?",
+                (actor.id,),
+            ).fetchall()
+            pending_ids = [
+                row["id"]
+                for row in pending_rows
+                if f"turn:{row['turn_id']}" == prefix or f"turn:{row['turn_id']}".startswith(prefix)
+            ]
+            for pending_id in pending_ids:
+                self._connection.execute(
+                    "DELETE FROM review_pending WHERE id=? AND actor_id=?",
+                    (pending_id, actor.id),
+                )
         return forgotten
+
+    def stage_review_candidate(
+        self,
+        actor: Actor,
+        text: str,
+        kind: str,
+        turn_id: str,
+        *,
+        expected_deletion_revision: int | None = None,
+    ) -> dict:
+        """Stage a post-turn memory review candidate for explicit owner approval."""
+        self._consent(actor)
+        if not isinstance(text, str) or not text.strip() or len(text.strip().encode()) > 8192:
+            raise ValueError("memory size/content limit")
+        _identifier(kind)
+        _identifier(turn_id)
+        if expected_deletion_revision is not None and (
+            type(expected_deletion_revision) is not int or expected_deletion_revision < 0
+        ):
+            raise ValueError("expected deletion revision must be a nonnegative integer")
+        self._ensure_space()
+        clean_text = text.strip()
+        pending_id = str(uuid4())
+        created = _now()
+        with self._transaction(write=True):
+            if (
+                expected_deletion_revision is not None
+                and expected_deletion_revision != self._revision(actor)
+            ):
+                raise PermissionError("stale deletion revision")
+            self._connection.execute(
+                "INSERT INTO review_pending(id, actor_id, text, kind, turn_id, created_at)"
+                " VALUES (?,?,?,?,?,?)",
+                (pending_id, actor.id, clean_text, kind, turn_id, created),
+            )
+        return {
+            "id": pending_id,
+            "actor_id": actor.id,
+            "text": clean_text,
+            "kind": kind,
+            "turn_id": turn_id,
+            "created_at": created,
+        }
+
+    def list_review_pending(self, actor: Actor) -> list[dict]:
+        """Return staged post-turn review candidates for `actor`, oldest first."""
+        if not isinstance(actor, Actor):
+            raise TypeError("actor must be a trusted Actor")
+        with self._transaction():
+            rows = self._connection.execute(
+                "SELECT id, actor_id, text, kind, turn_id, created_at FROM review_pending"
+                " WHERE actor_id=? ORDER BY rowid",
+                (actor.id,),
+            ).fetchall()
+            return [dict(row) for row in rows]
+
+    def approve_review_pending(self, pending_id: str, actor: Actor) -> MemoryRecord:
+        """Promote a staged candidate into canonical memory and remove it from review_pending."""
+        self._consent(actor)
+        UUID(pending_id)
+        with self._lock:
+            with self._transaction():
+                row = self._connection.execute(
+                    "SELECT id, text, kind, turn_id FROM review_pending WHERE id=? AND actor_id=?",
+                    (pending_id, actor.id),
+                ).fetchone()
+                if row is None:
+                    raise KeyError("pending review candidate not found")
+                text, kind, turn_id = row["text"], row["kind"], row["turn_id"]
+            record = self.remember(
+                text,
+                actor,
+                kind=kind,
+                source="post_turn_review",
+                origin="explicit",
+                source_locator=f"turn:{turn_id}",
+            )
+            with self._transaction(write=True):
+                self._connection.execute(
+                    "DELETE FROM review_pending WHERE id=? AND actor_id=?",
+                    (pending_id, actor.id),
+                )
+            return record
+
+    def reject_review_pending(self, pending_id: str, actor: Actor) -> bool:
+        """Delete a staged candidate in `actor`'s namespace without writing to memory."""
+        if not isinstance(actor, Actor):
+            raise TypeError("actor must be a trusted Actor")
+        UUID(pending_id)
+        with self._transaction(write=True):
+            cursor = self._connection.execute(
+                "DELETE FROM review_pending WHERE id=? AND actor_id=?",
+                (pending_id, actor.id),
+            )
+            return cursor.rowcount > 0
 
     def acknowledge_purge(
         self,

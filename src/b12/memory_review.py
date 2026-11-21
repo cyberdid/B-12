@@ -196,29 +196,66 @@ class MemoryReviewer:
         if active.invalidated or memory.deletion_revision(actor) != rev:
             return {"state": "rejected", "reason": "stale_deletion_revision"}
 
+        approval_mode = bool(getattr(self.runtime.settings, "memory_review_approval", False))
+        from b12.audio.voice_guards import normalize
+
+        pending_norms = (
+            {normalize(item["text"]) for item in memory.list_review_pending(actor)}
+            if approval_mode
+            else set()
+        )
         memory_ids: list[str] = []
+        staged_ids: list[str] = []
         skipped_duplicates = 0
         for item in candidates[:_MAX_CANDIDATES]:
-            if memory.find_duplicate(item["text"], actor) is not None:
+            if memory.find_duplicate(item["text"], actor) is not None or (
+                approval_mode and normalize(item["text"]) in pending_norms
+            ):
                 skipped_duplicates += 1
                 continue
             try:
-                record = memory.remember(
-                    item["text"],
-                    actor,
-                    kind=item["kind"],
-                    source="post_turn_review",
-                    origin="explicit",
-                    source_locator=f"turn:{item['turn_id']}",
-                    expected_deletion_revision=rev,
-                )
+                if approval_mode:
+                    staged = memory.stage_review_candidate(
+                        actor,
+                        item["text"],
+                        item["kind"],
+                        item["turn_id"],
+                        expected_deletion_revision=rev,
+                    )
+                    pending_norms.add(normalize(item["text"]))
+                    staged_ids.append(staged["id"])
+                else:
+                    record = memory.remember(
+                        item["text"],
+                        actor,
+                        kind=item["kind"],
+                        source="post_turn_review",
+                        origin="explicit",
+                        source_locator=f"turn:{item['turn_id']}",
+                        expected_deletion_revision=rev,
+                    )
+                    memory_ids.append(record.id)
             except PermissionError:
                 return {"state": "rejected", "reason": "stale_deletion_revision"}
             except DiskSpaceLow:
                 return {"state": "failed", "reason": "disk_space_low"}
-            memory_ids.append(record.id)
 
         control.set_meta(cursor_key, str(last_sequence))
+        if approval_mode:
+            if not staged_ids:
+                return {
+                    "state": "skipped",
+                    "reason": "duplicate",
+                    "count": 0,
+                    "skipped_duplicates": skipped_duplicates,
+                }
+            return {
+                "state": "staged",
+                "reason": "approval_required",
+                "staged_ids": staged_ids,
+                "count": len(staged_ids),
+                "skipped_duplicates": skipped_duplicates,
+            }
         if not memory_ids:
             return {
                 "state": "skipped",

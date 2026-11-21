@@ -149,6 +149,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_grounding": False,
         "memory_taint": False,
         "memory_review": False,
+        "memory_review_approval": False,
         "session_search": False,
         "memory_ranking": False,
         "goal_contract": False,
@@ -328,3 +329,9 @@ def test_memory_review_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).memory_review is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW": "true"}
     assert Settings.from_env(env).memory_review is True
+
+
+def test_memory_review_approval_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_review_approval is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW_APPROVAL": "true"}
+    assert Settings.from_env(env).memory_review_approval is True

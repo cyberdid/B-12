@@ -79,6 +79,8 @@ class Settings(BaseModel):
     memory_taint: bool = False
     # ADR-020: background post-turn memory review of recent unreviewed interactive turns.
     memory_review: bool = False
+    # ADR-020: stage post-turn memory review candidates in review_pending until owner approves.
+    memory_review_approval: bool = False
     # FTS5 search over the actor's own past conversation turns (`conversation_search`). Off until
     # measured.
     session_search: bool = False
@@ -257,6 +259,7 @@ class Settings(BaseModel):
                 "memory_grounding",
                 "memory_taint",
                 "memory_review",
+                "memory_review_approval",
                 "session_search",
                 "memory_ranking",
                 "goal_contract",

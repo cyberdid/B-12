@@ -420,7 +420,31 @@ async def cmd_memory(args, settings) -> int:
             emit_json(receipt.model_dump(mode="json"))
             return 0 if receipt.state == "complete" else 3
         elif args.action == "pending":
-            emit_json([r.model_dump(mode="json") for r in runtime.memory.pending_purges(actor)])
+            purges = [r.model_dump(mode="json") for r in runtime.memory.pending_purges(actor)]
+            reviews = runtime.memory.list_review_pending(actor)
+            emit_json([*purges, *reviews])
+        elif args.action == "approve":
+            if not args.value:
+                emit_json({"error": "id_required"})
+                return 1
+            try:
+                record = runtime.memory.approve_review_pending(args.value, actor)
+            except (KeyError, ValueError):
+                emit_json({"error": "not_found"})
+                return 1
+            emit_json(record.model_dump(mode="json"))
+        elif args.action == "reject":
+            if not args.value:
+                emit_json({"error": "id_required"})
+                return 1
+            try:
+                rejected = runtime.memory.reject_review_pending(args.value, actor)
+            except ValueError:
+                rejected = False
+            if not rejected:
+                emit_json({"error": "not_found"})
+                return 1
+            emit_json({"rejected": args.value})
         return 0
     finally:
         runtime.close()
@@ -1183,7 +1207,9 @@ def parser() -> argparse.ArgumentParser:
     answer.add_argument("text", nargs="*", help="текст відповіді")
     answer.add_argument("--skip", action="store_true", help="пропустити уточнення")
     memory = sub.add_parser("memory", help="пам’ять власника")
-    memory.add_argument("action", choices=("remember", "search", "forget", "pending"))
+    memory.add_argument(
+        "action", choices=("remember", "search", "forget", "pending", "approve", "reject")
+    )
     memory.add_argument("value", nargs="?", default="")
     memory.add_argument(
         "--document",

@@ -709,3 +709,128 @@ async def test_scheduler_run_invokes_review_memory_idle_after_reflect_idle(
     finally:
         scheduler.close()
         runtime.close()
+
+
+async def test_approval_mode_stages_instead_of_writing(
+    scripted_ollama, tmp_path, monkeypatch, capsys
+):
+    from b12.cli import main as cli_main
+    from b12.memory_review import MemoryReviewer
+
+    state, base = scripted_ollama
+    state_dir = tmp_path / "state"
+    runtime = open_runtime(
+        base.model_copy(
+            update={
+                "state_dir": state_dir,
+                "memory_review": True,
+                "memory_review_approval": True,
+            }
+        )
+    )
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        session = runtime.control.create_session(actor.id)
+        runtime.control.set_meta("owner_actor", actor.id)
+        runtime.control.set_meta("cli_session", session)
+        t1, t2 = str(uuid4()), str(uuid4())
+        runtime.sessions.commit_turn(
+            session,
+            actor.id,
+            t1,
+            [
+                {"role": "user", "content": "Запам'ятай: улюблений напій зелений чай."},
+                {"role": "assistant", "content": "Зрозуміло."},
+            ],
+            tags={},
+        )
+        runtime.sessions.commit_turn(
+            session,
+            actor.id,
+            t2,
+            [
+                {"role": "user", "content": "Запам'ятай: зустріч щопонеділка о 10:00."},
+                {"role": "assistant", "content": "Прийнято."},
+            ],
+            tags={},
+        )
+        state["script"] = [
+            {
+                "content": json.dumps(
+                    {
+                        "candidates": [
+                            {
+                                "text": "Улюблений напій — зелений чай",
+                                "kind": "preference",
+                                "turn_id": t1,
+                            },
+                            {
+                                "text": "Зустріч щопонеділка о 10:00",
+                                "kind": "decision",
+                                "turn_id": t2,
+                            },
+                        ]
+                    },
+                    ensure_ascii=False,
+                )
+            }
+        ]
+        outcome = await MemoryReviewer(runtime).review(actor)
+        assert outcome["state"] == "staged"
+        assert outcome["reason"] == "approval_required"
+        assert len(outcome["staged_ids"]) == 2
+        assert runtime.memory.recent(actor) == []
+        staged_one, staged_two = outcome["staged_ids"]
+    finally:
+        runtime.close()
+
+    monkeypatch.setenv("B12_STATE_DIR", str(state_dir))
+    monkeypatch.setenv("B12_MODEL", base.model)
+    monkeypatch.setenv("B12_OLLAMA_URL", base.ollama_url)
+    monkeypatch.setenv("B12_MODEL_PROFILE", str(base.model_profile))
+    monkeypatch.setenv("B12_TOKENIZER_DIR", str(base.tokenizer_dir))
+    monkeypatch.setenv("B12_NUM_CTX", str(base.num_ctx))
+    monkeypatch.setenv("B12_OUTPUT_TOKENS", str(base.output_tokens))
+
+    # CLI: pending -> approve <id1> -> reject <id2> -> pending empty
+    assert await asyncio.to_thread(cli_main, ["memory", "pending"]) == 0
+    pending_out = json.loads(capsys.readouterr().out)
+    assert [item["id"] for item in pending_out] == [staged_one, staged_two]
+
+    assert await asyncio.to_thread(cli_main, ["memory", "approve", staged_one]) == 0
+    approved_out = json.loads(capsys.readouterr().out)
+    assert approved_out["text"] == "Улюблений напій — зелений чай"
+    assert approved_out["source"] == "post_turn_review"
+    assert approved_out["source_locator"] == f"turn:{t1}"
+
+    assert await asyncio.to_thread(cli_main, ["memory", "reject", staged_two]) == 0
+    rejected_out = json.loads(capsys.readouterr().out)
+    assert rejected_out == {"rejected": staged_two}
+
+    assert await asyncio.to_thread(cli_main, ["memory", "pending"]) == 0
+    assert json.loads(capsys.readouterr().out) == []
+
+    # Verify only the approved record is stored in MemoryStore.
+    reopened = open_runtime(base.model_copy(update={"state_dir": state_dir}))
+    try:
+        owner = reopened.control.resolve_actor(actor.id)
+        assert [r.text for r in reopened.memory.recent(owner)] == ["Улюблений напій — зелений чай"]
+        # Staging another candidate and clearing its session cleans up review_pending too.
+        sess2 = reopened.control.create_session(owner.id)
+        t3 = str(uuid4())
+        reopened.sessions.commit_turn(
+            sess2,
+            owner.id,
+            t3,
+            [
+                {"role": "user", "content": "Секрет тимчасовий."},
+                {"role": "assistant", "content": "Добре."},
+            ],
+            tags={},
+        )
+        reopened.memory.stage_review_candidate(owner, "Тимчасовий секрет", "fact", t3)
+        assert len(reopened.memory.list_review_pending(owner)) == 1
+        reopened.sessions.clear_session(sess2, owner.id)
+        assert reopened.memory.list_review_pending(owner) == []
+    finally:
+        reopened.close()
