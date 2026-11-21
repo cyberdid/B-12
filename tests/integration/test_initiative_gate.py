@@ -8,19 +8,18 @@ CAPS = ("filesystem.read", "filesystem.write", "time.read", "process.execute")
 
 
 class Clock:
+    """A pinned clock: the test must not depend on the wall-clock time of day."""
+
     def __init__(self):
-        real = datetime.now(UTC)
-        start = real.replace(hour=10, minute=0, second=0, microsecond=0)
-        while start < real + timedelta(hours=1):
-            start += timedelta(days=1)
-        self.now = start
+        self.now = datetime(2026, 11, 21, 10, 0, tzinfo=UTC)
 
     def __call__(self):
         return self.now
 
 
 @pytest.fixture
-def rig(scripted_ollama, tmp_path, request):
+def rig(scripted_ollama, tmp_path, request, monkeypatch):
+    from b12 import goals as goals_module
     from b12.autonomy import Scheduler
     from b12.runtime import open_runtime
 
@@ -29,6 +28,9 @@ def rig(scripted_ollama, tmp_path, request):
     settings = base.model_copy(update={"state_dir": tmp_path / "state", "initiative_gate": gate})
     runtime = open_runtime(settings)
     clock = Clock()
+    # Proposal timestamps must follow the same pinned clock, or the 24h dedupe window compares
+    # the test clock with the real one and depends on the time of day.
+    monkeypatch.setattr(goals_module, "_now", lambda: clock.now.isoformat())
     runtime.attention.clock = clock
     scheduler = Scheduler(runtime, clock=clock)
     actor = runtime.control.create_actor(owner=True, consent=True)
