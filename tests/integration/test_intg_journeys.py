@@ -20,16 +20,33 @@ class Crash(BaseException):
     """A process stop: not an Exception, so nothing in the runtime catches it."""
 
 
+_CLOCK_REF: list = []
+
+
 class Clock:
+    """A pinned clock: the test must not depend on the wall-clock time of day."""
+
     def __init__(self):
-        real = datetime.now(UTC)
-        start = real.replace(hour=10, minute=0, second=0, microsecond=0)
-        while start < real + timedelta(hours=1):
-            start += timedelta(days=1)
-        self.now = start
+        self.now = datetime(2026, 11, 21, 10, 0, tzinfo=UTC)
+        _CLOCK_REF[:] = [self]
 
     def __call__(self):
         return self.now
+
+
+@pytest.fixture(autouse=True)
+def _pin_goal_clock(monkeypatch):
+    """GoalStore stamps goals and proposals with real time; pin them to the test clock."""
+    from b12 import goals as goals_module
+
+    _CLOCK_REF.clear()
+
+    def now():
+        if _CLOCK_REF:
+            return _CLOCK_REF[0].now.isoformat()
+        return datetime(2026, 11, 21, 10, 0, tzinfo=UTC).isoformat()
+
+    monkeypatch.setattr(goals_module, "_now", now)
 
 
 @pytest.fixture

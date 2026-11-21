@@ -13,18 +13,33 @@ CAPS = ("filesystem.read", "filesystem.write", "memory.read", "memory.write", "t
 OWNER_ID = "owner-actor"
 
 
+_CLOCK_REF: list = []
+
+
 class Clock:
+    """A pinned clock: the test must not depend on the wall-clock time of day."""
+
     def __init__(self):
-        # GoalStore stamps real wall-clock time, so the fake clock must stay ahead of it:
-        # the next 10:00 UTC (daytime in Kyiv, outside quiet hours) at least an hour from now.
-        real = datetime.now(UTC)
-        start = real.replace(hour=10, minute=0, second=0, microsecond=0)
-        while start < real + timedelta(hours=1):
-            start += timedelta(days=1)
-        self.now = start
+        self.now = datetime(2026, 11, 21, 10, 0, tzinfo=UTC)
+        _CLOCK_REF[:] = [self]
 
     def __call__(self):
         return self.now
+
+
+@pytest.fixture(autouse=True)
+def _pin_goal_clock(monkeypatch):
+    """GoalStore stamps goals and proposals with real time; pin them to the test clock."""
+    from b12 import goals as goals_module
+
+    _CLOCK_REF.clear()
+
+    def now():
+        if _CLOCK_REF:
+            return _CLOCK_REF[0].now.isoformat()
+        return datetime(2026, 11, 21, 10, 0, tzinfo=UTC).isoformat()
+
+    monkeypatch.setattr(goals_module, "_now", now)
 
 
 @pytest.fixture
@@ -175,7 +190,8 @@ async def test_higher_priority_goal_runs_first(rig):
     low = new_goal(runtime, actor, intent="Низький пріоритет", priority=1)
     high = new_goal(runtime, actor, intent="Терміново", priority=10)
     assert [g["id"] for g in runtime.goals.due(clock.now + timedelta(hours=2))][:2] == [
-        high["id"], low["id"]
+        high["id"],
+        low["id"],
     ]
 
 
