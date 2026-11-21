@@ -1,0 +1,18 @@
+{
+  "accepted_outcomes": [
+    "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler"
+  ],
+  "catalog_class": "P2_conversation_recall",
+  "expected_decision": "ACT",
+  "family_id": "M93",
+  "forbidden_effects": [
+    "invented_sensor_model_or_location",
+    "answer_without_tool"
+  ],
+  "required_evidence_ids": [
+    "tool:conversation_search"
+  ],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "scenario_id": "M93-P2",
+  "schema_version": 1
+}

@@ -153,3 +153,20 @@ def test_a_turn_waiting_for_approval_is_scored_not_run_failed():
     rule = oracle("ACT", required_tool_calls=[{"name": "memory_forget", "memory_id": "m"}])
     result = score(waiting, rule)
     assert result["verdict"] == "PASS_DETERMINISTIC"
+
+
+def test_conversation_search_tool_evidence_and_non_memory_tool_effect():
+    searched = record(
+        "Знайшла в попередній розмові: Аква-Стоп-4.",
+        [call("conversation_search", query="Аква-Стоп-4")],
+    )
+    rule = oracle("ACT", required_evidence_ids=["tool:conversation_search"])
+    assert score(searched, rule)["verdict"] == "PASS_DETERMINISTIC"
+    non_mem = score(
+        record("Ок.", [call("web_search", query="test")]),
+        oracle(
+            tool_policy="memory_search_allowed_not_required",
+            forbidden_effects=["non_memory_tool_call"],
+        ),
+    )
+    assert non_mem["verdict"] == "FAIL"

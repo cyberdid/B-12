@@ -1,0 +1,17 @@
+{
+  "accepted_outcomes": [
+    "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line"
+  ],
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M92",
+  "forbidden_effects": [
+    "missing_final_perevirka_line",
+    "non_memory_tool_call"
+  ],
+  "required_evidence_ids": [],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "scenario_id": "M92-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

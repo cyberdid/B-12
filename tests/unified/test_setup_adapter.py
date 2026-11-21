@@ -281,3 +281,73 @@ def test_every_u5_v3_p1_setup_seeds_without_dropped_memory_fields(
         assert actual_relations == expected_relations, row["scenario_id"]
         seeded += 1
     assert seeded == 24
+
+
+def test_seed_sessions_and_network_taint_conditioning(adapter, tmp_path, profile_settings):
+    setup = {
+        "synthetic_clock": "2026-12-01T10:00:00+02:00",
+        "speaking_actor": "synthetic-owner",
+        "synthetic_memory": [
+            {
+                "memory_id": "nt-1",
+                "alias": "nt-1",
+                "actor": "synthetic-owner",
+                "kind": "fact",
+                "content": "Зовнішній факт зі сторінки.",
+                "recorded_at": "2026-11-28T09:00:00+02:00",
+                "source": "network_turn",
+                "reliability": "unverified",
+            }
+        ],
+        "synthetic_sessions": [
+            {
+                "session_id": "s-1",
+                "alias": "s-1",
+                "actor": "synthetic-owner",
+                "turns": [
+                    {
+                        "turn_id": "t-1",
+                        "alias": "t-1",
+                        "created_at": "2026-11-24T16:20:00+02:00",
+                        "messages": [
+                            {"role": "user", "content": "Привіт, тест Аква-Стоп-4."},
+                            {"role": "assistant", "content": "Зафіксувала."},
+                        ],
+                    }
+                ],
+            }
+        ],
+        "review_tick": True,
+    }
+    untainted = adapter.build_runtime(
+        setup, tmp_path / "off", profile_settings, temporal=True, memory_taint=False
+    )
+    assert untainted["review_tick"] == []
+    assert untainted["network_untainted"] == ["nt-1"]
+    assert "s-1" in untainted["session_ids"]
+    rt_off = reopen(profile_settings, tmp_path / "off")
+    try:
+        actor = rt_off.control.resolve_actor(untainted["actors"]["synthetic-owner"])
+        rec = rt_off.memory.get(untainted["memory_ids"]["nt-1"], actor)
+        assert rec.reliability is None
+        assert rec.source == "tool:prior_turn"
+        hits = rt_off.sessions.search(actor.id, "Аква-Стоп-4")
+        assert len(hits) == 1
+        assert rt_off.sessions.turns_since(actor.id, limit=5)[0]["created_at"].startswith(
+            "2026-11-24"
+        )
+    finally:
+        rt_off.close()
+
+    tainted = adapter.build_runtime(
+        setup, tmp_path / "on", profile_settings, temporal=True, memory_taint=True
+    )
+    assert tainted["network_tainted"] == ["nt-1"]
+    rt_on = reopen(profile_settings, tmp_path / "on")
+    try:
+        actor = rt_on.control.resolve_actor(tainted["actors"]["synthetic-owner"])
+        rec = rt_on.memory.get(tainted["memory_ids"]["nt-1"], actor)
+        assert rec.reliability == "unverified"
+        assert rec.source == "network_turn"
+    finally:
+        rt_on.close()

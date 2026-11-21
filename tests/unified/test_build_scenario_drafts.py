@@ -205,3 +205,23 @@ def test_frozen_set_requires_reviewed_oracles_and_records_the_review(tmp_path):
         assert row["status"] == "FROZEN"
         oracle = json.loads((root / row["oracle_fixture"]).read_text(encoding="utf-8"))
         assert oracle["review_status"] == "REVIEWED: codex+gemini, author fixes"
+
+
+def test_draft_with_non_default_review_status_records_pending_owner_in_notes(tmp_path):
+    builder = load_module(BUILDER_PATH, "scenario_draft_builder_pending")
+    root = tmp_path / "repo"
+    root.mkdir()
+    status_note = "DRAFT_PENDING_OWNER_REVIEW: Codex review PENDING_OWNER"
+    manifest = builder.build_set(
+        [sample_case()],
+        root=root,
+        fixture_rel_dir="f/c",
+        manifest_rel_path="s/c.json",
+        status="DRAFT",
+        review_status=status_note,
+    )
+    for row in manifest["scenarios"]:
+        assert row["status"] == "DRAFT"
+        assert status_note in row["notes"]
+        oracle = json.loads((root / row["oracle_fixture"]).read_text(encoding="utf-8"))
+        assert oracle["review_status"] == status_note

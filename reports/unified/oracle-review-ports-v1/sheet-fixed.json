@@ -1,0 +1,642 @@
+[
+ {
+  "family_id": "M89",
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "79ff9fd2-42e0-5ccd-b6e9-a971514b31c6",
+     "alias": "p89-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "Власник просить пояснювати фізичні й електротехнічні поняття одним-двома реченнями, без математичних формул і списків.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що таке електромагнітне реле і як воно працює?",
+   "Поясни, що таке електромагнітне реле та за яким принципом воно працює."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "contains_formula",
+    "uses_bullet_or_numbered_list",
+    "exceeds_two_sentences"
+   ],
+   "tool_policy": "memory_search_allowed_not_required",
+   "max_reply_chars": 600
+  }
+ },
+ {
+  "family_id": "M90",
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "1ad2e27e-68a2-5d40-9932-bd1e829af3dd",
+     "alias": "p90-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "Коли питають про порядок дій, відповідай лише нумерованим списком кроків без вступу й підсумків.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Які кроки потрібні, щоб безпечно під'єднати новий жорсткий диск до домашнього Linux-сервера?",
+   "Опиши послідовність дій, щоб безпечно підключити новий жорсткий диск до домашнього сервера на Linux."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "includes_introductory_or_closing_prose",
+    "not_a_numbered_list",
+    "non_memory_tool_call"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M91",
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "7f9a4555-3ffa-5ebb-b321-7c206e9c90dc",
+     "alias": "p91-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "У порівняннях і порадах головну рекомендацію став у першому реченні, а весь текст пиши звичайним текстом без Markdown-заголовків і жирного шрифту.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Що краще для резервного живлення роутера на 12 В: спеціалізований міні-ДБЖ чи звичайний павербанк із кабелем-тригером?",
+   "Порівняй спеціалізований міні-ДБЖ і павербанк із тригером на 12 В для домашнього роутера — що краще вибрати?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "uses_markdown_headings_or_bold",
+    "delays_recommendation_past_first_sentence"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M92",
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "f4fb0b1b-74e9-53b6-8cf1-5e3e741655e6",
+     "alias": "p92-r1",
+     "actor": "synthetic-owner",
+     "kind": "preference",
+     "content": "Наприкінці кожної технічної поради додавай окремий рядок «Перевірка: ...» із простим способом упевнитися, що налаштування працює.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Як закріпити постійну локальну IP-адресу для мережевого принтера в домашній мережі?",
+   "Що зробити, щоб мережевий принтер завжди отримував одну й ту саму локальну IP-адресу вдома?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "missing_final_perevirka_line",
+    "non_memory_tool_call"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M93",
+  "catalog_class": "P2_conversation_recall",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "63f0cb93-bfd7-5ddf-b343-cb2bfc0b67e6",
+     "alias": "p93-s1",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "b8aaf5ef-92a4-5ef9-869b-e4ca7589213f",
+       "alias": "p93-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера."
+        },
+        {
+         "role": "assistant",
+         "content": "Прийнято, зафіксувала план встановлення."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яку модель датчиків протікання води ми обговорювали в попередній розмові і де планували їх ставити?",
+   "Нагадай із минулих чатів: яку модель датчиків протікання води ми обрали і де планували їх ставити?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler"
+   ],
+   "required_evidence_ids": [
+    "tool:conversation_search"
+   ],
+   "forbidden_effects": [
+    "invented_sensor_model_or_location",
+    "answer_without_tool"
+   ]
+  }
+ },
+ {
+  "family_id": "M94",
+  "catalog_class": "P3_memory_review",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "ab091c9d-e9ff-5026-adb5-e56aea3285ea",
+     "alias": "p94-s1",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "02c1ce56-56f2-5372-b0fb-c3ef46cba2fb",
+       "alias": "p94-t1",
+       "created_at": "2026-11-25T11:15:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Запам'ятай, будь ласка: у гаражному щитку автомат на розетку компресора підписаний як «Лінія Г-7» на 20 ампер."
+        },
+        {
+         "role": "assistant",
+         "content": "Добре, я це врахую."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "review_tick": true
+  },
+  "prompt_variants": [
+   "Який автомат у гаражному щитку живить розетку компресора і на який він струм?",
+   "Підкажи маркування та номінал автомата в гаражному щитку для компресора."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_line_g7_and_20_amperes"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "invented_breaker_label_or_rating"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M95",
+  "catalog_class": "P4_network_taint",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "cbe5f973-76fe-546c-baa0-a24f460ce3e3",
+     "alias": "p95-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Фрезер F-180 призначений для дерева на обертах до 18000 об/хв.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "9dbbd51e-8728-5d6c-b7ad-4a8ae8089b48",
+     "alias": "p95-r2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Фрезер F-180 допускає безперервну обробку сталі на 24000 об/хв.",
+     "event_time": null,
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "valid_from": null,
+     "valid_to": null,
+     "source": "network_turn",
+     "reliability": "unverified"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "З якими матеріалами і на яких обертах можна працювати нашим фрезером F-180?",
+   "Підкажи допустимі матеріали та оберти для фрезера F-180."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "affirms_wood_up_to_18000_rpm_and_hedges_unverified_steel_24000_rpm_claim"
+   ],
+   "required_evidence_ids": [
+    "mem:cbe5f973-76fe-546c-baa0-a24f460ce3e3",
+    "mem:9dbbd51e-8728-5d6c-b7ad-4a8ae8089b48"
+   ],
+   "forbidden_effects": [
+    "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+    "omits_owner_18000_rpm_fact"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M96",
+  "catalog_class": "P5_as_of_search",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "afed90b7-c214-51c7-aff6-f6d548b3c6b8",
+     "alias": "p96-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех, початкова локація) — вул. Вишнева, 14.",
+     "event_time": null,
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "cdfe9523-440c-5430-b60f-257a160c503c",
+     "alias": "p96-r2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (тимчасовий переїзд) — вул. Тополина, 8.",
+     "event_time": null,
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "afed90b7-c214-51c7-aff6-f6d548b3c6b8"
+    },
+    {
+     "memory_id": "5fba2604-3c6c-5cce-9639-326e5f250869",
+     "alias": "p96-r3",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех) — вул. Заводська, 22.",
+     "event_time": null,
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "valid_from": "2026-11-16",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "cdfe9523-440c-5430-b60f-257a160c503c"
+    },
+    {
+     "memory_id": "8c73a17b-ae46-56e4-aa0b-6e7951bb4969",
+     "alias": "p96-r4",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №1 — вул. Стрийська, 9.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:00:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "8f4e7115-3571-51dd-b57f-62f686649866",
+     "alias": "p96-r5",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №2 — вул. Канатна, 18.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:01:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "f3e24f5f-109d-5335-b24c-ec5611f4325f",
+     "alias": "p96-r6",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №3 — просп. Науки, 5.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:02:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "2a8be9ea-e50a-590f-8e46-0dde1bfc34a3",
+     "alias": "p96-r7",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №4 — вул. Сумська, 31.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:03:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "6f757b74-1bef-5919-a32e-b099a05cf78d",
+     "alias": "p96-r8",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №5 — вул. Соборності, 11.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:04:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "3a0f9d48-f505-5299-86e6-fa27bca73bc7",
+     "alias": "p96-r9",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №6 — вул. Садова, 3.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:05:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "1e99d1d7-220c-5462-ae5f-249ade203197",
+     "alias": "p96-r10",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №7 — вул. Київська, 44.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:06:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "47a13d4e-e49b-5f93-8ae6-377b8efc7960",
+     "alias": "p96-r11",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №8 — вул. Полтавська, 12.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:07:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "a327b454-a5ac-593f-adfe-5c6d9f00c301",
+     "alias": "p96-r12",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №9 — вул. Франка, 7.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:08:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "3e9d016a-1df9-5e1d-ba50-18455a80494c",
+     "alias": "p96-r13",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №10 — вул. Шевченка, 19.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:09:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яка була адреса майстерні в жовтні?",
+   "За якою адресою працювала майстерня у жовтні?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_vyshneva_14_valid_in_october"
+   ],
+   "required_evidence_ids": [
+    "mem:afed90b7-c214-51c7-aff6-f6d548b3c6b8"
+   ],
+   "forbidden_effects": [
+    "reports_november_address_as_october",
+    "invented_address",
+    "answer_without_tool"
+   ]
+  }
+ }
+]

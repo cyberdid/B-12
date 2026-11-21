@@ -1,0 +1,51 @@
+{
+  "family_id": "M93",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "p93-s1",
+        "session_id": "63f0cb93-bfd7-5ddf-b343-cb2bfc0b67e6",
+        "turns": [
+          {
+            "alias": "p93-t1",
+            "created_at": "2026-11-24T16:20:00+02:00",
+            "messages": [
+              {
+                "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+                "role": "user"
+              },
+              {
+                "content": "Прийнято, зафіксувала план встановлення.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "b8aaf5ef-92a4-5ef9-869b-e4ca7589213f"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

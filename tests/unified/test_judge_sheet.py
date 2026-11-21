@@ -110,3 +110,12 @@ def test_pilot_keeps_metric_tagged_criteria_when_other_check_deterministically_f
         "no_current_format_rule_or_asks": "required",
         "applies_revoked_pdf_rule": "prohibited",
     }
+
+
+def test_facts_include_synthetic_sessions_and_review_tick(tmp_path):
+    write_record(tmp_path / "rec", "M94-P1", "Автомат Лінія Г-7 на 20 А.")
+    sheet = build(ROOT / "evals/unified/scenario_sets/ports-live-v1.json", tmp_path / "rec", ROOT)
+    assert len(sheet) == 1
+    facts = sheet[0]["synthetic_facts"]
+    assert facts["review_tick"] is True
+    assert len(facts["synthetic_sessions"]) == 1

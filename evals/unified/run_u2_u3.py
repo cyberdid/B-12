@@ -198,6 +198,10 @@ def run_scenario(
         existing_files_root=existing_files_root,
         temporal=memory_temporal,
         scoped="memory_scoped" in runtime_flags,
+        memory_taint="memory_taint" in runtime_flags,
+        memory_review="memory_review" in runtime_flags,
+        memory_review_approval="memory_review_approval" in runtime_flags,
+        memory_grounding="memory_grounding" in runtime_flags,
     )
     from b12.runtime import open_runtime
 
@@ -277,7 +281,17 @@ def run_scenario(
             "tokens_prompt": sum(int(m.get("prompt_eval_count", 0) or 0) for m in metrics),
             "tokens_completion": sum(int(m.get("eval_count", 0) or 0) for m in metrics),
             "seed_report": {
-                k: report[k] for k in ("dropped_fields", "applied_relations", "revoked_memories")
+                k: report[k]
+                for k in (
+                    "dropped_fields",
+                    "applied_relations",
+                    "revoked_memories",
+                    "review_tick",
+                    "network_tainted",
+                    "network_untainted",
+                    "session_ids",
+                )
+                if k in report
             },
             "tool_policy": tool_policy,
         }

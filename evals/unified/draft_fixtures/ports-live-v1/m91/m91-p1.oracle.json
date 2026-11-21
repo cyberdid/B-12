@@ -1,0 +1,17 @@
+{
+  "accepted_outcomes": [
+    "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold"
+  ],
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M91",
+  "forbidden_effects": [
+    "uses_markdown_headings_or_bold",
+    "delays_recommendation_past_first_sentence"
+  ],
+  "required_evidence_ids": [],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "scenario_id": "M91-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

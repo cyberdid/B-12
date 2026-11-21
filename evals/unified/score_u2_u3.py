@@ -22,6 +22,8 @@ TOOLS = {
     "memory_store",
     "memory_forget",
     "memory_supersede",
+    "conversation_search",
+    "clarify",
     "note_add",
     "system_info",
     "run_command",

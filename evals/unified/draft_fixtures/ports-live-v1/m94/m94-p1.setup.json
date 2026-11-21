@@ -1,0 +1,52 @@
+{
+  "family_id": "M94",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "p94-s1",
+        "session_id": "ab091c9d-e9ff-5026-adb5-e56aea3285ea",
+        "turns": [
+          {
+            "alias": "p94-t1",
+            "created_at": "2026-11-25T11:15:00+02:00",
+            "messages": [
+              {
+                "content": "Запам'ятай, будь ласка: у гаражному щитку автомат на розетку компресора підписаний як «Лінія Г-7» на 20 ампер.",
+                "role": "user"
+              },
+              {
+                "content": "Добре, я це врахую.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "02c1ce56-56f2-5372-b0fb-c3ef46cba2fb"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,19 @@
+{
+  "accepted_outcomes": [
+    "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists"
+  ],
+  "catalog_class": "P1_preference_placement",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M89",
+  "forbidden_effects": [
+    "contains_formula",
+    "uses_bullet_or_numbered_list",
+    "exceeds_two_sentences"
+  ],
+  "max_reply_chars": 600,
+  "required_evidence_ids": [],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "scenario_id": "M89-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

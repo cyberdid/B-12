@@ -209,6 +209,8 @@ def build_set(
                 notes = (
                     f"Synthetic; frozen after oracle review ({review_status})."
                     if status == "FROZEN"
+                    else f"Synthetic draft ({review_status}); not frozen or runner-validated."
+                    if review_status != "UNREVIEWED"
                     else "Synthetic draft; not independently reviewed or runner-validated."
                 )
                 if case.get("blocked_by"):

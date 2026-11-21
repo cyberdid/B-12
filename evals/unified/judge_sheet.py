@@ -46,11 +46,13 @@ def _facts(setup):
         ]
     for key in (
         "synthetic_goals",
+        "synthetic_sessions",
         "synthetic_environment",
         "missing_files",
         "control_policy",
         "speaking_actor",
         "synthetic_clock",
+        "review_tick",
     ):
         if setup.get(key) is not None:
             facts[key] = setup[key]
