@@ -77,6 +77,8 @@ class Settings(BaseModel):
     # Network taint for memory writes in the same turn (OpenClaw-derived, 20.11.2026): once any
     # network.http tool completes in a turn, memory_store marks new records unverified/network_turn.
     memory_taint: bool = False
+    # ADR-020: background post-turn memory review of recent unreviewed interactive turns.
+    memory_review: bool = False
     # FTS5 search over the actor's own past conversation turns (`conversation_search`). Off until
     # measured.
     session_search: bool = False
@@ -254,6 +256,7 @@ class Settings(BaseModel):
                 "preference_rules",
                 "memory_grounding",
                 "memory_taint",
+                "memory_review",
                 "session_search",
                 "memory_ranking",
                 "goal_contract",

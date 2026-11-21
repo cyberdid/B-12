@@ -178,6 +178,33 @@ class SessionStore:
         """Latest complete turns, oldest first; `live` hides turns with dead evidence."""
         return self.history_with_tags(session_id, actor_id, max_turns=max_turns, live=live)[0]
 
+    def _turn_messages(self, turn_id: str) -> list[dict]:
+        result = []
+        for message in self.db.execute(
+            "SELECT * FROM messages WHERE turn_id=? ORDER BY position", (turn_id,)
+        ):
+            item = {
+                "id": message["id"],
+                "turn_id": turn_id,
+                "role": message["role"],
+                "content": message["content"],
+            }
+            if message["tool_calls"]:
+                item["tool_calls"] = json.loads(message["tool_calls"])
+            for key in ("tool_name", "tool_call_id"):
+                if message[key] is not None:
+                    item[key] = message[key]
+            result.append(item)
+        return result
+
+    def _turn_tags(self, turn_id: str) -> dict[str, str]:
+        return {
+            tag["evidence_id"]: tag["kind"]
+            for tag in self.db.execute(
+                "SELECT evidence_id,kind FROM tags WHERE turn_id=?", (turn_id,)
+            )
+        }
+
     def history_with_tags(
         self,
         session_id: str,
@@ -200,12 +227,7 @@ class SessionStore:
         ):
             if len(selected) >= max_turns:
                 break
-            tags = {
-                tag["evidence_id"]: tag["kind"]
-                for tag in self.db.execute(
-                    "SELECT evidence_id,kind FROM tags WHERE turn_id=?", (row["turn_id"],)
-                )
-            }
+            tags = self._turn_tags(row["turn_id"])
             if live is not None and not all(live(e, k) for e, k in tags.items()):
                 continue
             selected.append((row["turn_id"], tags))
@@ -214,22 +236,45 @@ class SessionStore:
             carried.update(tags)
         result = []
         for turn_id, _ in reversed(selected):
-            for message in self.db.execute(
-                "SELECT * FROM messages WHERE turn_id=? ORDER BY position", (turn_id,)
-            ):
-                item = {
-                    "id": message["id"],
-                    "turn_id": turn_id,
-                    "role": message["role"],
-                    "content": message["content"],
-                }
-                if message["tool_calls"]:
-                    item["tool_calls"] = json.loads(message["tool_calls"])
-                for key in ("tool_name", "tool_call_id"):
-                    if message[key] is not None:
-                        item[key] = message[key]
-                result.append(item)
+            result.extend(self._turn_messages(turn_id))
         return result, carried
+
+    def turns_since(
+        self,
+        actor_id: str,
+        after_sequence: int = 0,
+        limit: int = 6,
+        *,
+        live: Callable[[str, str], bool] | None = None,
+    ) -> list[dict]:
+        """Complete turns for `actor_id` with `sequence > after_sequence`, oldest first."""
+        if type(after_sequence) is not int or after_sequence < 0:
+            raise ValueError("after_sequence must be a nonnegative integer")
+        if type(limit) is not int or limit < 0:
+            raise ValueError("limit must be a nonnegative integer")
+        if limit == 0:
+            return []
+        result: list[dict] = []
+        for row in self.db.execute(
+            "SELECT sequence, turn_id, session_id, created_at FROM turns "
+            "WHERE actor_id=? AND sequence>? ORDER BY sequence ASC",
+            (actor_id, after_sequence),
+        ):
+            if len(result) >= limit:
+                break
+            tags = self._turn_tags(row["turn_id"])
+            if live is not None and not all(live(e, k) for e, k in tags.items()):
+                continue
+            result.append(
+                {
+                    "turn_id": row["turn_id"],
+                    "sequence": row["sequence"],
+                    "session_id": row["session_id"],
+                    "created_at": row["created_at"],
+                    "messages": self._turn_messages(row["turn_id"]),
+                }
+            )
+        return result
 
     def save_checkpoint(
         self, turn_id: str, session_id: str, actor_id: str, state: dict, *, tags: Mapping[str, str]

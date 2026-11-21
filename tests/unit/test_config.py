@@ -148,6 +148,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "preference_placement": "system",
         "memory_grounding": False,
         "memory_taint": False,
+        "memory_review": False,
         "session_search": False,
         "memory_ranking": False,
         "goal_contract": False,
@@ -321,3 +322,9 @@ def test_h5_flags_are_opt_in_and_environment_configurable(tmp_path):
     )
     assert env.stable_prefix is True
     assert env.parallel_reads is True
+
+
+def test_memory_review_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_review is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW": "true"}
+    assert Settings.from_env(env).memory_review is True

@@ -249,6 +249,10 @@ class ControlStore:
         ).fetchone()
         return dict(row) if row else None
 
+    def turn_task_id(self, turn_id: str) -> str | None:
+        row = self.db.execute("SELECT task_id FROM turns WHERE id=?", (turn_id,)).fetchone()
+        return row[0] if row else None
+
     def sessions_for(self, actor_id: str) -> list[str]:
         return [
             row[0]

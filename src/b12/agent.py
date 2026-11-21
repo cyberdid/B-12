@@ -791,6 +791,7 @@ class Agent:
         self._waiting: dict[str, dict] = {}
         self._revisions: dict[str, int] = {}
         self._tainted: set[str] = set()
+        self._tainted_history: set[str] = set()
         self.started_at = time.time()
         # Wall clock for "today" in temporal memory (ADR-015); evaluations pin it.
         self.clock = lambda: datetime.now(UTC)
@@ -1851,6 +1852,7 @@ class Agent:
             if tool is not None and tool.capability == "network.http":
                 state["tainted"] = True
                 self._tainted.add(context.turn_id)
+                self._tainted_history.add(context.turn_id)
             self._track_files(state, call, result)
             if call.name == "file_read":
                 chunks = state.setdefault("chunks", {})
@@ -2104,6 +2106,11 @@ class Agent:
         self.sessions.drop_checkpoint(context.turn_id, actor.id)
 
     def _commit(self, context, state, active) -> bool:
+        tainted = bool(
+            state.get("tainted")
+            or context.turn_id in self._tainted
+            or context.turn_id in self._tainted_history
+        )
         self._tainted.discard(context.turn_id)
         if active.invalidated:
             return False
@@ -2128,4 +2135,6 @@ class Agent:
             state["turn_messages"],
             tags=state["tags"],
         )
+        if tainted:
+            self.control.set_meta(f"tainted_turn:{context.turn_id}", "1")
         return True

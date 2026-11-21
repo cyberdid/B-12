@@ -151,6 +151,7 @@ RUNTIME_FLAGS = (
     "preference_rules",
     "memory_grounding",
     "memory_taint",
+    "memory_review",
     "memory_as_of",
     "session_search",
     "memory_ranking",
@@ -330,6 +331,9 @@ def main(argv=None):
         "--memory-taint", action="store_true", help="taint memory writes after network calls"
     )
     parser.add_argument(
+        "--memory-review", action="store_true", help="ADR-020 post-turn memory review"
+    )
+    parser.add_argument(
         "--memory-as-of", action="store_true", help="historical as_of parameter on memory_search"
     )
     parser.add_argument(
@@ -428,6 +432,7 @@ def main(argv=None):
                     ("preference_rules", args.preference_rules),
                     ("memory_grounding", args.memory_grounding),
                     ("memory_taint", args.memory_taint),
+                    ("memory_review", args.memory_review),
                     ("memory_as_of", args.memory_as_of),
                     ("session_search", args.session_search),
                     ("memory_ranking", args.memory_ranking),

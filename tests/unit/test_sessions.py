@@ -171,3 +171,49 @@ def test_applied_invalidation_ledger_deduplicates_operations(tmp_path):
     store.mark_invalidation_applied(operation)
     assert store.invalidation_applied(operation)
     store.close()
+
+
+def test_turns_since_orders_by_sequence_filters_actor_and_live_tags(tmp_path):
+    from b12.sessions import SessionStore
+
+    actor, other, session, other_session, dead_ev, live_ev = new_ids(6)
+    t1, t2, t3, t_other = new_ids(4)
+    store = SessionStore(tmp_path / "sessions")
+    try:
+        store.commit_turn(
+            session, actor, t1, turn("перший", "відповідь 1"), tags={live_ev: "memory"}
+        )
+        store.commit_turn(
+            session, actor, t2, turn("мертвий", "відповідь 2"), tags={dead_ev: "memory"}
+        )
+        store.commit_turn(other_session, other, t_other, turn("чужий", "ні"), tags={})
+        store.commit_turn(session, actor, t3, turn("третій", "відповідь 3"), tags={})
+
+        all_actor = store.turns_since(actor, after_sequence=0, limit=6)
+        assert [item["turn_id"] for item in all_actor] == [t1, t2, t3]
+        assert all_actor[0]["sequence"] < all_actor[1]["sequence"] < all_actor[2]["sequence"]
+        assert all_actor[0]["session_id"] == session
+        assert [m["content"] for m in all_actor[0]["messages"]] == ["перший", "відповідь 1"]
+
+        live_only = store.turns_since(
+            actor,
+            after_sequence=0,
+            limit=6,
+            live=lambda evidence_id, kind: evidence_id != dead_ev,
+        )
+        assert [item["turn_id"] for item in live_only] == [t1, t3]
+
+        paged = store.turns_since(
+            actor,
+            after_sequence=all_actor[0]["sequence"],
+            limit=1,
+            live=lambda evidence_id, kind: evidence_id != dead_ev,
+        )
+        assert [item["turn_id"] for item in paged] == [t3]
+
+        with pytest.raises(ValueError):
+            store.turns_since(actor, after_sequence=-1)
+        with pytest.raises(ValueError):
+            store.turns_since(actor, limit=-1)
+    finally:
+        store.close()

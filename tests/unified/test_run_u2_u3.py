@@ -280,6 +280,7 @@ def test_runtime_flags_reach_the_record(tmp_path, capsys):
                 "--memory-temporal",
                 "--memory-as-of",
                 "--memory-taint",
+                "--memory-review",
                 "--session-search",
                 "--memory-ranking",
                 "--goal-contract",
