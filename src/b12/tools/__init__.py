@@ -23,6 +23,8 @@ def register_host_tools(
     resolver=None,
     session_search=False,
     clarify_tool=False,
+    skill_store=None,
+    skills=False,
 ):
     """Register all concrete host tools; caller owns/closes injected stores.
 
@@ -32,6 +34,7 @@ def register_host_tools(
     """
     from b12.tools import clarify, conversation, filesystem, network, notes, process
     from b12.tools import memory as memory_tools
+    from b12.tools import skills as skill_tools
 
     filesystem.register(registry, backups, verify_writes=verify_writes)
     notes.register(registry)
@@ -43,6 +46,8 @@ def register_host_tools(
     network.register(registry)
     if session_search:
         conversation.register(registry, sessions=sessions, resolver=resolver)
+    if skills:
+        skill_tools.register(registry, skills=skill_store)
     memory_tools.register(
         registry,
         memory=memory,

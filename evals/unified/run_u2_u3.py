@@ -161,6 +161,7 @@ RUNTIME_FLAGS = (
     "clarify_tool",
     "stable_prefix",
     "parallel_reads",
+    "skills",
 )
 
 
@@ -383,6 +384,11 @@ def main(argv=None):
         action="store_true",
         help="run consecutive *.read tool calls concurrently via asyncio.gather",
     )
+    parser.add_argument(
+        "--skills",
+        action="store_true",
+        help="ADR-021 procedural skills index and skill_view/skill_propose tools",
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -462,6 +468,7 @@ def main(argv=None):
                     ("clarify_tool", args.clarify_tool),
                     ("stable_prefix", args.stable_prefix),
                     ("parallel_reads", args.parallel_reads),
+                    ("skills", args.skills),
                 )
                 if on
             ),

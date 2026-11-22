@@ -289,6 +289,7 @@ def test_runtime_flags_reach_the_record(tmp_path, capsys):
                 "--clarify-tool",
                 "--stable-prefix",
                 "--parallel-reads",
+                "--skills",
                 "--preference-placement",
                 "query",
             ]
@@ -328,6 +329,23 @@ async def test_h5_flags_reach_run_scenario(scripted_ollama, tmp_path):
         runtime_flags=("clarify_tool", "stable_prefix", "parallel_reads"),
     )
     assert sorted(record["runtime_flags"]) == ["clarify_tool", "parallel_reads", "stable_prefix"]
+
+
+async def test_skills_flag_reaches_run_scenario(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["script"] = [{"content": "Батарейки."}]
+    record = await asyncio.to_thread(
+        run_scenario,
+        row("C01-P1"),
+        ROOT,
+        base,
+        tmp_path / "w",
+        files_root=tmp_path / "fs",
+        runtime_flags=("skills",),
+    )
+    assert record["runtime_flags"] == ["skills"]
+    offered = {t["function"]["name"] for t in state["requests"][0].get("tools", [])}
+    assert "skill_view" in offered
 
 
 async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):

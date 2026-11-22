@@ -159,6 +159,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "clarify_tool": False,
         "stable_prefix": False,
         "parallel_reads": False,
+        "skills": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -335,3 +336,9 @@ def test_memory_review_approval_is_opt_in_and_environment_configurable(tmp_path)
     assert Settings(state_dir=tmp_path).memory_review_approval is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW_APPROVAL": "true"}
     assert Settings.from_env(env).memory_review_approval is True
+
+
+def test_skills_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).skills is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_SKILLS": "true"}
+    assert Settings.from_env(env).skills is True

@@ -104,6 +104,8 @@ class Settings(BaseModel):
     # Task H5: run consecutive read-only (*.read) tool calls concurrently via asyncio.gather while
     # preserving call order in results and keeping effectful calls sequential. Off until measured.
     parallel_reads: bool = False
+    # ADR-021: procedural skills index and skill_view/skill_propose tools. Off until measured.
+    skills: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -268,6 +270,7 @@ class Settings(BaseModel):
                 "clarify_tool",
                 "stable_prefix",
                 "parallel_reads",
+                "skills",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

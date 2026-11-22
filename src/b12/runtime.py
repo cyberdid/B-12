@@ -21,6 +21,7 @@ from b12.retrieval import KnowledgeIndex
 from b12.schedules import ScheduleStore
 from b12.service import Operations
 from b12.sessions import SessionStore
+from b12.skills import SkillStore
 from b12.tools import register_host_tools
 from b12.tools.filesystem import BackupStore
 from b12.tools.registry import ToolRegistry
@@ -42,6 +43,7 @@ class Runtime:
     attention: AttentionPolicy
     operations: Operations
     schedules: ScheduleStore | None = None
+    skills: SkillStore | None = None
     mcp_servers: list = field(default_factory=list)
     speakers: object = None
 
@@ -94,6 +96,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     sessions.on_clear_turns = _on_clear_turns
     goals = GoalStore(root / "goals")
     schedules = ScheduleStore(root / "goals")
+    skills_store = SkillStore(root / "skills")
     attention = AttentionPolicy(root / "attention", settings)
     operations = Operations(root)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)
@@ -126,6 +129,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     agent.purge = purge
     agent.goals = goals  # current preferences of the speaker are shown to the model
     agent.schedules = schedules
+    agent.skills = skills_store
     if settings.embedding_python:
         from b12.semantic import BridgeEmbedder, SemanticIndex
 
@@ -158,6 +162,8 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         resolver=resolver,
         session_search=settings.session_search,
         clarify_tool=settings.clarify_tool,
+        skill_store=skills_store,
+        skills=settings.skills,
     )
     if not settings.forget_requires_approval:
         registry.approval_exempt.add("memory_forget")
@@ -184,5 +190,6 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         attention,
         operations,
         schedules=schedules,
+        skills=skills_store,
         speakers=speakers,
     )
