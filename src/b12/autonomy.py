@@ -223,9 +223,11 @@ class Scheduler:
         clock=_clock,
         max_goals_per_tick: int = 2,
         reflection_interval_s: float = 6 * 3600,
+        skill_curate_interval_s: float = 7 * 86400,
     ):
         self.runtime, self.clock, self.max_goals = runtime, clock, max_goals_per_tick
         self.reflection_interval = timedelta(seconds=reflection_interval_s)
+        self.skill_curate_interval = timedelta(seconds=skill_curate_interval_s)
         path = runtime.settings.state_dir / "scheduler.lock"
         self._lock = os.open(path, os.O_CREAT | os.O_RDWR, 0o600)
         try:
@@ -883,6 +885,24 @@ class Scheduler:
             outcomes.append({"actor_id": actor_id, **await reviewer.review(actor)})
         return outcomes
 
+    async def curate_skills_idle(self) -> list[dict]:
+        """ADR-021: run deterministic skill curation once a week when idle."""
+        rt = self.runtime
+        if not getattr(rt.settings, "skills", False) or getattr(rt, "skills", None) is None:
+            return []
+        now = self.clock()
+        last = rt.control.get_meta("last_skill_curate")
+        if last and now - datetime.fromisoformat(last) < self.skill_curate_interval:
+            return []
+        for actor_id in rt.control.actor_ids():
+            if self._busy(actor_id):
+                return [{"actor_id": actor_id, "state": "skipped", "reason": "actor_busy"}]
+            if not rt.attention.execution_allowed(actor_id):
+                return [{"actor_id": actor_id, "state": "skipped", "reason": "owner_stop"}]
+        report = rt.skills.curate(now)
+        rt.control.set_meta("last_skill_curate", now.isoformat())
+        return [{"state": "curated", **report}]
+
     async def run(self, stop: asyncio.Event):
         while not stop.is_set():
             await self.tick()
@@ -894,6 +914,10 @@ class Scheduler:
                 await self.review_memory_idle()
             except Exception:
                 log.exception("idle memory review failed")
+            try:
+                await self.curate_skills_idle()
+            except Exception:
+                log.exception("idle skill curation failed")
             try:
                 await asyncio.wait_for(stop.wait(), self.runtime.settings.scheduler_tick_s)
             except TimeoutError:

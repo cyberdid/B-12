@@ -454,11 +454,22 @@ async def cmd_session_clear(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
         owner = require_owner(runtime)
+        before_forgotten = {
+            s["name"] for s in runtime.skills.list() if s["status"] == "source_forgotten"
+        }
         # The runtime's clear hook already forgets reviewer records of the cleared turns.
         runtime.sessions.clear_session(owner.session_id, owner.actor_id)
         actor = owner.actor()
         runtime.memory.forget_by_locator(actor, f"session:{owner.session_id}")
-        emit_json({"cleared": owner.session_id})
+        after_forgotten = [
+            s["name"]
+            for s in runtime.skills.list()
+            if s["status"] == "source_forgotten" and s["name"] not in before_forgotten
+        ]
+        payload: dict[str, object] = {"cleared": owner.session_id}
+        if after_forgotten:
+            payload["source_forgotten_skills"] = after_forgotten
+        emit_json(payload)
         return 0
     finally:
         runtime.close()
@@ -735,6 +746,72 @@ async def cmd_intent(args, settings) -> int:
             return 1
         emit_json({"removed": args.value})
         return 0
+    finally:
+        runtime.close()
+
+
+async def cmd_skills(args, settings) -> int:
+    runtime = open_or_fail(settings)
+    try:
+        require_owner(runtime)
+        skills = runtime.skills
+        if args.action == "list":
+            emit_json(skills.list())
+            return 0
+        if args.action == "pending":
+            emit_json(skills.list_pending())
+            return 0
+        if not args.value:
+            emit_json({"error": "id_required"})
+            return 1
+        if args.action == "show":
+            try:
+                emit_json(skills.show(args.value))
+            except (KeyError, ValueError):
+                emit_json({"error": "not_found"})
+                return 1
+            return 0
+        if args.action == "diff":
+            try:
+                pending = skills.get_pending(args.value)
+            except (KeyError, ValueError):
+                emit_json({"error": "not_found"})
+                return 1
+            emit_json(
+                {
+                    "id": pending["id"],
+                    "name": pending["name"],
+                    "action": pending.get("action", "create"),
+                    "diff": pending.get("diff", ""),
+                }
+            )
+            return 0
+        if args.action == "approve":
+            try:
+                emit_json(skills.approve(args.value))
+            except (KeyError, ValueError):
+                emit_json({"error": "not_found"})
+                return 1
+            return 0
+        if args.action == "reject":
+            try:
+                rejected = skills.reject(args.value)
+            except ValueError:
+                rejected = False
+            if not rejected:
+                emit_json({"error": "not_found"})
+                return 1
+            emit_json({"rejected": args.value})
+            return 0
+        if args.action in ("pin", "unpin"):
+            try:
+                fn = skills.pin if args.action == "pin" else skills.unpin
+                emit_json(fn(args.value))
+            except (KeyError, ValueError):
+                emit_json({"error": "not_found"})
+                return 1
+            return 0
+        return 1
     finally:
         runtime.close()
 
@@ -1298,6 +1375,12 @@ def parser() -> argparse.ArgumentParser:
     intent.add_argument("--days", type=int, default=90, help="термін дії в днях")
     intent.add_argument("--fires", type=int, default=3, help="максимальна кількість спрацювань")
     intent.add_argument("--cooldown", type=int, default=86400, help="інтервал повтору в секундах")
+    skills = sub.add_parser("skills", help="процедурні навички власника (ADR-021)")
+    skills.add_argument(
+        "action",
+        choices=("list", "show", "pending", "diff", "approve", "reject", "pin", "unpin"),
+    )
+    skills.add_argument("value", nargs="?", default="")
     for name in ("quiet", "stop"):
         sub.add_parser(
             name, help="тихий режим" if name == "quiet" else "зупинка фону"
@@ -1548,6 +1631,7 @@ def main(argv=None) -> int:
         "goals": cmd_goals,
         "schedule": cmd_schedule,
         "intent": cmd_intent,
+        "skills": cmd_skills,
         "quiet": cmd_flag,
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,

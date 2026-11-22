@@ -345,7 +345,7 @@ async def test_skills_flag_reaches_run_scenario(scripted_ollama, tmp_path):
     )
     assert record["runtime_flags"] == ["skills"]
     offered = {t["function"]["name"] for t in state["requests"][0].get("tools", [])}
-    assert "skill_view" in offered
+    assert {"skill_view", "skill_propose"} <= offered
 
 
 async def test_preference_placement_query_flag_reaches_run_scenario(scripted_ollama, tmp_path):

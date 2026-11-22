@@ -88,15 +88,40 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     backups = BackupStore(root / "backups")
     sessions = SessionStore(root / "sessions")
 
+    goals = GoalStore(root / "goals")
+    schedules = ScheduleStore(root / "goals")
+    skills_store = SkillStore(root / "skills")
+
+    def _report_forgotten_skills(actor_id: str, forgotten: list[str]) -> None:
+        for name in forgotten:
+            goals.add_proposal(
+                actor_id,
+                f"skill:{name}",
+                f"Навичка «{name}» втратила вихідну сесію і позначена source_forgotten "
+                "(файл збережено для перевірки власником).",
+                delivered=False,
+                reason="source_forgotten",
+                attention_id=None,
+                tags={},
+                decision="inbox",
+            )
+
     def _on_clear_turns(actor_id: str, turn_ids: list[str]) -> None:
         actor = control.resolve_actor(actor_id)
         for turn_id in turn_ids:
             memory.forget_by_locator(actor, f"turn:{turn_id}", source="post_turn_review")
+        _report_forgotten_skills(
+            actor_id, skills_store.mark_source_forgotten(turn_ids=turn_ids, actor_id=actor_id)
+        )
+
+    def _on_clear_session(actor_id: str, session_id: str) -> None:
+        _report_forgotten_skills(
+            actor_id,
+            skills_store.mark_source_forgotten(session_ids=[session_id], actor_id=actor_id),
+        )
 
     sessions.on_clear_turns = _on_clear_turns
-    goals = GoalStore(root / "goals")
-    schedules = ScheduleStore(root / "goals")
-    skills_store = SkillStore(root / "skills")
+    sessions.on_clear_session = _on_clear_session
     attention = AttentionPolicy(root / "attention", settings)
     operations = Operations(root)
     registry = ToolRegistry(control, timeout_s=settings.tool_timeout_s)

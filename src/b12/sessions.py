@@ -67,8 +67,10 @@ class SessionStore:
         path: Path,
         *,
         on_clear_turns: Callable[[str, list[str]], None] | None = None,
+        on_clear_session: Callable[[str, str], None] | None = None,
     ):
         self.on_clear_turns = on_clear_turns
+        self.on_clear_session = on_clear_session
         self.path = Path(path).absolute()
         if self.path.is_symlink():
             raise ValueError("session directory cannot be a symlink")
@@ -444,6 +446,8 @@ class SessionStore:
             self._delete_turns(turns)
         if self.on_clear_turns is not None and turns:
             self.on_clear_turns(actor_id, list(turns))
+        if self.on_clear_session is not None:
+            self.on_clear_session(actor_id, session_id)
         return turns
 
     def invalidation_applied(self, operation_id: str) -> bool:
