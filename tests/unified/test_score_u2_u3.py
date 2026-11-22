@@ -170,3 +170,40 @@ def test_conversation_search_tool_evidence_and_non_memory_tool_effect():
         ),
     )
     assert non_mem["verdict"] == "FAIL"
+
+
+def test_literal_conversation_search_without_call_is_unexecuted_claim():
+    claimed = score(
+        record("Я перевірила через conversation_search: згадок немає."),
+        oracle(tool_policy="memory_search_allowed_not_required"),
+    )
+    assert claimed["verdict"] == "FAIL"
+    unexecuted = checks(claimed, "unexecuted_claim")
+    assert len(unexecuted) == 1
+    assert unexecuted[0]["result"] == "FAIL"
+    assert unexecuted[0]["detail"] == "conversation_search"
+
+    executed = score(
+        record(
+            "Через conversation_search знайдено запис Аква-Стоп-4.",
+            [call("conversation_search", query="Аква-Стоп-4")],
+        ),
+        oracle("ACT", required_evidence_ids=["tool:conversation_search"]),
+    )
+    assert executed["verdict"] == "PASS_DETERMINISTIC"
+    assert checks(executed, "unexecuted_claim") == []
+
+
+def test_clarify_word_in_reply_does_not_trigger_unexecuted_claim():
+    replied = score(
+        record("Please clarify which sensor model you mean."),
+        oracle("NO_TOOL"),
+    )
+    assert replied["verdict"] == "PASS_DETERMINISTIC"
+    assert checks(replied, "unexecuted_claim") == []
+
+    forbidden = score(
+        record("?", [call("clarify", question="Which one?", choices=["A", "B"])]),
+        oracle("ASK", forbidden_effects=["clarify"]),
+    )
+    assert forbidden["verdict"] == "FAIL"
