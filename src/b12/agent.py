@@ -55,6 +55,7 @@ EVENT_TYPES = frozenset(
 _WAITING_STATES = frozenset({"awaiting_approval", "awaiting_clarify"})
 _TERMINAL = {"completed": "turn_completed", "failed": "turn_failed", "cancelled": "turn_cancelled"}
 _MESSAGE_KEYS = ("id", "role", "content", "tool_calls", "tool_name", "tool_call_id")
+_TAINT_HISTORY_MAX = 1024
 
 SYSTEM_PROMPT = (
     "Критична політика доступу: контрольний канал визначає доступні інструменти й дозволи; "
@@ -791,6 +792,7 @@ class Agent:
         self._waiting: dict[str, dict] = {}
         self._revisions: dict[str, int] = {}
         self._tainted: set[str] = set()
+        self._tainted_order: deque[str] = deque(maxlen=_TAINT_HISTORY_MAX)
         self._tainted_history: set[str] = set()
         self.started_at = time.time()
         # Wall clock for "today" in temporal memory (ADR-015); evaluations pin it.
@@ -804,6 +806,15 @@ class Agent:
     # Trusted port for memory_store: True once a network.http call completed in this turn.
     def turn_tainted(self, context: ExecutionContext) -> bool:
         return context.turn_id in self._tainted
+
+    def _record_tainted_history(self, turn_id: str) -> None:
+        if turn_id in self._tainted_history:
+            return
+        if len(self._tainted_order) == self._tainted_order.maxlen:
+            evicted = self._tainted_order.popleft()
+            self._tainted_history.discard(evicted)
+        self._tainted_order.append(turn_id)
+        self._tainted_history.add(turn_id)
 
     def history_messages(self, session_id: str, actor: Actor) -> list[dict]:
         if not actor.consent:
@@ -1852,7 +1863,7 @@ class Agent:
             if tool is not None and tool.capability == "network.http":
                 state["tainted"] = True
                 self._tainted.add(context.turn_id)
-                self._tainted_history.add(context.turn_id)
+                self._record_tainted_history(context.turn_id)
             self._track_files(state, call, result)
             if call.name == "file_read":
                 chunks = state.setdefault("chunks", {})

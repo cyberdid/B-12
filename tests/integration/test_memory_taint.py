@@ -1,10 +1,14 @@
 """Task A2: per-turn network taint for memory writes."""
 
 import asyncio
+import time
 
 import pytest
 
+from b12.agent import _Active
 from b12.auth import owner_capabilities
+from b12.contracts import ToolCall, ToolResult
+from b12.memory_review import MemoryReviewer
 from b12.runtime import open_runtime
 
 
@@ -222,3 +226,94 @@ async def test_denied_network_call_and_cancelled_turn_behavior(scripted_ollama, 
             assert runtime2.agent._tainted == set()
         finally:
             runtime2.close()
+
+
+async def test_tainted_history_is_bounded(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    server = await _start_http()
+    async with server:
+        port = server.sockets[0].getsockname()[1]
+        runtime = open_runtime(
+            base.model_copy(
+                update={
+                    "state_dir": tmp_path / "state",
+                    "network_allow": ("127.0.0.1",),
+                    "memory_taint": True,
+                }
+            )
+        )
+        try:
+            actor = runtime.control.create_actor(owner=True, consent=True)
+            session = runtime.control.create_session(actor.id)
+            grant = runtime.control.issue_grant(
+                actor.id, session, owner_capabilities(runtime.settings), ttl_s=600
+            )
+            state["script"] = [
+                {"tool_calls": [("http_fetch", {"url": f"http://127.0.0.1:{port}/"})]},
+                {"content": "Перевірила перший."},
+            ]
+            first = await runtime.agent.turn(session, grant, "Перевір 0.", timeout_s=60)
+            assert first.state == "completed"
+            assert first.tool_results and first.tool_results[0].status == "completed"
+            oldest_turn_id = first.turn_id
+
+            async def _noop_emit(*_args, **_kwargs):
+                return None
+
+            for i in range(1, 1099):
+                context = runtime.control.begin_turn(session, grant, deadline=time.monotonic() + 60)
+                call = ToolCall(
+                    id=f"net-{i}",
+                    name="http_fetch",
+                    arguments={"url": f"http://127.0.0.1:{port}/"},
+                )
+                tool_result = ToolResult(
+                    call_id=call.id,
+                    name="http_fetch",
+                    status="completed",
+                    content={"status": 200},
+                )
+                turn_state = {
+                    "queue": [call],
+                    "call_ids": [],
+                    "results": [],
+                    "tags": {},
+                    "turn_messages": [
+                        {"role": "user", "content": f"fetch {i}"},
+                        {
+                            "role": "assistant",
+                            "content": "",
+                            "tool_calls": [
+                                {
+                                    "id": call.id,
+                                    "function": {
+                                        "name": "http_fetch",
+                                        "arguments": {"url": f"http://127.0.0.1:{port}/"},
+                                    },
+                                }
+                            ],
+                        },
+                    ],
+                }
+                await runtime.agent._record_call_outcome(
+                    context, turn_state, call, tool_result, _noop_emit
+                )
+                turn_state["turn_messages"].append({"role": "assistant", "content": "done"})
+                assert runtime.agent._commit(context, turn_state, _Active(actor.id, context.cancel))
+
+            state["script"] = [
+                {"tool_calls": [("http_fetch", {"url": f"http://127.0.0.1:{port}/"})]},
+                {"content": "Перевірила останній."},
+            ]
+            last = await runtime.agent.turn(session, grant, "Перевір 1099.", timeout_s=60)
+            assert last.state == "completed", f"last failed: {last.error_code}"
+            assert last.tool_results and last.tool_results[0].status == "completed"
+
+            assert len(runtime.agent._tainted_history) <= 1024
+            assert len(runtime.agent._tainted_history) == 1024
+            assert oldest_turn_id not in runtime.agent._tainted_history
+            assert last.turn_id in runtime.agent._tainted_history
+            assert runtime.control.get_meta(f"tainted_turn:{oldest_turn_id}") == "1"
+            assert MemoryReviewer(runtime)._is_tainted({"turn_id": oldest_turn_id, "messages": []})
+        finally:
+            runtime.close()
