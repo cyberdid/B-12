@@ -1,4 +1,4 @@
-"""Tests for Phase G `ports-live-v1` (M89-M96, DRAFT pending owner Codex review)."""
+"""Tests for Phase G `ports-live-v1` (M89-M96, FROZEN after dual blind oracle review)."""
 
 import asyncio
 import json
@@ -34,7 +34,7 @@ def _row(scenario_id: str) -> dict:
     return next(r for r in rows if r["scenario_id"] == scenario_id)
 
 
-def test_manifest_is_valid_draft_pending_owner_review_and_never_frozen():
+def test_manifest_is_valid_frozen_after_dual_blind_review():
     document = _read(MANIFEST)
     assert validate(document, ROOT) == []
     rows = document["scenarios"]
@@ -42,16 +42,14 @@ def test_manifest_is_valid_draft_pending_owner_review_and_never_frozen():
     assert {r["family_id"] for r in rows} == {f"M{i}" for i in range(89, 97)}
     assert {r["track"] for r in rows} == {"memory"}
     assert {r["split"] for r in rows} == {"locked_test"}
-    assert {r["status"] for r in rows} == {"DRAFT"}
+    assert {r["status"] for r in rows} == {"FROZEN"}
     assert not [r for r in rows if r["notes"].startswith("BLOCKED:")]
     for row in rows:
-        assert "DRAFT_PENDING_OWNER_REVIEW" in row["notes"]
-        assert "Codex re-review PENDING_OWNER" in row["notes"]
-        assert author_ports_v1.PENDING_OWNER_REVIEW_STATUS in row["notes"]
+        assert row["notes"].startswith("Synthetic; frozen after oracle review (")
+        assert "FROZEN 2026-11-22" in row["notes"]
+        assert author_ports_v1.FROZEN_REVIEW_STATUS in row["notes"]
         oracle = _read(ROOT / row["oracle_fixture"])
-        assert "DRAFT_PENDING_OWNER_REVIEW" in oracle["review_status"]
-        assert "Codex re-review PENDING_OWNER" in oracle["review_status"]
-        assert oracle["review_status"] == author_ports_v1.PENDING_OWNER_REVIEW_STATUS
+        assert oracle["review_status"] == author_ports_v1.FROZEN_REVIEW_STATUS
 
     classes = {
         row["family_id"]: _read(ROOT / row["oracle_fixture"])["catalog_class"] for row in rows
@@ -86,8 +84,8 @@ def test_authoring_script_reproduces_manifest_deterministically(tmp_path):
         fixture_rel_dir="evals/unified/draft_fixtures/ports-live-v1",
         manifest_rel_path="evals/unified/scenario_sets/ports-live-v1.json",
         set_id="ports-live-v1",
-        status="DRAFT",
-        review_status=author_ports_v1.PENDING_OWNER_REVIEW_STATUS,
+        status="FROZEN",
+        review_status=author_ports_v1.FROZEN_REVIEW_STATUS,
     )
     assert rebuilt == _read(MANIFEST)
 

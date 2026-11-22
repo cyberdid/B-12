@@ -50,6 +50,11 @@ PENDING_OWNER_REVIEW_STATUS = (
     "Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; "
     "Codex re-review PENDING_OWNER"
 )
+FROZEN_REVIEW_STATUS = (
+    "REVIEWED 2026-11-22: blind Gemini 4 Hydrogen (draft: 4 minor, 1 major fixed) "
+    "and Codex (round 1: 2 minor, 3 major fixed; round 2: 8/8 ok in codex-review-2.json) "
+    "- all fixed before any run; FROZEN 2026-11-22"
+)
 
 REVIEW_SCHEMA = {
     "type": "object",
@@ -506,7 +511,8 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help="optional combined rubric+sheet prompt filename inside --review-pack",
     )
-    parser.add_argument("--review-status", default=DRAFT_UNREVIEWED)
+    parser.add_argument("--status", default="FROZEN", choices=("DRAFT", "FROZEN"))
+    parser.add_argument("--review-status", default=FROZEN_REVIEW_STATUS)
     parser.add_argument("--skip-build", action="store_true")
     args = parser.parse_args(argv)
 
@@ -517,7 +523,7 @@ def main(argv: list[str] | None = None) -> None:
             json.dumps(
                 {
                     "set_id": "ports-live-v1",
-                    "status": "DRAFT",
+                    "status": args.status,
                     "review_status": args.review_status,
                     "synthetic_only": True,
                     "split": "locked_test",
@@ -537,10 +543,10 @@ def main(argv: list[str] | None = None) -> None:
             fixture_rel_dir="evals/unified/draft_fixtures/ports-live-v1",
             manifest_rel_path="evals/unified/scenario_sets/ports-live-v1.json",
             set_id="ports-live-v1",
-            status="DRAFT",
+            status=args.status,
             review_status=args.review_status,
         )
-        print(f"Built {len(manifest['scenarios'])} DRAFT scenarios in {manifest['set_id']}")
+        print(f"Built {len(manifest['scenarios'])} {args.status} scenarios in {manifest['set_id']}")
     if args.review_pack is not None:
         args.review_pack.mkdir(parents=True, exist_ok=True)
         sheet = build_review_sheet(cases)

@@ -2,7 +2,8 @@
 
 - Draft sheet: [sheet.json](sheet.json) (`catalog_class` and expected framing hidden to avoid anchoring; `M96` has 8 synthetic rows), fixed sheet: [sheet-fixed.json](sheet-fixed.json), combined Codex prompt: [prompt-fixed.txt](prompt-fixed.txt), rubric: [rubric.md](rubric.md), schema: [schema.json](schema.json).
 - Blind review 1 — **Gemini 4 Hydrogen** (`@hydrogen-critic`, [review-gemini-on-draft.json](review-gemini-on-draft.json)): **3 ok, 4 minor, 1 major, 0 blocker**.
-- Blind review 2 — **Codex** (run 22.11.2026 on prior `prompt-fixed.txt`, read-only): [review-codex-on-fixed.json](review-codex-on-fixed.json): **3 ok (M90, M92, M93), 2 minor (M89, M91), 3 major (M94, M95, M96), 0 blocker**. All 5 findings were accepted and fixed on 22.11.2026; [prompt-fixed.txt](prompt-fixed.txt), [sheet-fixed.json](sheet-fixed.json), and [rubric.md](rubric.md) were regenerated. **Set is NOT frozen.** Awaiting the owner's Codex re-review on the updated [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json) with [schema.json](schema.json) before freezing or launching Phase G2.
+- Blind review 2 — **Codex** (run 22.11.2026 on prior `prompt-fixed.txt`, read-only): [review-codex-on-fixed.json](review-codex-on-fixed.json): **3 ok (M90, M92, M93), 2 minor (M89, M91), 3 major (M94, M95, M96), 0 blocker**. All 5 findings were accepted and fixed on 22.11.2026; [prompt-fixed.txt](prompt-fixed.txt), [sheet-fixed.json](sheet-fixed.json), and [rubric.md](rubric.md) were regenerated (kept `DRAFT` pending Codex re-review).
+- Blind review 3 — **Codex round 2** (22.11.2026, on updated [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json)): [codex-review-2.json](codex-review-2.json) — **8/8 ok (M89–M96), 0 minor, 0 major, 0 blocker**.
 
 | Family | Reviewer | Decision | Action in fixed `ports-live-v1` |
 |---|---|---|---|
@@ -22,6 +23,6 @@
 
 ## Status
 
-- Scenario manifest `status` (`scenarios-v2.schema.json`): `DRAFT` (do **not** set `FROZEN` before clean Codex re-review).
-- Review status: **`DRAFT_PENDING_OWNER_REVIEW`** (`blind Gemini 4 Hydrogen review fixed 2026-11-21; Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; Codex re-review PENDING_OWNER`).
-- Codex review: **22.11.2026 findings (M89, M91 minor; M94, M95, M96 major) fixed 22.11.2026**. The set stays `DRAFT`, awaiting the owner's Codex re-review on the updated [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json).
+- Scenario manifest `status` (`scenarios-v2.schema.json`): **`FROZEN`** (frozen 22.11.2026 after clean Codex re-review `codex-review-2.json`, 8/8 `ok`).
+- Review status: **`FROZEN_REVIEW_STATUS`** (`REVIEWED 2026-11-22: blind Gemini 4 Hydrogen (draft: 4 minor, 1 major fixed) and Codex (round 1: 2 minor, 3 major fixed; round 2: 8/8 ok in codex-review-2.json) - all fixed before any run; FROZEN 2026-11-22`).
+- `evals/unified/scenario_sets/ports-live-v1.json` SHA-256: `4ee145e95243bc16a83ccdd0271f4fd8c3780ed677f4513a5f968d25189d7505`.
