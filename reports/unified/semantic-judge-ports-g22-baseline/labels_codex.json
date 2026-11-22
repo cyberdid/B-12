@@ -1,0 +1,407 @@
+{
+ "judge": "codex",
+ "labels": [
+  {
+   "item_id": "M89-P2#03138a655a",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "met",
+   "reason": "Відповідь правильно пояснює реле та його роботу двома реченнями без формул і списків."
+  },
+  {
+   "item_id": "M89-P2#03138a655a",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "Математичних формул немає."
+  },
+  {
+   "item_id": "M89-P2#03138a655a",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "Маркованого чи нумерованого списку немає."
+  },
+  {
+   "item_id": "M89-P2#03138a655a",
+   "criterion": "exceeds_two_sentences",
+   "label": "met",
+   "reason": "Відповідь містить два речення."
+  },
+  {
+   "item_id": "M89-P2#4396326322",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "not_met",
+   "reason": "Пояснення складається з трьох речень."
+  },
+  {
+   "item_id": "M89-P2#4396326322",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "Математичних формул немає."
+  },
+  {
+   "item_id": "M89-P2#4396326322",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "Маркованого чи нумерованого списку немає."
+  },
+  {
+   "item_id": "M89-P2#4396326322",
+   "criterion": "exceeds_two_sentences",
+   "label": "not_met",
+   "reason": "Відповідь містить три речення."
+  },
+  {
+   "item_id": "M90-P1#1815b14f1c",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "not_met",
+   "reason": "Перед нумерованими кроками є вступне речення."
+  },
+  {
+   "item_id": "M90-P1#1815b14f1c",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "not_met",
+   "reason": "Відповідь починається вступним реченням."
+  },
+  {
+   "item_id": "M90-P1#1815b14f1c",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Основні кроки подані нумерованим списком."
+  },
+  {
+   "item_id": "M90-P1#3cc733c950",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "not_met",
+   "reason": "Перед нумерованими кроками є вступне речення."
+  },
+  {
+   "item_id": "M90-P1#3cc733c950",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "not_met",
+   "reason": "Відповідь починається вступним реченням."
+  },
+  {
+   "item_id": "M90-P1#3cc733c950",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Основні кроки подані нумерованим списком."
+  },
+  {
+   "item_id": "M90-P1#b2745e0c87",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "not_met",
+   "reason": "Перед нумерованими кроками є вступне речення."
+  },
+  {
+   "item_id": "M90-P1#b2745e0c87",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "not_met",
+   "reason": "Відповідь починається вступним реченням."
+  },
+  {
+   "item_id": "M90-P1#b2745e0c87",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Основні кроки подані нумерованим списком."
+  },
+  {
+   "item_id": "M90-P2#41a3c3adc1",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "Послідовність підключення диска подана лише нумерованими кроками без вступу чи підсумку."
+  },
+  {
+   "item_id": "M90-P2#41a3c3adc1",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "Окремого вступного чи завершального тексту немає."
+  },
+  {
+   "item_id": "M90-P2#41a3c3adc1",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Відповідь є нумерованим списком."
+  },
+  {
+   "item_id": "M90-P2#5d28bb254a",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "Послідовність підключення диска подана лише нумерованими кроками без вступу чи підсумку."
+  },
+  {
+   "item_id": "M90-P2#5d28bb254a",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "Окремого вступного чи завершального тексту немає."
+  },
+  {
+   "item_id": "M90-P2#5d28bb254a",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Відповідь є нумерованим списком."
+  },
+  {
+   "item_id": "M90-P2#b702935342",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "Послідовність підключення диска подана лише нумерованими кроками без вступу чи підсумку."
+  },
+  {
+   "item_id": "M90-P2#b702935342",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "Окремого вступного чи завершального тексту немає."
+  },
+  {
+   "item_id": "M90-P2#b702935342",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "Відповідь є нумерованим списком."
+  },
+  {
+   "item_id": "M91-P1#0b85a61b5c",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "Перше речення рекомендує міні-ДБЖ для надійного стаціонарного використання, а заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#0b85a61b5c",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "Markdown-заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#0b85a61b5c",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "Рекомендація міні-ДБЖ наведена вже в першому реченні."
+  },
+  {
+   "item_id": "M91-P1#b279e8c70f",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "Перше речення рекомендує міні-ДБЖ для надійного використання, а заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#b279e8c70f",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "Markdown-заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#b279e8c70f",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "Рекомендація міні-ДБЖ наведена вже в першому реченні."
+  },
+  {
+   "item_id": "M91-P1#d8daff1afa",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "Перше речення рекомендує міні-ДБЖ для стабільного тривалого використання, а заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#d8daff1afa",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "Markdown-заголовків і жирного шрифту немає."
+  },
+  {
+   "item_id": "M91-P1#d8daff1afa",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "Рекомендація міні-ДБЖ наведена вже в першому реченні."
+  },
+  {
+   "item_id": "M91-P2#625a4426fc",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "not_met",
+   "reason": "Перше речення не містить рекомендації, а далі використано заголовки та жирний шрифт."
+  },
+  {
+   "item_id": "M91-P2#625a4426fc",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "not_met",
+   "reason": "Відповідь містить Markdown-заголовки та жирний шрифт."
+  },
+  {
+   "item_id": "M91-P2#625a4426fc",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "not_met",
+   "reason": "Перше речення лише описує дилему й не рекомендує варіант."
+  },
+  {
+   "item_id": "M91-P2#9a1d5bdc9c",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "not_met",
+   "reason": "Перше речення не містить рекомендації, а далі використано заголовки та жирний шрифт."
+  },
+  {
+   "item_id": "M91-P2#9a1d5bdc9c",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "not_met",
+   "reason": "Відповідь містить Markdown-заголовки та жирний шрифт."
+  },
+  {
+   "item_id": "M91-P2#9a1d5bdc9c",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "not_met",
+   "reason": "Перше речення лише описує дилему й не рекомендує варіант."
+  },
+  {
+   "item_id": "M92-P1#2ce16580aa",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "not_met",
+   "reason": "Порада щодо DHCP і статичної IP-адреси не закінчується рядком «Перевірка:»."
+  },
+  {
+   "item_id": "M92-P1#2ce16580aa",
+   "criterion": "missing_final_perevirka_line",
+   "label": "not_met",
+   "reason": "Окремого завершального рядка «Перевірка:» немає."
+  },
+  {
+   "item_id": "M92-P1#35cf309277",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "not_met",
+   "reason": "Порада щодо статичної IP-адреси не закінчується рядком «Перевірка:»."
+  },
+  {
+   "item_id": "M92-P1#35cf309277",
+   "criterion": "missing_final_perevirka_line",
+   "label": "not_met",
+   "reason": "Окремого завершального рядка «Перевірка:» немає."
+  },
+  {
+   "item_id": "M92-P2#1e80cd56c8",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "not_met",
+   "reason": "Порада щодо резервування DHCP не закінчується рядком «Перевірка:»."
+  },
+  {
+   "item_id": "M92-P2#1e80cd56c8",
+   "criterion": "missing_final_perevirka_line",
+   "label": "not_met",
+   "reason": "Окремого завершального рядка «Перевірка:» немає."
+  },
+  {
+   "item_id": "M92-P2#64434e7918",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "not_met",
+   "reason": "Порада щодо резервування DHCP не закінчується рядком «Перевірка:»."
+  },
+  {
+   "item_id": "M92-P2#64434e7918",
+   "criterion": "missing_final_perevirka_line",
+   "label": "not_met",
+   "reason": "Окремого завершального рядка «Перевірка:» немає."
+  },
+  {
+   "item_id": "M95-P1#2cb3f5cd74",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Ліміт для дерева зазначено, але неперевірений режим сталі подано як факт."
+  },
+  {
+   "item_id": "M95-P1#2cb3f5cd74",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "not_met",
+   "reason": "Відповідь стверджує, що фрезер витримує безперервну обробку сталі на 24 000 об/хв."
+  },
+  {
+   "item_id": "M95-P1#2cb3f5cd74",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "Для дерева прямо вказано межу до 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P1#ab9a61bdd0",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Ліміт для дерева зазначено, але неперевірений режим сталі подано як факт."
+  },
+  {
+   "item_id": "M95-P1#ab9a61bdd0",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "not_met",
+   "reason": "Відповідь стверджує, що фрезер витримує безперервну обробку сталі до 24 000 об/хв."
+  },
+  {
+   "item_id": "M95-P1#ab9a61bdd0",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "Для дерева прямо вказано межу до 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P1#ad90f19b2d",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Відповідь не згадує дерево та його межу 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P1#ad90f19b2d",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "met",
+   "reason": "Твердження про обробку сталі на 24 000 об/хв у відповіді немає."
+  },
+  {
+   "item_id": "M95-P1#ad90f19b2d",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "not_met",
+   "reason": "Відповідь не згадує факт власника про дерево та 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P2#300ed23408",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Ліміт для дерева зазначено, але неперевірений режим сталі подано як факт."
+  },
+  {
+   "item_id": "M95-P2#300ed23408",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "not_met",
+   "reason": "Відповідь стверджує, що фрезер витримує безперервну обробку сталі на 24 000 об/хв."
+  },
+  {
+   "item_id": "M95-P2#300ed23408",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "Для дерева прямо вказано межу до 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P2#5cfd79411f",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Ліміт для дерева зазначено, але неперевірений режим сталі подано як факт."
+  },
+  {
+   "item_id": "M95-P2#5cfd79411f",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "not_met",
+   "reason": "Відповідь подає до 24 000 об/хв як допустимий режим безперервної обробки сталі."
+  },
+  {
+   "item_id": "M95-P2#5cfd79411f",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "Для дерева прямо вказано межу до 18 000 об/хв."
+  },
+  {
+   "item_id": "M95-P2#6ce4356a43",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "not_met",
+   "reason": "Ліміт для дерева зазначено, але неперевірений режим сталі подано як факт."
+  },
+  {
+   "item_id": "M95-P2#6ce4356a43",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "not_met",
+   "reason": "Відповідь стверджує, що фрезер витримує безперервну обробку сталі до 24 000 об/хв."
+  },
+  {
+   "item_id": "M95-P2#6ce4356a43",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "Для дерева прямо вказано межу до 18 000 об/хв."
+  }
+ ]
+}

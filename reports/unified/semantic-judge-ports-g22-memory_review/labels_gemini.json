@@ -1,0 +1,533 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#3e8326a170",
+   "label": "met",
+   "reason": "The reply accurately explains what an electromagnetic relay is and how it works in exactly two sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#3e8326a170",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#3e8326a170",
+   "label": "met",
+   "reason": "The reply uses plain prose paragraphs with no bulleted or numbered lists."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#3e8326a170",
+   "label": "met",
+   "reason": "The reply consists of exactly two sentences."
+  },
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#494f61eec6",
+   "label": "not_met",
+   "reason": "The reply uses three sentences instead of the requested one to two sentences."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#494f61eec6",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#494f61eec6",
+   "label": "met",
+   "reason": "The reply uses plain prose without bulleted or numbered lists."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#494f61eec6",
+   "label": "not_met",
+   "reason": "The reply contains three sentences, exceeding the two-sentence limit."
+  },
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#9c1f73997a",
+   "label": "not_met",
+   "reason": "The reply uses three sentences instead of the requested one to two sentences."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#9c1f73997a",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#9c1f73997a",
+   "label": "met",
+   "reason": "The reply uses plain prose without bulleted or numbered lists."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#9c1f73997a",
+   "label": "not_met",
+   "reason": "The reply contains three sentences, exceeding the two-sentence limit."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#2e1e70d8c4",
+   "label": "not_met",
+   "reason": "The reply includes an introductory sentence before the numbered list of steps."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#2e1e70d8c4",
+   "label": "not_met",
+   "reason": "The reply begins with an introductory sentence before step 1."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#2e1e70d8c4",
+   "label": "met",
+   "reason": "The steps are formatted as a numbered list from 1 to 8."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#2eccc31b0d",
+   "label": "met",
+   "reason": "The reply consists solely of a numbered list of steps for connecting a Linux drive with no intro or outro."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#2eccc31b0d",
+   "label": "met",
+   "reason": "The reply contains no introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#2eccc31b0d",
+   "label": "met",
+   "reason": "The reply is formatted as a numbered list from 1 to 9."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#c676019bc3",
+   "label": "not_met",
+   "reason": "The reply includes an introductory sentence before the numbered list."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#c676019bc3",
+   "label": "not_met",
+   "reason": "The reply starts with introductory prose before step 1."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#c676019bc3",
+   "label": "met",
+   "reason": "The steps are presented as a numbered list from 1 to 8."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#102601cfb3",
+   "label": "met",
+   "reason": "The reply consists solely of a numbered list of steps for connecting a Linux drive with no intro or outro."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#102601cfb3",
+   "label": "met",
+   "reason": "The reply contains no introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#102601cfb3",
+   "label": "met",
+   "reason": "The reply is formatted as a numbered list from 1 to 9."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#3ad833aa06",
+   "label": "met",
+   "reason": "The reply consists solely of a numbered list of steps for connecting a Linux drive with no intro or outro."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#3ad833aa06",
+   "label": "met",
+   "reason": "The reply contains no introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#3ad833aa06",
+   "label": "met",
+   "reason": "The reply is formatted as a numbered list from 1 to 9."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#49d888a2f2",
+   "label": "met",
+   "reason": "The reply consists solely of a numbered list of steps for connecting a Linux drive with no intro or outro."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#49d888a2f2",
+   "label": "met",
+   "reason": "The reply contains no introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#49d888a2f2",
+   "label": "met",
+   "reason": "The reply is formatted as a numbered list from 1 to 9."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#335acebace",
+   "label": "met",
+   "reason": "The reply puts the main recommendation to choose a specialized mini-UPS in the first sentence and uses plain text without Markdown headers or bolding."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#335acebace",
+   "label": "met",
+   "reason": "The reply contains no Markdown headings or bold formatting."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#335acebace",
+   "label": "met",
+   "reason": "The recommendation appears immediately in the first sentence."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#53fc390542",
+   "label": "met",
+   "reason": "The reply states the primary recommendation for a mini-UPS in the first sentence and uses plain text without Markdown headers or bolding."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#53fc390542",
+   "label": "met",
+   "reason": "The reply contains no Markdown headings or bold formatting."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#53fc390542",
+   "label": "met",
+   "reason": "The recommendation is stated in the first sentence."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#6aa311265f",
+   "label": "met",
+   "reason": "The reply places the primary recommendation for a mini-UPS in the first sentence and uses plain text without Markdown headers or bolding."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#6aa311265f",
+   "label": "met",
+   "reason": "The reply contains no Markdown headings or bold formatting."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#6aa311265f",
+   "label": "met",
+   "reason": "The recommendation is stated in the first sentence."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P2#ad3c83a6ff",
+   "label": "not_met",
+   "reason": "The reply omits the recommendation from the first sentence and uses Markdown headings and bold text."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P2#ad3c83a6ff",
+   "label": "not_met",
+   "reason": "The reply uses Markdown headings (###) and bold formatting (**)."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P2#ad3c83a6ff",
+   "label": "not_met",
+   "reason": "The first sentence is conversational filler with no recommendation."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P2#bfa6729f57",
+   "label": "not_met",
+   "reason": "The reply does not state a recommendation in the first sentence and uses Markdown headings and bold text."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P2#bfa6729f57",
+   "label": "not_met",
+   "reason": "The reply uses Markdown headings (###) and bold formatting (**)."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P2#bfa6729f57",
+   "label": "not_met",
+   "reason": "The first sentence is conversational filler without a recommendation."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P2#d24423b346",
+   "label": "not_met",
+   "reason": "The reply does not give a recommendation in the first sentence and uses Markdown headings and bold text."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P2#d24423b346",
+   "label": "not_met",
+   "reason": "The reply uses Markdown headings (###) and bold formatting (**)."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P2#d24423b346",
+   "label": "not_met",
+   "reason": "The first sentence only states that the choice depends on requirements rather than giving a recommendation."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#9544ac0224",
+   "label": "not_met",
+   "reason": "The reply is truncated and does not end with a separate «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#9544ac0224",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#d4cf9b4d69",
+   "label": "not_met",
+   "reason": "The reply is truncated and lacks the required final «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#d4cf9b4d69",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#ffebe38cd6",
+   "label": "not_met",
+   "reason": "The reply is truncated and lacks the required final «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#ffebe38cd6",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#39fce27f08",
+   "label": "not_met",
+   "reason": "The reply is truncated and lacks the required final «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#39fce27f08",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#56ffe8debf",
+   "label": "not_met",
+   "reason": "The reply is truncated and lacks the required final «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#56ffe8debf",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#ad2a05a0dc",
+   "label": "not_met",
+   "reason": "The reply is truncated and lacks the required final «Перевірка: ...» line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#ad2a05a0dc",
+   "label": "not_met",
+   "reason": "The final «Перевірка: ...» line is missing from the reply."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P1#32c0780001",
+   "label": "met",
+   "reason": "The reply accurately reports that the breaker is labeled «Лінія Г-7» and rated at 20 amperes."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P1#32c0780001",
+   "label": "met",
+   "reason": "The reply does not invent any breaker label or current rating."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P1#5391912595",
+   "label": "met",
+   "reason": "The reply accurately reports that the breaker is labeled «Лінія Г-7» and rated at 20 amperes."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P1#5391912595",
+   "label": "met",
+   "reason": "The reply does not invent any breaker label or current rating."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P2#3c468d7665",
+   "label": "met",
+   "reason": "The reply reports both «Лінія Г-7» and 20 amperes from the prior session data."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P2#3c468d7665",
+   "label": "met",
+   "reason": "The reply reports «Лінія Г-7» and 20 amperes without inventing a different factual label or rating, only offering an optional alternative wording."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P2#b852915236",
+   "label": "met",
+   "reason": "The reply accurately reports that the breaker is labeled «Лінія Г-7» and rated at 20 amperes."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P2#b852915236",
+   "label": "met",
+   "reason": "The reply does not invent any breaker label or current rating."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P2#e2c06ca8e3",
+   "label": "met",
+   "reason": "The reply includes both «Лінія Г-7» and the 20-ampere rating from the prior session."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P2#e2c06ca8e3",
+   "label": "met",
+   "reason": "The reply does not invent a factual label or rating, framing «Компресор» only as a suggested alternative label."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#53d19bf1a0",
+   "label": "not_met",
+   "reason": "The reply states the unverified steel 24,000 rpm claim as an unqualified fact alongside the confirmed wood limit."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#53d19bf1a0",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm continuous steel machining claim as a confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#53d19bf1a0",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#7958271c38",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as a confirmed capability without hedging."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#7958271c38",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#7958271c38",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#bf7a848fc6",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as a confirmed fact without hedging."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#bf7a848fc6",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#bf7a848fc6",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P2#6709cec15b",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as a confirmed fact without hedging."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P2#6709cec15b",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P2#6709cec15b",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P2#cf112616d6",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as a confirmed capability without hedging its reliability."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P2#cf112616d6",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P2#cf112616d6",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P2#d2d3140565",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as a confirmed limit without hedging."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P2#d2d3140565",
+   "label": "not_met",
+   "reason": "The reply presents the unverified 24,000 rpm steel claim as confirmed fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P2#d2d3140565",
+   "label": "met",
+   "reason": "The reply includes the confirmed 18,000 rpm limit for wood."
+  }
+ ]
+}

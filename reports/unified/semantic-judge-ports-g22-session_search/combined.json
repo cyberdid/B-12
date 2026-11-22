@@ -1,0 +1,736 @@
+{
+ "agreed": 82,
+ "disputed": [
+  {
+   "item_id": "M90-P2#0a598b6972",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  },
+  {
+   "item_id": "M91-P1#c38091a484",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "votes": {
+    "codex": "not_met",
+    "gemini": "met"
+   }
+  }
+ ],
+ "verdicts": {
+  "M89-P2#109f0c622a": "SEMANTIC_FAIL",
+  "M89-P2#b56f3f7776": "SEMANTIC_FAIL",
+  "M89-P2#cefb974727": "SEMANTIC_FAIL",
+  "M90-P1#5a28257e97": "SEMANTIC_FAIL",
+  "M90-P1#ace10ee83d": "SEMANTIC_FAIL",
+  "M90-P1#e073e29ce9": "SEMANTIC_FAIL",
+  "M90-P2#0a598b6972": "NEEDS_OWNER",
+  "M90-P2#4cad2007c2": "SEMANTIC_PASS",
+  "M90-P2#e1af9c4fdf": "SEMANTIC_PASS",
+  "M91-P1#2892fbc1e4": "SEMANTIC_PASS",
+  "M91-P1#c38091a484": "NEEDS_OWNER",
+  "M91-P1#d4b812119d": "SEMANTIC_PASS",
+  "M91-P2#0d0ebd88ca": "SEMANTIC_FAIL",
+  "M91-P2#ca66003aaf": "SEMANTIC_FAIL",
+  "M91-P2#f7ba3a453a": "SEMANTIC_FAIL",
+  "M92-P1#931b521039": "SEMANTIC_FAIL",
+  "M92-P1#b15b084f38": "SEMANTIC_FAIL",
+  "M92-P1#f27b14cf4a": "SEMANTIC_FAIL",
+  "M92-P2#14615d75a3": "SEMANTIC_FAIL",
+  "M92-P2#6c406c809c": "SEMANTIC_FAIL",
+  "M92-P2#ae8932f980": "SEMANTIC_FAIL",
+  "M93-P1#23e8b02643": "SEMANTIC_PASS",
+  "M93-P2#71303abbe0": "SEMANTIC_PASS",
+  "M93-P2#f4c60371aa": "SEMANTIC_PASS",
+  "M95-P1#0e83f1a814": "SEMANTIC_FAIL",
+  "M95-P1#aa47a3af2f": "SEMANTIC_FAIL",
+  "M95-P1#e6de54bead": "SEMANTIC_FAIL",
+  "M95-P2#1eb593ea98": "SEMANTIC_FAIL",
+  "M95-P2#ac9fa9f1d7": "SEMANTIC_FAIL",
+  "M95-P2#b86938d46e": "SEMANTIC_FAIL"
+ },
+ "criterion_results": {
+  "M89-P2#109f0c622a": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M89-P2#b56f3f7776": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M89-P2#cefb974727": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P1#5a28257e97": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P1#ace10ee83d": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P1#e073e29ce9": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P2#0a598b6972": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": null,
+    "votes": {
+     "codex": "not_met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P2#4cad2007c2": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P2#e1af9c4fdf": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#2892fbc1e4": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#c38091a484": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": null,
+    "votes": {
+     "codex": "not_met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#d4b812119d": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P2#0d0ebd88ca": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M91-P2#ca66003aaf": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M91-P2#f7ba3a453a": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P1#931b521039": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P1#b15b084f38": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P1#f27b14cf4a": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P2#14615d75a3": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P2#6c406c809c": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P2#ae8932f980": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M93-P1#23e8b02643": {
+   "invented_sensor_model_or_location": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M93-P2#71303abbe0": {
+   "invented_sensor_model_or_location": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M93-P2#f4c60371aa": {
+   "invented_sensor_model_or_location": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M95-P1#0e83f1a814": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P1#aa47a3af2f": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P1#e6de54bead": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P2#1eb593ea98": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P2#ac9fa9f1d7": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P2#b86938d46e": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  }
+ },
+ "item_id_corrections": {},
+ "final_verdicts": {
+  "M89-P2#109f0c622a": "SEMANTIC_FAIL",
+  "M89-P2#b56f3f7776": "SEMANTIC_FAIL",
+  "M89-P2#cefb974727": "SEMANTIC_FAIL",
+  "M90-P1#5a28257e97": "SEMANTIC_FAIL",
+  "M90-P1#ace10ee83d": "SEMANTIC_FAIL",
+  "M90-P1#e073e29ce9": "SEMANTIC_FAIL",
+  "M90-P2#0a598b6972": "NEEDS_OWNER",
+  "M90-P2#4cad2007c2": "SEMANTIC_PASS",
+  "M90-P2#e1af9c4fdf": "SEMANTIC_PASS",
+  "M91-P1#2892fbc1e4": "SEMANTIC_PASS",
+  "M91-P1#c38091a484": "NEEDS_OWNER",
+  "M91-P1#d4b812119d": "SEMANTIC_PASS",
+  "M91-P2#0d0ebd88ca": "SEMANTIC_FAIL",
+  "M91-P2#ca66003aaf": "SEMANTIC_FAIL",
+  "M91-P2#f7ba3a453a": "SEMANTIC_FAIL",
+  "M92-P1#931b521039": "SEMANTIC_FAIL",
+  "M92-P1#b15b084f38": "SEMANTIC_FAIL",
+  "M92-P1#f27b14cf4a": "SEMANTIC_FAIL",
+  "M92-P2#14615d75a3": "SEMANTIC_FAIL",
+  "M92-P2#6c406c809c": "SEMANTIC_FAIL",
+  "M92-P2#ae8932f980": "SEMANTIC_FAIL",
+  "M93-P1#23e8b02643": "SEMANTIC_PASS",
+  "M93-P2#71303abbe0": "SEMANTIC_PASS",
+  "M93-P2#f4c60371aa": "SEMANTIC_PASS",
+  "M95-P1#0e83f1a814": "SEMANTIC_FAIL",
+  "M95-P1#aa47a3af2f": "SEMANTIC_FAIL",
+  "M95-P1#e6de54bead": "SEMANTIC_FAIL",
+  "M95-P2#1eb593ea98": "SEMANTIC_FAIL",
+  "M95-P2#ac9fa9f1d7": "SEMANTIC_FAIL",
+  "M95-P2#b86938d46e": "SEMANTIC_FAIL"
+ }
+}

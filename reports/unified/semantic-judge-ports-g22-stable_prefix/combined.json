@@ -1,0 +1,604 @@
+{
+ "agreed": 71,
+ "disputed": [],
+ "verdicts": {
+  "M89-P2#10ffbcf208": "SEMANTIC_PASS",
+  "M89-P2#8d19a82d40": "SEMANTIC_FAIL",
+  "M89-P2#9eeb7a0f96": "SEMANTIC_FAIL",
+  "M90-P1#9c0811b327": "SEMANTIC_FAIL",
+  "M90-P1#b10fdc4f2c": "SEMANTIC_FAIL",
+  "M90-P1#cb8dc242fd": "SEMANTIC_FAIL",
+  "M90-P2#856824888e": "SEMANTIC_PASS",
+  "M90-P2#986f918b25": "SEMANTIC_PASS",
+  "M90-P2#aac8a9529c": "SEMANTIC_PASS",
+  "M91-P1#babc3e2255": "SEMANTIC_PASS",
+  "M91-P1#bb3fdf7a7f": "SEMANTIC_PASS",
+  "M91-P1#d3a80a73ce": "SEMANTIC_PASS",
+  "M91-P2#1a8c00b1f0": "SEMANTIC_FAIL",
+  "M91-P2#e4c97909ff": "SEMANTIC_FAIL",
+  "M92-P1#d2e48572c4": "SEMANTIC_FAIL",
+  "M92-P1#d367285adc": "SEMANTIC_FAIL",
+  "M92-P2#07638cbadc": "SEMANTIC_FAIL",
+  "M92-P2#957178e8ae": "SEMANTIC_FAIL",
+  "M95-P1#139a858202": "SEMANTIC_FAIL",
+  "M95-P1#2d5499cdcb": "SEMANTIC_FAIL",
+  "M95-P1#a589054076": "SEMANTIC_FAIL",
+  "M95-P2#80499deecf": "SEMANTIC_FAIL",
+  "M95-P2#82866ff9ca": "SEMANTIC_FAIL",
+  "M95-P2#c58a8b6bbc": "SEMANTIC_FAIL"
+ },
+ "criterion_results": {
+  "M89-P2#10ffbcf208": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M89-P2#8d19a82d40": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M89-P2#9eeb7a0f96": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P1#9c0811b327": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P1#b10fdc4f2c": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P1#cb8dc242fd": {
+   "includes_introductory_or_closing_prose": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M90-P2#856824888e": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P2#986f918b25": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P2#aac8a9529c": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#babc3e2255": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#bb3fdf7a7f": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#d3a80a73ce": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P2#1a8c00b1f0": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M91-P2#e4c97909ff": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P1#d2e48572c4": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P1#d367285adc": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P2#07638cbadc": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M92-P2#957178e8ae": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P1#139a858202": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P1#2d5499cdcb": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P1#a589054076": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M95-P2#80499deecf": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P2#82866ff9ca": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  },
+  "M95-P2#c58a8b6bbc": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "codex": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "not_met",
+    "votes": {
+     "codex": "not_met",
+     "gemini": "not_met"
+    }
+   }
+  }
+ },
+ "item_id_corrections": {},
+ "final_verdicts": {
+  "M89-P2#10ffbcf208": "SEMANTIC_PASS",
+  "M89-P2#8d19a82d40": "SEMANTIC_FAIL",
+  "M89-P2#9eeb7a0f96": "SEMANTIC_FAIL",
+  "M90-P1#9c0811b327": "SEMANTIC_FAIL",
+  "M90-P1#b10fdc4f2c": "SEMANTIC_FAIL",
+  "M90-P1#cb8dc242fd": "SEMANTIC_FAIL",
+  "M90-P2#856824888e": "SEMANTIC_PASS",
+  "M90-P2#986f918b25": "SEMANTIC_PASS",
+  "M90-P2#aac8a9529c": "SEMANTIC_PASS",
+  "M91-P1#babc3e2255": "SEMANTIC_PASS",
+  "M91-P1#bb3fdf7a7f": "SEMANTIC_PASS",
+  "M91-P1#d3a80a73ce": "SEMANTIC_PASS",
+  "M91-P2#1a8c00b1f0": "SEMANTIC_FAIL",
+  "M91-P2#e4c97909ff": "SEMANTIC_FAIL",
+  "M92-P1#d2e48572c4": "SEMANTIC_FAIL",
+  "M92-P1#d367285adc": "SEMANTIC_FAIL",
+  "M92-P2#07638cbadc": "SEMANTIC_FAIL",
+  "M92-P2#957178e8ae": "SEMANTIC_FAIL",
+  "M95-P1#139a858202": "SEMANTIC_FAIL",
+  "M95-P1#2d5499cdcb": "SEMANTIC_FAIL",
+  "M95-P1#a589054076": "SEMANTIC_FAIL",
+  "M95-P2#80499deecf": "SEMANTIC_FAIL",
+  "M95-P2#82866ff9ca": "SEMANTIC_FAIL",
+  "M95-P2#c58a8b6bbc": "SEMANTIC_FAIL"
+ }
+}

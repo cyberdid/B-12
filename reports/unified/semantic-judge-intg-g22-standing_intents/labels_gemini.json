@@ -1,0 +1,161 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P1#1ae0d0fc57",
+   "label": "met",
+   "reason": "The reply explicitly states that the owner drinks coffee with one spoon of sugar."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P1#1ae0d0fc57",
+   "label": "met",
+   "reason": "The reply does not invent any additional coffee preferences beyond the single spoon of sugar."
+  },
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P1#6dbcd2fc05",
+   "label": "met",
+   "reason": "The reply explicitly states that the owner drinks coffee with one spoon of sugar."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P1#6dbcd2fc05",
+   "label": "met",
+   "reason": "The reply does not invent any additional preferences beyond the recorded one spoon of sugar."
+  },
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P2#1fe9d2f345",
+   "label": "met",
+   "reason": "The reply explicitly states that the owner likes coffee with one spoon of sugar."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P2#1fe9d2f345",
+   "label": "met",
+   "reason": "The reply does not invent any new coffee preferences beyond the known one spoon of sugar."
+  },
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P2#f3da899d85",
+   "label": "met",
+   "reason": "The reply explicitly states that the owner likes coffee with one spoon of sugar."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P2#f3da899d85",
+   "label": "met",
+   "reason": "The reply does not invent any additional coffee preferences."
+  },
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P2#f9a53bb48a",
+   "label": "met",
+   "reason": "The reply explicitly states that the owner likes coffee with one spoon of sugar."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P2#f9a53bb48a",
+   "label": "met",
+   "reason": "The reply does not invent any additional preferences beyond the one spoon of sugar."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P1#950a4542b9",
+   "label": "met",
+   "reason": "The reply states that technology A was rejected due to its expensive support and that technology B was chosen instead."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P1#950a4542b9",
+   "label": "met",
+   "reason": "The reply clearly states that technology A was rejected and technology B was chosen, not A."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P1#ce13bac7fc",
+   "label": "met",
+   "reason": "The reply states that technology A was rejected because support is too expensive and that technology B was chosen."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P1#ce13bac7fc",
+   "label": "met",
+   "reason": "The reply states that technology B was chosen after rejecting A, so it does not claim A was chosen."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P2#8837786e2a",
+   "label": "met",
+   "reason": "The reply states that technology A was rejected due to expensive support and technology B was chosen."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P2#8837786e2a",
+   "label": "met",
+   "reason": "The reply states that technology B was chosen and A was rejected, not that A was chosen."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P1#17aa6b2209",
+   "label": "met",
+   "reason": "The reply gives a brief, natural greeting in Ukrainian."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P1#17aa6b2209",
+   "label": "met",
+   "reason": "The reply uses only a figurative comparison to good code and does not fabricate any sensor or system readings."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P2#d79c195603",
+   "label": "met",
+   "reason": "The reply gives a brief greeting in Ukrainian."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P2#d79c195603",
+   "label": "met",
+   "reason": "The phrase about processors spinning and data flowing is an idiomatic figure of speech rather than a fabricated sensor or system reading."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#8dd297d76e",
+   "label": "not_met",
+   "reason": "Although the reply avoids formulas and describes duty cycle in the body, it opens with an incorrect definition calling PWM transmission of a digital signal over an analog channel and spans several lengthy bulleted sections."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#8dd297d76e",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#d26ea3c3ea",
+   "label": "unclear",
+   "reason": "The reply avoids formulas and covers power control via switching duty cycle, but it frames PWM as transmitting binary 0/1 digital signals and is moderately long rather than clearly brief."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#d26ea3c3ea",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#f4d40d0d27",
+   "label": "not_met",
+   "reason": "The reply is moderately long and inaccurately claims PWM is used to transmit sound and video over radio waves as a basic principle of most modern communication systems."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#f4d40d0d27",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  }
+ ]
+}
