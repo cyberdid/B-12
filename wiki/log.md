@@ -1477,3 +1477,8 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
 - Перевірено наявність і цілісність артефактів для сліпої рецензії власником у `reports/unified/oracle-review-ports-v1/` (`prompt-fixed.txt` SHA-256 `bacfaa6425ee4ec513ebdccb4592aacf7b70050a32f28c112e3301c5ac25977e`, `sheet-fixed.json` SHA-256 `15a1f4ee534ee1d7438e9852200f86eb258f61e6e4ca4dc1167e023a3fa8e95e`) та валідність `evals/unified/scenario_sets/ports-live-v1.json` (SHA-256 `415d100e1b672a4ecba90ae007eb58115524fc27e2beabd9523c715acc026915`, статус збережено `DRAFT`).
 - Зафіксовано run pin `<PIN>` = `12b7f45e05c71407a51349c116667223e7c70197` (`12b7f45`) у [RUN_PIN_ports-live-v1.md](../reports/unified/RUN_PIN_ports-live-v1.md) зі статусами `Codex review of ports-live-v1: PENDING_OWNER`, `Freeze status: DRAFT_PENDING_OWNER_REVIEW (awaiting owner's Codex review)` та `Colab budget (hours): PENDING_OWNER (do not queue model runs until set by owner)`.
 - Оновлено `.worktrees/eval-run` у режим detached HEAD на фінальний коміт, прибрано тимчасові worktrees/гілки `tmp-track-f` і `tmp-track-h`. Модельні evals і Codex не запускалися; очікуються ворота власника перед Track G.
+
+## [2026-11-22] decision | Слово-активатор відкладено повністю
+
+- **Рішення власника:** H6 step 2 не виконується: жодних завантажень моделей openWakeWord, жодного класифікатора hey_jarvis, навчання на «Капрі» не починаємо. Код кроку 1 (`wake_word`, вимкнений) лишається без змін.
+- Основа рішення: ліцензія тестового класифікатора (CC-BY-NC-SA) і відсутність власної фрази; вимірювати детектор без моделі не можна. Деталі в [RESUME](../reports/unified/RESUME.md).

@@ -188,3 +188,7 @@ Every new behaviour is a `Settings` flag, default False (see Global Constraints 
 **Prompt surface:** a task that changes what the model sees with flags off must regenerate `tests/fixtures/prompt_surface/owner_default.json` (`B12_UPDATE_PROMPT_SURFACE=1`) and say so in the commit. With flags off it should not change.
 
 **Log:** append one `## [YYYY-MM-DD] lint | …` entry to `wiki/log.md` per finished phase (append only).
+
+## Decision — 22.11.2026: wake word deferred entirely (owner)
+
+Owner: «давай поки без цього взагалі». H6 step 2 is cancelled for now: no openWakeWord model downloads, no hey_jarvis classifier, no custom «Капрі» training. The code from H6 step 1 (`src/b12/audio/wake.py`, `wake_word` flag, off) stays in place and is not extended. Do not start any wake-word work until the owner reopens it.
