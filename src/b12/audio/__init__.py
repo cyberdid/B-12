@@ -8,6 +8,7 @@ from b12.audio.endpoint import EndpointDecision, EndpointDetector, SileroVad
 from b12.audio.pipeline import VoicePipeline, VoiceTurnMetrics, VoiceTurnResult
 from b12.audio.speaker import SpeakerMatch, SpeakerStore, SpeakerVerifier
 from b12.audio.tts import AudioPlayer, PiperTts, SynthesizedAudio, extract_stream_clauses
+from b12.audio.wake import WakeDetector
 
 __all__ = [
     "AcousticEchoCanceller",
@@ -30,6 +31,7 @@ __all__ = [
     "VoicePipeline",
     "VoiceTurnMetrics",
     "VoiceTurnResult",
+    "WakeDetector",
     "WhisperAsr",
     "extract_stream_clauses",
     "inventory_devices",

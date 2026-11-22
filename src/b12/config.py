@@ -106,6 +106,9 @@ class Settings(BaseModel):
     parallel_reads: bool = False
     # ADR-021: procedural skills index and skill_view/skill_propose tools. Off until measured.
     skills: bool = False
+    # Task H6 (Step 1): local wake-word gating in LiveSession (accept utterances only within 8 s
+    # after wake detection; RAM-only 1.5 s ring buffer). Off until Step 2 model approval.
+    wake_word: bool = False
     # After the one nudge, a reply that still claims a check while no tool ran gets a runtime
     # note saying the check did not happen (Bolt repeated such claims, 18.11.2026). Off: arm D3
     # was neutral and the model sometimes answered the note as if the user said it.
@@ -271,6 +274,7 @@ class Settings(BaseModel):
                 "stable_prefix",
                 "parallel_reads",
                 "skills",
+                "wake_word",
                 "annotate_unverified_claims",
             ):
                 value = value.strip().lower() in ("1", "true", "yes", "on")

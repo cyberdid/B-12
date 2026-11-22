@@ -160,6 +160,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "stable_prefix": False,
         "parallel_reads": False,
         "skills": False,
+        "wake_word": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
         "network_allow": (),
@@ -342,3 +343,9 @@ def test_skills_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings(state_dir=tmp_path).skills is False
     env = {"B12_STATE_DIR": str(tmp_path), "B12_SKILLS": "true"}
     assert Settings.from_env(env).skills is True
+
+
+def test_wake_word_is_opt_in_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).wake_word is False
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_WAKE_WORD": "true"}
+    assert Settings.from_env(env).wake_word is True

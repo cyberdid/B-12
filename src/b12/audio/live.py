@@ -11,15 +11,18 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import math
 import shutil
 import time
 from collections import deque
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 
 from b12.audio.capture import MicController
+from b12.audio.wake import WakeDetector
 
 FRAME_SAMPLES = 512  # 32 ms at 16 kHz, the frame size the VAD and AEC are tuned for
 SAMPLE_RATE = 16000
@@ -187,11 +190,36 @@ class LiveSession:
         *,
         segmenter: Segmenter | None = None,
         on_event: Callable[[dict], None] | None = None,
+        mode: Literal["always", "wake"] | None = None,
+        wake_detector: WakeDetector | None = None,
+        wake_window_s: float = 8.0,
+        clock: Callable[[], float] = time.monotonic,
     ):
+        if mode is None:
+            settings = getattr(getattr(duplex, "runtime", None), "settings", None)
+            mode = (
+                "wake"
+                if wake_detector is not None or bool(getattr(settings, "wake_word", False))
+                else "always"
+            )
+        if mode not in ("always", "wake"):
+            raise ValueError(f"unsupported live mode: {mode!r}")
+        if not math.isfinite(wake_window_s) or wake_window_s <= 0:
+            raise ValueError("wake_window_s must be positive and finite")
+
         self.duplex = duplex
         self.mic = mic
         self.segmenter = segmenter or Segmenter(threshold=duplex.barge_in_vad_threshold)
         self.on_event = on_event or (lambda event: None)
+        self.mode: Literal["always", "wake"] = mode
+        self.wake_window_s = float(wake_window_s)
+        self.wake_detector = (
+            wake_detector
+            if wake_detector is not None
+            else (WakeDetector() if self.mode == "wake" else None)
+        )
+        self._clock = clock
+        self._wake_until: float | None = None
         self.utterances = 0
         self.asr_calls = 0
         self.barge_ins = 0
@@ -204,6 +232,12 @@ class LiveSession:
     async def run(self, stop: asyncio.Event) -> dict:
         async for frame in self.mic.frames(stop):
             barge = await self.duplex.feed_capture_frame(frame)
+            now = float(self._clock())
+            if self.mode == "wake" and self.wake_detector is not None:
+                wake_frame = barge.cleaned_audio if len(barge.cleaned_audio) else frame
+                if self.wake_detector.feed(wake_frame):
+                    self._wake_until = now + self.wake_window_s
+                    self._emit("wake", window_s=self.wake_window_s)
             self._frames += 1
             if self._frames % 31 == 0:  # about once a second: the acoustic health of this session
                 stats = barge.aec_stats
@@ -221,12 +255,19 @@ class LiveSession:
                 barge.cleaned_audio,
                 vad_probability=barge.vad_probability,
                 echo=barge.aec_stats.is_echo_dominant or barge.aec_stats.is_media_contaminated,
+                now=now,
             )
             if utterance is not None:
-                self.utterances += 1
-                self._emit("utterance", seconds=round(len(utterance.audio) / SAMPLE_RATE, 3))
-                await self._cancel_turn()
-                self._turn = asyncio.create_task(self._answer(utterance.audio))
+                if self.mode == "wake" and (self._wake_until is None or now > self._wake_until):
+                    self._emit(
+                        "wake_ignored",
+                        seconds=round(len(utterance.audio) / SAMPLE_RATE, 3),
+                    )
+                else:
+                    self.utterances += 1
+                    self._emit("utterance", seconds=round(len(utterance.audio) / SAMPLE_RATE, 3))
+                    await self._cancel_turn()
+                    self._turn = asyncio.create_task(self._answer(utterance.audio))
             if stop.is_set():
                 break
         if stop.is_set():
