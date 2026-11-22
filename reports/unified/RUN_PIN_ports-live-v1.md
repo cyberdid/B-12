@@ -17,9 +17,9 @@ tags: [track-r5, track-g, run-pin, ports-live-v1, owner-gate]
 
 ## Обов'язкові поля статусу й воріт власника
 
-- Codex review of ports-live-v1: PENDING_OWNER
-- Freeze status: DRAFT_PENDING_OWNER_REVIEW (awaiting owner's Codex review)
-- Colab budget (hours): PENDING_OWNER (do not queue model runs until set by owner)
+- Codex review of ports-live-v1: done 22.11.2026, 3 major + 2 minor open (`reports/unified/oracle-review-ports-v1/review-codex-on-fixed.json`); re-review after fixes required
+- Freeze status: DRAFT (blocked by the open Codex findings; freeze only after a clean re-review)
+- Colab budget (hours): NO CAP. Owner, 22.11.2026: "на всі кредити можна, скоро новий місяць". Model runs may be queued; the orchestrator stops Colab when the queue is empty.
 
 ## Перевірені артефакти перед Track G
 
@@ -50,7 +50,7 @@ tags: [track-r5, track-g, run-pin, ports-live-v1, owner-gate]
 
 1. **Codex blind oracle review (`ports-live-v1`):** власник запускає сліпий огляд на [prompt-fixed.txt](oracle-review-ports-v1/prompt-fixed.txt) / [sheet-fixed.json](oracle-review-ports-v1/sheet-fixed.json) з [schema.json](oracle-review-ports-v1/schema.json).
 2. **Freeze (`ports-live-v1.json`):** після позитивної рецензії власника оновити статус маніфесту на `FROZEN` і зафіксувати фінальний SHA-256 у [oracle-review-ports-v1/README.md](oracle-review-ports-v1/README.md).
-3. **Colab budget (hours):** власник задає числовий ліміт годин у цьому файлі; до появи числа модельні завдання у `jobs.tsv` ставити заборонено.
+3. **Colab budget:** встановлено 22.11.2026 — без ліміту (кредити власника). Ліміт не є причиною відкладати прогони; зупинка черги — порожня черга в `jobs.tsv`.
 4. **Перезапуск оркестратора (R4):** власник вручну перезапускає запущений `ops/remote/orchestrator.sh`, щоб підхопити `133780e`.
 5. **H6 Step 2 (openWakeWord ONNX):** очікує окремого схвалення власника на завантаження (`melspectrogram.onnx`, `embedding_model.onnx`, вибір між `hey_jarvis_v0.1.onnx` під CC-BY-NC-SA-4.0 чи власним класифікатором «Капрі», а також `onnxruntime` vs пакет `openwakeword`).
 6. **H7 (кандидат Q23):** рекомендація не витрачати бюджет Track G на LongMemEval-S / BEAM, а після Track G розглянути легкий bulk-ingestion retrieval-sufficiency прогін зрізу 50–100 питань LongMemEval-S (MIT).
