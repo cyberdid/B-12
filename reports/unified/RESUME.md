@@ -192,3 +192,21 @@ Every new behaviour is a `Settings` flag, default False (see Global Constraints 
 ## Decision — 22.11.2026: wake word deferred entirely (owner)
 
 Owner: «давай поки без цього взагалі». H6 step 2 is cancelled for now: no openWakeWord model downloads, no hey_jarvis classifier, no custom «Капрі» training. The code from H6 step 1 (`src/b12/audio/wake.py`, `wake_word` flag, off) stays in place and is not extended. Do not start any wake-word work until the owner reopens it.
+
+
+## Checkpoint — 22.11.2026 ~22:00: G2.1–G2.6 завершено, дефолти `0f930c8`, пауза `gpt-6-luna`
+
+- **Статус коду та гілки (`feat/unified-dr2-dr3`):**
+  - `4783479`: завершено `G2.1` (`14/14`, `224/224`) та `G2.2` (`9/9`, `396/396` на `gemma4:12b` Colab L4, `0` помилок), судді `Codex + Gemini` (`96.7%` згоди), звіти `G2_1_SCREEN_REPORT_2026-11-22.md`, `CAPRI_PORTS_OWNER_DISPUTES.md` (7 спорів без прецеденту), `CAPRI_PORTS_DECISION_REPORT.md`.
+  - `0f930c8`: за рішенням власника увімкнено за замовчуванням у `src/b12/config.py`: `preference_rules=True`, `preference_placement="query"`, `memory_taint=True`, `memory_review=True`, `memory_review_approval=True` (варіант C). Повний CPU-набір тестів на `0f930c8` підтверджено: **`982 passed, 1 skipped in 241.49s`**.
+  - Незалежне дерево `/home/cyberdid/Projects/B-12/.worktrees/eval-run` тримається на detached піні `d116105` (до зміни дефолтів) для чесного порівняння моделей.
+- **Стан усіх процесів:** усі фонові задачі, `ops/remote/orchestrator.sh` (`orchestrator stopped`), `subscription_bridge`, `run_locked_pilot.sh`, `sandboxed_suite.sh`, `bwrap`, `ollama_broker` та сесія Colab `b12eval` коректно зупинені; жодних побічних або завислих процесів і тимчасових `/tmp/b12-*` не лишилося. Незакомічені файли Codex у `wiki/`, `raw/`, `reports/unified/semantic-judge-F/` збережено.
+- **Збережений прогрес діагностики `gpt-6-luna` (`evals/capri_comprehensive/artifacts/` у `.worktrees/eval-run`, пін `d116105`, `--variant deployed --model-timeout 230 --num-ctx 200000 --output-tokens 16384 --memory-temporal --goals-in-context`, НЕ deployed-конфігурація):**
+  1. `ports-live-v1-luna6-baseline-2026-11-22`: **завершено `16/16`** (`DONE` у `pilot.log`, `0` помилок, `det=8/16`).
+  2. `ports-live-v1-luna6-preference_placement-2026-11-22`: **збережено `12/16`** записів (`11` чистих `EXECUTED`; `M91-P1` має `error_code="http_error"` через 3 відхилені мостом спроби виклику нативного `web_search` — при повторному запуску `run_locked_pilot.sh` автоматично відкладе `M91-P1.json` у `.broken.*` і дорахує `M91-P1` та `M94-P2..M96-P2`).
+  3. Плечі в черзі на продовження (`0/16`): `luna-ports-memory_review` (`--memory-review`), `luna-ports-memory_taint` (`--memory-taint`), `luna-ports-session_search` (`--session-search`), `luna-ports-memory_as_of` (`--memory-as-of`).
+- **Як продовжити діагностику `gpt-6-luna`:**
+  1. Підняти міст з `.worktrees/eval-run`: `.venv/bin/python -m evals.subscription_bridge --backend codex --model gpt-6-luna --port 11501 --upstream http://127.0.0.1:11434 --timeout 200` (локальний `ollama serve` має тримати проксі метаданих без завантаження GPU).
+  2. Послідовно запустити/докачати з `.worktrees/eval-run` скрипт `scratch/run_luna_ports.py` (або `B12_EVAL_OLLAMA_URL=http://127.0.0.1:11501 B12_EVAL_MODEL=gemma4:12b B12_EVAL_VARIANT=deployed NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed --model-timeout 230 --num-ctx 200000 --output-tokens 16384 --memory-temporal --goals-in-context <прапорці>" evals/unified/run_locked_pilot.sh evals/unified/scenario_sets/ports-live-v1.json <out_dir> 1 A0`).
+  3. **Судді для `gpt-6-luna` за прямим рішенням власника (22.11.2026):** **Gemini 4 Hydrogen (`agy`) + Codex `gpt-6.2-sol` High** (без `Opus` і без `Haiku`, із явною приміткою в окремому звіті про виняток щодо спільного сімейства OpenAI/Codex).
+- **Також відкрито окремо:** повторити `h4-compaction` (`evals.unified.compaction_recall`) із коректним `--tokenizer-dir profiles/tokenizers/gemma4-12b` (коли власник відкриє сесію для Colab/моделей).
