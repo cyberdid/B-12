@@ -25,6 +25,7 @@ async def test_stable_prefix_keeps_persona_bytes_first(scripted_ollama, tmp_path
                     "memory_temporal": True,
                     "goals_in_context": True,
                     "preference_rules": True,
+                    "preference_placement": "system",
                     "memory_scoped": True,
                 }
             )

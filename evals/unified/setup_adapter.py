@@ -320,16 +320,12 @@ def build_runtime(
     if setup.get("review_tick"):
         updates.update(
             {
-                "memory_review": bool(memory_review or getattr(settings, "memory_review", False)),
-                "memory_review_approval": bool(
-                    memory_review_approval or getattr(settings, "memory_review_approval", False)
-                ),
-                "memory_grounding": bool(
-                    memory_grounding or getattr(settings, "memory_grounding", False)
-                ),
+                "memory_review": bool(memory_review),
+                "memory_review_approval": bool(memory_review_approval),
+                "memory_grounding": bool(memory_grounding),
             }
         )
-    effective_taint = bool(memory_taint or getattr(settings, "memory_taint", False))
+    effective_taint = bool(memory_taint)
     runtime = open_runtime(settings.model_copy(update=updates))
     try:
         actors = _actors(runtime, setup)

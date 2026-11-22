@@ -144,12 +144,12 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_scoped": False,
         "task_ledger": True,
         "initiative_gate": True,
-        "preference_rules": False,
-        "preference_placement": "system",
+        "preference_rules": True,
+        "preference_placement": "query",
         "memory_grounding": False,
-        "memory_taint": False,
-        "memory_review": False,
-        "memory_review_approval": False,
+        "memory_taint": True,
+        "memory_review": True,
+        "memory_review_approval": True,
         "session_search": False,
         "memory_ranking": False,
         "goal_contract": False,
@@ -238,10 +238,10 @@ def test_memory_scoped_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings.from_env(env).memory_scoped
 
 
-def test_memory_taint_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).memory_taint is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TAINT": "true"}
-    assert Settings.from_env(env).memory_taint
+def test_memory_taint_is_enabled_by_default_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_taint is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_TAINT": "false"}
+    assert Settings.from_env(env).memory_taint is False
 
 
 def test_schedules_is_opt_in_and_environment_configurable(tmp_path):
@@ -256,10 +256,11 @@ def test_standing_intents_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings.from_env(env).standing_intents
 
 
-def test_preference_placement_defaults_to_system_and_validates_literal(tmp_path):
-    assert Settings(state_dir=tmp_path).preference_placement == "system"
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_PREFERENCE_PLACEMENT": "query"}
-    assert Settings.from_env(env).preference_placement == "query"
+def test_preference_placement_defaults_to_query_and_validates_literal(tmp_path):
+    assert Settings(state_dir=tmp_path).preference_rules is True
+    assert Settings(state_dir=tmp_path).preference_placement == "query"
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_PREFERENCE_PLACEMENT": "system"}
+    assert Settings.from_env(env).preference_placement == "system"
     with pytest.raises(ValidationError):
         Settings(state_dir=tmp_path, preference_placement="invalid")
 
@@ -327,16 +328,16 @@ def test_h5_flags_are_opt_in_and_environment_configurable(tmp_path):
     assert env.parallel_reads is True
 
 
-def test_memory_review_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).memory_review is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW": "true"}
-    assert Settings.from_env(env).memory_review is True
+def test_memory_review_is_enabled_by_default_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_review is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW": "false"}
+    assert Settings.from_env(env).memory_review is False
 
 
-def test_memory_review_approval_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).memory_review_approval is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW_APPROVAL": "true"}
-    assert Settings.from_env(env).memory_review_approval is True
+def test_memory_review_approval_is_enabled_by_default_and_environment_configurable(tmp_path):
+    assert Settings(state_dir=tmp_path).memory_review_approval is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_REVIEW_APPROVAL": "false"}
+    assert Settings.from_env(env).memory_review_approval is False
 
 
 def test_skills_is_opt_in_and_environment_configurable(tmp_path):

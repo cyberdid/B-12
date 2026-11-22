@@ -66,21 +66,24 @@ class Settings(BaseModel):
     # deliver, defer, inbox) instead of attention alone. On since 20.11.2026 (owner approved).
     initiative_gate: bool = True
     # The speaker's stated answer preferences from memory as rules for the reply's form
-    # (INTG-08/M88: models ignored "explain briefly" offered only as evidence). Off until measured.
-    preference_rules: bool = False
+    # (INTG-08/M88, G2.2 ports-live-v1 P1: +54.2 p.p. [+37.5, +75.0] with query placement).
+    # On since 22.11.2026 (owner approved).
+    preference_rules: bool = True
     # Where preference_rules sit in the prompt ("system" vs prepended beside the user query).
-    preference_placement: Literal["system", "query"] = "system"
+    preference_placement: Literal["system", "query"] = "query"
     # Grounding rules for memory writes (from Hermes Agent's review prompt, 20.11.2026): store
     # only what the owner said or a tool showed; no inferred traits; a one-off request is not a
     # standing preference. Changes the memory_store schema text, so off until measured.
     memory_grounding: bool = False
     # Network taint for memory writes in the same turn (OpenClaw-derived, 20.11.2026): once any
     # network.http tool completes in a turn, memory_store marks new records unverified/network_turn.
-    memory_taint: bool = False
+    # On since 22.11.2026 (owner approved after G2.2 ports-live-v1 P4 measurement).
+    memory_taint: bool = True
     # ADR-020: background post-turn memory review of recent unreviewed interactive turns.
-    memory_review: bool = False
+    # On since 22.11.2026 in owner-approval staging mode (Option C, owner approved).
+    memory_review: bool = True
     # ADR-020: stage post-turn memory review candidates in review_pending until owner approves.
-    memory_review_approval: bool = False
+    memory_review_approval: bool = True
     # FTS5 search over the actor's own past conversation turns (`conversation_search`). Off until
     # measured.
     session_search: bool = False

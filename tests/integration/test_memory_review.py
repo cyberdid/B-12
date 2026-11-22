@@ -31,7 +31,12 @@ async def test_review_records_grounded_fact_with_turn_locator(scripted_ollama, t
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -95,7 +100,12 @@ async def test_review_skips_duplicates(scripted_ollama, tmp_path):
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -143,7 +153,12 @@ async def test_review_rejects_invalid_output(scripted_ollama, tmp_path):
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -215,7 +230,12 @@ async def test_purge_during_review_rejects_the_write(scripted_ollama, tmp_path):
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -287,7 +307,12 @@ async def test_review_never_forgets_or_supersedes(scripted_ollama, tmp_path, mon
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -357,6 +382,7 @@ async def test_review_excludes_goal_and_tainted_turns_and_requires_consent(
                 update={
                     "state_dir": tmp_path / "state",
                     "memory_review": True,
+                    "memory_review_approval": False,
                     "network_allow": ("127.0.0.1",),
                 }
             )
@@ -439,7 +465,12 @@ async def test_review_caps_batch_at_6_turns_and_5_candidates(scripted_ollama, tm
     state, base = scripted_ollama
     runtime = open_runtime(
         base.model_copy(
-            update={"state_dir": tmp_path / "state", "memory_review": True, "output_tokens": 2048}
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+                "output_tokens": 2048,
+            }
         )
     )
     try:
@@ -529,7 +560,13 @@ async def test_review_does_not_run_while_actor_is_busy(scripted_ollama, tmp_path
         off_runtime.close()
 
     runtime = open_runtime(
-        base.model_copy(update={"state_dir": tmp_path / "on", "memory_review": True})
+        base.model_copy(
+            update={
+                "state_dir": tmp_path / "on",
+                "memory_review": True,
+                "memory_review_approval": False,
+            }
+        )
     )
     scheduler = Scheduler(runtime)
     try:
@@ -590,7 +627,13 @@ async def test_clearing_session_forgets_reviewed_records(scripted_ollama, tmp_pa
 
     state, base = scripted_ollama
     runtime = open_runtime(
-        base.model_copy(update={"state_dir": tmp_path / "state", "memory_review": True})
+        base.model_copy(
+            update={
+                "state_dir": tmp_path / "state",
+                "memory_review": True,
+                "memory_review_approval": False,
+            }
+        )
     )
     try:
         actor = runtime.control.create_actor(owner=True, consent=True)
@@ -654,6 +697,7 @@ async def test_scheduler_run_invokes_review_memory_idle_after_reflect_idle(
             update={
                 "state_dir": tmp_path / "state",
                 "memory_review": True,
+                "memory_review_approval": False,
                 "scheduler_tick_s": 0.01,
             }
         )

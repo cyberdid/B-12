@@ -10,7 +10,13 @@ PINNED = datetime(2026, 12, 1, 8, 0, tzinfo=UTC)
 
 async def _system(base, tmp_path, flag, setup):
     runtime = open_runtime(
-        base.model_copy(update={"state_dir": tmp_path / str(flag), "preference_rules": flag})
+        base.model_copy(
+            update={
+                "state_dir": tmp_path / str(flag),
+                "preference_rules": flag,
+                "preference_placement": "system",
+            }
+        )
     )
     try:
         runtime.agent.clock = lambda: PINNED
