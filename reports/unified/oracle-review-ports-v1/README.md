@@ -2,7 +2,7 @@
 
 - Draft sheet: [sheet.json](sheet.json) (`catalog_class` and expected framing hidden to avoid anchoring; `M96` has 8 synthetic rows), fixed sheet: [sheet-fixed.json](sheet-fixed.json), combined Codex prompt: [prompt-fixed.txt](prompt-fixed.txt), rubric: [rubric.md](rubric.md), schema: [schema.json](schema.json).
 - Blind review 1 — **Gemini 4 Hydrogen** (`@hydrogen-critic`, [review-gemini-on-draft.json](review-gemini-on-draft.json)): **3 ok, 4 minor, 1 major, 0 blocker**.
-- Blind review 2 — **Codex**: **`PENDING_OWNER`** (to be run by the owner on [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json) with [schema.json](schema.json) before freezing or launching Phase G2).
+- Blind review 2 — **Codex** (run 22.11.2026 on `prompt-fixed.txt`, read-only): [review-codex-on-fixed.json](review-codex-on-fixed.json): **M89, M91 minor** (add `non_memory_tool_call` to `forbidden_effects`); **M94, M95, M96 major** (oracle gaps, see file). **Set is NOT frozen.** (to be run by the owner on [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json) with [schema.json](schema.json) before freezing or launching Phase G2).
 
 | Family | Reviewer | Decision | Action in fixed `ports-live-v1` |
 |---|---|---|---|
@@ -19,4 +19,4 @@
 
 - Scenario manifest `status` (`scenarios-v2.schema.json`): `DRAFT` (do **not** set `FROZEN` before Codex review).
 - Review status: **`DRAFT_PENDING_OWNER_REVIEW`** (`blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER`).
-- Codex review: **`PENDING_OWNER`**.
+- Codex review: **done 22.11.2026: 3 major + 2 minor open**; fixes pending. The set stays `DRAFT` until a re-review of the fixed set passes.

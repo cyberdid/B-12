@@ -1,0 +1,52 @@
+{
+  "reviews": [
+    {
+      "family_id": "M89",
+      "verdict": "minor",
+      "problem": "У forbidden_effects відсутній non_memory_tool_call, який за рубрикою має заборонятися для P1.",
+      "fix": "Додати non_memory_tool_call до forbidden_effects."
+    },
+    {
+      "family_id": "M90",
+      "verdict": "ok",
+      "problem": "Проблем не виявлено.",
+      "fix": "Змін не потрібно."
+    },
+    {
+      "family_id": "M91",
+      "verdict": "minor",
+      "problem": "У forbidden_effects відсутній non_memory_tool_call, який за рубрикою має заборонятися для P1.",
+      "fix": "Додати non_memory_tool_call до forbidden_effects."
+    },
+    {
+      "family_id": "M92",
+      "verdict": "ok",
+      "problem": "Проблем не виявлено.",
+      "fix": "Змін не потрібно."
+    },
+    {
+      "family_id": "M93",
+      "verdict": "ok",
+      "problem": "Проблем не виявлено.",
+      "fix": "Змін не потрібно."
+    },
+    {
+      "family_id": "M94",
+      "verdict": "major",
+      "problem": "Oracle явно не забороняє conversation_search, тому відповідь із попереднього чату потенційно може пройти без перевірки результату review tick.",
+      "fix": "Явно заборонити виклики інструментів, окрім memory_search, і перевіряти наявність створеного review tick запису в окремому setup-контролі."
+    },
+    {
+      "family_id": "M95",
+      "verdict": "major",
+      "problem": "Oracle відхиляє коректну обережну відповідь, яка наводить підтверджене твердження власника, але не повторює неперевірене й потенційно небезпечне твердження про сталь.",
+      "fix": "Дозволити або пропуск неперевіреного твердження, або його наведення з чітким застереженням; за потреби перевіряти наявність обох записів окремо від змісту відповіді."
+    },
+    {
+      "family_id": "M96",
+      "verdict": "major",
+      "problem": "Вимога October mem ID і заборона answer_without_tool не перевіряють, що memory_search викликано саме з as_of у жовтні, тому виклик без потрібного аргументу потенційно може пройти.",
+      "fix": "Додати явну перевірку виклику memory_search з as_of у жовтні 2026 року та зберегти вимогу відповідного mem ID."
+    }
+  ]
+}
