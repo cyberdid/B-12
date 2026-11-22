@@ -14,8 +14,9 @@ tags: [track-f, skills, adr-021, procedural-memory]
 
 # Звіт Track F — Навички як процедурна пам'ять (ADR-021, прапорець `skills`)
 
-**Робочий worktree / гілка:** підготовлено в `.worktrees/tmp-track-f` (`tmp/track-f-20261122`: `709f5a2`, `450736a`), інтегровано у `.worktrees/unified-dr2-dr3` (`feat/unified-dr2-dr3`).  
-**Коміти у `feat/unified-dr2-dr3`:** F1 — `8cf159e`, F2 — `adac2d6`, звіт і журнал — поточний коміт.
+**Робочий worktree / гілка:** підготовлено в `.worktrees/tmp-track-f` (`tmp/track-f-20261122`: `709f5a2`, `450736a`), інтегровано у `.worktrees/unified-dr2-dr3` (`feat/unified-dr2-dr3`).
+
+**Коміти у `feat/unified-dr2-dr3`:** F1 — `8cf159e`, F2 — `adac2d6`, звіт і журнал — `55026af`.
 
 ## Підсумок реалізації (**перевірений факт**)
 

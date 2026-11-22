@@ -1,7 +1,9 @@
 # Track H — звіт про виконання (H4, H6 Step 1, H7)
 
-**Дата:** 2026-11-22  
-**Гілка / worktree:** підготовлено в `.worktrees/tmp-track-h` (`tmp/track-h-20261122`: `86d5058`, `f6ac0f8`, `0c73898`), інтегровано у `.worktrees/unified-dr2-dr3` (`feat/unified-dr2-dr3`: H4 `2717d87`, H6 step 1 `1b0efde`, H7 `dfcba6c`)  
+**Дата:** 2026-11-22
+
+**Гілка / worktree:** підготовлено в `.worktrees/tmp-track-h` (`tmp/track-h-20261122`: `86d5058`, `f6ac0f8`, `0c73898`), інтегровано у `.worktrees/unified-dr2-dr3` (`feat/unified-dr2-dr3`: H4 `2717d87`, H6 step 1 `1b0efde`, H7 `dfcba6c`)
+
 **Обмеження виконання дотримано:** жодного запуску реальних моделей, жодного завантаження локального GPU чи Colab, жодного завантаження ONNX-моделей, `summary`-політику в H4 не реалізовано, `tests/fixtures/prompt_surface/owner_default.json` не змінено.
 
 ---

@@ -11,8 +11,9 @@ tags: [track-r5, track-g, run-pin, ports-live-v1, owner-gate]
 
 # Track R5 — Run Pin & Prerequisites for Track G (`ports-live-v1`)
 
-**Pin commit (`<PIN>`):** `12b7f45e05c71407a51349c116667223e7c70197` (`12b7f45` на гілці `feat/unified-dr2-dr3`, після завершення та інтеграції R1–R4, F1–F2, H4/H6 step 1/H7; наступний коміт Track R5 додає лише цей файл і запис у `wiki/log.md` без змін у коді, тестах чи фікстурах).  
-**Eval worktree:** `/home/cyberdid/Projects/B-12/.worktrees/eval-run` (переведено на detached `HEAD` після коміту R5; моделі в межах R5 не запускалися, `unified-dr2-dr3` ніколи не використовується для модельних прогонів).
+**Pin commit (`<PIN>`):** `12b7f45e05c71407a51349c116667223e7c70197` (`12b7f45` на гілці `feat/unified-dr2-dr3`, після завершення та інтеграції R1–R4, F1–F2, H4/H6 step 1/H7; фінальні документи R5 додають лише цей файл і запис у `wiki/log.md` без змін у коді, тестах чи фікстурах).
+
+**Eval worktree:** `/home/cyberdid/Projects/B-12/.worktrees/eval-run` (переведено на detached `HEAD` після фінального коміту R5; моделі в межах R5 не запускалися, `unified-dr2-dr3` ніколи не використовується для модельних прогонів).
 
 ## Обов'язкові поля статусу й воріт власника
 
