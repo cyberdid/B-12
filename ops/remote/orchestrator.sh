@@ -14,6 +14,32 @@ SESSION=b12eval; SOCK_DIR="$HOME/b12-embed"; SOCK="$SOCK_DIR/embed.sock"
 export PATH="$HOME/.local/bin:$PATH"
 mkdir -p "$Q" "$SOCK_DIR"; touch "$Q/jobs.tsv"
 log() { echo "$(date -Is) $*" >>"$Q/orchestrator.log"; }
+DRIVER_PID=""
+SLEEP_PID=""
+
+cleanup() {
+  trap - TERM INT
+  if [ -n "${DRIVER_PID:-}" ]; then
+    kill -TERM -- "-$DRIVER_PID" 2>/dev/null || true
+    wait "$DRIVER_PID" 2>/dev/null || true
+    DRIVER_PID=""
+  fi
+  if [ -n "${SLEEP_PID:-}" ]; then
+    kill -TERM "$SLEEP_PID" 2>/dev/null || true
+    wait "$SLEEP_PID" 2>/dev/null || true
+    SLEEP_PID=""
+  fi
+  log "orchestrator stopped"
+  exit 0
+}
+trap cleanup TERM INT
+
+interruptible_sleep() {
+  sleep "$1" &
+  SLEEP_PID=$!
+  wait "$SLEEP_PID" 2>/dev/null || true
+  SLEEP_PID=""
+}
 
 pending_jobs() {
   while IFS=$'\t' read -r name manifest out repeats arm model extra; do
@@ -47,6 +73,7 @@ ssh_ready() {
 }
 
 ensure_colab() {  # $1 = space-separated models
+  [ "${B12_ORCH_DRYRUN:-0}" = "1" ] && return 0
   if ! session_alive; then
     ssh -O exit "$SESSION" >/dev/null 2>&1
     log "creating Colab session"; colab new -s "$SESSION" --gpu L4 >>"$Q/orchestrator.log" 2>&1 || return 1
@@ -81,6 +108,10 @@ ensure_colab() {  # $1 = space-separated models
 }
 
 profile_for() {  # model -> profile file name matching the served digest (template must match)
+  if [ "${B12_ORCH_DRYRUN:-0}" = "1" ]; then
+    echo "dryrun"
+    return 0
+  fi
   "$REPO/.venv/bin/python" "$REPO/ops/remote/profile_for.py" "$1" "$Q/tags.json"
 }
 
@@ -96,35 +127,36 @@ run_job() {
     B12_EVAL_EMBED_SOCKET="$SOCK" NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed $extra" \
     evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm" >>"$Q/$name.log" 2>&1 &
   local driver=$! misses=0 records last_change
-  records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' | wc -l)"; last_change=$(date +%s)
+  DRIVER_PID="$driver"
+  records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' 2>/dev/null | wc -l)"; last_change=$(date +%s)
   while kill -0 "$driver" 2>/dev/null; do
-    sleep 30
-    local now_records; now_records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' | wc -l)"
+    interruptible_sleep 30
+    local now_records; now_records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' 2>/dev/null | wc -l)"
     if [ "$now_records" != "$records" ]; then records="$now_records"; last_change=$(date +%s); fi
     if [ $(( $(date +%s) - last_change )) -ge 900 ]; then
       log "$name: no new record for 15 min, restarting the driver"
-      kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null
+      kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null; DRIVER_PID=""
       return 1
     fi
-    if tunnel_ok && session_alive; then misses=0; continue; fi
+    if [ "${B12_ORCH_DRYRUN:-0}" = "1" ] || (tunnel_ok && session_alive); then misses=0; continue; fi
     misses=$((misses + 1))
     [ "$misses" -lt 3 ] && continue  # one failed listing is not a lost session
     log "$name: Colab lost (3 checks), stopping the driver to resume after reconnect"
-    kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null
+    kill -TERM -- "-$driver" 2>/dev/null; wait "$driver" 2>/dev/null; DRIVER_PID=""
     return 1
   done
-  wait "$driver"; grep -qs DONE "$REPO/$out/pilot.log"
+  wait "$driver"; DRIVER_PID=""; grep -qs DONE "$REPO/$out/pilot.log"
 }
 
 log "orchestrator start"
 while true; do
   jobs_left="$(pending_jobs)"
   if [ -z "$jobs_left" ]; then
-    if session_alive; then log "queue empty: stopping Colab"; ssh -O exit "$SESSION" >/dev/null 2>&1; colab stop -s "$SESSION" >>"$Q/orchestrator.log" 2>&1; fi
-    sleep 300; continue
+    if [ "${B12_ORCH_DRYRUN:-0}" != "1" ] && session_alive; then log "queue empty: stopping Colab"; ssh -O exit "$SESSION" >/dev/null 2>&1; colab stop -s "$SESSION" >>"$Q/orchestrator.log" 2>&1; fi
+    interruptible_sleep 300; continue
   fi
   IFS=$'\t' read -r name manifest out repeats arm model extra <<<"$(head -1 <<<"$jobs_left")"
   models="$(cut -f6 <<<"$jobs_left" | sort -u | tr '\n' ' ')"
-  if ! ensure_colab "$models"; then log "Colab not ready; retry in 2 min"; sleep 120; continue; fi
-  run_job "$name" "$manifest" "$out" "$repeats" "$arm" "$model" "$extra" || sleep 30
+  if ! ensure_colab "$models"; then log "Colab not ready; retry in 2 min"; interruptible_sleep 120; continue; fi
+  run_job "$name" "$manifest" "$out" "$repeats" "$arm" "$model" "$extra" || interruptible_sleep 30
 done
