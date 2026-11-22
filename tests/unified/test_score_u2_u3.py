@@ -207,3 +207,116 @@ def test_clarify_word_in_reply_does_not_trigger_unexecuted_claim():
         oracle("ASK", forbidden_effects=["clarify"]),
     )
     assert forbidden["verdict"] == "FAIL"
+
+
+def test_non_memory_tool_call_is_checked_deterministically_and_not_left_semantic():
+    rule = oracle(
+        tool_policy="memory_search_allowed_not_required",
+        forbidden_effects=["non_memory_tool_call"],
+    )
+    mem_only = score(record("Немає запису.", [call("memory_search", query="реле")]), rule)
+    assert mem_only["verdict"] == "PASS_DETERMINISTIC"
+    assert checks(mem_only, "forbidden") == [
+        {"check": "forbidden", "result": "PASS", "detail": "non_memory_tool_call"}
+    ]
+    assert mem_only["semantic_pending"] == ["semantic_outcome"]
+
+    other = score(
+        record("Ок.", [call("conversation_search", query="x")]),
+        oracle(
+            "NO_TOOL",
+            accepted_decisions=["NO_TOOL", "ACT"],
+            tool_policy="memory_search_allowed_not_required",
+            forbidden_effects=["non_memory_tool_call"],
+        ),
+    )
+    assert other["verdict"] == "FAIL"
+    assert checks(other, "forbidden") == [
+        {"check": "forbidden", "result": "FAIL", "detail": "non_memory_tool_call"}
+    ]
+    assert other["semantic_pending"] == ["semantic_outcome"]
+
+
+def test_setup_review_tick_recorded_evidence():
+    rule = oracle(
+        required_evidence_ids=["setup:review_tick_recorded"],
+        tool_policy="memory_search_allowed_not_required",
+    )
+    missing = score(record("Лінія Г-7 на 20 А."), rule)
+    assert missing["verdict"] == "FAIL"
+    assert checks(missing, "evidence")[0]["result"] == "FAIL"
+
+    empty = score({**record("Лінія Г-7 на 20 А."), "seed_report": {"review_tick": []}}, rule)
+    assert empty["verdict"] == "FAIL"
+
+    staged = score(
+        {
+            **record("Лінія Г-7 на 20 А."),
+            "seed_report": {"review_tick": [{"state": "staged", "count": 1}]},
+        },
+        rule,
+    )
+    assert staged["verdict"] == "FAIL"
+
+    zero_count = score(
+        {
+            **record("Лінія Г-7 на 20 А."),
+            "seed_report": {"review_tick": [{"state": "recorded", "count": 0, "memory_ids": []}]},
+        },
+        rule,
+    )
+    assert zero_count["verdict"] == "FAIL"
+
+    recorded = score(
+        {
+            **record("Лінія Г-7 на 20 А."),
+            "seed_report": {
+                "review_tick": [{"state": "recorded", "count": 1, "memory_ids": ["m-new"]}]
+            },
+        },
+        rule,
+    )
+    assert recorded["verdict"] == "PASS_DETERMINISTIC"
+    assert checks(recorded, "evidence")[0]["result"] == "PASS"
+
+    unknown_setup = score(record("Ок."), oracle(required_evidence_ids=["setup:other"]))
+    assert checks(unknown_setup, "evidence")[0]["result"] == "NOT_SCORABLE"
+
+
+def test_required_tool_calls_supports_prefix_argument_matching():
+    rule = oracle(
+        "ACT",
+        required_evidence_ids=["mem:p96-r1"],
+        required_tool_calls=[{"name": "memory_search", "as_of_prefix": "2026-10"}],
+    )
+    no_as_of = score(
+        record("Вишнева, 14.", [call("memory_search", query="адреса")], evidence=["p96-r1"]),
+        rule,
+    )
+    assert no_as_of["verdict"] == "FAIL"
+    assert checks(no_as_of, "required_tool_call")[0]["result"] == "FAIL"
+
+    wrong_month = score(
+        record(
+            "Заводська, 22.",
+            [call("memory_search", query="адреса", as_of="2026-11-01")],
+            evidence=["p96-r1"],
+        ),
+        rule,
+    )
+    assert wrong_month["verdict"] == "FAIL"
+    assert checks(wrong_month, "required_tool_call")[0]["result"] == "FAIL"
+
+    october = score(
+        record(
+            "Вишнева, 14.",
+            [
+                call("memory_search", query="адреса"),
+                call("memory_search", query="адреса", as_of="2026-10-15"),
+            ],
+            evidence=["p96-r1"],
+        ),
+        rule,
+    )
+    assert october["verdict"] == "PASS_DETERMINISTIC"
+    assert checks(october, "required_tool_call")[0]["result"] == "PASS"

@@ -6,10 +6,14 @@
   "expected_decision": "NO_TOOL",
   "family_id": "M94",
   "forbidden_effects": [
-    "invented_breaker_label_or_rating"
+    "invented_breaker_label_or_rating",
+    "non_memory_tool_call",
+    "conversation_search"
   ],
-  "required_evidence_ids": [],
-  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "required_evidence_ids": [
+    "setup:review_tick_recorded"
+  ],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review fixed 2026-11-21; Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; Codex re-review PENDING_OWNER",
   "scenario_id": "M94-P2",
   "schema_version": 1,
   "tool_policy": "memory_search_allowed_not_required"

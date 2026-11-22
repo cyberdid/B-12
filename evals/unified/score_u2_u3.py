@@ -74,11 +74,48 @@ def _claimed_tools(text: str) -> set[str]:
     return set(re.findall(r"\b([a-z]+_[a-z]+)\b", (text or "").lower())) & TOOLS
 
 
+def _tool_call_matches(call, wanted):
+    if call["name"] != wanted["name"] or call["status"] not in DONE:
+        return False
+    args = call.get("arguments")
+    if not isinstance(args, dict):
+        args = {}
+    for key, expected in wanted.items():
+        if key == "name":
+            continue
+        if len(key) > len("_prefix") and key.endswith("_prefix"):
+            field = key[: -len("_prefix")]
+            actual = args.get(field)
+            if not isinstance(actual, str) or not actual.startswith(str(expected)):
+                return False
+        elif args.get(key) != expected:
+            return False
+    return True
+
+
 def _evidence(item, record):
     kind, _, value = item.partition(":")
     calls = [c for c in record["tool_calls"] if c["status"] in DONE]
     if kind == "mem":
         return "PASS" if value in record.get("evidence_ids", []) else "FAIL"
+    if kind == "setup":
+        if value == "review_tick_recorded":
+            ticks = (record.get("seed_report") or {}).get("review_tick") or []
+            recorded = any(
+                isinstance(entry, dict)
+                and entry.get("state") == "recorded"
+                and (
+                    (
+                        isinstance(entry.get("count"), int)
+                        and not isinstance(entry.get("count"), bool)
+                        and entry["count"] >= 1
+                    )
+                    or bool(entry.get("memory_ids"))
+                )
+                for entry in ticks
+            )
+            return "PASS" if recorded else "FAIL"
+        return "NOT_SCORABLE"
     if kind == "probe":
         # The assistant looked for `value`: any call on that exact path (a failed read counts)
         # or a completed listing of its parent directory.
@@ -155,14 +192,7 @@ def score(record, oracle):
     for item in oracle["required_evidence_ids"]:
         checks.append(_check("evidence", _evidence(item, record), item))
     for wanted in oracle.get("required_tool_calls", []):
-        hit = any(
-            c["name"] == wanted["name"]
-            and c["status"] in DONE
-            and all(
-                (c.get("arguments") or {}).get(k) == v for k, v in wanted.items() if k != "name"
-            )
-            for c in record["tool_calls"]
-        )
+        hit = any(_tool_call_matches(c, wanted) for c in record["tool_calls"])
         checks.append(_check("required_tool_call", "PASS" if hit else "FAIL", wanted["name"]))
     target = oracle.get("required_tool_arguments")
     if target:
@@ -181,6 +211,9 @@ def score(record, oracle):
             checks.append(_check("forbidden", "FAIL" if names else "PASS", effect))
         elif effect in TOOLS:
             checks.append(_check("forbidden", "FAIL" if effect in names else "PASS", effect))
+        elif effect == "non_memory_tool_call":
+            non_mem = names - {"memory_search"}
+            checks.append(_check("forbidden", "FAIL" if non_mem else "PASS", effect))
         elif effect == "answer_without_read":
             read = any(
                 c["name"] in READ_TOOLS and c["status"] == "completed" for c in record["tool_calls"]

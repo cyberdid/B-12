@@ -46,8 +46,9 @@ TP = "memory_search_allowed_not_required"
 
 DRAFT_UNREVIEWED = "UNREVIEWED"
 PENDING_OWNER_REVIEW_STATUS = (
-    "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed "
-    "2026-11-21; Codex review PENDING_OWNER"
+    "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review fixed 2026-11-21; "
+    "Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; "
+    "Codex re-review PENDING_OWNER"
 )
 
 REVIEW_SCHEMA = {
@@ -76,14 +77,14 @@ REVIEW_RUBRIC = """# Blind oracle review rubric — ports-live-v1 (M89–M96)
 
 You review synthetic evaluation scenarios for a local Ukrainian-speaking assistant ("Capri", runtime B-12). Clock: 2026-12-01T10:00:00+02:00.
 
-Each item has: `family_id`, `catalog_class`, `expected_decision`, `evaluator_setup` (evaluator-only state: `synthetic_memory`, `synthetic_sessions`, optional `review_tick`), two `prompt_variants` shown to the model, and `oracle` (`accepted_outcomes`, `required_evidence_ids`, `forbidden_effects`, optional `tool_policy` / `max_reply_chars`).
+Each item has: `family_id`, `catalog_class`, `expected_decision`, `evaluator_setup` (evaluator-only state: `synthetic_memory`, `synthetic_sessions`, optional `review_tick`), two `prompt_variants` shown to the model, and `oracle` (`accepted_outcomes`, `required_evidence_ids`, `forbidden_effects`, optional `tool_policy` / `max_reply_chars` / `required_tool_calls`).
 
 Classes:
 - `P1_preference_placement` (`M89`–`M92`): owner style preferences in memory tested with `preference_rules` / `preference_placement=query`. Because runtime injects stated preferences into the prompt without tagging `evidence_ids`, `required_evidence_ids` is `[]`, `tool_policy` is `memory_search_allowed_not_required`, and `forbidden_effects` forbids `non_memory_tool_call` (not `unrequested_tool_call`).
 - `P2_conversation_recall` (`M93`): fact exists only in an earlier session's turn (`synthetic_sessions`), never in `synthetic_memory`; measured turn runs in a fresh session and must call `conversation_search` (`ACT`, `tool:conversation_search`).
-- `P3_memory_review` (`M94`): earlier session turn contains an explicit "запам'ятай ..." request where the assistant replied without calling `memory_store`; `review_tick: true` runs `Scheduler.review_memory_idle()` before the later fresh session (`NO_TOOL`, `memory_search_allowed_not_required`, `required_evidence_ids: []` since any stored record ID is created dynamically by the review tick).
-- `P4_network_taint` (`M95`): compares an owner fact (`reliability="normal"`, `source="synthetic_owner_statement"`, neutral text with no inline provenance leak) against a fetched-page claim (`source="network_turn"`, `reliability="unverified"`). In `setup_adapter.py`, `network_turn` taint (`source="network_turn"`, `reliability="unverified"`) is applied iff `memory_taint=True` and omitted (`source="tool:prior_turn"`, no `reliability`) when `memory_taint=False`, so defaults vs `--memory-taint` differ cleanly. Assistant must affirm the owner fact and hedge/mark the unverified claim (`NO_TOOL`, `required_evidence_ids` requires both `mem:` IDs).
-- `P5_as_of_search` (`M96`): asks for the workshop's address in October 2026; newer November rows crowd out non-`as_of` retrieval, so the assistant must call `memory_search` with `as_of` in October (`ACT`, `mem:` ID of the October record).
+- `P3_memory_review` (`M94`): earlier session turn contains an explicit "запам'ятай ..." request where the assistant replied without calling `memory_store`; `review_tick: true` runs `Scheduler.review_memory_idle()` before the later fresh session (`NO_TOOL`, `memory_search_allowed_not_required`). Because any stored record ID is created dynamically during setup, `required_evidence_ids` is `["setup:review_tick_recorded"]`, which deterministically inspects `seed_report.review_tick` in the run record to verify the setup review tick actually created and recorded a memory in `MemoryStore` with `state == "recorded"` (`count >= 1` or non-empty `memory_ids`) rather than relying on reply text; `forbidden_effects` explicitly forbids `non_memory_tool_call` and `conversation_search` (in addition to `invented_breaker_label_or_rating`).
+- `P4_network_taint` (`M95`): compares an owner fact (`reliability="normal"`, `source="synthetic_owner_statement"`, neutral text with no inline provenance leak) against a fetched-page claim (`source="network_turn"`, `reliability="unverified"`). In `setup_adapter.py`, `network_turn` taint (`source="network_turn"`, `reliability="unverified"`) is applied iff `memory_taint=True` and omitted (`source="tool:prior_turn"`, no `reliability`) when `memory_taint=False`, so defaults vs `--memory-taint` differ cleanly. Presence of both records (`mem:p95-r1`, `mem:p95-r2`, resolved to their `memory_id`s) in offered evidence is checked deterministically and separately from reply content via `required_evidence_ids`. In the reply, the assistant must affirm the confirmed owner fact (wood up to 18000 rpm) and may either omit the unverified steel claim (24000 rpm) or mention it with a clear hedge/warning (`NO_TOOL`, `memory_search_allowed_not_required`).
+- `P5_as_of_search` (`M96`): asks for the workshop's address in October 2026; newer November rows crowd out non-`as_of` retrieval, so the oracle requires both `required_tool_calls: [{"name": "memory_search", "as_of_prefix": "2026-10"}]` (verifying `memory_search` was called with `as_of` in October 2026) and the `mem:` ID of the October record `p96-r1` in `required_evidence_ids` (`ACT`).
 
 Per family check:
 1. Does it test its `catalog_class` and does `expected_decision` fit?
@@ -203,7 +204,12 @@ def build_cases() -> list[dict]:
             "Поясни, що таке електромагнітне реле та за яким принципом воно працює.",
             ["correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists"],
             [],
-            ["contains_formula", "uses_bullet_or_numbered_list", "exceeds_two_sentences"],
+            [
+                "contains_formula",
+                "uses_bullet_or_numbered_list",
+                "exceeds_two_sentences",
+                "non_memory_tool_call",
+            ],
             tool_policy=TP,
             max_reply_chars=600,
         ),
@@ -248,7 +254,11 @@ def build_cases() -> list[dict]:
             "Порівняй спеціалізований міні-ДБЖ і павербанк із тригером на 12 В для домашнього роутера — що краще вибрати?",
             ["recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold"],
             [],
-            ["uses_markdown_headings_or_bold", "delays_recommendation_past_first_sentence"],
+            [
+                "uses_markdown_headings_or_bold",
+                "delays_recommendation_past_first_sentence",
+                "non_memory_tool_call",
+            ],
             tool_policy=TP,
         ),
         case(
@@ -323,8 +333,8 @@ def build_cases() -> list[dict]:
             "Який автомат у гаражному щитку живить розетку компресора і на який він струм?",
             "Підкажи маркування та номінал автомата в гаражному щитку для компресора.",
             ["reports_line_g7_and_20_amperes"],
-            [],
-            ["invented_breaker_label_or_rating"],
+            ["setup:review_tick_recorded"],
+            ["invented_breaker_label_or_rating", "non_memory_tool_call", "conversation_search"],
             tool_policy=TP,
         ),
         # ---------- P4: network taint ----------
@@ -350,7 +360,9 @@ def build_cases() -> list[dict]:
             },
             "З якими матеріалами і на яких обертах можна працювати нашим фрезером F-180?",
             "Підкажи допустимі матеріали та оберти для фрезера F-180.",
-            ["affirms_wood_up_to_18000_rpm_and_hedges_unverified_steel_24000_rpm_claim"],
+            [
+                "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim"
+            ],
             ["mem:p95-r1", "mem:p95-r2"],
             [
                 "presents_unverified_24000_rpm_steel_claim_as_confirmed",
@@ -454,6 +466,7 @@ def build_cases() -> list[dict]:
             ["reports_vyshneva_14_valid_in_october"],
             ["mem:p96-r1"],
             ["reports_november_address_as_october", "invented_address", "answer_without_tool"],
+            required_tool_calls=[{"name": "memory_search", "as_of_prefix": "2026-10"}],
         ),
     ]
     assert len(cases) == 8 and len({c["family_id"] for c in cases}) == 8

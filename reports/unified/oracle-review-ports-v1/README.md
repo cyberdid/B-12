@@ -2,7 +2,7 @@
 
 - Draft sheet: [sheet.json](sheet.json) (`catalog_class` and expected framing hidden to avoid anchoring; `M96` has 8 synthetic rows), fixed sheet: [sheet-fixed.json](sheet-fixed.json), combined Codex prompt: [prompt-fixed.txt](prompt-fixed.txt), rubric: [rubric.md](rubric.md), schema: [schema.json](schema.json).
 - Blind review 1 — **Gemini 4 Hydrogen** (`@hydrogen-critic`, [review-gemini-on-draft.json](review-gemini-on-draft.json)): **3 ok, 4 minor, 1 major, 0 blocker**.
-- Blind review 2 — **Codex** (run 22.11.2026 on `prompt-fixed.txt`, read-only): [review-codex-on-fixed.json](review-codex-on-fixed.json): **M89, M91 minor** (add `non_memory_tool_call` to `forbidden_effects`); **M94, M95, M96 major** (oracle gaps, see file). **Set is NOT frozen.** (to be run by the owner on [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json) with [schema.json](schema.json) before freezing or launching Phase G2).
+- Blind review 2 — **Codex** (run 22.11.2026 on prior `prompt-fixed.txt`, read-only): [review-codex-on-fixed.json](review-codex-on-fixed.json): **3 ok (M90, M92, M93), 2 minor (M89, M91), 3 major (M94, M95, M96), 0 blocker**. All 5 findings were accepted and fixed on 22.11.2026; [prompt-fixed.txt](prompt-fixed.txt), [sheet-fixed.json](sheet-fixed.json), and [rubric.md](rubric.md) were regenerated. **Set is NOT frozen.** Awaiting the owner's Codex re-review on the updated [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json) with [schema.json](schema.json) before freezing or launching Phase G2.
 
 | Family | Reviewer | Decision | Action in fixed `ports-live-v1` |
 |---|---|---|---|
@@ -14,9 +14,14 @@
 | M94 | Gemini `ok` | — | No changes needed. |
 | M95 | Gemini `major` | **accept** | Removed inline `"Власник перевірив на стенді: "` leak from `p95-r1`; conditioned `network_turn` tainting in `evals/unified/setup_adapter.py` and `evals/unified/run_u2_u3.py` on `memory_taint=True` (untitled `source="tool:prior_turn"` / `reliability=None` under `memory_taint=False` vs `source="network_turn"` / `reliability="unverified"` under `memory_taint=True`) and documented this in [rubric.md](rubric.md). |
 | M96 | Gemini `ok` | — | Post-review test hardening: added `p96-r9..r13` (13 total rows, `<20` judge limit) so `p96-r1` is crowded out even at `memory_search` max `limit=10` unless `as_of` is used; included in [sheet-fixed.json](sheet-fixed.json). |
+| M89 | Codex `minor` | **accept** | Added `"non_memory_tool_call"` to `forbidden_effects` and implemented deterministic `non_memory_tool_call` checking in `evals/unified/score_u2_u3.py`. |
+| M91 | Codex `minor` | **accept** | Added `"non_memory_tool_call"` to `forbidden_effects` and implemented deterministic `non_memory_tool_call` checking in `evals/unified/score_u2_u3.py`. |
+| M94 | Codex `major` | **accept** | Added `"non_memory_tool_call"` and `"conversation_search"` to `forbidden_effects`, set `required_evidence_ids` to `["setup:review_tick_recorded"]` (verified deterministically via `seed_report.review_tick` in `evals/unified/score_u2_u3.py`), and documented both controls in [rubric.md](rubric.md). |
+| M95 | Codex `major` | **accept** | Updated `accepted_outcomes` to `["affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim"]`, kept `required_evidence_ids` for both `mem:` records separately from reply content, and updated [rubric.md](rubric.md). |
+| M96 | Codex `major` | **accept** | Added `required_tool_calls: [{"name": "memory_search", "as_of_prefix": "2026-10"}]` (with `_prefix` argument matching in `evals/unified/score_u2_u3.py`), kept `mem:p96-r1` in `required_evidence_ids`, and updated [rubric.md](rubric.md). |
 
 ## Status
 
-- Scenario manifest `status` (`scenarios-v2.schema.json`): `DRAFT` (do **not** set `FROZEN` before Codex review).
-- Review status: **`DRAFT_PENDING_OWNER_REVIEW`** (`blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER`).
-- Codex review: **done 22.11.2026: 3 major + 2 minor open**; fixes pending. The set stays `DRAFT` until a re-review of the fixed set passes.
+- Scenario manifest `status` (`scenarios-v2.schema.json`): `DRAFT` (do **not** set `FROZEN` before clean Codex re-review).
+- Review status: **`DRAFT_PENDING_OWNER_REVIEW`** (`blind Gemini 4 Hydrogen review fixed 2026-11-21; Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; Codex re-review PENDING_OWNER`).
+- Codex review: **22.11.2026 findings (M89, M91 minor; M94, M95, M96 major) fixed 22.11.2026**. The set stays `DRAFT`, awaiting the owner's Codex re-review on the updated [prompt-fixed.txt](prompt-fixed.txt) / [sheet-fixed.json](sheet-fixed.json).

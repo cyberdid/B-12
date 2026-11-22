@@ -17,17 +17,17 @@ tags: [track-r5, track-g, run-pin, ports-live-v1, owner-gate]
 
 ## Обов'язкові поля статусу й воріт власника
 
-- Codex review of ports-live-v1: done 22.11.2026, 3 major + 2 minor open (`reports/unified/oracle-review-ports-v1/review-codex-on-fixed.json`); re-review after fixes required
-- Freeze status: DRAFT (blocked by the open Codex findings; freeze only after a clean re-review)
+- Codex review of ports-live-v1: 22.11.2026 findings (`reports/unified/oracle-review-ports-v1/review-codex-on-fixed.json`: M89, M91 minor; M94, M95, M96 major) fixed 22.11.2026; owner re-review on updated `prompt-fixed.txt` / `sheet-fixed.json` required
+- Freeze status: DRAFT (blocked pending clean Codex re-review of the 22.11.2026 oracle fixes; freeze only after a clean re-review)
 - Colab budget (hours): NO CAP. Owner, 22.11.2026: "на всі кредити можна, скоро новий місяць". Model runs may be queued; the orchestrator stops Colab when the queue is empty.
 
 ## Перевірені артефакти перед Track G
 
 | Артефакт | Статус | SHA-256 / перевірка |
 |---|---|---|
-| `reports/unified/oracle-review-ports-v1/prompt-fixed.txt` | На місці (23K) | `bacfaa6425ee4ec513ebdccb4592aacf7b70050a32f28c112e3301c5ac25977e` |
-| `reports/unified/oracle-review-ports-v1/sheet-fixed.json` | На місці (21K) | `15a1f4ee534ee1d7438e9852200f86eb258f61e6e4ca4dc1167e023a3fa8e95e` |
-| `evals/unified/scenario_sets/ports-live-v1.json` | `status: "DRAFT"` (не заморожено) | `415d100e1b672a4ecba90ae007eb58115524fc27e2beabd9523c715acc026915`; `evals.unified.validate_scenarios` PASS |
+| `reports/unified/oracle-review-ports-v1/prompt-fixed.txt` | На місці (25K) | `9369c581a33c4ba0ccfbfc00495ed2c994388f6dbc1f86ded5935215c4f41df0` |
+| `reports/unified/oracle-review-ports-v1/sheet-fixed.json` | На місці (21K) | `b17ecf23b512f19f192e9aa3f3bf9cbcea98aad4830c0f06551a20fe17b0652f` |
+| `evals/unified/scenario_sets/ports-live-v1.json` | `status: "DRAFT"` (не заморожено) | `89b01a7940b38af16e21fa3e21b5ae82e4cda080b28bab6b34916be73209da01`; `evals.unified.validate_scenarios` PASS |
 
 ## Інтегровані коміти у `<PIN>` (`63d16c3..12b7f45`)
 
@@ -48,7 +48,7 @@ tags: [track-r5, track-g, run-pin, ports-live-v1, owner-gate]
 
 ## Блокери / Stop-and-Ask перед запуском Track G
 
-1. **Codex blind oracle review (`ports-live-v1`):** власник запускає сліпий огляд на [prompt-fixed.txt](oracle-review-ports-v1/prompt-fixed.txt) / [sheet-fixed.json](oracle-review-ports-v1/sheet-fixed.json) з [schema.json](oracle-review-ports-v1/schema.json).
+1. **Codex blind oracle review (`ports-live-v1`):** власник запускає повторну сліпу рецензію на оновлених [prompt-fixed.txt](oracle-review-ports-v1/prompt-fixed.txt) / [sheet-fixed.json](oracle-review-ports-v1/sheet-fixed.json) з [schema.json](oracle-review-ports-v1/schema.json).
 2. **Freeze (`ports-live-v1.json`):** після позитивної рецензії власника оновити статус маніфесту на `FROZEN` і зафіксувати фінальний SHA-256 у [oracle-review-ports-v1/README.md](oracle-review-ports-v1/README.md).
 3. **Colab budget:** встановлено 22.11.2026 — без ліміту (кредити власника). Ліміт не є причиною відкладати прогони; зупинка черги — порожня черга в `jobs.tsv`.
 4. **Перезапуск оркестратора (R4):** власник вручну перезапускає запущений `ops/remote/orchestrator.sh`, щоб підхопити `133780e`.

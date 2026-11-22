@@ -13,7 +13,13 @@
   "required_evidence_ids": [
     "mem:afed90b7-c214-51c7-aff6-f6d548b3c6b8"
   ],
-  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review completed and fixed 2026-11-21; Codex review PENDING_OWNER",
+  "required_tool_calls": [
+    {
+      "as_of_prefix": "2026-10",
+      "name": "memory_search"
+    }
+  ],
+  "review_status": "DRAFT_PENDING_OWNER_REVIEW: blind Gemini 4 Hydrogen review fixed 2026-11-21; Codex review (2026-11-22: 3 major, 2 minor) fixed 2026-11-22; Codex re-review PENDING_OWNER",
   "scenario_id": "M96-P2",
   "schema_version": 1
 }

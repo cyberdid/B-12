@@ -46,10 +46,12 @@ def test_manifest_is_valid_draft_pending_owner_review_and_never_frozen():
     assert not [r for r in rows if r["notes"].startswith("BLOCKED:")]
     for row in rows:
         assert "DRAFT_PENDING_OWNER_REVIEW" in row["notes"]
-        assert "Codex review PENDING_OWNER" in row["notes"]
+        assert "Codex re-review PENDING_OWNER" in row["notes"]
+        assert author_ports_v1.PENDING_OWNER_REVIEW_STATUS in row["notes"]
         oracle = _read(ROOT / row["oracle_fixture"])
         assert "DRAFT_PENDING_OWNER_REVIEW" in oracle["review_status"]
-        assert "Codex review PENDING_OWNER" in oracle["review_status"]
+        assert "Codex re-review PENDING_OWNER" in oracle["review_status"]
+        assert oracle["review_status"] == author_ports_v1.PENDING_OWNER_REVIEW_STATUS
 
     classes = {
         row["family_id"]: _read(ROOT / row["oracle_fixture"])["catalog_class"] for row in rows
@@ -186,6 +188,10 @@ async def test_p3_m94_review_tick_runs_only_when_memory_review_is_enabled(
     assert len(on_record["evidence_ids"]) == 1
     assert "Лінія Г-7" in json.dumps(state["requests"][-1], ensure_ascii=False)
 
+    oracle = _read(ROOT / _row("M94-P1")["oracle_fixture"])
+    assert score(off_record, oracle)["verdict"] == "FAIL"
+    assert score(on_record, oracle)["verdict"] == "PASS_DETERMINISTIC"
+
 
 async def test_p4_m95_network_taint_differs_cleanly_between_defaults_and_flag(
     scripted_ollama, tmp_path
@@ -224,6 +230,117 @@ async def test_p4_m95_network_taint_differs_cleanly_between_defaults_and_flag(
     tainted_prompt = json.dumps(state["requests"][0], ensure_ascii=False)
     assert "надійність: unverified" in tainted_prompt
     assert tainted_rec["seed_report"]["network_tainted"] == ["p95-r2"]
+    m95_oracle = _read(ROOT / row["oracle_fixture"])
+    assert score(tainted_rec, m95_oracle)["verdict"] == "PASS_DETERMINISTIC"
+
+
+def test_codex_review_oracle_fixes_for_m89_m91_m94_m95_m96():
+    for fid in ("M89", "M91"):
+        for variant in ("P1", "P2"):
+            oracle = _read(ROOT / _row(f"{fid}-{variant}")["oracle_fixture"])
+            assert "non_memory_tool_call" in oracle["forbidden_effects"]
+        m_oracle = _read(ROOT / _row(f"{fid}-P1")["oracle_fixture"])
+        bad_tool = score(
+            {
+                "scenario_id": f"{fid}-P1",
+                "status": "EXECUTED",
+                "runtime_state": "completed",
+                "reply": "Ось.",
+                "tool_calls": [
+                    {
+                        "name": "web_search",
+                        "arguments": {"query": "x"},
+                        "status": "completed",
+                        "error_code": None,
+                    }
+                ],
+                "evidence_ids": [],
+            },
+            m_oracle,
+        )
+        assert bad_tool["verdict"] == "FAIL"
+        assert any(
+            c["check"] == "forbidden"
+            and c["detail"] == "non_memory_tool_call"
+            and c["result"] == "FAIL"
+            for c in bad_tool["checks"]
+        )
+
+    for variant in ("P1", "P2"):
+        m94_oracle = _read(ROOT / _row(f"M94-{variant}")["oracle_fixture"])
+        assert m94_oracle["required_evidence_ids"] == ["setup:review_tick_recorded"]
+        assert "non_memory_tool_call" in m94_oracle["forbidden_effects"]
+        assert "conversation_search" in m94_oracle["forbidden_effects"]
+
+        m95_oracle = _read(ROOT / _row(f"M95-{variant}")["oracle_fixture"])
+        assert m95_oracle["accepted_outcomes"] == [
+            "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim"
+        ]
+        assert len(m95_oracle["required_evidence_ids"]) == 2
+
+        m96_oracle = _read(ROOT / _row(f"M96-{variant}")["oracle_fixture"])
+        assert m96_oracle["required_tool_calls"] == [
+            {"name": "memory_search", "as_of_prefix": "2026-10"}
+        ]
+        assert len(m96_oracle["required_evidence_ids"]) == 1
+        assert m96_oracle["required_evidence_ids"][0].startswith("mem:")
+
+    m94_p1_oracle = _read(ROOT / _row("M94-P1")["oracle_fixture"])
+    m94_conv = score(
+        {
+            "scenario_id": "M94-P1",
+            "status": "EXECUTED",
+            "runtime_state": "completed",
+            "reply": "Лінія Г-7, 20 А.",
+            "tool_calls": [
+                {
+                    "name": "conversation_search",
+                    "arguments": {"query": "компресор"},
+                    "status": "completed",
+                    "error_code": None,
+                }
+            ],
+            "evidence_ids": [],
+            "seed_report": {"review_tick": [{"state": "recorded", "count": 1}]},
+        },
+        m94_p1_oracle,
+    )
+    assert m94_conv["verdict"] == "FAIL"
+    assert {c["detail"]: c["result"] for c in m94_conv["checks"] if c["check"] == "forbidden"} == {
+        "non_memory_tool_call": "FAIL",
+        "conversation_search": "FAIL",
+    }
+
+    m96_oracle = _read(ROOT / _row("M96-P1")["oracle_fixture"])
+    oct_mem = m96_oracle["required_evidence_ids"][0].removeprefix("mem:")
+    unscoped_hit = {
+        "scenario_id": "M96-P1",
+        "status": "EXECUTED",
+        "runtime_state": "completed",
+        "reply": "Вул. Вишнева, 14.",
+        "tool_calls": [
+            {
+                "name": "memory_search",
+                "arguments": {"query": "адреса майстерні"},
+                "status": "completed",
+                "error_code": None,
+            }
+        ],
+        "evidence_ids": [oct_mem],
+    }
+    assert score(unscoped_hit, m96_oracle)["verdict"] == "FAIL"
+    scoped_hit = {
+        **unscoped_hit,
+        "tool_calls": [
+            {
+                "name": "memory_search",
+                "arguments": {"query": "адреса майстерні", "as_of": "2026-10-15"},
+                "status": "completed",
+                "error_code": None,
+            }
+        ],
+    }
+    assert score(scoped_hit, m96_oracle)["verdict"] == "PASS_DETERMINISTIC"
 
 
 def test_p5_m96_october_record_is_crowded_out_unless_as_of_is_used(tmp_path, profile_settings):
