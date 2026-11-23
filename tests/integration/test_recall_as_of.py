@@ -102,3 +102,33 @@ async def test_records_matching_more_question_words_win_the_slots(scripted_ollam
         assert workshop.id in {item["id"] for item in items}
     finally:
         runtime.close()
+
+
+async def test_a_replaced_record_valid_in_the_period_is_shown_as_valid_then(
+    scripted_ollama, tmp_path
+):
+    """asof-live-v1 M98-P2: the September supplier, later replaced, must not read as doubtful."""
+    _, base = scripted_ollama
+    runtime = open_runtime(
+        base.model_copy(update={"state_dir": tmp_path / "s", "recall_as_of": True})
+    )
+    try:
+        runtime.agent.clock = lambda: NOW
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        old = runtime.memory.remember(
+            "Постачальник фанери — ТОВ «Ліс-Пром».",
+            actor,
+            valid_from="2026-07-01",
+            valid_to="2026-09-30",
+        )
+        new = runtime.memory.remember(
+            "Постачальник фанери — ФОП Гнатюк.", actor, valid_from="2026-10-01"
+        )
+        assert runtime.memory.supersede(old.id, actor, replaced_by=new.id)
+        items = await runtime.agent._recall("Від кого ми брали фанеру у вересні?", actor)
+        shown = {item["id"]: item["text"] for item in items}
+        assert old.id in shown and new.id not in shown
+        assert "чинне в запитаний період 2026-09-01 – 2026-09-30" in shown[old.id]
+        assert "замінено новішим записом" not in shown[old.id]
+    finally:
+        runtime.close()

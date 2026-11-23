@@ -1089,7 +1089,19 @@ class Agent:
                 _, total, hits = scored.get(record.id, (record, 0.0, 0))
                 scored[record.id] = (record, total + rel, hits + 1)
         ranked = sorted(scored.values(), key=lambda item: (-item[2], -item[1]))
-        kept: dict[str, str] = {record.id: render(record) for record, _, _ in ranked[:limit]}
+        # A record valid in the asked period is the answer for that period even when a later
+        # record replaced it; the bare "замінено новішим записом" made gpt-6-luna doubt it
+        # (asof-live-v1 M98-P2: "не можу підтвердити, що саме в нього брали фанеру у вересні").
+        note = (
+            f"чинне в запитаний період {start} – {end}; пізніша заміна стосується часу після нього"
+        )
+
+        def in_period(record) -> str:
+            text = render(record).replace(" · замінено новішим записом", "", 1)
+            head, sep, rest = text.partition("] ")
+            return f"{head} · {note}] {rest}" if sep else f"[{note}] {text}"
+
+        kept: dict[str, str] = {record.id: in_period(record) for record, _, _ in ranked[:limit]}
         for key, value in found.items():
             if len(kept) >= limit:
                 break
