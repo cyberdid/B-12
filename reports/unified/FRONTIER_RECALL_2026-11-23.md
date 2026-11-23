@@ -112,7 +112,7 @@ New frozen sets, each after two blind reviews (Codex + Gemini; all findings fixe
 | `standing_intents` | M107 owner intent «перед фарбою — ґрунтовка CT 17» | 0/6 | **6/6** | **working** (whole-word keywords: «фарба» ≠ «фарбу») |
 | `skills` | M108 owner XT60 procedure via `skill_view` | 0/6 | **6/6** | **working**; 3/6 replies voice it as «я паяю» instead of the owner's |
 | `clarify_tool` | M106 ambiguous «видали старий бекап» | 0/6 | 0/6 | **no effect**: luna never calls `clarify`; it refuses («немає інструмента видалення») |
-| `memory_grounding` | M109–M110 via post-turn review (`flags-live-v3`) | correct | correct | **nothing to fix on frontier**: the review stored nothing in both arms (`no_candidates`) |
+| `memory_grounding` | M109–M110 via post-turn review (`flags-live-v3`) | 12/12 | 10/12 | **nothing to fix on frontier**: the review stored nothing in both arms (`no_candidates`); the 2 misses are one reply type («мовою останнього повідомлення, без сигналу — українською», from the system prompt's language rule) that judges passed in the other arm — judge variance, not the flag |
 | `stable_prefix` | ports-live-v1, Colab gemma4:12b, warm Ollama, A-B-A-B, 64 records/arm | TTFT P50 3562 ms, P95 4091 | P50 3570, P95 4336 | **no effect**; the old P95 gain was a cold first scenario |
 
 M104/M105 in `flags-live-v1` (one-off request, inferred trait) pass in every arm: luna stored
@@ -128,3 +128,12 @@ Bench fixes found on the way: judge sheet now shows seeded intents/skills (`ba9b
 judges failed correct M107 replies as «invented owner note»); runner seeds intents/skills
 (`2b37a05`); separate `.worktrees/eval-luna` (same package set as `eval-run`) so frontier and Colab
 runs do not share a checkout.
+
+Judges for `flags-live-v3`: two independent Gemini runs (Opus quota exhausted again after the
+re-judge of section 3/5).
+
+## 6. Owner decision, 23.11.2026
+
+On by default (`ea834b5`): `recall_as_of`, `recall_conversations`, `memory_ranking`,
+`standing_intents`, `skills`. Still off: `clarify_tool`, `stable_prefix`, `session_search`,
+`memory_grounding`, `parallel_reads` (not measured), `goal_contract`, `schedules`, `wake_word`.
