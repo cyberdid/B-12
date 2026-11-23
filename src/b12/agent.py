@@ -27,6 +27,7 @@ from uuid import uuid4
 from b12.context import ContextBuilder
 from b12.contracts import Actor, ToolCall, ToolResult
 from b12.control import ControlError, ExecutionContext
+from b12.conversation_recall import recall_note, refers_to_past_conversation
 from b12.memory_packet import evidence_packet
 from b12.model_errors import ModelError
 from b12.persona import (
@@ -941,6 +942,18 @@ class Agent:
             for item in await self._recall(text, actor):
                 state["evidence"].append(item)
                 state["tags"][item["id"]] = "memory"
+            if (
+                getattr(self.settings, "recall_conversations", False)
+                and actor.consent
+                and refers_to_past_conversation(text)
+            ):
+                state["conversation_note"] = recall_note(
+                    self.sessions,
+                    actor.id,
+                    text,
+                    current_session=context.session_id,
+                    live=lambda eid, kind: self.resolver.live(eid, kind, actor),
+                )
             return await self._drive(context, actor, state, on_event, started=True)
 
     async def resume(
@@ -1289,8 +1302,11 @@ class Agent:
                 # Transitive evidence: what this turn quotes from history belongs to this turn too.
                 state["tags"].update(carried)
                 system, query_rules = self._build_system(actor, state, task_id=context.task_id)
+                query_prefix = "\n\n".join(
+                    part for part in (state.get("conversation_note", ""), query_rules) if part
+                )
                 request = self._admit(
-                    system, history, state, tools, persist, query_prefix=query_rules
+                    system, history, state, tools, persist, query_prefix=query_prefix
                 )
 
                 async def delta(text):

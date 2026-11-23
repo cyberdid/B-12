@@ -53,6 +53,10 @@ class Settings(BaseModel):
     # records valid then come first, records valid only outside it are dropped. Both gemma4:12b
     # and gpt-6-luna failed M96 by never calling memory_search(as_of). Off until measured.
     recall_as_of: bool = False
+    # A question that points at a past conversation ("в попередній розмові", "ми обговорювали")
+    # gets the best-matching earlier turns as data beside it, without waiting for the model to
+    # call conversation_search (M93: luna 1/2, gemma 4/6 called it). Off until measured.
+    recall_conversations: bool = False
     # Runtime read-back after every successful file_write: size, hash, match and opening go
     # back to the model (unverified writes failed for every model, 18.11.2026). Off: no effect
     # measurable by the current oracles (U4 report).
@@ -263,6 +267,7 @@ class Settings(BaseModel):
                 "memory_temporal",
                 "memory_as_of",
                 "recall_as_of",
+                "recall_conversations",
                 "verify_writes",
                 "goals_in_context",
                 "memory_scoped",

@@ -205,6 +205,13 @@ class SessionStore:
             result.append(item)
         return result
 
+    def turn_messages(self, turn_id: str, actor_id: str) -> list[dict]:
+        """Messages of one committed turn, only when it belongs to `actor_id`; else []."""
+        row = self.db.execute("SELECT actor_id FROM turns WHERE turn_id=?", (turn_id,)).fetchone()
+        if row is None or row["actor_id"] != actor_id:
+            return []
+        return self._turn_messages(turn_id)
+
     def _turn_tags(self, turn_id: str) -> dict[str, str]:
         return {
             tag["evidence_id"]: tag["kind"]
