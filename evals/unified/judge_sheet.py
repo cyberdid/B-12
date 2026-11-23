@@ -47,6 +47,10 @@ def _facts(setup):
     for key in (
         "synthetic_goals",
         "synthetic_sessions",
+        # Owner state the runtime injects beside the question when its flag is on (flags-live-v2
+        # M107: judges without it read «вона в тебе в списку» as an invented owner note).
+        "synthetic_intents",
+        "synthetic_skills",
         "synthetic_environment",
         "missing_files",
         "control_policy",

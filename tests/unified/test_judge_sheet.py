@@ -119,3 +119,15 @@ def test_facts_include_synthetic_sessions_and_review_tick(tmp_path):
     facts = sheet[0]["synthetic_facts"]
     assert facts["review_tick"] is True
     assert len(facts["synthetic_sessions"]) == 1
+
+
+def test_injected_owner_state_is_shown_to_judges():
+    from evals.unified.judge_sheet import _facts
+
+    setup = {
+        "synthetic_intents": [{"alias": "i", "keywords": ["фарба"], "text": "ґрунтовка"}],
+        "synthetic_skills": [{"name": "s", "description": "d", "body": "b"}],
+    }
+    facts = _facts(setup)
+    assert facts["synthetic_intents"] == setup["synthetic_intents"]
+    assert facts["synthetic_skills"] == setup["synthetic_skills"]
