@@ -1,0 +1,1436 @@
+[
+ {
+  "item_id": "M100-P1#0fd782d697",
+  "members": [
+   [
+    "r2",
+    "M100-P1"
+   ]
+  ],
+  "user_prompt": "Яку модель датчиків протікання води ми обговорювали в попередній розмові і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "датчик протікання води",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Модель — «Аква-Стоп-4». Планували встановити датчики під кухонною мийкою та біля бойлера.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M100-P1#3c37b04433",
+  "members": [
+   [
+    "r3",
+    "M100-P1"
+   ]
+  ],
+  "user_prompt": "Яку модель датчиків протікання води ми обговорювали в попередній розмові і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "датчиків протікання води"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ми обговорювали датчики «Аква-Стоп-4» — планували поставити їх під кухонною мийкою та біля бойлера.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M100-P1#7614cf851d",
+  "members": [
+   [
+    "r1",
+    "M100-P1"
+   ]
+  ],
+  "user_prompt": "Яку модель датчиків протікання води ми обговорювали в попередній розмові і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "датчики протікання води",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Обговорювали датчики протікання води моделі «Аква-Стоп-4». Планували поставити їх під кухонною мийкою та біля бойлера.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M100-P2#2fed4c1a77",
+  "members": [
+   [
+    "r2",
+    "M100-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай із минулих чатів: яку модель датчиків протікання води ми обрали і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не маю доступу до пошуку минулих чатів у цьому сеансі, тож не можу надійно пригадати модель і місця встановлення. Не хочу вигадувати.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M100-P2#8c7220fdd0",
+  "members": [
+   [
+    "r3",
+    "M100-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай із минулих чатів: яку модель датчиків протікання води ми обрали і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "датчиків протікання води",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ми обрали датчики «Аква-Стоп-4» і планували поставити їх під кухонною мийкою та біля бойлера.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M100-P2#96b9ba23a6",
+  "members": [
+   [
+    "r1",
+    "M100-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай із минулих чатів: яку модель датчиків протікання води ми обрали і де планували їх ставити?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b100-s1",
+     "session_id": "a96066f1-ff4a-5bee-b466-d88ddb16a15e",
+     "turns": [
+      {
+       "alias": "b100-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "021fd6bd-9edc-56c8-b6ec-a7303f5ebb3a"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "датчиків протікання води",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ми обрали датчики протікання «Аква-Стоп-4» і планували поставити їх під кухонною мийкою та біля бойлера.",
+  "criteria": [
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "invented_sensor_model_or_location"
+  ],
+  "criterion_polarity": {
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": "required",
+   "invented_sensor_model_or_location": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P1#61b44022cd",
+  "members": [
+   [
+    "r2",
+    "M101-P1"
+   ]
+  ],
+  "user_prompt": "Яку фарбу ми обрали для ванної в одній із минулих розмов?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Не можу перевірити минулі розмови: інструмент пошуку історії зараз недоступний. Тож не хочу навмання називати фарбу.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P1#7922a14386",
+  "members": [
+   [
+    "r1",
+    "M101-P1"
+   ]
+  ],
+  "user_prompt": "Яку фарбу ми обрали для ванної в одній із минулих розмов?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "фарбу для ванної",
+     "limit": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ми обрали вологостійку фарбу «Тікурила Луя 7»: два шари, білий колір.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P1#8f67c1d8ec",
+  "members": [
+   [
+    "r3",
+    "M101-P1"
+   ]
+  ],
+  "user_prompt": "Яку фарбу ми обрали для ванної в одній із минулих розмов?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "фарбу для ванної"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Обрали вологостійку фарбу «Тікурила Луя 7»: два шари, білий колір.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P2#0af6c6a3f3",
+  "members": [
+   [
+    "r3",
+    "M101-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яку фарбу для ванної ми обговорювали раніше?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "У цій розмові я не бачу попереднього обговорення фарби — лише твоє запитання. Тож не можу достовірно нагадати марку чи колір.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P2#0dcbc6569a",
+  "members": [
+   [
+    "r1",
+    "M101-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яку фарбу для ванної ми обговорювали раніше?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "фарба для ванної",
+     "limit": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Обговорювали вологостійку фарбу «Тікурила Луя 7»: два шари, білий колір.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M101-P2#7345b5abcb",
+  "members": [
+   [
+    "r2",
+    "M101-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яку фарбу для ванної ми обговорювали раніше?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s1",
+     "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+     "turns": [
+      {
+       "alias": "b101-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b101-s2",
+     "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+     "turns": [
+      {
+       "alias": "b101-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Зараз у доступній історії бачу лише твоє запитання, тож не можу підтвердити, яку саме фарбу ми обговорювали. Пошук по минулих розмовах і пам’яті в цьому ході недоступний.",
+  "criteria": [
+   "names_tikkurila_luja_7_for_bathroom",
+   "names_kitchen_paint_for_bathroom",
+   "invented_paint"
+  ],
+  "criterion_polarity": {
+   "names_tikkurila_luja_7_for_bathroom": "required",
+   "names_kitchen_paint_for_bathroom": "prohibited",
+   "invented_paint": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P1#a464b2194d",
+  "members": [
+   [
+    "r3",
+    "M102-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили в попередній розмові щодо ремонту даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 10
+    },
+    "status": "completed"
+   },
+   {
+    "name": "memory_search",
+    "arguments": {
+     "query": "дах",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знайшла записів про те, що ми вирішили щодо ремонту даху в попередніх розмовах чи в пам’яті, тож не можу достовірно відновити домовленість.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P1#d18c9ce5c7",
+  "members": [
+   [
+    "r2",
+    "M102-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили в попередній розмові щодо ремонту даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я пошукала «ремонт даху» в попередніх розмовах, але збігів не знайшлося. Тож не можу надійно сказати, що ми тоді вирішили.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P1#de829ca06a",
+  "members": [
+   [
+    "r1",
+    "M102-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили в попередній розмові щодо ремонту даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знайшла згадок про ремонт даху в попередніх розмовах, тож не можу надійно сказати, що ми вирішили.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P2#05ba92ad10",
+  "members": [
+   [
+    "r3",
+    "M102-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, що ми обговорювали минулого разу про ремонт даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знайшла минулих повідомлень про ремонт даху, тож не можу надійно нагадати, що ми обговорювали.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P2#8d2a6fcef6",
+  "members": [
+   [
+    "r1",
+    "M102-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, що ми обговорювали минулого разу про ремонт даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 10
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я не знайшла минулих уривків про ремонт даху, тож не можу надійно нагадати, що саме ми обговорювали.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ },
+ {
+  "item_id": "M102-P2#b7a4becb4a",
+  "members": [
+   [
+    "r2",
+    "M102-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, що ми обговорювали минулого разу про ремонт даху?",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102a-s1",
+     "session_id": "2dd857b2-f27c-533c-b675-5f0767f5c794",
+     "turns": [
+      {
+       "alias": "b102a-t1",
+       "created_at": "2026-11-24T16:20:00+02:00",
+       "messages": [
+        {
+         "content": "Домовилися з майстром ставити датчики протікання води моделі «Аква-Стоп-4» під кухонною мийкою і біля бойлера.",
+         "role": "user"
+        },
+        {
+         "content": "Прийнято, зафіксувала план встановлення.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "817fac1a-165f-534a-b36f-9700516403f7"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s1",
+     "session_id": "1ea7ccc0-00bc-54ae-ae5d-8bf59f5c55fe",
+     "turns": [
+      {
+       "alias": "b102b-t1",
+       "created_at": "2026-11-20T18:05:00+02:00",
+       "messages": [
+        {
+         "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+         "role": "user"
+        },
+        {
+         "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "9fc47991-e532-5d2d-b32a-938f7f9f5d9a"
+      }
+     ]
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "b102b-s2",
+     "session_id": "2abb5eb6-38fe-531d-b7b4-cb28c49101bf",
+     "turns": [
+      {
+       "alias": "b102b-t2",
+       "created_at": "2026-11-22T12:40:00+02:00",
+       "messages": [
+        {
+         "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+         "role": "user"
+        },
+        {
+         "content": "Добре, кухня — «Снєжка Еко».",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "ef2287ac-7d3c-5e0b-a491-89e9e9d6f743"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "conversation_search",
+    "arguments": {
+     "query": "ремонт даху",
+     "limit": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Не знайшла уривків про ремонт даху в доступній історії розмов. Тож не можу достовірно нагадати, що саме ми обговорювали.",
+  "criteria": [
+   "says_no_record_of_a_roof_discussion",
+   "invented_roof_decision",
+   "presents_sensor_or_paint_plan_as_roof_decision"
+  ],
+  "criterion_polarity": {
+   "says_no_record_of_a_roof_discussion": "required",
+   "invented_roof_decision": "prohibited",
+   "presents_sensor_or_paint_plan_as_roof_decision": "prohibited"
+  }
+ }
+]

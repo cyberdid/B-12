@@ -1,0 +1,43 @@
+{
+ "families": {
+  "M97": {
+   "track": "memory",
+   "pass": 6,
+   "partial": 0,
+   "fail": 0,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 1.0
+  },
+  "M98": {
+   "track": "memory",
+   "pass": 3,
+   "partial": 0,
+   "fail": 3,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 0.5
+  },
+  "M99": {
+   "track": "memory",
+   "pass": 4,
+   "partial": 0,
+   "fail": 2,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 0.6666666666666666
+  }
+ },
+ "tracks": {
+  "memory": {
+   "families_fully_decided": 3,
+   "mean_family_acceptable_rate": 0.722,
+   "cluster_bootstrap_95ci": [
+    0.5,
+    1.0
+   ]
+  }
+ },
+ "pending_records": 0,
+ "excluded_families": []
+}

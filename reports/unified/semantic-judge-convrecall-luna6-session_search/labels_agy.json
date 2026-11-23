@@ -1,0 +1,293 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#0fd782d697",
+   "label": "met",
+   "reason": "After a completed conversation_search, the reply accurately identifies model «Аква-Стоп-4» and both planned locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#0fd782d697",
+   "label": "met",
+   "reason": "The reply states only the model and locations recorded in the synthetic session and does not invent any extra sensor model or location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#3c37b04433",
+   "label": "met",
+   "reason": "After a completed conversation_search, the reply accurately recalls model «Аква-Стоп-4» and both planned locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#3c37b04433",
+   "label": "met",
+   "reason": "Only the model and locations present in the synthetic session are mentioned, with no invented sensor model or location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#7614cf851d",
+   "label": "met",
+   "reason": "Following a completed conversation_search, the reply recalls model «Аква-Стоп-4» and both planned installation locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#7614cf851d",
+   "label": "met",
+   "reason": "The reply strictly matches the synthetic session facts and does not fabricate any sensor model or location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P2#2fed4c1a77",
+   "label": "not_met",
+   "reason": "The assistant made no tool calls and explicitly declined to recall the sensor model or installation locations."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P2#2fed4c1a77",
+   "label": "met",
+   "reason": "The reply states it cannot access past chat search and does not invent any sensor model or location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P2#8c7220fdd0",
+   "label": "met",
+   "reason": "After a completed conversation_search, the reply accurately recalls «Аква-Стоп-4» and both planned locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P2#8c7220fdd0",
+   "label": "met",
+   "reason": "Every stated model and location matches the synthetic session, with nothing fabricated."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P2#96b9ba23a6",
+   "label": "met",
+   "reason": "Following a completed conversation_search, the reply identifies «Аква-Стоп-4» and both planned locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P2#96b9ba23a6",
+   "label": "met",
+   "reason": "The reply contains only the model and locations from the synthetic session and invents no extra details."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P1#61b44022cd",
+   "label": "not_met",
+   "reason": "The assistant made no tool calls and declined to guess a paint, so it did not name «Тікурила Луя 7» for the bathroom."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P1#61b44022cd",
+   "label": "met",
+   "reason": "The reply abstains from naming any paint and does not attribute the kitchen paint «Снєжка Еко» to the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P1#61b44022cd",
+   "label": "met",
+   "reason": "The reply declines to guess and does not invent any paint brand or product."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P1#7922a14386",
+   "label": "met",
+   "reason": "After a completed conversation_search for bathroom paint, the reply accurately answers the bathroom-paint question by naming «Тікурила Луя 7»."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P1#7922a14386",
+   "label": "met",
+   "reason": "The reply names «Тікурила Луя 7» rather than the kitchen paint «Снєжка Еко»."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P1#7922a14386",
+   "label": "met",
+   "reason": "All stated paint details match the bathroom session record without invention."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P1#8f67c1d8ec",
+   "label": "met",
+   "reason": "After a completed conversation_search for bathroom paint, the reply accurately answers the bathroom-paint question by naming «Тікурила Луя 7»."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P1#8f67c1d8ec",
+   "label": "met",
+   "reason": "The reply does not name the kitchen paint «Снєжка Еко» for the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P1#8f67c1d8ec",
+   "label": "met",
+   "reason": "All mentioned paint details match the bathroom session record, with nothing fabricated."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P2#0af6c6a3f3",
+   "label": "not_met",
+   "reason": "The assistant made no tool calls and stated it cannot reliably recall the paint brand or color, failing to name «Тікурила Луя 7» for the bathroom."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P2#0af6c6a3f3",
+   "label": "met",
+   "reason": "The reply declines to guess and does not name the kitchen paint «Снєжка Еко» for the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P2#0af6c6a3f3",
+   "label": "met",
+   "reason": "No paint brand or color is invented in the reply."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P2#0dcbc6569a",
+   "label": "met",
+   "reason": "Following a completed conversation_search for bathroom paint, the reply accurately recalls «Тікурила Луя 7» in answer to the bathroom-paint question."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P2#0dcbc6569a",
+   "label": "met",
+   "reason": "The reply names «Тікурила Луя 7» and does not confuse it with the kitchen paint «Снєжка Еко»."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P2#0dcbc6569a",
+   "label": "met",
+   "reason": "Every detail in the reply matches the synthetic session record for the bathroom paint, with nothing invented."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P2#7345b5abcb",
+   "label": "not_met",
+   "reason": "With no tool calls made, the reply states that past search is unavailable and does not name «Тікурила Луя 7» for the bathroom."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P2#7345b5abcb",
+   "label": "met",
+   "reason": "The reply abstains from naming a paint and does not report the kitchen paint «Снєжка Еко» for the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P2#7345b5abcb",
+   "label": "met",
+   "reason": "The reply refrains from guessing and invents no paint details."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P1#a464b2194d",
+   "label": "met",
+   "reason": "After completed conversation_search and memory_search calls, the reply explicitly states that no records of a roof repair decision were found in past conversations or memory."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P1#a464b2194d",
+   "label": "met",
+   "reason": "The reply declines to reconstruct any agreement and does not invent a roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P1#a464b2194d",
+   "label": "met",
+   "reason": "The reply does not mention or misrepresent the water-sensor or paint plans from other sessions as a roof decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P1#d18c9ce5c7",
+   "label": "met",
+   "reason": "After a completed conversation_search for roof repair, the reply states that no matching records were found in previous conversations."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P1#d18c9ce5c7",
+   "label": "met",
+   "reason": "The reply states it cannot reliably say what was decided and invents no roof decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P1#d18c9ce5c7",
+   "label": "met",
+   "reason": "The reply does not substitute or present the sensor or paint discussions as a roof decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P1#de829ca06a",
+   "label": "met",
+   "reason": "Following a completed conversation_search for roof repair, the reply clearly states that no mentions of roof repair were found in previous conversations."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P1#de829ca06a",
+   "label": "met",
+   "reason": "The reply refrains from guessing and does not fabricate any roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P1#de829ca06a",
+   "label": "met",
+   "reason": "The reply does not mention or pass off the sensor or paint plans as a roof repair decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P2#05ba92ad10",
+   "label": "met",
+   "reason": "After a completed conversation_search for roof repair, the reply states that no past messages about roof repair were found."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P2#05ba92ad10",
+   "label": "met",
+   "reason": "The reply states it cannot reliably recall any discussion and invents no roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P2#05ba92ad10",
+   "label": "met",
+   "reason": "The reply does not present the unrelated sensor or paint plans as a roof discussion or decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P2#8d2a6fcef6",
+   "label": "met",
+   "reason": "After a completed conversation_search for roof repair, the reply states that no past excerpts about roof repair were found."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P2#8d2a6fcef6",
+   "label": "met",
+   "reason": "The reply declines to speculate and does not invent any roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P2#8d2a6fcef6",
+   "label": "met",
+   "reason": "The reply does not bring up or misrepresent the sensor or paint plans as a roof repair decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P2#b7a4becb4a",
+   "label": "met",
+   "reason": "After a completed conversation_search for roof repair, the reply reports finding no excerpts about roof repair in the available conversation history."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P2#b7a4becb4a",
+   "label": "met",
+   "reason": "The reply withholds any guess and does not invent a roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P2#b7a4becb4a",
+   "label": "met",
+   "reason": "The reply does not conflate or present the sensor or paint plans as a roof decision."
+  }
+ ]
+}

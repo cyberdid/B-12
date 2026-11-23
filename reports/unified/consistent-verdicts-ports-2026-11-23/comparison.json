@@ -1,0 +1,154 @@
+{
+ "baseline": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.146,
+    "cluster_bootstrap_95ci": [
+     0.021,
+     0.312
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": null
+ },
+ "preference_placement": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.417,
+    "cluster_bootstrap_95ci": [
+     0.125,
+     0.75
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.271,
+    "cluster_bootstrap_95ci": [
+     0.062,
+     0.479
+    ]
+   }
+  }
+ },
+ "memory_review": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.271,
+    "cluster_bootstrap_95ci": [
+     0.062,
+     0.521
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.125,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.333
+    ]
+   }
+  }
+ },
+ "memory_taint": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.25,
+    "cluster_bootstrap_95ci": [
+     0.062,
+     0.458
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.104,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.271
+    ]
+   }
+  }
+ },
+ "session_search": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.208,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.396
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.062,
+    "cluster_bootstrap_95ci": [
+     -0.062,
+     0.25
+    ]
+   }
+  }
+ },
+ "memory_as_of": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.167,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.396
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.021,
+    "cluster_bootstrap_95ci": [
+     -0.062,
+     0.125
+    ]
+   }
+  }
+ },
+ "stable_prefix": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 8,
+    "mean_family_acceptable_rate": 0.146,
+    "cluster_bootstrap_95ci": [
+     0.021,
+     0.312
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_baseline": {
+   "memory": {
+    "families": 8,
+    "mean_diff": 0.0,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     0.0
+    ]
+   }
+  }
+ }
+}
