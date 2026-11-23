@@ -146,3 +146,16 @@ async def test_compaction_recall_evicts_middle_facts_under_tight_num_ctx(scripte
     report = await measure_compaction_recall(tight, history_turns=60)
     assert report["policies"]["trim"]["recall"] == 0.0
     assert report["policies"]["trim+memory"]["recall"] == 1.0
+
+
+def test_profile_paths_default_to_the_regular_runner_table(monkeypatch):
+    from evals.unified.compaction_recall import resolve_profile_paths
+
+    monkeypatch.delenv("B12_EVAL_PROFILE_FILE", raising=False)
+    profile, tokenizer = resolve_profile_paths("gemma4:12b", None, None)
+    assert profile.name == "gemma4-12b-ollama-0.33.3.json"
+    assert tokenizer.parent.name == "gemma4-12b"  # per model, never per Colab revision
+    monkeypatch.setenv("B12_EVAL_PROFILE_FILE", "gemma4-12b-colab-6114515d-ollama-0.33.3.json")
+    profile, tokenizer = resolve_profile_paths("gemma4:12b", None, None)
+    assert profile.name == "gemma4-12b-colab-6114515d-ollama-0.33.3.json"
+    assert tokenizer.parent.name == "gemma4-12b"

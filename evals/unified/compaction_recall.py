@@ -531,12 +531,46 @@ async def measure_compaction_recall(
     }
 
 
+def resolve_profile_paths(
+    model: str, profile: Path | None, tokenizer: Path | None
+) -> tuple[Path, Path]:
+    """Profile and tokenizer for `model`, the same way the regular runners resolve them.
+
+    H4 once failed with profile_invalid because a hand-built path named the Colab revision
+    (`gemma4-12b-6114515d`) as the tokenizer directory; the tokenizer is per model, not per
+    revision. Explicit arguments still win.
+    """
+    import os
+
+    from evals.capri_comprehensive.runners.live_components import EVAL_PROFILES
+
+    share = Path.home() / ".local/share/b12"
+    if model not in EVAL_PROFILES and (profile is None or tokenizer is None):
+        raise SystemExit(f"no calibrated profile for {model}; pass --model-profile/--tokenizer-dir")
+    default_profile, default_tokenizer = EVAL_PROFILES.get(model, (None, None))
+    if profile is None:
+        profile = share / "profiles" / os.environ.get("B12_EVAL_PROFILE_FILE", default_profile)
+    if tokenizer is None:
+        tokenizer = share / "tokenizers" / default_tokenizer
+    return profile, tokenizer
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--model", required=True)
     parser.add_argument("--ollama-url", default="http://127.0.0.1:11434")
-    parser.add_argument("--model-profile", type=Path, required=True)
-    parser.add_argument("--tokenizer-dir", type=Path, required=True)
+    parser.add_argument(
+        "--model-profile",
+        type=Path,
+        default=None,
+        help="default: the calibrated profile for --model (B12_EVAL_PROFILE_FILE overrides)",
+    )
+    parser.add_argument(
+        "--tokenizer-dir",
+        type=Path,
+        default=None,
+        help="default: the tokenizer the regular runners use for --model",
+    )
     parser.add_argument("--num-ctx", type=int, default=8192)
     parser.add_argument("--output-tokens", type=int, default=512)
     parser.add_argument("--head-turns", type=int, default=6)
@@ -550,6 +584,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--out", type=Path, default=None)
     args = parser.parse_args(argv)
+    args.model_profile, args.tokenizer_dir = resolve_profile_paths(
+        args.model, args.model_profile, args.tokenizer_dir
+    )
 
     with tempfile.TemporaryDirectory(prefix="b12-compaction-cfg-") as cfg_dir:
         settings = Settings(
