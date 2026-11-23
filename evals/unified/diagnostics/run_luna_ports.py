@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: E501  -- diagnostic runner copied from the agent; long log and command lines
 """Diagnostic runner: ports-live-v1 (frozen) through gpt-6-luna via subscription_bridge.
 
 Runs 6 arms (repeats=1, arm=A0, from .worktrees/eval-run at pin d116105):
@@ -22,7 +23,7 @@ import subprocess
 import sys
 import time
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 EVAL_REPO = Path(os.environ.get("B12_EVAL_REPO", Path.home() / "Projects/B-12/.worktrees/eval-run"))
@@ -78,7 +79,7 @@ ARMS: list[tuple[str, str, str]] = [
 
 def log(msg: str) -> None:
     SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+    ts = datetime.now(UTC).astimezone().isoformat(timespec="seconds")
     line = f"{ts} {msg}\n"
     with RUNNER_LOG.open("a", encoding="utf-8") as f:
         f.write(line)
@@ -127,7 +128,9 @@ def start_bridge() -> subprocess.Popen | None:
     )
     for _ in range(30):
         if bridge_healthy():
-            log(f"Started subscription_bridge (codex / gpt-6-luna) on port {BRIDGE_PORT} PID={proc.pid}")
+            log(
+                f"Started subscription_bridge (codex / gpt-6-luna) on port {BRIDGE_PORT} PID={proc.pid}"
+            )
             return proc
         if proc.poll() is not None:
             raise RuntimeError(f"subscription_bridge exited prematurely with rc={proc.returncode}")
@@ -208,9 +211,18 @@ def main() -> int:
                         if t_path.exists():
                             t_path.rename(t_path.with_name(f"{t_sid}.json.broken.{ts_q}"))
                     if attempt > 1:
-                        log(f"RETRY {name} attempt {attempt}/{MAX_PILOT_ATTEMPTS} (transient={transient}, bad={bad})")
+                        log(
+                            f"RETRY {name} attempt {attempt}/{MAX_PILOT_ATTEMPTS} (transient={transient}, bad={bad})"
+                        )
                     proc = subprocess.Popen(
-                        ["bash", "evals/unified/run_locked_pilot.sh", MANIFEST_REL, out_rel, "1", "A0"],
+                        [
+                            "bash",
+                            "evals/unified/run_locked_pilot.sh",
+                            MANIFEST_REL,
+                            out_rel,
+                            "1",
+                            "A0",
+                        ],
                         cwd=str(EVAL_REPO),
                         env=env,
                         stdout=subprocess.PIPE,
@@ -274,10 +286,14 @@ def main() -> int:
             state["results"][name] = {
                 "out_dir": out_rel,
                 "det_pass": f"{det_pass}/{len(scenarios)}",
-                "per_family": {k: f"{v.count('PASS_DETERMINISTIC')}/2" for k, v in sorted(per_fam.items())},
+                "per_family": {
+                    k: f"{v.count('PASS_DETERMINISTIC')}/2" for k, v in sorted(per_fam.items())
+                },
             }
             write_status(state)
-            log(f"DONE {name}: det={det_pass}/{len(scenarios)} | {state['results'][name]['per_family']}")
+            log(
+                f"DONE {name}: det={det_pass}/{len(scenarios)} | {state['results'][name]['per_family']}"
+            )
 
         state["state"] = "COMPLETED_ALL_6"
         state["current"] = None
