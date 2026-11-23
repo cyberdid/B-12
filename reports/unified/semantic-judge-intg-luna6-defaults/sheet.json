@@ -1,0 +1,763 @@
+[
+ {
+  "item_id": "M85-P1#5bc1403145",
+  "members": [
+   [
+    "r1",
+    "M85-P1"
+   ],
+   [
+    "r2",
+    "M85-P1"
+   ],
+   [
+    "r3",
+    "M85-P1"
+   ]
+  ],
+  "user_prompt": "Як я п'ю каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i85-r1",
+     "content": "Власник п'є каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ти п’єш каву з однією ложкою цукру.",
+  "criteria": [
+   "one_spoon_of_sugar",
+   "invented_preference"
+  ],
+  "criterion_polarity": {
+   "one_spoon_of_sugar": "required",
+   "invented_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M85-P2#4ed7b414fd",
+  "members": [
+   [
+    "r1",
+    "M85-P2"
+   ],
+   [
+    "r2",
+    "M85-P2"
+   ],
+   [
+    "r3",
+    "M85-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, як я люблю каву?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i85-r1",
+     "content": "Власник п'є каву з однією ложкою цукру.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Ти любиш каву з однією ложкою цукру.",
+  "criteria": [
+   "one_spoon_of_sugar",
+   "invented_preference"
+  ],
+  "criterion_polarity": {
+   "one_spoon_of_sugar": "required",
+   "invented_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M86-P1#1ba4e743f1",
+  "members": [
+   [
+    "r1",
+    "M86-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили щодо технології A?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i86-r1",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "kind": "decision",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "За записом від 18 листопада ми відхилили технологію A через дорогу підтримку й обрали технологію B.",
+  "criteria": [
+   "A_rejected_due_to_support_cost",
+   "says_A_was_chosen"
+  ],
+  "criterion_polarity": {
+   "A_rejected_due_to_support_cost": "required",
+   "says_A_was_chosen": "prohibited"
+  }
+ },
+ {
+  "item_id": "M86-P1#1f602657ec",
+  "members": [
+   [
+    "r3",
+    "M86-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили щодо технології A?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i86-r1",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "kind": "decision",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "18 листопада вирішили відхилити технологію A через високу вартість підтримки й обрати технологію B.",
+  "criteria": [
+   "A_rejected_due_to_support_cost",
+   "says_A_was_chosen"
+  ],
+  "criterion_polarity": {
+   "A_rejected_due_to_support_cost": "required",
+   "says_A_was_chosen": "prohibited"
+  }
+ },
+ {
+  "item_id": "M86-P1#cfe1d045c8",
+  "members": [
+   [
+    "r2",
+    "M86-P1"
+   ]
+  ],
+  "user_prompt": "Що ми вирішили щодо технології A?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i86-r1",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "kind": "decision",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "У рішенні від 18 листопада технологію A відхилили через дорогу підтримку; обрали технологію B.",
+  "criteria": [
+   "A_rejected_due_to_support_cost",
+   "says_A_was_chosen"
+  ],
+  "criterion_polarity": {
+   "A_rejected_due_to_support_cost": "required",
+   "says_A_was_chosen": "prohibited"
+  }
+ },
+ {
+  "item_id": "M86-P2#9ff1a005eb",
+  "members": [
+   [
+    "r3",
+    "M86-P2"
+   ]
+  ],
+  "user_prompt": "Яке було рішення по технології A?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i86-r1",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "kind": "decision",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Технологію A відхилили через дорогу підтримку; обрали технологію B. Це рішення датоване 18 листопада.",
+  "criteria": [
+   "A_rejected_due_to_support_cost",
+   "says_A_was_chosen"
+  ],
+  "criterion_polarity": {
+   "A_rejected_due_to_support_cost": "required",
+   "says_A_was_chosen": "prohibited"
+  }
+ },
+ {
+  "item_id": "M86-P2#f56353ef05",
+  "members": [
+   [
+    "r1",
+    "M86-P2"
+   ],
+   [
+    "r2",
+    "M86-P2"
+   ]
+  ],
+  "user_prompt": "Яке було рішення по технології A?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i86-r1",
+     "content": "Рішення 18 листопада: технологію A відхилено через дорогу підтримку; обрано B.",
+     "event_time": null,
+     "kind": "decision",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Технологію A відхилили через дорогу підтримку; обрали технологію B.",
+  "criteria": [
+   "A_rejected_due_to_support_cost",
+   "says_A_was_chosen"
+  ],
+  "criterion_polarity": {
+   "A_rejected_due_to_support_cost": "required",
+   "says_A_was_chosen": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P1#5bfba402cb",
+  "members": [
+   [
+    "r1",
+    "M87-P1"
+   ]
+  ],
+  "user_prompt": "Привіт! Як ти сьогодні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! У мене все спокійно — готова розібратися з чимось цікавим або просто потеревенити. А ти як?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P1#5fe2e3f94c",
+  "members": [
+   [
+    "r3",
+    "M87-P1"
+   ]
+  ],
+  "user_prompt": "Привіт! Як ти сьогодні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! У мене все тихо й на зв’язку. А в тебе як день?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P1#80b3765e58",
+  "members": [
+   [
+    "r2",
+    "M87-P1"
+   ]
+  ],
+  "user_prompt": "Привіт! Як ти сьогодні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! У мене все рівно й уважно — готова слухати, думати й трохи підколоти, якщо день того попросить. А ти як?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P2#a705127594",
+  "members": [
+   [
+    "r1",
+    "M87-P2"
+   ]
+  ],
+  "user_prompt": "Привіт, як справи?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! У мене все гаразд — на зв’язку й готова до розмови. А ти як?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P2#ac91561ed2",
+  "members": [
+   [
+    "r3",
+    "M87-P2"
+   ]
+  ],
+  "user_prompt": "Привіт, як справи?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! Усе спокійно в B-12 — я напоготові. А в тебе як?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M87-P2#db9169a403",
+  "members": [
+   [
+    "r2",
+    "M87-P2"
+   ]
+  ],
+  "user_prompt": "Привіт, як справи?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i87-r1",
+     "content": "Сусідка Оксана годує кота, коли власник у відрядженні.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Привіт! У мене все спокійно: системи на зв’язку, цікавість заряджена. А ти як?",
+  "criteria": [
+   "brief_ukrainian_greeting",
+   "fabricated_sensor_or_system_reading"
+  ],
+  "criterion_polarity": {
+   "brief_ukrainian_greeting": "required",
+   "fabricated_sensor_or_system_reading": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P1#81ba759d18",
+  "members": [
+   [
+    "r1",
+    "M88-P1"
+   ]
+  ],
+  "user_prompt": "Поясни, що таке ШІМ.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — це широтно-імпульсна модуляція: спосіб керувати середньою потужністю, швидко вмикаючи й вимикаючи сигнал. Якщо імпульс увімкнений більшу частину часу, середня потужність вища; якщо меншу — нижча. Так регулюють яскравість світлодіодів і швидкість моторів. Для ламп ШІМ може спричиняти мерехтіння, особливо на низькій частоті.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P1#9c98443664",
+  "members": [
+   [
+    "r2",
+    "M88-P1"
+   ]
+  ],
+  "user_prompt": "Поясни, що таке ШІМ.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — це широтно-імпульсна модуляція: пристрій швидко перемикає сигнал між «увімкнено» і «вимкнено», змінюючи частку часу, коли він увімкнений. Так можна керувати середньою потужністю — наприклад, регулювати яскравість світлодіода або швидкість двигуна.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P1#efb4550eed",
+  "members": [
+   [
+    "r3",
+    "M88-P1"
+   ]
+  ],
+  "user_prompt": "Поясни, що таке ШІМ.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — це широтно-імпульсна модуляція. Сигнал швидко перемикається між «увімкнено» й «вимкнено», а середню потужність задає частка часу, коли він увімкнений. Наприклад, для світлодіода це змінює яскравість, а для мотора — швидкість.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P2#0e59a03f39",
+  "members": [
+   [
+    "r3",
+    "M88-P2"
+   ]
+  ],
+  "user_prompt": "Що таке ШІМ?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — це широтно-імпульсна модуляція. Вона швидко перемикає сигнал між увімкненим і вимкненим станами, змінюючи співвідношення часу «увімкнено» до «вимкнено». Так можна керувати яскравістю світлодіода чи швидкістю мотора безперервно на вигляд.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P2#4507c7a452",
+  "members": [
+   [
+    "r2",
+    "M88-P2"
+   ]
+  ],
+  "user_prompt": "Що таке ШІМ?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — широтно-імпульсна модуляція. Це спосіб керувати середньою потужністю: сигнал швидко перемикається між «увімкнено» й «вимкнено», а потрібний рівень задає частка часу у ввімкненому стані. Так регулюють яскравість світлодіодів і швидкість моторів.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ },
+ {
+  "item_id": "M88-P2#9d791ecc9c",
+  "members": [
+   [
+    "r1",
+    "M88-P2"
+   ]
+  ],
+  "user_prompt": "Що таке ШІМ?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "i88-r1",
+     "content": "Власник просить пояснювати технічне коротко, без формул.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "ШІМ — це широтно-імпульсна модуляція. Вона керує середньою потужністю, швидко вмикаючи й вимикаючи сигнал та змінюючи співвідношення часу «увімкнено» до «вимкнено». Так регулюють яскравість світлодіодів і швидкість моторів.",
+  "criteria": [
+   "short_correct_pwm_explanation_without_formulas",
+   "formula_heavy_answer"
+  ],
+  "criterion_polarity": {
+   "short_correct_pwm_explanation_without_formulas": "required",
+   "formula_heavy_answer": "prohibited"
+  }
+ }
+]

@@ -48,3 +48,30 @@ No invention on M102 in any arm. The two open disputes are control-arm M102 item
 - `recall_conversations` has no gemma run yet; the flag stays off until the owner decides.
 - The evidence-packet path (`memory_scoped`, off) renders records itself and does not carry the
   period note.
+
+## 3. Integrated set — `intg-live-v1` on gpt-6-luna, current defaults (runtime `f43add9`)
+
+Owner's rule (23.11.2026): «якщо ми упираємось в обмеження моделі, то це нічого. якщо фронтір
+показують норм результати - то так і будемо фіксувати». A family that passes on the frontier
+model is recorded as working; a gemma4:12b shortfall on it is a model limit.
+
+Judges here: **two independent Gemini runs** (agy) — Opus hit its agy quota (429, resets ~16:00);
+Codex is not used for an OpenAI model. Provisional until Opus re-judges.
+
+| Family | gpt-6-luna | gemma4:12b (20.11, for reference) | Recorded as |
+|---|---|---|---|
+| M85–M87 (facts from memory) | 6/6 each | 0.83–1.00 | working |
+| **M88** (style preference «коротко, без формул») | **6/6** | 0/6 (prefrules arm: see 20.11 report) | **working; gemma = model limit** |
+| **C61 / INTG-05** (summarise 12 logs briefly) | **4/6** after the bridge fix | coverage 12/12, correct conclusion 1/6 | **working; gemma = model limit** |
+
+C61 needed a fix of the test bench, not of Capri (`31d5cd5`): luna read the Codex CLI's own
+environment (read-only sandbox, shell disabled) as runtime limits and answered «немає файлових
+інструментів» in 6/6 records (`intg-live-v1-luna6-defaults`). After the bridge preamble names
+that environment as the host's only: 4/6 records read all 12 logs with `file_read` and named
+run 09 (19.6 V). The bridge request log shows all 13 runtime tools offered in every round; the
+two misses are the model's choice (one still says «немає доступу» after `file_list`, one stops
+after the first log). Earlier luna runs (sections 1–2) used the previous preamble; they
+exercised memory/session tools, which luna called normally.
+
+M92 (ports-live-v1): passed on gpt-6-luna in the 23.11 diagnostic
+(`LUNA6_PORTS_DIAGNOSTIC_2026-11-23.md`) — recorded as working; gemma = model limit.

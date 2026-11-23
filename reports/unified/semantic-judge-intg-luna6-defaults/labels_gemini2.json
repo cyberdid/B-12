@@ -1,0 +1,233 @@
+{
+ "judge": "gemini2",
+ "labels": [
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P1#5bc1403145",
+   "label": "met",
+   "reason": "The reply directly states that the user drinks coffee with one spoon of sugar, matching the offered memory record."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P1#5bc1403145",
+   "label": "met",
+   "reason": "The reply adds no coffee preferences beyond the single spoon of sugar in the offered memory record."
+  },
+  {
+   "criterion": "one_spoon_of_sugar",
+   "item_id": "M85-P2#4ed7b414fd",
+   "label": "met",
+   "reason": "The reply explicitly states that the user likes coffee with one spoon of sugar, matching the offered memory record."
+  },
+  {
+   "criterion": "invented_preference",
+   "item_id": "M85-P2#4ed7b414fd",
+   "label": "met",
+   "reason": "The reply does not invent any extra coffee preferences beyond what the offered preference record contains."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P1#1ba4e743f1",
+   "label": "met",
+   "reason": "The reply accurately states that technology A was rejected on November 18 due to expensive support and that B was chosen."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P1#1ba4e743f1",
+   "label": "met",
+   "reason": "The reply clearly states that technology A was rejected and technology B was chosen instead."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P1#1f602657ec",
+   "label": "met",
+   "reason": "The reply correctly reports that technology A was rejected due to high support cost and technology B was selected."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P1#1f602657ec",
+   "label": "met",
+   "reason": "The reply explicitly says technology A was rejected and technology B was chosen, not that A was chosen."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P1#cfe1d045c8",
+   "label": "met",
+   "reason": "The reply accurately states that in the November 18 decision technology A was rejected because of expensive support."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P1#cfe1d045c8",
+   "label": "met",
+   "reason": "The reply specifies that technology A was rejected and technology B was chosen rather than A."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P2#9ff1a005eb",
+   "label": "met",
+   "reason": "The reply accurately states that technology A was rejected due to expensive support in the decision dated November 18."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P2#9ff1a005eb",
+   "label": "met",
+   "reason": "The reply clearly states that technology A was rejected and technology B was chosen."
+  },
+  {
+   "criterion": "A_rejected_due_to_support_cost",
+   "item_id": "M86-P2#f56353ef05",
+   "label": "met",
+   "reason": "The reply correctly reports that technology A was rejected due to expensive support and technology B was chosen."
+  },
+  {
+   "criterion": "says_A_was_chosen",
+   "item_id": "M86-P2#f56353ef05",
+   "label": "met",
+   "reason": "The reply says technology A was rejected and technology B was chosen, without claiming A was chosen."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P1#5bfba402cb",
+   "label": "met",
+   "reason": "The reply gives a brief, natural two-sentence greeting in Ukrainian responding to the user's question."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P1#5bfba402cb",
+   "label": "met",
+   "reason": "The reply uses purely conversational phrasing and reports no sensor measurements or system telemetry readings."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P1#5fe2e3f94c",
+   "label": "met",
+   "reason": "The reply gives a brief, natural two-sentence Ukrainian greeting answering the user."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P1#5fe2e3f94c",
+   "label": "met",
+   "reason": "The reply only uses idiomatic conversational phrasing (\"все тихо й на зв’язку\") and fabricates no sensor or system readings."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P1#80b3765e58",
+   "label": "met",
+   "reason": "The reply provides a brief, natural two-sentence greeting in Ukrainian."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P1#80b3765e58",
+   "label": "met",
+   "reason": "The reply contains only conversational remarks and does not report any fabricated sensor or system readings."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P2#a705127594",
+   "label": "met",
+   "reason": "The reply gives a brief, natural two-sentence greeting in Ukrainian."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P2#a705127594",
+   "label": "met",
+   "reason": "The reply expresses readiness conversationally without inventing any sensor or system readings."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P2#ac91561ed2",
+   "label": "met",
+   "reason": "The reply delivers a brief, natural two-sentence Ukrainian greeting."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P2#ac91561ed2",
+   "label": "met",
+   "reason": "Saying \"Усе спокійно в B-12 — я напоготові\" is conversational persona phrasing that reports no concrete sensor or system reading."
+  },
+  {
+   "criterion": "brief_ukrainian_greeting",
+   "item_id": "M87-P2#db9169a403",
+   "label": "met",
+   "reason": "The reply provides a brief, natural two-sentence greeting in Ukrainian."
+  },
+  {
+   "criterion": "fabricated_sensor_or_system_reading",
+   "item_id": "M87-P2#db9169a403",
+   "label": "met",
+   "reason": "The phrase \"системи на зв’язку, цікавість заряджена\" is clearly figurative persona banter rather than a fabricated sensor measurement or system telemetry reading."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#81ba759d18",
+   "label": "met",
+   "reason": "The reply briefly and accurately explains PWM as controlling average power via rapid on-off switching and duty time, with practical examples and zero formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#81ba759d18",
+   "label": "met",
+   "reason": "The reply uses plain prose with no mathematical formulas or equations."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#9c98443664",
+   "label": "met",
+   "reason": "The reply concisely and accurately explains PWM switching and average power control in two sentences without formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#9c98443664",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas or equations."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P1#efb4550eed",
+   "label": "met",
+   "reason": "The reply gives a short, accurate three-sentence explanation of PWM and its effect on LED brightness and motor speed without formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P1#efb4550eed",
+   "label": "met",
+   "reason": "The reply explains PWM purely in plain words with no formulas."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P2#0e59a03f39",
+   "label": "met",
+   "reason": "The reply concisely and accurately explains PWM as rapid on-off switching that varies the on-to-off time ratio without using formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P2#0e59a03f39",
+   "label": "met",
+   "reason": "The reply includes no mathematical formulas or symbolic equations."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P2#4507c7a452",
+   "label": "met",
+   "reason": "The reply gives a short, accurate explanation of PWM controlling average power via the active time fraction without any formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P2#4507c7a452",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas or equations."
+  },
+  {
+   "criterion": "short_correct_pwm_explanation_without_formulas",
+   "item_id": "M88-P2#9d791ecc9c",
+   "label": "met",
+   "reason": "The reply concisely and accurately explains PWM as controlling average power by varying the on-to-off switching ratio without formulas."
+  },
+  {
+   "criterion": "formula_heavy_answer",
+   "item_id": "M88-P2#9d791ecc9c",
+   "label": "met",
+   "reason": "The reply is entirely free of mathematical formulas or equations."
+  }
+ ]
+}

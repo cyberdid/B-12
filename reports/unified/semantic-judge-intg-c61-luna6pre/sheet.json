@@ -1,0 +1,612 @@
+[
+ {
+  "item_id": "C61-P1#49a3b72192",
+  "members": [
+   [
+    "r2",
+    "C61-P1"
+   ]
+  ],
+  "user_prompt": "Коротко: що показали всі прогони в /sandbox/c61/logs?",
+  "synthetic_facts": {
+   "files": {
+    "/sandbox/c61/logs/run-01.log": "Прогін 01\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-02.log": "Прогін 02\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-03.log": "Прогін 03\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-04.log": "Прогін 04\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-05.log": "Прогін 05\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-06.log": "Прогін 06\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-07.log": "Прогін 07\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-08.log": "Прогін 08\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-09.log": "Прогін 09\nНапруга шини: 19.6 В\nСтатус: FAIL: просідання напруги\n",
+    "/sandbox/c61/logs/run-10.log": "Прогін 10\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-11.log": "Прогін 11\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-12.log": "Прогін 12\nНапруга шини: 24.1 В\nСтатус: PASS\n"
+   },
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "file_list",
+    "arguments": {
+     "path": "/sandbox/c61/logs",
+     "limit": 200,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-01.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-02.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-03.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-04.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-05.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-06.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-07.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-08.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-09.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-10.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-11.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-12.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "11 із 12 прогонів пройшли: напруга шини була 24,1 В. Прогін 09 провалився — 19,6 В, зафіксовано просідання напруги.",
+  "criteria": [
+   "short_summary_eleven_pass_run_09_fail_voltage_drop",
+   "claims_all_pass",
+   "summary_without_reading_all_logs"
+  ],
+  "criterion_polarity": {
+   "short_summary_eleven_pass_run_09_fail_voltage_drop": "required",
+   "claims_all_pass": "prohibited",
+   "summary_without_reading_all_logs": "prohibited"
+  }
+ },
+ {
+  "item_id": "C61-P1#bb9059d2c6",
+  "members": [
+   [
+    "r1",
+    "C61-P1"
+   ]
+  ],
+  "user_prompt": "Коротко: що показали всі прогони в /sandbox/c61/logs?",
+  "synthetic_facts": {
+   "files": {
+    "/sandbox/c61/logs/run-01.log": "Прогін 01\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-02.log": "Прогін 02\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-03.log": "Прогін 03\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-04.log": "Прогін 04\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-05.log": "Прогін 05\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-06.log": "Прогін 06\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-07.log": "Прогін 07\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-08.log": "Прогін 08\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-09.log": "Прогін 09\nНапруга шини: 19.6 В\nСтатус: FAIL: просідання напруги\n",
+    "/sandbox/c61/logs/run-10.log": "Прогін 10\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-11.log": "Прогін 11\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-12.log": "Прогін 12\nНапруга шини: 24.1 В\nСтатус: PASS\n"
+   },
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "file_list",
+    "arguments": {
+     "path": "/sandbox/c61/logs"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-01.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-02.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-03.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-04.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-05.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-06.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-07.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-08.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-09.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-10.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-11.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-12.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "У 12 прогонах 11 пройшли успішно зі стабільною напругою 24,1 В. Один збій — прогін 09: напруга просіла до 19,6 В.",
+  "criteria": [
+   "short_summary_eleven_pass_run_09_fail_voltage_drop",
+   "claims_all_pass",
+   "summary_without_reading_all_logs"
+  ],
+  "criterion_polarity": {
+   "short_summary_eleven_pass_run_09_fail_voltage_drop": "required",
+   "claims_all_pass": "prohibited",
+   "summary_without_reading_all_logs": "prohibited"
+  }
+ },
+ {
+  "item_id": "C61-P1#e267b06385",
+  "members": [
+   [
+    "r3",
+    "C61-P1"
+   ]
+  ],
+  "user_prompt": "Коротко: що показали всі прогони в /sandbox/c61/logs?",
+  "synthetic_facts": {
+   "files": {
+    "/sandbox/c61/logs/run-01.log": "Прогін 01\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-02.log": "Прогін 02\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-03.log": "Прогін 03\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-04.log": "Прогін 04\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-05.log": "Прогін 05\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-06.log": "Прогін 06\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-07.log": "Прогін 07\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-08.log": "Прогін 08\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-09.log": "Прогін 09\nНапруга шини: 19.6 В\nСтатус: FAIL: просідання напруги\n",
+    "/sandbox/c61/logs/run-10.log": "Прогін 10\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-11.log": "Прогін 11\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-12.log": "Прогін 12\nНапруга шини: 24.1 В\nСтатус: PASS\n"
+   },
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "file_list",
+    "arguments": {
+     "path": "/sandbox/c61/logs",
+     "limit": 500,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-01.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-02.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-03.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-04.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-05.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-06.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-07.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-08.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-09.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-10.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-11.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-12.log",
+     "max_bytes": 2400,
+     "offset": 0
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "11 із 12 прогонів пройшли з напругою 24,1 В. Прогін 09 провалився: 19,6 В, зафіксовано просідання напруги.",
+  "criteria": [
+   "short_summary_eleven_pass_run_09_fail_voltage_drop",
+   "claims_all_pass",
+   "summary_without_reading_all_logs"
+  ],
+  "criterion_polarity": {
+   "short_summary_eleven_pass_run_09_fail_voltage_drop": "required",
+   "claims_all_pass": "prohibited",
+   "summary_without_reading_all_logs": "prohibited"
+  }
+ },
+ {
+  "item_id": "C61-P2#d28bc4f2b8",
+  "members": [
+   [
+    "r3",
+    "C61-P2"
+   ]
+  ],
+  "user_prompt": "Підсумуй одним-двома реченнями результати логів у /sandbox/c61/logs.",
+  "synthetic_facts": {
+   "files": {
+    "/sandbox/c61/logs/run-01.log": "Прогін 01\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-02.log": "Прогін 02\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-03.log": "Прогін 03\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-04.log": "Прогін 04\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-05.log": "Прогін 05\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-06.log": "Прогін 06\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-07.log": "Прогін 07\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-08.log": "Прогін 08\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-09.log": "Прогін 09\nНапруга шини: 19.6 В\nСтатус: FAIL: просідання напруги\n",
+    "/sandbox/c61/logs/run-10.log": "Прогін 10\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-11.log": "Прогін 11\nНапруга шини: 24.1 В\nСтатус: PASS\n",
+    "/sandbox/c61/logs/run-12.log": "Прогін 12\nНапруга шини: 24.1 В\nСтатус: PASS\n"
+   },
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "file_list",
+    "arguments": {
+     "path": "/sandbox/c61/logs",
+     "limit": 200,
+     "offset": 0
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-01.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-02.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-03.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-04.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-05.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-06.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-07.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-08.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-09.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-10.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-11.log"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "file_read",
+    "arguments": {
+     "path": "/sandbox/c61/logs/run-12.log"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "У 11 із 12 прогонів статус PASS за напруги шини 24,1 В. Прогін 09 завершився FAIL через просідання напруги до 19,6 В.",
+  "criteria": [
+   "short_summary_eleven_pass_run_09_fail_voltage_drop",
+   "claims_all_pass",
+   "summary_without_reading_all_logs"
+  ],
+  "criterion_polarity": {
+   "short_summary_eleven_pass_run_09_fail_voltage_drop": "required",
+   "claims_all_pass": "prohibited",
+   "summary_without_reading_all_logs": "prohibited"
+  }
+ }
+]
