@@ -1,0 +1,1 @@
+{"type":"object","additionalProperties":false,"required":["reviews"],"properties":{"reviews":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["family_id","verdict","problem","fix"],"properties":{"family_id":{"type":"string"},"verdict":{"enum":["ok","minor","major","blocker"]},"problem":{"type":"string"},"fix":{"type":"string"}}}}}}

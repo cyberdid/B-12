@@ -35,6 +35,7 @@ from evals.unified.draft_sources.author_ports_v1 import (  # noqa: E402
 SET_ID = "convrecall-live-v1"
 TP = "memory_search_allowed_conversation_search_allowed_not_required"
 DRAFT_REVIEW_STATUS = "UNREVIEWED"
+FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
 
 REVIEW_RUBRIC = """# Blind oracle review rubric — convrecall-live-v1 (M100–M102)
 
@@ -119,8 +120,8 @@ def build_cases() -> list[dict]:
             "B2_past_conversation_with_distractor",
             "NO_TOOL",
             {"synthetic_memory": [], "synthetic_sessions": _paint_sessions("b101")},
-            "Яку фарбу ми обрали для ванної в минулій розмові?",
-            "Нагадай, яку фарбу для ванної ми обговорювали минулого разу?",
+            "Яку фарбу ми обрали для ванної в одній із минулих розмов?",
+            "Нагадай, яку фарбу для ванної ми обговорювали раніше?",
             ["names_tikkurila_luja_7_for_bathroom"],
             [],
             ["names_kitchen_paint_for_bathroom", "invented_paint"],

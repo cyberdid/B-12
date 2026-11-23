@@ -1,0 +1,22 @@
+{
+ "reviews": [
+  {
+   "family_id": "M100",
+   "fix": "No fix needed.",
+   "problem": "No problem found; the scenario, Ukrainian prompt variants, and oracle align cleanly with B1_past_conversation_m93.",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M101",
+   "fix": "Reword the prompt variants to refer to past conversations generally (such as 'у минулих розмовах' and 'раніше') rather than the single last conversation.",
+   "problem": "Prompt variant 0 asks 'в минулій розмові' (singular, and variant 1 asks 'минулого разу') even though the bathroom session b101-s1 (2026-11-20) predates the kitchen distractor session b101-s2 (2026-11-22), which could cause a literal assistant to check only the most recent session.",
+   "verdict": "minor"
+  },
+  {
+   "family_id": "M102",
+   "fix": "No fix needed.",
+   "problem": "No problem found; the distractor-only past sessions, false-presupposition prompts, and oracle accurately test B3_no_such_conversation.",
+   "verdict": "ok"
+  }
+ ]
+}

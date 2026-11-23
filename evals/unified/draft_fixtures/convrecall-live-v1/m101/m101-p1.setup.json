@@ -1,0 +1,73 @@
+{
+  "family_id": "M101",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "b101-s1",
+        "session_id": "a544dda5-a5e8-5614-8835-8180e0b042e7",
+        "turns": [
+          {
+            "alias": "b101-t1",
+            "created_at": "2026-11-20T18:05:00+02:00",
+            "messages": [
+              {
+                "content": "Для ванної беремо вологостійку фарбу «Тікурила Луя 7», два шари, колір білий.",
+                "role": "user"
+              },
+              {
+                "content": "Записала: ванна — «Тікурила Луя 7», два шари.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "29a630b2-eece-5838-b583-4dfdd4c2d4d1"
+          }
+        ]
+      },
+      {
+        "actor": "synthetic-owner",
+        "alias": "b101-s2",
+        "session_id": "3fc7cdbb-7a2a-5af1-9461-9f367118ad07",
+        "turns": [
+          {
+            "alias": "b101-t2",
+            "created_at": "2026-11-22T12:40:00+02:00",
+            "messages": [
+              {
+                "content": "А для кухні візьмемо фарбу «Снєжка Еко», вона дешевша.",
+                "role": "user"
+              },
+              {
+                "content": "Добре, кухня — «Снєжка Еко».",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "14674c32-861f-5b37-9c65-e9d80a3cbb08"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}
