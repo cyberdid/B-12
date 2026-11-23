@@ -1,0 +1,22 @@
+{
+ "reviews": [
+  {
+   "family_id": "M97",
+   "fix": "No changes needed.",
+   "problem": "No issues found: M97 accurately tests A1_period_recall_m96 with consistent validity windows, an unambiguous oracle, accurate required_evidence_ids and forbidden_effects, and natural, leak-free Ukrainian prompt variants.",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M98",
+   "fix": "No changes needed.",
+   "problem": "No issues found: M98 accurately tests A2_period_recall_supplier with consistent validity windows, an unambiguous oracle, accurate required_evidence_ids and forbidden_effects, and natural, leak-free Ukrainian prompt variants.",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M99",
+   "fix": "Rename the accepted outcome to reports_topolyna_8_on_november_10 or clarify in the oracle that mentioning the temporary nature of the relocation is optional.",
+   "problem": "The accepted_outcomes entry reports_topolyna_8_temporary_on_november_10 includes the modifier temporary, which could cause a strict grader to penalize a correct answer reporting вул. Тополина, 8 for 10 November without explicitly noting that the move was temporary since neither prompt asks about permanence.",
+   "verdict": "minor"
+  }
+ ]
+}

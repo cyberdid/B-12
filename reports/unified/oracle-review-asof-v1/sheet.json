@@ -1,0 +1,557 @@
+[
+ {
+  "family_id": "M97",
+  "catalog_class": "A1_period_recall_m96",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "a879a4a4-2f45-569d-9bd6-6346fc7797a5",
+     "alias": "a97-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех, початкова локація) — вул. Вишнева, 14.",
+     "event_time": null,
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "64ddb3a0-6141-5f30-a375-23e04e56d200",
+     "alias": "a97-r2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (тимчасовий переїзд) — вул. Тополина, 8.",
+     "event_time": null,
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "a879a4a4-2f45-569d-9bd6-6346fc7797a5"
+    },
+    {
+     "memory_id": "cd8c0bd9-5b06-5731-a606-a9ac45d2dd78",
+     "alias": "a97-r3",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех) — вул. Заводська, 22.",
+     "event_time": null,
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "valid_from": "2026-11-16",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "64ddb3a0-6141-5f30-a375-23e04e56d200"
+    },
+    {
+     "memory_id": "4bd22de8-0933-59ca-9e34-57c42708c322",
+     "alias": "a97-r4",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №1 — вул. Стрийська, 9.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:00:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "d0e70e92-0bc0-5076-a867-96b5f244e0a0",
+     "alias": "a97-r5",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №2 — вул. Канатна, 18.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:01:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "cc20f0f5-df3c-5447-bea1-92af77d62087",
+     "alias": "a97-r6",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №3 — просп. Науки, 5.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:02:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "4c2ffbe0-25ce-53da-8f89-0dbb873215f1",
+     "alias": "a97-r7",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №4 — вул. Сумська, 31.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:03:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "3afd7b5f-a042-5e11-a4a2-c52d1510c2ea",
+     "alias": "a97-r8",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №5 — вул. Соборності, 11.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:04:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "b975c3f6-05a0-542e-8850-7161310bddb3",
+     "alias": "a97-r9",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №6 — вул. Садова, 3.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:05:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "60ba93a4-86db-5792-b17e-a3ef42d91fc6",
+     "alias": "a97-r10",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №7 — вул. Київська, 44.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:06:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "12b88509-4a23-5efb-9edd-6ce0efde6bb3",
+     "alias": "a97-r11",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №8 — вул. Полтавська, 12.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:07:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "4abbaa06-3b67-53f6-b9c9-da6bf8b12cbb",
+     "alias": "a97-r12",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №9 — вул. Франка, 7.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:08:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "de89c2a8-11e9-5ce9-a2bc-9168f7a49281",
+     "alias": "a97-r13",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні №10 — вул. Шевченка, 19.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T10:09:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Яка була адреса майстерні в жовтні?",
+   "За якою адресою працювала майстерня у жовтні?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_vyshneva_14_valid_in_october"
+   ],
+   "required_evidence_ids": [
+    "mem:a879a4a4-2f45-569d-9bd6-6346fc7797a5"
+   ],
+   "forbidden_effects": [
+    "reports_november_address_as_october",
+    "invented_address"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M98",
+  "catalog_class": "A2_period_recall_supplier",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "499e3cf4-fa5b-5330-ad02-efe0c865b3b2",
+     "alias": "a98-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник фанери — ТОВ «Ліс-Пром».",
+     "event_time": null,
+     "recorded_at": "2026-07-01T10:00:00+02:00",
+     "valid_from": "2026-07-01",
+     "valid_to": "2026-09-30",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "ad67e792-9094-5f66-b05d-166216a4f3c0",
+     "alias": "a98-r2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник фанери — ФОП Гнатюк.",
+     "event_time": null,
+     "recorded_at": "2026-10-01T10:00:00+02:00",
+     "valid_from": "2026-10-01",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "499e3cf4-fa5b-5330-ad02-efe0c865b3b2"
+    },
+    {
+     "memory_id": "af7adead-aa59-5dd4-9fef-8a8dbaf13c30",
+     "alias": "a98-o1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник фарби — ТОВ «Колір-Плюс».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:01:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "ce7ff1c2-1dac-5e88-ab28-415f727ddae8",
+     "alias": "a98-o2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник клею — ФОП Мельник.",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:02:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "bfd0870a-3f22-53cd-ac15-9f051b2627d0",
+     "alias": "a98-o3",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник метизів — ТОВ «Кріп-Сервіс».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:03:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "3c69d353-b822-5b97-ad16-48bc248319d0",
+     "alias": "a98-o4",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник лаку — ТОВ «Лак-Майстер».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:04:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "d0892f6f-f0c0-573b-bb7a-94067a3344c6",
+     "alias": "a98-o5",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник шліфшкурки — ФОП Дорош.",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:05:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "7484492b-8e94-50fb-af40-bb7ae6e14a1e",
+     "alias": "a98-o6",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник кромки — ТОВ «Кромка-Юа».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:06:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "8a84b3bf-c897-5f2b-8380-30ee6f1a6ee6",
+     "alias": "a98-o7",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник фурнітури — ТОВ «Фурна».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:07:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "b1e47d9b-7777-5754-9e29-e6f6be150726",
+     "alias": "a98-o8",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Постачальник ДСП — ТОВ «Плита-Центр».",
+     "event_time": null,
+     "recorded_at": "2026-10-10T10:08:00+02:00",
+     "valid_from": "2026-10-10",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Хто постачав нам фанеру у вересні?",
+   "Від кого ми брали фанеру у вересні?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "names_lis_prom_as_september_plywood_supplier"
+   ],
+   "required_evidence_ids": [
+    "mem:499e3cf4-fa5b-5330-ad02-efe0c865b3b2"
+   ],
+   "forbidden_effects": [
+    "names_gnatiuk_as_september_supplier",
+    "names_other_material_supplier",
+    "invented_supplier"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M99",
+  "catalog_class": "A3_day_precision",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [
+    {
+     "memory_id": "e8d6975a-7226-511a-976c-b0e1bb239e47",
+     "alias": "a99-r1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех) — вул. Вишнева, 14.",
+     "event_time": null,
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "239e531c-de03-5c2c-b7bc-320fac8f17be",
+     "alias": "a99-r2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (тимчасовий переїзд на час ремонту) — вул. Тополина, 8.",
+     "event_time": null,
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15",
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "e8d6975a-7226-511a-976c-b0e1bb239e47"
+    },
+    {
+     "memory_id": "91c73ba2-1d6b-59f6-9b9f-4d1dce6a6c86",
+     "alias": "a99-r3",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса майстерні (основний цех після ремонту) — вул. Заводська, 22.",
+     "event_time": null,
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "valid_from": "2026-11-16",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal",
+     "supersedes": "239e531c-de03-5c2c-b7bc-320fac8f17be"
+    },
+    {
+     "memory_id": "150f0fb0-b0a0-5737-8f7b-a1a4fd08f9b0",
+     "alias": "a99-w1",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №1 — вул. Лугова, 3.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:01:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "9ea97850-d3e5-51ba-9e72-32ca2cee3713",
+     "alias": "a99-w2",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №2 — вул. Річна, 17.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:02:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "b77ea517-b06b-5cdb-bcfc-79276b30ae9f",
+     "alias": "a99-w3",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №3 — вул. Польова, 40.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:03:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "868b53dd-dce3-51c5-9e2c-05efb02c333e",
+     "alias": "a99-w4",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №4 — вул. Гірська, 6.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:04:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "2771b36a-eca2-559d-bce6-195cc664f942",
+     "alias": "a99-w5",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №5 — вул. Озерна, 21.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:05:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    },
+    {
+     "memory_id": "20a40570-c7d6-55b7-93ad-963fa794869e",
+     "alias": "a99-w6",
+     "actor": "synthetic-owner",
+     "kind": "fact",
+     "content": "Адреса складу №6 — вул. Липова, 12.",
+     "event_time": null,
+     "recorded_at": "2026-11-20T11:06:00+02:00",
+     "valid_from": "2026-11-05",
+     "valid_to": null,
+     "source": "synthetic_owner_statement",
+     "reliability": "normal"
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Де працювала майстерня 10 листопада?",
+   "За якою адресою була майстерня 10 листопада?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "reports_topolyna_8_on_november_10"
+   ],
+   "required_evidence_ids": [
+    "mem:239e531c-de03-5c2c-b7bc-320fac8f17be"
+   ],
+   "forbidden_effects": [
+    "reports_vyshneva_or_zavodska_for_november_10",
+    "reports_warehouse_as_workshop",
+    "invented_address"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ }
+]

@@ -1,0 +1,20 @@
+{
+  "accepted_outcomes": [
+    "reports_topolyna_8_on_november_10"
+  ],
+  "catalog_class": "A3_day_precision",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M99",
+  "forbidden_effects": [
+    "reports_vyshneva_or_zavodska_for_november_10",
+    "reports_warehouse_as_workshop",
+    "invented_address"
+  ],
+  "required_evidence_ids": [
+    "mem:239e531c-de03-5c2c-b7bc-320fac8f17be"
+  ],
+  "review_status": "REVIEWED 2026-11-23: blind Codex (M97-M99 ok) and blind Gemini 4 Hydrogen (M97, M98 ok; M99 minor: accepted outcome named the move 'temporary' - renamed) - fixed before any run; FROZEN 2026-11-23",
+  "scenario_id": "M99-P1",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}
