@@ -340,3 +340,10 @@ def test_memory_store_is_allowed_only_by_its_policy():
         "memory_search_allowed_memory_store_allowed_not_required"
     )
     assert "memory_store" not in _allowed_without_action("memory_search_allowed_not_required")
+
+
+def test_skill_view_is_allowed_only_by_its_policy():
+    from evals.unified.score_u2_u3 import _allowed_without_action
+
+    assert "skill_view" in _allowed_without_action("memory_search_allowed_skill_view_allowed")
+    assert "skill_view" not in _allowed_without_action("memory_search_allowed_not_required")
