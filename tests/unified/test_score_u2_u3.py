@@ -320,3 +320,14 @@ def test_required_tool_calls_supports_prefix_argument_matching():
     )
     assert october["verdict"] == "PASS_DETERMINISTIC"
     assert checks(october, "required_tool_call")[0]["result"] == "PASS"
+
+
+def test_conversation_search_is_allowed_only_by_its_policy():
+    from evals.unified.score_u2_u3 import _allowed_without_action
+
+    assert "conversation_search" in _allowed_without_action(
+        "memory_search_allowed_conversation_search_allowed_not_required"
+    )
+    assert "conversation_search" not in _allowed_without_action(
+        "memory_search_allowed_not_required"
+    )

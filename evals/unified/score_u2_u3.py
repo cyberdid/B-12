@@ -148,6 +148,8 @@ def _allowed_without_action(policy):
         allowed.add("memory_search")
     if "web_search_allowed" in policy:
         allowed.add("web_search")
+    if "conversation_search_allowed" in policy:  # convrecall-live-v1 (23.11.2026)
+        allowed.add("conversation_search")
     if "read_only_discovery_allowed" in policy:
         allowed |= {"file_search", "file_list"}
     return allowed
