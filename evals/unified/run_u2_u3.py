@@ -154,6 +154,7 @@ RUNTIME_FLAGS = (
     "memory_review",
     "memory_review_approval",
     "memory_as_of",
+    "recall_as_of",
     "session_search",
     "memory_ranking",
     "goal_contract",
@@ -358,6 +359,9 @@ def main(argv=None):
         "--memory-as-of", action="store_true", help="historical as_of parameter on memory_search"
     )
     parser.add_argument(
+        "--recall-as-of", action="store_true", help="recall applies the period a question names"
+    )
+    parser.add_argument(
         "--session-search", action="store_true", help="FTS5 conversation_search tool"
     )
     parser.add_argument(
@@ -461,6 +465,7 @@ def main(argv=None):
                     ("memory_review", args.memory_review),
                     ("memory_review_approval", args.memory_review_approval),
                     ("memory_as_of", args.memory_as_of),
+                    ("recall_as_of", args.recall_as_of),
                     ("session_search", args.session_search),
                     ("memory_ranking", args.memory_ranking),
                     ("goal_contract", args.goal_contract),

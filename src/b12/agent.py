@@ -973,6 +973,11 @@ class Agent:
             return []
         temporal = getattr(self.settings, "memory_temporal", False)
         now = self.clock()
+        period = None
+        if getattr(self.settings, "recall_as_of", False):
+            from b12.temporal_query import resolve_period
+
+            period = resolve_period(text, now)
 
         def _dated(record):
             return _render_dated(record, temporal=temporal, now=now)
@@ -1023,6 +1028,8 @@ class Agent:
                     # Stale or superseded facts are kept for the owner, not offered as evidence.
                     if len(found) < limit and record.status == "active":
                         found.setdefault(record.id, _dated(record))
+        if period is not None:
+            found = self._period_first(found, filtered, actor, period, limit, _dated)
         scoped = getattr(self.settings, "memory_scoped", False)
         if (temporal or scoped) and found:
             # ADR-015: replaced history is offered only right after its replacement, marked,
@@ -1049,6 +1056,33 @@ class Agent:
                     records.append((record, False))
             return evidence_packet(records, now)
         return [{"id": key, "text": value} for key, value in found.items()]
+
+    def _period_first(self, found, terms, actor, period, limit, render) -> dict[str, str]:
+        """recall_as_of: records valid during the asked period come first; a current record whose
+        validity window lies outside the period is dropped, so it cannot crowd out the answer
+        (ports-live-v1 M96: ten addresses valid from November hid the October one)."""
+        from b12.memory import _parse_time_bound, _valid_during
+
+        start, end = period[0].isoformat(), period[1].isoformat()
+        window = (_parse_time_bound(start), _parse_time_bound(end, end=True))
+        kept: dict[str, str] = {}
+        for term in list(dict.fromkeys(terms))[:8]:
+            for record in self.memory.search(
+                term, actor, limit=max(limit * 2, 6), valid_during=(start, end)
+            ):
+                if len(kept) < limit:
+                    kept.setdefault(record.id, render(record))
+        for key, value in found.items():
+            if len(kept) >= limit:
+                break
+            if key in kept:
+                continue
+            record = self.memory.get(key, actor)
+            if record is None:
+                continue
+            if not (record.valid_from or record.valid_to) or _valid_during(record, *window):
+                kept[key] = value
+        return kept
 
     def _tool_message(self, result: ToolResult) -> dict:
         body = {

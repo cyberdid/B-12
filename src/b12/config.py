@@ -49,6 +49,10 @@ class Settings(BaseModel):
     # Historical point-in-time search parameter (`as_of`) on memory_search when memory_temporal
     # is also enabled. Off until measured.
     memory_as_of: bool = False
+    # Recall applies the period a question names ("у жовтні", "15 жовтня", "минулого місяця"):
+    # records valid then come first, records valid only outside it are dropped. Both gemma4:12b
+    # and gpt-6-luna failed M96 by never calling memory_search(as_of). Off until measured.
+    recall_as_of: bool = False
     # Runtime read-back after every successful file_write: size, hash, match and opening go
     # back to the model (unverified writes failed for every model, 18.11.2026). Off: no effect
     # measurable by the current oracles (U4 report).
@@ -258,6 +262,7 @@ class Settings(BaseModel):
                 "memory_enrichment",
                 "memory_temporal",
                 "memory_as_of",
+                "recall_as_of",
                 "verify_writes",
                 "goals_in_context",
                 "memory_scoped",

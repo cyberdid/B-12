@@ -284,6 +284,22 @@ def _valid_as_of(record: MemoryRecord, target: datetime) -> bool:
     return True
 
 
+def _valid_during(record: MemoryRecord, start: datetime, end: datetime) -> bool:
+    """True when the record's validity window overlaps [start, end] (recall_as_of)."""
+    if not (
+        record.status == "active"
+        or (record.status == "stale" and record.status_reason == "superseded")
+    ):
+        return False
+    if record.valid_from and _parse_time_bound(record.valid_from) > end:
+        return False
+    if record.valid_to and _parse_time_bound(record.valid_to, end=True) < start:
+        return False
+    if record.event_time and _parse_time_bound(record.event_time) > end:
+        return False
+    return True
+
+
 def _temporal_fields(event_time, valid_from, valid_to, reliability, locator, temporal_source):
     """Validate ADR-015 fields before anything is written; unknown values stay None."""
     from b12.migrations import RELIABILITY, TEMPORAL_SOURCES
@@ -862,22 +878,49 @@ class MemoryStore:
         )
 
     def search(
-        self, query: str, actor: Actor, *, limit: int = 8, as_of: str | None = None
+        self,
+        query: str,
+        actor: Actor,
+        *,
+        limit: int = 8,
+        as_of: str | None = None,
+        valid_during: tuple[str, str] | None = None,
     ) -> list[MemoryRecord]:
-        return [record for record, _ in self.search_scored(query, actor, limit=limit, as_of=as_of)]
+        return [
+            record
+            for record, _ in self.search_scored(
+                query, actor, limit=limit, as_of=as_of, valid_during=valid_during
+            )
+        ]
 
     def search_scored(
-        self, query: str, actor: Actor, *, limit: int = 8, as_of: str | None = None
+        self,
+        query: str,
+        actor: Actor,
+        *,
+        limit: int = 8,
+        as_of: str | None = None,
+        valid_during: tuple[str, str] | None = None,
     ) -> list[tuple[MemoryRecord, float]]:
+        """`as_of`: valid at one moment; `valid_during` (ISO start, ISO end): valid at any point
+        of the period. Both include superseded history; at most one may be given."""
         self._consent(actor)
         self._limit(limit)
         if not isinstance(query, str):
             raise TypeError("query must be text")
+        if as_of is not None and valid_during is not None:
+            raise ValueError("pass as_of or valid_during, not both")
         target = _as_of_cutoff(as_of) if as_of is not None else None
+        window = None
+        if valid_during is not None:
+            start, end = valid_during
+            window = (_parse_time_bound(start), _parse_time_bound(end, end=True))
+            if window[0] > window[1]:
+                raise ValueError("valid_during start is after its end")
         # Only literal Unicode alphanumeric tokens (keeping internal apostrophes); no FTS syntax.
         raw_terms = re.findall(r"[^\W_]+(?:['’ʼ][^\W_]+)*", query, flags=re.UNICODE)[:64]
         terms = [t.replace("’", "'").replace("ʼ", "'").lower() for t in raw_terms]
-        sql_limit = -1 if target is not None else limit
+        sql_limit = -1 if (target is not None or window is not None) else limit
 
         def fts_expr(items: list[str], joiner: str = " AND ") -> str:
             return joiner.join(
@@ -898,6 +941,8 @@ class MemoryStore:
             pairs = [(self._record(row), max(1e-6, -float(row["bm25_score"]))) for row in raw_rows]
             if target is not None:
                 pairs = [(record, rel) for record, rel in pairs if _valid_as_of(record, target)]
+            if window is not None:
+                pairs = [(record, rel) for record, rel in pairs if _valid_during(record, *window)]
             return pairs[:limit]
 
         with self._transaction():
