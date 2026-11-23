@@ -17,8 +17,11 @@ done
 python3 -c 'import sentence_transformers as s, transformers as t; assert (s.__version__, t.__version__) == ("6.1.0", "5.19.0")' 2>/dev/null \
   || pip install -q sentence-transformers==6.1.0 transformers==5.19.0 >/tmp/pip.log 2>&1
 if ! (exec 3<>/dev/tcp/127.0.0.1/11436) 2>/dev/null; then
-  (cd /root/b12/scripts && HF_HUB_OFFLINE=1 setsid nohup python3 embed_server.py \
-     --backend st_embedder:Embedder --port 11436 </dev/null >/tmp/embed.log 2>&1 &)
+  # The whole background subshell is detached from the SSH channel, not only the python: the
+  # subshell itself kept the channel's stdout open, so the caller's ssh never returned
+  # (23.11.2026: the orchestrator hung 27 min after the embedding server was up).
+  (cd /root/b12/scripts && HF_HUB_OFFLINE=1 exec setsid nohup python3 embed_server.py \
+     --backend st_embedder:Embedder --port 11436) </dev/null >/tmp/embed.log 2>&1 &
   for _ in $(seq 180); do (exec 3<>/dev/tcp/127.0.0.1/11436) 2>/dev/null && break; sleep 1; done
 fi
 curl -fs 127.0.0.1:11434/api/tags
