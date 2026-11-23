@@ -104,6 +104,7 @@ def start_bridge() -> subprocess.Popen | None:
     if bridge_healthy():
         log(f"Reusing existing subscription_bridge on port {BRIDGE_PORT}")
         return None
+    SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
     flog = BRIDGE_LOG.open("a", encoding="utf-8")
     proc = subprocess.Popen(
         [
