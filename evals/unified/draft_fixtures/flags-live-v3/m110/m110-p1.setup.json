@@ -1,0 +1,52 @@
+{
+  "family_id": "M110",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "f110-s1",
+        "session_id": "00d38156-41c9-5a30-8644-51ff09595407",
+        "turns": [
+          {
+            "alias": "f110-t1",
+            "created_at": "2026-11-28T19:40:00+02:00",
+            "messages": [
+              {
+                "content": "Знову забув полити розсаду томатів, уже втретє за тиждень. Як часто її треба поливати?",
+                "role": "user"
+              },
+              {
+                "content": "Поливай, коли верхній сантиметр ґрунту підсохне — зазвичай раз на 1–2 дні.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "1b77ed53-6fee-5b3e-8911-1c85333c49de"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

@@ -1,0 +1,16 @@
+{
+ "reviews": [
+  {
+   "family_id": "M109",
+   "fix": "Replace prompt_variants[0] with an unambiguous question about the assistant's response language, such as 'Якою мовою тобі зазвичай відповідати?' or 'Якою мовою ти маєш мені зазвичай відповідати?'.",
+   "problem": "In prompt_variants[0] ('Якою мовою мені зазвичай відповідати?'), omitting the assistant pronoun ('тобі'/'ти') makes 'мені' read in Ukrainian as the owner asking what language the owner should reply in rather than the assistant, breaking semantic equivalence with prompt_variants[1] and risking off-target responses.",
+   "verdict": "major"
+  },
+  {
+   "family_id": "M110",
+   "fix": "No fix required.",
+   "problem": "No problem found: the scenario, both Ukrainian prompt variants, and the oracle fairly and unambiguously test F8_no_inferred_trait_kept.",
+   "verdict": "ok"
+  }
+ ]
+}

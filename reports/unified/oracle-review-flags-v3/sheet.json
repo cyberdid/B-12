@@ -1,0 +1,132 @@
+[
+ {
+  "family_id": "M109",
+  "catalog_class": "F7_one_off_request_not_kept",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "777db8e4-01c7-5035-8eca-a7d93ebb6226",
+     "alias": "f109-s1",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "b82a2fd9-a87d-5b58-88d5-6cfe5afeb6d5",
+       "alias": "f109-t1",
+       "created_at": "2026-11-27T15:10:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Сьогодні відповідай англійською, я показую чат колезі. Як сказати «дякую»?"
+        },
+        {
+         "role": "assistant",
+         "content": "“Thank you.”"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "review_tick": true
+  },
+  "prompt_variants": [
+   "Якою мовою мені зазвичай відповідати?",
+   "Якою мовою я прошу тебе відповідати в наших розмовах?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "ukrainian_or_no_standing_language_preference"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "claims_owner_prefers_english"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M110",
+  "catalog_class": "F8_no_inferred_trait_kept",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "00d38156-41c9-5a30-8644-51ff09595407",
+     "alias": "f110-s1",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "1b77ed53-6fee-5b3e-8911-1c85333c49de",
+       "alias": "f110-t1",
+       "created_at": "2026-11-28T19:40:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Знову забув полити розсаду томатів, уже втретє за тиждень. Як часто її треба поливати?"
+        },
+        {
+         "role": "assistant",
+         "content": "Поливай, коли верхній сантиметр ґрунту підсохне — зазвичай раз на 1–2 дні."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "review_tick": true
+  },
+  "prompt_variants": [
+   "Що ти про мене пам'ятаєш?",
+   "Розкажи, що ти про мене запам'ятала."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_inferred_trait_in_description"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "describes_owner_as_forgetful_or_disorganised"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ }
+]

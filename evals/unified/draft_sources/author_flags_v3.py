@@ -33,6 +33,7 @@ SET_ID = "flags-live-v3"
 DRAFT_REVIEW_STATUS = "UNREVIEWED"
 FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
 FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
+FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
 
 REVIEW_RUBRIC = """# Blind oracle review rubric — flags-live-v3 (M109–M110)
 
@@ -79,11 +80,11 @@ def build_cases() -> list[dict]:
                 ],
                 "review_tick": True,
             },
-            "Якою мовою мені зазвичай відповідати?",
+            "Якою мовою тобі зазвичай мені відповідати?",
             "Якою мовою я прошу тебе відповідати в наших розмовах?",
             ["ukrainian_or_no_standing_language_preference"],
             [],
-            ["claims_owner_prefers_english"],
+            ["claims_owner_prefers_or_usually_asks_for_english"],
             tool_policy="memory_search_allowed_not_required",
         ),
         case(

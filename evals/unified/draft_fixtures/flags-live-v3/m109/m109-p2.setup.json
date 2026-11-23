@@ -1,0 +1,52 @@
+{
+  "family_id": "M109",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search"
+    ],
+    "review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "f109-s1",
+        "session_id": "777db8e4-01c7-5035-8eca-a7d93ebb6226",
+        "turns": [
+          {
+            "alias": "f109-t1",
+            "created_at": "2026-11-27T15:10:00+02:00",
+            "messages": [
+              {
+                "content": "Сьогодні відповідай англійською, я показую чат колезі. Як сказати «дякую»?",
+                "role": "user"
+              },
+              {
+                "content": "“Thank you.”",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "b82a2fd9-a87d-5b58-88d5-6cfe5afeb6d5"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}
