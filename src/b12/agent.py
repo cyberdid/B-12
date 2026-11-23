@@ -1065,13 +1065,18 @@ class Agent:
 
         start, end = period[0].isoformat(), period[1].isoformat()
         window = (_parse_time_bound(start), _parse_time_bound(end, end=True))
-        kept: dict[str, str] = {}
+        # Rank by how many question words a record matches, then by relevance: filling the slots
+        # term by term let six "Адреса складу" rows (matched by "адресою" alone) crowd out the one
+        # workshop address that matches both "адресою" and "майстерня" (asof-live-v1 M99-P2).
+        scored: dict[str, tuple[object, float, int]] = {}
         for term in list(dict.fromkeys(terms))[:8]:
-            for record in self.memory.search(
-                term, actor, limit=max(limit * 2, 6), valid_during=(start, end)
+            for record, rel in self.memory.search_scored(
+                term, actor, limit=max(limit * 3, 10), valid_during=(start, end)
             ):
-                if len(kept) < limit:
-                    kept.setdefault(record.id, render(record))
+                _, total, hits = scored.get(record.id, (record, 0.0, 0))
+                scored[record.id] = (record, total + rel, hits + 1)
+        ranked = sorted(scored.values(), key=lambda item: (-item[2], -item[1]))
+        kept: dict[str, str] = {record.id: render(record) for record, _, _ in ranked[:limit]}
         for key, value in found.items():
             if len(kept) >= limit:
                 break

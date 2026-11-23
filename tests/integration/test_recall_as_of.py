@@ -76,3 +76,29 @@ async def test_a_record_without_a_validity_window_is_kept(scripted_ollama, tmp_p
     _, base = scripted_ollama
     got, ids, _ = await _recall(base, tmp_path, "О котрій працювала майстерня в жовтні?", flag=True)
     assert ids["undated"] in got
+
+
+async def test_records_matching_more_question_words_win_the_slots(scripted_ollama, tmp_path):
+    """Six warehouse addresses valid in the period match "адресою" only; the workshop address
+    matches "адресою" and "майстерня" and must not be crowded out (asof-live-v1 M99-P2)."""
+    _, base = scripted_ollama
+    runtime = open_runtime(
+        base.model_copy(update={"state_dir": tmp_path / "s", "recall_as_of": True})
+    )
+    try:
+        runtime.agent.clock = lambda: NOW
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        workshop = runtime.memory.remember(
+            "Адреса майстерні (тимчасовий переїзд) — вул. Тополина, 8.",
+            actor,
+            valid_from="2026-11-01",
+            valid_to="2026-11-15",
+        )
+        for n in range(1, 7):
+            runtime.memory.remember(
+                f"Адреса складу №{n} — вул. Складська, {n}.", actor, valid_from="2026-11-05"
+            )
+        items = await runtime.agent._recall("За якою адресою була майстерня 10 листопада?", actor)
+        assert workshop.id in {item["id"] for item in items}
+    finally:
+        runtime.close()
