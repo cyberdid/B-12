@@ -52,11 +52,11 @@ class Settings(BaseModel):
     # Recall applies the period a question names ("у жовтні", "15 жовтня", "минулого місяця"):
     # records valid then come first, records valid only outside it are dropped. Both gemma4:12b
     # and gpt-6-luna failed M96 by never calling memory_search(as_of). Off until measured.
-    recall_as_of: bool = False
+    recall_as_of: bool = True  # owner 23.11.2026: on after frontier measurements
     # A question that points at a past conversation ("в попередній розмові", "ми обговорювали")
     # gets the best-matching earlier turns as data beside it, without waiting for the model to
     # call conversation_search (M93: luna 1/2, gemma 4/6 called it). Off until measured.
-    recall_conversations: bool = False
+    recall_conversations: bool = True  # owner 23.11.2026: on after frontier measurements
     # Runtime read-back after every successful file_write: size, hash, match and opening go
     # back to the model (unverified writes failed for every model, 18.11.2026). Off: no effect
     # measurable by the current oracles (U4 report).
@@ -97,7 +97,7 @@ class Settings(BaseModel):
     session_search: bool = False
     # Recency (30d half-life) and importance (1..10) ranking for recalled memories + importance
     # field on memory_store. Off until measured.
-    memory_ranking: bool = False
+    memory_ranking: bool = True  # owner 23.11.2026: on after frontier measurements
     # ADR-019: structured goal completion contract, extra trusted checks and boundaries.
     goal_contract: bool = False
     # Owner-allowlisted exact argv tuples for command_exit_zero goal checks.
@@ -105,7 +105,7 @@ class Settings(BaseModel):
     # ADR-022: wall-clock owner schedules through the initiative gate.
     schedules: bool = False
     # Event-based standing intents: keyword-triggered data blocks injected before recall.
-    standing_intents: bool = False
+    standing_intents: bool = True  # owner 23.11.2026: on after frontier measurements
     # Structured clarify(question, choices, allow_other) tool (Hermes-derived, 20.11.2026): pauses
     # the turn and resumes when the speaker answers via API, CLI or voice. Off until measured.
     clarify_tool: bool = False
@@ -116,7 +116,7 @@ class Settings(BaseModel):
     # preserving call order in results and keeping effectful calls sequential. Off until measured.
     parallel_reads: bool = False
     # ADR-021: procedural skills index and skill_view/skill_propose tools. Off until measured.
-    skills: bool = False
+    skills: bool = True  # owner 23.11.2026: on after frontier measurements
     # Task H6 (Step 1): local wake-word gating in LiveSession (accept utterances only within 8 s
     # after wake detection; RAM-only 1.5 s ring buffer). Off until Step 2 model approval.
     wake_word: bool = False

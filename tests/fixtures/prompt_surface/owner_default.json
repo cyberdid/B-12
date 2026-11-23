@@ -282,11 +282,11 @@
   },
   {
    "function": {
-    "description": "Remember a fact about the owner. Arguments: text (the fact, required); kind (a short type such as fact or user_preference). Optional when the user stated them: event_time, valid_from, valid_to (ISO dates), reliability, source_locator.",
+    "description": "Remember a fact about the owner. Arguments: text (the fact, required); kind (a short type such as fact or user_preference). Optional when the user stated them: event_time, valid_from, valid_to (ISO dates), reliability, source_locator. Optional: importance (1-10; 0 if unknown).",
     "name": "memory_store",
     "parameters": {
      "additionalProperties": false,
-     "description": "memory_store with ADR-015 fields; offered only when settings.memory_temporal is on.\n\nEmpty strings mean unknown (the calibrated tool-schema subset has no optional types).",
+     "description": "memory_store with ADR-015 fields and importance; offered when memory_ranking is on.",
      "properties": {
       "document_evidence_ids": {
        "description": "Optional evidence_id values from knowledge_search results; the memory then cites that document and becomes stale if the document changes or is removed",
@@ -312,6 +312,14 @@
        "maxItems": 32,
        "title": "Evidence Ids",
        "type": "array"
+      },
+      "importance": {
+       "default": 0,
+       "description": "Importance from 1 (trivial) to 10 (critical); 0 if unknown. Max 10",
+       "maximum": 10,
+       "minimum": 0,
+       "title": "Importance",
+       "type": "integer"
       },
       "kind": {
        "default": "fact",
@@ -373,7 +381,7 @@
      "required": [
       "text"
      ],
-     "title": "TemporalStoreArgs",
+     "title": "RankedTemporalStoreArgs",
      "type": "object"
     }
    },
@@ -506,6 +514,69 @@
       "declared_effects"
      ],
      "title": "CommandArgs",
+     "type": "object"
+    }
+   },
+   "type": "function"
+  },
+  {
+   "function": {
+    "description": "Stage a new or updated SKILL.md proposal for owner approval (never writes SKILL.md directly). Arguments: name, content (with frontmatter name and description <= 60 chars).",
+    "name": "skill_propose",
+    "parameters": {
+     "additionalProperties": false,
+     "properties": {
+      "content": {
+       "description": "Full SKILL.md content with YAML frontmatter (name and description <= 60 chars) and sections for when to use, procedure, pitfalls, and verification",
+       "maxLength": 65536,
+       "minLength": 1,
+       "title": "Content",
+       "type": "string"
+      },
+      "name": {
+       "description": "Skill directory name (alphanumeric, -, _)",
+       "maxLength": 64,
+       "minLength": 1,
+       "title": "Name",
+       "type": "string"
+      }
+     },
+     "required": [
+      "name",
+      "content"
+     ],
+     "title": "SkillProposeArgs",
+     "type": "object"
+    }
+   },
+   "type": "function"
+  },
+  {
+   "function": {
+    "description": "Load a skill's SKILL.md instructions or a reference file inside that skill directory. Arguments: name (required), path (optional relative file inside the skill).",
+    "name": "skill_view",
+    "parameters": {
+     "additionalProperties": false,
+     "properties": {
+      "name": {
+       "description": "Skill directory name",
+       "maxLength": 64,
+       "minLength": 1,
+       "title": "Name",
+       "type": "string"
+      },
+      "path": {
+       "default": "",
+       "description": "Optional relative file path inside the skill directory (default SKILL.md)",
+       "maxLength": 256,
+       "title": "Path",
+       "type": "string"
+      }
+     },
+     "required": [
+      "name"
+     ],
+     "title": "SkillViewArgs",
      "type": "object"
     }
    },

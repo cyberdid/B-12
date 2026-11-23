@@ -139,8 +139,8 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_enrichment": True,
         "memory_temporal": True,
         "memory_as_of": False,
-        "recall_as_of": False,
-        "recall_conversations": False,
+        "recall_as_of": True,
+        "recall_conversations": True,
         "verify_writes": False,
         "goals_in_context": True,
         "memory_scoped": False,
@@ -153,15 +153,15 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "memory_review": True,
         "memory_review_approval": True,
         "session_search": False,
-        "memory_ranking": False,
+        "memory_ranking": True,
         "goal_contract": False,
         "goal_check_commands": (),
         "schedules": False,
-        "standing_intents": False,
+        "standing_intents": True,
         "clarify_tool": False,
         "stable_prefix": False,
         "parallel_reads": False,
-        "skills": False,
+        "skills": True,
         "wake_word": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
@@ -252,10 +252,11 @@ def test_schedules_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings.from_env(env).schedules
 
 
-def test_standing_intents_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).standing_intents is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_STANDING_INTENTS": "true"}
-    assert Settings.from_env(env).standing_intents
+def test_standing_intents_is_on_by_default_and_environment_configurable(tmp_path):
+    # Owner 23.11.2026: on after the frontier measurements (FRONTIER_RECALL_2026-11-23.md).
+    assert Settings(state_dir=tmp_path).standing_intents is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_STANDING_INTENTS": "false"}
+    assert Settings.from_env(env).standing_intents is False
 
 
 def test_preference_placement_defaults_to_query_and_validates_literal(tmp_path):
@@ -279,10 +280,11 @@ def test_session_search_is_opt_in_and_environment_configurable(tmp_path):
     assert Settings.from_env(env).session_search
 
 
-def test_memory_ranking_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).memory_ranking is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_RANKING": "true"}
-    assert Settings.from_env(env).memory_ranking
+def test_memory_ranking_is_on_by_default_and_environment_configurable(tmp_path):
+    # Owner 23.11.2026: on after the frontier measurements (FRONTIER_RECALL_2026-11-23.md).
+    assert Settings(state_dir=tmp_path).memory_ranking is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_MEMORY_RANKING": "false"}
+    assert Settings.from_env(env).memory_ranking is False
 
 
 def test_goal_contract_and_check_commands_config(tmp_path, monkeypatch):
@@ -342,10 +344,11 @@ def test_memory_review_approval_is_enabled_by_default_and_environment_configurab
     assert Settings.from_env(env).memory_review_approval is False
 
 
-def test_skills_is_opt_in_and_environment_configurable(tmp_path):
-    assert Settings(state_dir=tmp_path).skills is False
-    env = {"B12_STATE_DIR": str(tmp_path), "B12_SKILLS": "true"}
-    assert Settings.from_env(env).skills is True
+def test_skills_is_on_by_default_and_environment_configurable(tmp_path):
+    # Owner 23.11.2026: on after the frontier measurements (FRONTIER_RECALL_2026-11-23.md).
+    assert Settings(state_dir=tmp_path).skills is True
+    env = {"B12_STATE_DIR": str(tmp_path), "B12_SKILLS": "false"}
+    assert Settings.from_env(env).skills is False
 
 
 def test_wake_word_is_opt_in_and_environment_configurable(tmp_path):
