@@ -225,6 +225,43 @@ def _seed_goals(runtime, setup, actors, sessions, report):
             )
 
 
+def _seed_intents(runtime, setup, actors, report):
+    """Seed event-based standing intents (flag `standing_intents`): keyword-triggered data blocks.
+    Created a day before the scenario clock so they are active and outside any cooldown."""
+    rows = setup.get("synthetic_intents", []) or []
+    if not rows:
+        return
+    clock = setup.get("synthetic_clock")
+    now = (datetime.fromisoformat(clock) if clock else datetime.now(UTC)) - timedelta(days=1)
+    report["intent_ids"] = {}
+    for row in rows:
+        actor = actors[row.get("actor", OWNER)]
+        created = runtime.schedules.add_intent(
+            actor.id, list(row["keywords"]), row["text"], cooldown_s=0, now=now
+        )
+        report["intent_ids"][row["alias"]] = created["id"]
+
+
+def _seed_skills(runtime, setup, report):
+    """Seed owner skills (flag `skills`): `<state>/skills/<name>/SKILL.md` with frontmatter."""
+    rows = setup.get("synthetic_skills", []) or []
+    if not rows:
+        return
+    from b12.skills import validate_frontmatter
+
+    report["skills"] = []
+    for row in rows:
+        text = (
+            f"---\nname: {row['name']}\ndescription: {row['description']}\n---\n{row['body']}\n"
+        )
+        if validate_frontmatter(text) is None:
+            raise ValueError(f"invalid synthetic skill {row['name']!r}")
+        target = runtime.skills.path / row["name"]
+        target.mkdir(mode=0o700)
+        (target / "SKILL.md").write_text(text, encoding="utf-8")
+        report["skills"].append(row["name"])
+
+
 def _seed_sessions(runtime, setup, actors, report):
     """Seed prior sessions/turns (P2 conversation recall, P3 post-turn memory review)."""
     prior_sessions = setup.get("synthetic_sessions", []) or []
@@ -342,6 +379,8 @@ def build_runtime(
         # its evidence was live, then become evidence-stale after a later replacement.
         _apply_memory_lifecycle(runtime, setup, seeded_memory, report, temporal=temporal)
         _seed_sessions(runtime, setup, actors, report)
+        _seed_intents(runtime, setup, actors, report)
+        _seed_skills(runtime, setup, report)
         if setup.get("review_tick"):
             if setup.get("synthetic_clock"):
                 pinned = datetime.fromisoformat(setup["synthetic_clock"])

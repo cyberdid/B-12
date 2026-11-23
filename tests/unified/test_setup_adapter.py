@@ -351,3 +351,30 @@ def test_seed_sessions_and_network_taint_conditioning(adapter, tmp_path, profile
         assert rec.source == "network_turn"
     finally:
         rt_on.close()
+
+
+def test_seeds_standing_intents_and_skills(adapter, tmp_path, profile_settings):
+    """flags-live-v2: intents fire on their keyword at the scenario clock; skills are indexed."""
+    from datetime import datetime
+
+    setup = {
+        "synthetic_clock": "2026-12-01T10:00:00+02:00",
+        "synthetic_intents": [
+            {"alias": "i1", "keywords": ["фарба"], "text": "Купити ґрунтовку до фарби."}
+        ],
+        "synthetic_skills": [
+            {"name": "paint-wall", "description": "Як фарбувати стіну", "body": "1. Ґрунтувати."}
+        ],
+    }
+    state = tmp_path / "state"
+    report = adapter.build_runtime(setup, state, profile_settings)
+    assert set(report["intent_ids"]) == {"i1"} and report["skills"] == ["paint-wall"]
+    runtime = reopen(profile_settings, state)
+    try:
+        owner = runtime.control.resolve_actor(report["actors"]["synthetic-owner"])
+        now = datetime.fromisoformat(setup["synthetic_clock"])
+        fired = runtime.schedules.match_intents(owner.id, "Яка фарба краща?", now=now)
+        assert [item["text"] for item in fired] == ["Купити ґрунтовку до фарби."]
+        assert [s["name"] for s in runtime.skills.index()] == ["paint-wall"]
+    finally:
+        runtime.close()
