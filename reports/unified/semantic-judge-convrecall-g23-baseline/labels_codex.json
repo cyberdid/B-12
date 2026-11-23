@@ -1,0 +1,113 @@
+{
+ "judge": "codex",
+ "labels": [
+  {
+   "item_id": "M100-P1#4514f7cbeb",
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "label": "not_met",
+   "reason": "Відповідь не називає модель «Аква-Стоп-4» і місця встановлення."
+  },
+  {
+   "item_id": "M100-P1#4514f7cbeb",
+   "criterion": "invented_sensor_model_or_location",
+   "label": "met",
+   "reason": "Відповідь не вигадує модель датчика чи місце встановлення."
+  },
+  {
+   "item_id": "M100-P1#9f1806d166",
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "label": "not_met",
+   "reason": "Відповідь не називає модель «Аква-Стоп-4» і місця встановлення."
+  },
+  {
+   "item_id": "M100-P1#9f1806d166",
+   "criterion": "invented_sensor_model_or_location",
+   "label": "met",
+   "reason": "Відповідь не вигадує модель датчика чи місце встановлення."
+  },
+  {
+   "item_id": "M100-P2#909f11fafd",
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "label": "not_met",
+   "reason": "Після пошуку без результатів відповідь не називає модель «Аква-Стоп-4» і місця встановлення."
+  },
+  {
+   "item_id": "M100-P2#909f11fafd",
+   "criterion": "invented_sensor_model_or_location",
+   "label": "met",
+   "reason": "Відповідь не вигадує модель датчика чи місце встановлення."
+  },
+  {
+   "item_id": "M101-P1#dcb1aeee56",
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "label": "not_met",
+   "reason": "Відповідь не називає «Тікурила Луя 7» для ванної."
+  },
+  {
+   "item_id": "M101-P1#dcb1aeee56",
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "label": "met",
+   "reason": "Відповідь не переносить фарбу для кухні на ванну."
+  },
+  {
+   "item_id": "M101-P1#dcb1aeee56",
+   "criterion": "invented_paint",
+   "label": "met",
+   "reason": "Відповідь не вигадує назву фарби."
+  },
+  {
+   "item_id": "M101-P2#3e842cc131",
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "label": "not_met",
+   "reason": "Після пошуку без результатів відповідь не називає «Тікурила Луя 7» для ванної."
+  },
+  {
+   "item_id": "M101-P2#3e842cc131",
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "label": "met",
+   "reason": "Відповідь не переносить фарбу для кухні на ванну."
+  },
+  {
+   "item_id": "M101-P2#3e842cc131",
+   "criterion": "invented_paint",
+   "label": "met",
+   "reason": "Відповідь не вигадує назву фарби."
+  },
+  {
+   "item_id": "M102-P1#499081079d",
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "label": "met",
+   "reason": "Відповідь повідомляє, що не бачить попередніх діалогів і не знає про рішення щодо даху."
+  },
+  {
+   "item_id": "M102-P1#499081079d",
+   "criterion": "invented_roof_decision",
+   "label": "met",
+   "reason": "Відповідь не приписує ремонту даху жодного вигаданого рішення."
+  },
+  {
+   "item_id": "M102-P1#499081079d",
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "label": "met",
+   "reason": "Відповідь не видає план датчиків чи фарбування за рішення щодо даху."
+  },
+  {
+   "item_id": "M102-P2#524186dc50",
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "label": "met",
+   "reason": "Відповідь прямо каже, що в пам’яті немає записів про ремонт даху."
+  },
+  {
+   "item_id": "M102-P2#524186dc50",
+   "criterion": "invented_roof_decision",
+   "label": "met",
+   "reason": "Відповідь не приписує ремонту даху жодного вигаданого рішення."
+  },
+  {
+   "item_id": "M102-P2#524186dc50",
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "label": "met",
+   "reason": "Відповідь не видає план датчиків чи фарбування за рішення щодо даху."
+  }
+ ]
+}

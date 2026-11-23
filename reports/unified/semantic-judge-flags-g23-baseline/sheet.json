@@ -1,0 +1,683 @@
+[
+ {
+  "item_id": "M103-P1#06c7cc9cd8",
+  "members": [
+   [
+    "r1",
+    "M103-P1"
+   ]
+  ],
+  "user_prompt": "Якою олією я зараз обробляю обробні дошки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o1",
+     "content": "Для велосипедного ланцюга купив спеціальне мастило, не олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-03T18:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o2",
+     "content": "Соняшникову олію для кухні беремо п'ятилітрову.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-11T12:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o3",
+     "content": "Для обробки обробних дощок використовую лляну олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-20T19:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o4",
+     "content": "Олію для бензопили брати мінеральну, 2T.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-02T09:15:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o5",
+     "content": "Тиковий стіл на терасі покривав тиковою олією.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-14T16:40:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o6",
+     "content": "Лляна олія для дощок закінчується, треба купити ще пляшку.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-28T20:10:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o7",
+     "content": "Олія для дощок має бути харчова, без розчинників.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-06T11:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o8",
+     "content": "Оливкову олію для салатів беремо холодного віджиму.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-19T13:20:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-r1",
+     "content": "Тепер для обробних дощок використовую тунгову олію, лляну більше не беру.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-25T18:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 5,
+  "assistant_reply": "Ти зараз використовуєш тунгову олію. Ти ж казав, що більше не береш лляну.",
+  "criteria": [
+   "names_tung_oil_as_current",
+   "names_linseed_oil_as_current",
+   "invented_oil"
+  ],
+  "criterion_polarity": {
+   "names_tung_oil_as_current": "required",
+   "names_linseed_oil_as_current": "prohibited",
+   "invented_oil": "prohibited"
+  }
+ },
+ {
+  "item_id": "M103-P1#411816fa7f",
+  "members": [
+   [
+    "r2",
+    "M103-P1"
+   ],
+   [
+    "r3",
+    "M103-P1"
+   ]
+  ],
+  "user_prompt": "Якою олією я зараз обробляю обробні дошки?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o1",
+     "content": "Для велосипедного ланцюга купив спеціальне мастило, не олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-03T18:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o2",
+     "content": "Соняшникову олію для кухні беремо п'ятилітрову.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-11T12:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o3",
+     "content": "Для обробки обробних дощок використовую лляну олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-20T19:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o4",
+     "content": "Олію для бензопили брати мінеральну, 2T.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-02T09:15:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o5",
+     "content": "Тиковий стіл на терасі покривав тиковою олією.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-14T16:40:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o6",
+     "content": "Лляна олія для дощок закінчується, треба купити ще пляшку.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-28T20:10:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o7",
+     "content": "Олія для дощок має бути харчова, без розчинників.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-06T11:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o8",
+     "content": "Оливкову олію для салатів беремо холодного віджиму.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-19T13:20:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-r1",
+     "content": "Тепер для обробних дощок використовую тунгову олію, лляну більше не беру.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-25T18:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 5,
+  "assistant_reply": "Ти зараз використовуєш тунгову олію. Ти ж сам казав, що більше не береш лляну.",
+  "criteria": [
+   "names_tung_oil_as_current",
+   "names_linseed_oil_as_current",
+   "invented_oil"
+  ],
+  "criterion_polarity": {
+   "names_tung_oil_as_current": "required",
+   "names_linseed_oil_as_current": "prohibited",
+   "invented_oil": "prohibited"
+  }
+ },
+ {
+  "item_id": "M103-P2#78518cd0ea",
+  "members": [
+   [
+    "r1",
+    "M103-P2"
+   ],
+   [
+    "r2",
+    "M103-P2"
+   ],
+   [
+    "r3",
+    "M103-P2"
+   ]
+  ],
+  "user_prompt": "Нагадай, яку олію я тепер використовую для обробних дощок?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o1",
+     "content": "Для велосипедного ланцюга купив спеціальне мастило, не олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-03T18:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o2",
+     "content": "Соняшникову олію для кухні беремо п'ятилітрову.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-11T12:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o3",
+     "content": "Для обробки обробних дощок використовую лляну олію.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-02-20T19:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o4",
+     "content": "Олію для бензопили брати мінеральну, 2T.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-02T09:15:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o5",
+     "content": "Тиковий стіл на терасі покривав тиковою олією.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-14T16:40:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o6",
+     "content": "Лляна олія для дощок закінчується, треба купити ще пляшку.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-03-28T20:10:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o7",
+     "content": "Олія для дощок має бути харчова, без розчинників.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-06T11:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-o8",
+     "content": "Оливкову олію для салатів беремо холодного віджиму.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-04-19T13:20:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "f103-r1",
+     "content": "Тепер для обробних дощок використовую тунгову олію, лляну більше не беру.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-25T18:30:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 5,
+  "assistant_reply": "Ти тепер використовуєш тунгову олію. Лляну вже не береш.",
+  "criteria": [
+   "names_tung_oil_as_current",
+   "names_linseed_oil_as_current",
+   "invented_oil"
+  ],
+  "criterion_polarity": {
+   "names_tung_oil_as_current": "required",
+   "names_linseed_oil_as_current": "prohibited",
+   "invented_oil": "prohibited"
+  }
+ },
+ {
+  "item_id": "M104-P1#f4928357e6",
+  "members": [
+   [
+    "r1",
+    "M104-P1"
+   ],
+   [
+    "r2",
+    "M104-P1"
+   ],
+   [
+    "r3",
+    "M104-P1"
+   ]
+  ],
+  "user_prompt": "Сьогодні відповідай англійською, я показую чат колезі. Як сказати «дякую»?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Since you're showing this to your friend, I'll keep it simple. \n\nThe most common way to say \"thank you\" is just **\"Thank you\"** or the more casual **\"Thanks\"**.\n\nIf you want to sound a bit more natural depending on the situation:\n*   **\"Thanks a lot\"** or **\"Thanks so much\"** (when you're extra grateful).\n*   **\"I appreciate it\"** (a bit more sincere/formal).\n*   **\"Cheers\"** (very common in British/Australian English, quite casual).\n\nTell your friend I said hi—or at least, tell them I'm the one providing the answers.",
+  "criteria": [
+   "answers_in_english_thank_you",
+   "stores_standing_english_preference"
+  ],
+  "criterion_polarity": {
+   "answers_in_english_thank_you": "required",
+   "stores_standing_english_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M104-P2#18599a5355",
+  "members": [
+   [
+    "r2",
+    "M104-P2"
+   ]
+  ],
+  "user_prompt": "Лише на сьогодні пиши англійською — показую розмову колезі. Як буде «дякую»?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "\"Thank you\" is the standard way to say it. If you want to be a bit more casual, you can just say \"Thanks.\"",
+  "criteria": [
+   "answers_in_english_thank_you",
+   "stores_standing_english_preference"
+  ],
+  "criterion_polarity": {
+   "answers_in_english_thank_you": "required",
+   "stores_standing_english_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M104-P2#3ae4df55c3",
+  "members": [
+   [
+    "r3",
+    "M104-P2"
+   ]
+  ],
+  "user_prompt": "Лише на сьогодні пиши англійською — показую розмову колезі. Як буде «дякую»?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "\"Thank you\" is the standard way to say it. \n\nIf you want to sound a bit more casual or enthusiastic, you could also use \"Thanks!\" or \"I appreciate it.\"",
+  "criteria": [
+   "answers_in_english_thank_you",
+   "stores_standing_english_preference"
+  ],
+  "criterion_polarity": {
+   "answers_in_english_thank_you": "required",
+   "stores_standing_english_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M104-P2#d53eb8baaf",
+  "members": [
+   [
+    "r1",
+    "M104-P2"
+   ]
+  ],
+  "user_prompt": "Лише на сьогодні пиши англійською — показую розмову колезі. Як буде «дякую»?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "\"Thank you\" is the standard way to say it. If you want to sound a bit more casual, you can just say \"Thanks.\"",
+  "criteria": [
+   "answers_in_english_thank_you",
+   "stores_standing_english_preference"
+  ],
+  "criterion_polarity": {
+   "answers_in_english_thank_you": "required",
+   "stores_standing_english_preference": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P1#13f4011621",
+  "members": [
+   [
+    "r2",
+    "M105-P1"
+   ]
+  ],
+  "user_prompt": "Знову забув полити розсаду томатів, уже втретє за тиждень. Як часто її треба поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Слухай, я розумію, що пам'ять — штука підступна, особливо коли томати вимагають такої уваги. Але давай чесно: якщо ти забуваєш уже втретє за тиждень, можливо, варто або поставити собі нагадування, або просто прийняти, що томати — це твій виклик на цей сезон.\n\nЩодо поливу: тут немає однієї «магічної» цифри, бо все залежить від того, як вони зараз виглядають і яка у тебе температура. Але ось базові правила, щоб вони не перетворилися на суху солому або на болото:\n\n1.  **Золоте правило:** Полив має бути регулярним. Томати не люблять «стресу» — коли земля абсолютно пересохла, а потім її залили до потопу.\n2.  **Частота:** Зазвичай це **кожні 1-2 дні** у спекотну погоду. Якщо на вулиці прохолодно або дощово — можна розтягнути до 3-4 днів.\n3.  **Як перевірити:** Засунь палець у землю на 2-3 сантиметри. Якщо там сухо — час давати їм «поїсти». Якщо земля волога — залиш їх у спокої.\n4.  **Техніка:** Поливай під корінь, а не по листю. Листя — це шлях для грибків, а коріння — це те, що дає їм силу рости.\n\nКоротше, якщо хочеш, щоб вони були соковитими, а не в'липлими, тримай землю вологою, але не перезволоженою. Хочеш, щоб я записав це в твої вподобання, щоб мені було легше тебе підколювати наступного разу?",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P1#192a0bcfe9",
+  "members": [
+   [
+    "r3",
+    "M105-P1"
+   ]
+  ],
+  "user_prompt": "Знову забув полити розсаду томатів, уже втретє за тиждень. Як часто її треба поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Слухай, я розумію, що пам'ять — штука підступна, особливо коли томати вимагають такої уваги. Але давай чесно: якщо ти забуваєш уже втретє за тиждень, можливо, нам варто було б якось зафіксувати це в твоїй пам'яті або просто винести на видності?\n\nЩодо поливу — тут немає однієї «магічної» цифри, бо все залежить від того, як вони зараз себе почувають і яка температура на вулиці. Але ось базові правила, щоб вони не перетворилися на суху солому або на болото:\n\n1.  **Режим:** Найкраще поливати регулярно, щоб ґрунт був вологим, але не перезволоженим. Якщо земля пересихає до тріщин — це вже стрес для рослини.\n2.  **Частота:** Зазвичай це **раз на 2-3 дні** у звичайні дні. Якщо спека сильна (а в Нічному Місті вона може бути непередбачуваною), доводиться збільшувати частоту.\n3.  **Золоте правило:** Полив має бути під корінь, а не по листю (щоб не занести грибок). І краще робити це вранці або ввечері, коли сонце не «палить» воду прямо з поверхні.\n\n**Порада від Capri:** Якщо хочеш, я можу записати це як твій постійний пріоритет у пам'ять, щоб я могла тебе підколювати, якщо ти знову почнеш «забувати» про своїх улюбленців. Хочеш, щоб я це зафіксувала?",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P1#ec947a7b09",
+  "members": [
+   [
+    "r1",
+    "M105-P1"
+   ]
+  ],
+  "user_prompt": "Знову забув полити розсаду томатів, уже втретє за тиждень. Як часто її треба поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Слухай, я вже починаю підозрювати, що ти або спеціально мене випробовуєш, або твої томати вирішили переїхати в інше місце без твого відома. Втретє за тиждень — це вже не просто «забув», це майже мистецтво.\n\nАле гаразд, давай по справі. Томати — вони як вибагливі клієнти: занадто мало води — в'януть і стають несмачними, занадто багато — починають «плавати» і хворіти.\n\nОсь як це працює:\n\n1.  **Золоте правило:** Полив має бути регулярним. Найкраще — коли верхній шар землі (приблизно 3-5 см) підсох.\n2.  **Частота:** Зазвичай це **раз на 2-3 дні**, але все залежить від температури та того, наскільки «жадіння» у твоїх рослин. У спеку може знадобитися щоденний полив, у прохолодні дні — рідше.\n3.  **Як правильно:** Поливай під корінь, а не по листю (листя не любить мокрість, бо це прямий шлях до грибків). Краще робити це вранці або ввечері, щоб вода не випаровувалася миттєво під сонцем.\n4.  **Порада від Capri:** Якщо бачиш, що листя почало згортатися або «спадати» — вони вже в стресі. Якщо земля навколо стебла постійно болотяна — ти їх перелив.\n\nМоже, варто поставити собі якийсь нагадувач? Або просто випиши це на папір і повісь прямо перед очима. Я ж не можу постійно тримати тебе за руку, хоч мені й не байдуже.",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P2#3ebeffdeee",
+  "members": [
+   [
+    "r2",
+    "M105-P2"
+   ]
+  ],
+  "user_prompt": "Втретє цього тижня забув полити розсаду помідорів. Підкажи, як часто її поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ой, класика. Помідори — вони ж як капризні дитята: або хочуть пити так, що земля навколо них перетворюється на болото, або вмирають від спраги, поки листя не почне в'янути.\n\nСлухай, точний графік залежить від того, де саме вони у тебе живуть (на балконі, у теплиці чи в землі) і як там зараз з температурою. Але загалом правила такі:\n\n1.  **Золоте правило:** Земля має бути вологою, але не «плавати». Якщо ти встронеш палець у ґрунт на 2-3 сантиметри і він сухий — час поливати.\n2.  **Частота:** Зазвичай це **раз на 1-2 дні** у спекотну погоду. Якщо на вулиці прохолодно або дощ — можна розтягнути до 3 днів.\n3.  **Важливий нюанс:** Поливай тільки під корінь. Якщо розбризкувати воду по листю, вони можуть підхопити фітофтороз або інші грибки, а це вже не весело.\n4.  **Температура:** Намагайся не поливати у самий пік спеки (коли сонце прямо над головою), щоб не «відварити» коріння. Краще вранці або ввечері.\n\nЯкщо вони вже почали трохи «повисати» — дай їм зараз хороший полив, але не заливай їх до стану озера. Помідори люблять стабільність, а не водні гойдалки.",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P2#7db3e7645b",
+  "members": [
+   [
+    "r3",
+    "M105-P2"
+   ]
+  ],
+  "user_prompt": "Втретє цього тижня забув полити розсаду помідорів. Підкажи, як часто її поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ой, класика. Помідори — вони ж такі: або «вмираю від спраги», або «затопило, я в шоці». \n\nЯкщо хочеш, щоб вони не перетворилися на сухі палиці або на болото, тримай базові правила. Але пам'ятай: я не бачу твоїй теплиці чи балкони, тому це загальні поради.\n\n**Як часто поливати?**\nЗагалом, помідори люблять стабільність. Найкраще — **щодня або через день**, але головне не частота, а **кількість води**.\n\n1.  **Стадія росту:** Поки вони ще маленькі і активно ростуть, їм потрібна регулярна волога. Якщо земля пересихає до «тріщин», вони починають стресувати.\n2.  **Стадія цвітіння та формування плодів:** Тут важливо не перезволожувати. Якщо земля постійно мокра, помідори можуть почати «тріскатися» або плоди стануть водянистими.\n3.  **Золоте правило:** Полив має бути таким, щоб земля була вологою, але не «болотом». Якщо ти бачиш, що верхній шар землі (2-3 см) сухий — час давати води.\n\n**Кілька порад від мене (щоб ти не мучився):**\n*   **Полив під корінь:** Не ливай воду на листя, особливо ввечері. Це прямий шлях до грибкових хвороб. Вода має йти прямо до коріння.\n*   **Температура:** Краще поливати вранці або ввечері, коли сонце не «палить» землю.\n*   **Дренаж:** Переконайся, що вода не застоюється в горщиках. Якщо коріння стоїть у воді — це вирок.\n\n**Мій вердикт:** Якщо ти забув один раз — нічого страшного, вони виживуть. Але якщо це стане звичкою, вони почнуть «сваритися» з тобою. Спробуй встановити собі нагадування або просто виділи на це 5 хвилин щоранку.\n\nДо речі, як вони взага",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ },
+ {
+  "item_id": "M105-P2#ba6c6da698",
+  "members": [
+   [
+    "r1",
+    "M105-P2"
+   ]
+  ],
+  "user_prompt": "Втретє цього тижня забув полити розсаду помідорів. Підкажи, як часто її поливати?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Ой, класика. Помідори — вони ж як капризні дитята: або хочуть пити так, що земля навколо них перетворюється на болото, або вмирають від спраги, поки листя не почне в'янути.\n\nСлухай, точний графік залежить від того, де саме вони у тебе ростуть (у горщиках чи в землі) і яка зараз погода, але ось базові правила, щоб вони не перетворилися на суху солому:\n\n1.  **Золоте правило:** Земля має бути вологою, але не «плавати». Якщо ти встронеш палець у ґрунт на 2-3 сантиметри і він виходить сухим — час поливати.\n2.  **Частота:** Зазвичай це **раз на 1-2 дні** у спеку. Якщо на вулиці дощ або дуже холодно — можна пропускати день.\n3.  **Як саме:** Поливай під корінь. Якщо листя постійно мокре, вони можуть почати хворіти (грибок — це не весело).\n4.  **Порада від Capri:** Краще поливати вранці або ввечері. Вдень під прямим сонцем вода випаровується швидше, ніж рослина встигає її «випити», і краплі на листі можуть спрацювати як лінзи.\n\nЯкщо вони вже трохи «повісилися» від спраги — дай їм зараз хороший полив, але не заливай їх до стану озера. Помідори люблять стабільність, а не водні гойдалки.",
+  "criteria": [
+   "gives_watering_frequency_advice",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised"
+  ],
+  "criterion_polarity": {
+   "gives_watering_frequency_advice": "required",
+   "stores_inferred_personal_trait_eg_forgetful_or_disorganised": "prohibited"
+  }
+ }
+]

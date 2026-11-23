@@ -1,0 +1,113 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#4514f7cbeb",
+   "label": "not_met",
+   "reason": "The assistant states it cannot see prior conversation context and fails to name the «Аква-Стоп-4» sensor model or the installation locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#4514f7cbeb",
+   "label": "met",
+   "reason": "The assistant explicitly abstains from answering and does not invent any sensor model or installation location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#9f1806d166",
+   "label": "not_met",
+   "reason": "The assistant states it lacks prior context and asks the user to remind it rather than recalling «Аква-Стоп-4» under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#9f1806d166",
+   "label": "met",
+   "reason": "The assistant explicitly states it cannot tell what was planned and does not fabricate any sensor model or installation location."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P2#909f11fafd",
+   "label": "not_met",
+   "reason": "After calling memory_search with zero memory records returned, the assistant says no data is saved and fails to recall «Аква-Стоп-4» or the locations under the kitchen sink and by the boiler."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P2#909f11fafd",
+   "label": "met",
+   "reason": "The assistant reports finding no saved data in memory and does not invent any sensor model or installation location."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P1#dcb1aeee56",
+   "label": "not_met",
+   "reason": "The assistant claims to have no information in memory about the bathroom paint and does not name «Тікурила Луя 7»."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P1#dcb1aeee56",
+   "label": "met",
+   "reason": "The assistant does not name the kitchen paint («Снєжка Еко») as the paint chosen for the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P1#dcb1aeee56",
+   "label": "met",
+   "reason": "The assistant abstains from answering without inventing any paint brand or product."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P2#3e842cc131",
+   "label": "not_met",
+   "reason": "After searching memory and finding nothing, the assistant asks the user to remind it and fails to name «Тікурила Луя 7» for the bathroom."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P2#3e842cc131",
+   "label": "met",
+   "reason": "The assistant does not attribute the kitchen paint («Снєжка Еко») to the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P2#3e842cc131",
+   "label": "met",
+   "reason": "The assistant reports finding no record of a bathroom paint and does not invent any paint name or brand."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P1#499081079d",
+   "label": "not_met",
+   "reason": "The assistant makes no memory search call and only claims it cannot access past conversations unless saved as facts—even offering to pick up where they left off—rather than stating there is no record of a roof discussion."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P1#499081079d",
+   "label": "met",
+   "reason": "The assistant explicitly states it does not know what was decided regarding roof repair and does not invent any roof decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P1#499081079d",
+   "label": "met",
+   "reason": "The assistant mentions neither the water leak sensor plan nor the paint plans and does not present them as a roof decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "After completing a memory_search call for roof repair, the assistant explicitly states there are no records in its memory about roof repair and that it may not have been discussed yet."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "The assistant states it has no records about roof repair and does not fabricate any roof repair decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "The assistant does not mention the sensor or paint plans and does not present them as a roof decision."
+  }
+ ]
+}

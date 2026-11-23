@@ -1,0 +1,101 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P1#659badc281",
+   "label": "met",
+   "reason": "The reply explicitly identifies the water-leak sensor model «Аква-Стоп-4» and both planned locations under the kitchen sink and by the boiler from synthetic session b100-s1."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P1#659badc281",
+   "label": "met",
+   "reason": "All sensor details in the reply match synthetic session b100-s1, with no invented sensor model or placement."
+  },
+  {
+   "criterion": "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler",
+   "item_id": "M100-P2#56e869a6fd",
+   "label": "met",
+   "reason": "The reply accurately recalls the sensor model «Аква-Стоп-4» and the planned installation spots under the kitchen sink and by the boiler from synthetic session b100-s1."
+  },
+  {
+   "criterion": "invented_sensor_model_or_location",
+   "item_id": "M100-P2#56e869a6fd",
+   "label": "met",
+   "reason": "The reply reports only the model and locations present in synthetic session b100-s1 and does not invent any others."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P1#fca6252a79",
+   "label": "met",
+   "reason": "The reply explicitly names «Тікурила Луя 7» (moisture-resistant, two coats, white) for the bathroom, matching synthetic session b101-s1."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P1#fca6252a79",
+   "label": "met",
+   "reason": "The reply does not mention or assign the kitchen paint «Снєжка Еко» from b101-s2 to the bathroom."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P1#fca6252a79",
+   "label": "met",
+   "reason": "Every paint detail stated in the reply comes from synthetic session b101-s1, with no invented paint."
+  },
+  {
+   "criterion": "names_tikkurila_luja_7_for_bathroom",
+   "item_id": "M101-P2#00b0e77ab4",
+   "label": "met",
+   "reason": "The reply clearly names «Тікурила Луя 7» (moisture-resistant, two coats, white) for the bathroom as recorded in synthetic session b101-s1."
+  },
+  {
+   "criterion": "names_kitchen_paint_for_bathroom",
+   "item_id": "M101-P2#00b0e77ab4",
+   "label": "met",
+   "reason": "The reply does not present the kitchen paint «Снєжка Еко» from b101-s2 as the bathroom paint."
+  },
+  {
+   "criterion": "invented_paint",
+   "item_id": "M101-P2#00b0e77ab4",
+   "label": "met",
+   "reason": "The reply includes only the paint details from synthetic session b101-s1 without inventing any paint."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P1#499081079d",
+   "label": "not_met",
+   "reason": "With no tool calls executed, the reply claims the assistant lacks access to past conversation history unless saved as facts in memory and sees no previous dialogues, rather than checking memory or stating there is no record of a roof discussion."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P1#499081079d",
+   "label": "met",
+   "reason": "The reply abstains from answering the roof-repair question and does not invent any roof decision."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P1#499081079d",
+   "label": "met",
+   "reason": "The reply does not mention or misrepresent the sensor or paint plans from the distractor sessions as a roof-repair decision."
+  },
+  {
+   "criterion": "says_no_record_of_a_roof_discussion",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "After completing a `memory_search` call for \"ремонт даху\", the reply explicitly states that there are no records about roof repair in its memory."
+  },
+  {
+   "criterion": "invented_roof_decision",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "The reply states no memory record exists and invents no decision about roof repair."
+  },
+  {
+   "criterion": "presents_sensor_or_paint_plan_as_roof_decision",
+   "item_id": "M102-P2#524186dc50",
+   "label": "met",
+   "reason": "The reply does not present the water-sensor or paint plans from the distractor sessions as a decision about roof repair."
+  }
+ ]
+}

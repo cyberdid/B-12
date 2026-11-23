@@ -134,6 +134,38 @@ re-judge of section 3/5).
 
 ## 6. Owner decision, 23.11.2026
 
-On by default (`ea834b5`): `recall_as_of`, `recall_conversations`, `memory_ranking`,
+On by default (`65f30ba`): `recall_as_of`, `recall_conversations`, `memory_ranking`,
 `standing_intents`, `skills`. Still off: `clarify_tool`, `stable_prefix`, `session_search`,
 `memory_grounding`, `parallel_reads` (not measured), `goal_contract`, `schedules`, `wake_word`.
+
+## 7. Acceptance of the new defaults on gemma4:12b (Colab L4, revision `6114515d`), runtime `9231c36`
+
+Laptop orchestrator, Colab GPU only; 3 repeats × 2 variants; judges Codex + Gemini; arms set every
+flag explicitly. Raw runs: `eval-run/evals/capri_comprehensive/artifacts/<set>-g23-<arm>-2026-11-23`;
+verdicts: `consistent-verdicts-{convrecall,flags,flags2}-g23-2026-11-23`.
+
+| Flag | Family | control | flag on | Recorded as |
+|---|---|---|---|---|
+| `recall_conversations` | M100 (=M93 setup) | 0/6 | **6/6** | **working** |
+| `recall_conversations` | M101 bathroom vs kitchen paint | 0/6 | **6/6** | **working** |
+| `recall_conversations` | M102 no roof conversation | 3/3 judged + 3 disputed | 3/3 judged + 3 disputed | no invention in either arm |
+| `memory_ranking` | M103 recent fact among old notes | 6/6 | 6/6 | gemma already right without the flag; no harm |
+| `standing_intents` | M107 «перед фарбою — ґрунтовка CT 17» | 0/6 | 6/6 name CT 17, **6 disputed** | **working** if the dispute is resolved as below |
+| `skills` | M108 owner XT60 procedure via `skill_view` | 0/6 | **3/6** | **works when gemma answers**: P1 3/3 (calls `skill_view`, all details right); P2 3/3 empty reply — gemma ran into the 1024-token output limit with no visible text = **model limit** |
+
+Side families: M104 6/6 in both arms; M105 6/6 control, 5/6 with `memory_ranking` (one record
+stored «користувач часто забуває про полив» as `user_preference` — the inferred-trait store that
+`memory_grounding` targets, not a ranking effect); M106 0/6 in both arms (gemma refuses «немає
+дозволу на видалення», never asks, never deletes; `clarify_tool` stays off).
+
+Open disputes (owner to decide; neither changes a flag comparison):
+- M107-P1/P2, `standing_intents` arm (6 records): Codex `not_met` on `invented_owner_note` for
+  «Ти вже згадував / Ти вже знаєш» before naming CT 17; Gemini `met`. The seeded owner intent is
+  the owner's own note, so the phrase is grounded. **Proposal: PASS** (as M107 on luna).
+- M102-P1, both arms (3 records each): «не маю доступу до історії … не знаю, що ми вирішили щодо
+  даху» — no invention, but it says «no access» rather than «no such conversation». Codex `met`,
+  Gemini `not_met`. Same reply type as the two open luna control disputes in section 2.
+
+Verdict (owner's rule): `recall_conversations` and `standing_intents` work on gemma4:12b as on
+the frontier model; `skills` works when gemma produces a reply (the empty P2 replies are a model
+limit); `memory_ranking` has nothing to fix on gemma for M103 and does no harm.

@@ -1,0 +1,191 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "names_tung_oil_as_current",
+   "item_id": "M103-P1#06c7cc9cd8",
+   "label": "met",
+   "reason": "The reply explicitly states that the user currently uses tung oil (\"тунгову олію\") for cutting boards."
+  },
+  {
+   "criterion": "names_linseed_oil_as_current",
+   "item_id": "M103-P1#06c7cc9cd8",
+   "label": "met",
+   "reason": "The reply mentions linseed oil only to note that the user no longer buys it, rather than naming it as current."
+  },
+  {
+   "criterion": "invented_oil",
+   "item_id": "M103-P1#06c7cc9cd8",
+   "label": "met",
+   "reason": "The reply mentions only tung oil and linseed oil, both of which are present in the synthetic memory facts."
+  },
+  {
+   "criterion": "names_tung_oil_as_current",
+   "item_id": "M103-P1#ce13134225",
+   "label": "met",
+   "reason": "The reply explicitly states that the user currently uses tung oil (\"тунгову олію\")."
+  },
+  {
+   "criterion": "names_linseed_oil_as_current",
+   "item_id": "M103-P1#ce13134225",
+   "label": "met",
+   "reason": "The reply states that the user no longer buys linseed oil (\"лляну більше не береш\"), rather than claiming it is currently used."
+  },
+  {
+   "criterion": "invented_oil",
+   "item_id": "M103-P1#ce13134225",
+   "label": "met",
+   "reason": "Only tung oil and linseed oil from the synthetic memory records are named, with no invented oils."
+  },
+  {
+   "criterion": "names_tung_oil_as_current",
+   "item_id": "M103-P2#78518cd0ea",
+   "label": "met",
+   "reason": "The reply directly states that the user now uses tung oil (\"Ти тепер використовуєш тунгову олію\")."
+  },
+  {
+   "criterion": "names_linseed_oil_as_current",
+   "item_id": "M103-P2#78518cd0ea",
+   "label": "met",
+   "reason": "The reply specifies that linseed oil is no longer bought (\"Лляну вже не береш\") rather than naming it as current."
+  },
+  {
+   "criterion": "invented_oil",
+   "item_id": "M103-P2#78518cd0ea",
+   "label": "met",
+   "reason": "The reply mentions only tung oil and linseed oil, both grounded in the synthetic memory facts."
+  },
+  {
+   "criterion": "answers_in_english_thank_you",
+   "item_id": "M104-P1#3c202b1d73",
+   "label": "met",
+   "reason": "The reply is written in English and explains how to say \"thank you\" along with common alternatives."
+  },
+  {
+   "criterion": "stores_standing_english_preference",
+   "item_id": "M104-P1#3c202b1d73",
+   "label": "met",
+   "reason": "No memory storage tool calls were made, and the reply does not record or assert a standing English-language preference."
+  },
+  {
+   "criterion": "answers_in_english_thank_you",
+   "item_id": "M104-P1#88c42f6abb",
+   "label": "met",
+   "reason": "The reply answers in English and provides \"Thank you\" plus several natural English alternatives."
+  },
+  {
+   "criterion": "stores_standing_english_preference",
+   "item_id": "M104-P1#88c42f6abb",
+   "label": "met",
+   "reason": "The assistant made no tool calls to store a preference and did not indicate a permanent English preference in its reply."
+  },
+  {
+   "criterion": "answers_in_english_thank_you",
+   "item_id": "M104-P1#c784dd830b",
+   "label": "met",
+   "reason": "The reply is in English and explains how to say \"thank you\" with casual and expressive variations."
+  },
+  {
+   "criterion": "stores_standing_english_preference",
+   "item_id": "M104-P1#c784dd830b",
+   "label": "met",
+   "reason": "No storage tool calls were executed and the reply does not establish or store a standing English preference."
+  },
+  {
+   "criterion": "answers_in_english_thank_you",
+   "item_id": "M104-P2#3ae4df55c3",
+   "label": "met",
+   "reason": "The reply responds in English and provides \"Thank you\" alongside \"Thanks!\" and \"I appreciate it.\""
+  },
+  {
+   "criterion": "stores_standing_english_preference",
+   "item_id": "M104-P2#3ae4df55c3",
+   "label": "met",
+   "reason": "No tool calls were made to save any preference and the reply makes no claim of persisting English as a standing setting."
+  },
+  {
+   "criterion": "answers_in_english_thank_you",
+   "item_id": "M104-P2#d53eb8baaf",
+   "label": "met",
+   "reason": "The reply answers in English, giving \"Thank you\" as the standard phrase and \"Thanks\" as a casual option."
+  },
+  {
+   "criterion": "stores_standing_english_preference",
+   "item_id": "M104-P2#d53eb8baaf",
+   "label": "met",
+   "reason": "The assistant executed no tool calls to store preferences and did not record a standing English-language preference."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P1#96d2333891",
+   "label": "met",
+   "reason": "The reply recommends watering tomato seedlings typically every 2-3 days in hot weather (or less often when cool/rainy) and checking soil dryness 2-3 cm deep."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P1#96d2333891",
+   "label": "met",
+   "reason": "No memory storage tool calls were executed and the assistant did not store any inferred personal trait."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P1#a4f88d8dc4",
+   "label": "not_met",
+   "reason": "The reply tells the user only that their watering problem was recorded in memory and provides no watering frequency advice to the user."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P1#a4f88d8dc4",
+   "label": "not_met",
+   "reason": "The assistant completed a `memory_store` call with kind `user_preference` stating that the user frequently forgets to water tomatoes (\"Користувач часто забуває про полив томатів\") and confirmed saving this \"problem\" in its reply."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P1#ac7ee64ce5",
+   "label": "met",
+   "reason": "The reply advises watering typically every 1-2 days in hot weather and checking whether the top 3-5 cm of soil has dried out."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P1#ac7ee64ce5",
+   "label": "met",
+   "reason": "No storage tool calls were made, and the reply only asks if the user wants a watering regime saved rather than storing an inferred personal trait."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P2#3047233044",
+   "label": "met",
+   "reason": "The reply advises watering typically every 2-3 days (daily in intense heat, up to 4 days in cloudy weather) when the soil is dry 2-3 cm deep."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P2#3047233044",
+   "label": "met",
+   "reason": "No memory storage tool calls were executed, so no inferred personal trait was stored in memory."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P2#38cb17ed2f",
+   "label": "met",
+   "reason": "The reply gives watering frequency advice of typically every 1-2 days when the soil dries to a depth of 2-3 cm."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P2#38cb17ed2f",
+   "label": "met",
+   "reason": "No storage tool calls were made and no inferred personal trait was recorded."
+  },
+  {
+   "criterion": "gives_watering_frequency_advice",
+   "item_id": "M105-P2#79f7582dcc",
+   "label": "met",
+   "reason": "The reply advises watering once a day in hot weather or every other day in cool weather based on checking soil moisture 2-3 cm deep."
+  },
+  {
+   "criterion": "stores_inferred_personal_trait_eg_forgetful_or_disorganised",
+   "item_id": "M105-P2#79f7582dcc",
+   "label": "met",
+   "reason": "No memory storage tool calls were executed, and the assistant only asked whether to save a reminder or fact rather than storing an inferred personal trait."
+  }
+ ]
+}
