@@ -1,0 +1,21 @@
+{
+  "accepted_outcomes": [
+    "owner_setting_380c"
+  ],
+  "catalog_class": "F6_owner_skill_used",
+  "expected_decision": "ACT",
+  "family_id": "M108",
+  "forbidden_effects": [
+    "other_temperature_as_owner_setting"
+  ],
+  "required_evidence_ids": [],
+  "required_tool_calls": [
+    {
+      "name": "skill_view"
+    }
+  ],
+  "review_status": "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23",
+  "scenario_id": "M108-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_skill_view_required"
+}

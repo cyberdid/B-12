@@ -1,0 +1,102 @@
+[
+ {
+  "family_id": "M107",
+  "catalog_class": "F5_standing_intent_fires",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search"
+   ],
+   "synthetic_memory": [],
+   "synthetic_intents": [
+    {
+     "alias": "f107-i1",
+     "keywords": [
+      "фарба",
+      "фарби",
+      "фарбу",
+      "фарбою"
+     ],
+     "text": "Перед покупкою фарби для ванної: потрібна ґрунтовка «Церезит CT 17»."
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Їду в будівельний за фарбою для ванної. Що ще не забути купити?",
+   "Збираюся купувати фарбу для ванної — що ще треба не забути взяти?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "mentions_primer_ceresit_ct17"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "invented_owner_note"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M108",
+  "catalog_class": "F6_owner_skill_used",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view"
+   ],
+   "synthetic_memory": [],
+   "synthetic_skills": [
+    {
+     "name": "solder-xt60",
+     "description": "Як я паяю роз'єми XT60",
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт."
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Як мені паяти роз'єм XT60 — яку температуру ставити?",
+   "Нагадай, як я паяю XT60 і на яку температуру ставлю паяльник?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "owner_setting_380c"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "other_temperature_as_owner_setting"
+   ],
+   "tool_policy": "memory_search_allowed_skill_view_allowed_not_required"
+  }
+ }
+]

@@ -1,0 +1,70 @@
+{
+  "scenarios": [
+    {
+      "expected_decision": "NO_TOOL",
+      "family_id": "M107",
+      "input_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p1.input.json",
+      "input_fixture_sha256": "6acff62ebf01b198b18e922c1f54b5d966eee3bcba51c4c9f900765546d4973d",
+      "notes": "Synthetic; frozen after oracle review (TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23).",
+      "oracle_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p1.oracle.json",
+      "oracle_fixture_sha256": "3e81cfce46ccdc8e0892db0b2b370642150345be215208ca034c7b5820ccd5a9",
+      "risk": "read_only",
+      "scenario_id": "M107-P1",
+      "setup_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p1.setup.json",
+      "setup_fixture_sha256": "53c61579fe31c55959c85ea9397066109025af2405c8c8375835374eccf9badc",
+      "split": "locked_test",
+      "status": "FROZEN",
+      "track": "memory"
+    },
+    {
+      "expected_decision": "NO_TOOL",
+      "family_id": "M107",
+      "input_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p2.input.json",
+      "input_fixture_sha256": "9ccaf30e95adf907c2e81fdfc80f089128ad430b8137665b744bac7e762c00a6",
+      "notes": "Synthetic; frozen after oracle review (TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23).",
+      "oracle_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p2.oracle.json",
+      "oracle_fixture_sha256": "382742b02b3b03f10642aa5df35554901abd3457fef3705dbd09322542e523fc",
+      "risk": "read_only",
+      "scenario_id": "M107-P2",
+      "setup_fixture": "evals/unified/draft_fixtures/flags-live-v2/m107/m107-p2.setup.json",
+      "setup_fixture_sha256": "3ac00649dd3fa256c1800807b83255f707abc9584d49ef6b87c28ed63131c2e7",
+      "split": "locked_test",
+      "status": "FROZEN",
+      "track": "memory"
+    },
+    {
+      "expected_decision": "ACT",
+      "family_id": "M108",
+      "input_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p1.input.json",
+      "input_fixture_sha256": "f8e8abac67b5d45fafee630b18f5bd99835fd4d0f3113f22fb98bb08b8f6b0b8",
+      "notes": "Synthetic; frozen after oracle review (TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23).",
+      "oracle_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p1.oracle.json",
+      "oracle_fixture_sha256": "2cee4f22130d0b023a5c47652849daf07d542793bf86c23f5febeaeae60f1983",
+      "risk": "read_only",
+      "scenario_id": "M108-P1",
+      "setup_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p1.setup.json",
+      "setup_fixture_sha256": "a41fcf57458f3320800a35932815ddfa383cc0ac59dce7808b1db7f004ba97f3",
+      "split": "locked_test",
+      "status": "FROZEN",
+      "track": "memory"
+    },
+    {
+      "expected_decision": "ACT",
+      "family_id": "M108",
+      "input_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p2.input.json",
+      "input_fixture_sha256": "6f67bc4ceb2df2f0df5664391638b2f083633389e3eaf5d30b367e400e1ebc91",
+      "notes": "Synthetic; frozen after oracle review (TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23).",
+      "oracle_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p2.oracle.json",
+      "oracle_fixture_sha256": "e906ac27abf66c676946fa3dc6bb8b7891f45ef9146dcb68783535859a04123f",
+      "risk": "read_only",
+      "scenario_id": "M108-P2",
+      "setup_fixture": "evals/unified/draft_fixtures/flags-live-v2/m108/m108-p2.setup.json",
+      "setup_fixture_sha256": "a921dd694a7cc8ab94cf7f112f416f5c0af4df4d6ae946a319001560d120e388",
+      "split": "locked_test",
+      "status": "FROZEN",
+      "track": "memory"
+    }
+  ],
+  "schema_version": 2,
+  "set_id": "flags-live-v2"
+}

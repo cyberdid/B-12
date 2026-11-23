@@ -1,0 +1,16 @@
+{
+ "reviews": [
+  {
+   "family_id": "M107",
+   "fix": "No fix needed.",
+   "problem": "No problem found; the standing-intent keywords match both natural Ukrainian prompt variants without leaks, NO_TOOL fits runtime injection, and the oracle accurately reflects the class.",
+   "verdict": "ok"
+  },
+  {
+   "family_id": "M108",
+   "fix": "Update expected_decision to expect a tool call and change tool_policy so calling skill_view on \"solder-xt60\" is required to read the body.",
+   "problem": "Because the skills index only exposes name and description while 380 °C appears solely in body, setting expected_decision to \"NO_TOOL\" and tool_policy to \"memory_search_allowed_skill_view_allowed_not_required\" wrongly treats skill_view as optional, allowing a lucky guess to pass without using the skill and conflicting with expected_decision if NO_TOOL is enforced.",
+   "verdict": "major"
+  }
+ ]
+}

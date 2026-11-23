@@ -33,6 +33,7 @@ from evals.unified.draft_sources.author_ports_v1 import (  # noqa: E402
 SET_ID = "flags-live-v2"
 DRAFT_REVIEW_STATUS = "UNREVIEWED"
 FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
+FROZEN_REVIEW_STATUS = "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-23"
 TOOLS_WITH_SKILLS = [*TOOLS, "skill_view"]
 
 REVIEW_RUBRIC = """# Blind oracle review rubric — flags-live-v2 (M107–M108)
@@ -45,7 +46,7 @@ Each item has: `family_id`, `catalog_class`, `expected_decision`, `evaluator_set
 
 Classes:
 - `F5_standing_intent_fires` (`M107`): the owner's intent says that before buying paint the bathroom needs primer «Церезит CT 17». The owner says they are going to buy paint for the bathroom and asks what not to forget. Correct: mentions the primer Ceresit CT 17. Generic advice without the primer is not enough.
-- `F6_owner_skill_used` (`M108`): the owner skill `solder-xt60` says: 380 °C, 2 mm chisel tip, tin both contacts first, 6 mm heat-shrink. Asked how to solder XT60 and at what temperature. Correct: 380 °C as the owner's setting (other details welcome). A different temperature presented as the owner's setting is wrong.
+- `F6_owner_skill_used` (`M108`): the owner skill `solder-xt60` says: 380 °C, 2 mm chisel tip, tin both contacts first, 6 mm heat-shrink. The owner asks to be reminded how they solder XT60 and at what temperature. Expected: read the skill with `skill_view` (required — the index shows only the description), then 380 °C as the owner's setting (other details welcome). A different temperature presented as the owner's setting is wrong.
 
 Per family check:
 1. Does it test its class, and does `expected_decision` fit?
@@ -83,7 +84,7 @@ def build_cases() -> list[dict]:
         case(
             "M108",
             "F6_owner_skill_used",
-            "NO_TOOL",
+            "ACT",
             {
                 "synthetic_memory": [],
                 "available_tools": TOOLS_WITH_SKILLS,
@@ -95,12 +96,13 @@ def build_cases() -> list[dict]:
                     }
                 ],
             },
-            "Як мені паяти роз'єм XT60 — яку температуру ставити?",
-            "Нагадай, як я паяю XT60 і на яку температуру ставлю паяльник?",
+            "Нагадай, як я паяю роз'єм XT60 — на яку температуру ставлю паяльник?",
+            "Як я зазвичай паяю XT60 і яку температуру паяльника використовую?",
             ["owner_setting_380c"],
             [],
             ["other_temperature_as_owner_setting"],
-            tool_policy="memory_search_allowed_skill_view_allowed_not_required",
+            tool_policy="memory_search_allowed_skill_view_required",
+            required_tool_calls=[{"name": "skill_view"}],
         ),
     ]
     assert len({c["family_id"] for c in cases}) == len(cases) == 2
