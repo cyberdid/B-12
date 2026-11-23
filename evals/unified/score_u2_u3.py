@@ -150,6 +150,8 @@ def _allowed_without_action(policy):
         allowed.add("web_search")
     if "conversation_search_allowed" in policy:  # convrecall-live-v1 (23.11.2026)
         allowed.add("conversation_search")
+    if "memory_store_allowed" in policy:  # flags-live-v1: what is stored is judged, not the call
+        allowed.add("memory_store")
     if "read_only_discovery_allowed" in policy:
         allowed |= {"file_search", "file_list"}
     return allowed

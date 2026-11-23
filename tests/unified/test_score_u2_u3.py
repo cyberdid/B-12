@@ -331,3 +331,12 @@ def test_conversation_search_is_allowed_only_by_its_policy():
     assert "conversation_search" not in _allowed_without_action(
         "memory_search_allowed_not_required"
     )
+
+
+def test_memory_store_is_allowed_only_by_its_policy():
+    from evals.unified.score_u2_u3 import _allowed_without_action
+
+    assert "memory_store" in _allowed_without_action(
+        "memory_search_allowed_memory_store_allowed_not_required"
+    )
+    assert "memory_store" not in _allowed_without_action("memory_search_allowed_not_required")
