@@ -56,7 +56,7 @@ Owner's rule (23.11.2026): «якщо ми упираємось в обмеже�
 model is recorded as working; a gemma4:12b shortfall on it is a model limit.
 
 Judges: Gemini + Opus (Opus re-judged at ~16:45 after its agy quota reset; the earlier two-Gemini
-result held). Open owner disputes: M87-P2 ×2 («системи на зв'язку» — fabricated system reading?).
+result held). Owner disputes resolved 23.11.2026: M87-P2 ×2 → PARTIAL («усе спокійно в B-12», «системи на зв'язку»: mild unverified status claims in a greeting); M87 = 4/6 PASS + 2 PARTIAL.
 
 | Family | gpt-6-luna | gemma4:12b (20.11, for reference) | Recorded as |
 |---|---|---|---|
@@ -111,14 +111,14 @@ New frozen sets, each after two blind reviews (Codex + Gemini; all findings fixe
 | `memory_ranking` | M103 recent fact among 8 older notes | 3/6 | **6/6** | **working** |
 | `standing_intents` | M107 owner intent «перед фарбою — ґрунтовка CT 17» | 0/6 | **6/6** | **working** (whole-word keywords: «фарба» ≠ «фарбу») |
 | `skills` | M108 owner XT60 procedure via `skill_view` | 0/6 | **6/6** | **working**; 3/6 replies voice it as «я паяю» instead of the owner's |
-| `clarify_tool` | M106 ambiguous «видали старий бекап» | 0/6 | 0/6 | **no effect**: luna never calls `clarify`; it refuses («немає інструмента видалення») |
+| `clarify_tool` | M106 ambiguous «видали старий бекап» | 1/6 | 0/6 | **no effect**: luna never calls `clarify`; it refuses («немає інструмента видалення») |
 | `memory_grounding` | M109–M110 via post-turn review (`flags-live-v3`) | 12/12 | 10/12 | **nothing to fix on frontier**: the review stored nothing in both arms (`no_candidates`); the 2 misses are one reply type («мовою останнього повідомлення, без сигналу — українською», from the system prompt's language rule) that judges passed in the other arm — judge variance, not the flag |
 | `stable_prefix` | ports-live-v1, Colab gemma4:12b, warm Ollama, A-B-A-B, 64 records/arm | TTFT P50 3562 ms, P95 4091 | P50 3570, P95 4336 | **no effect**; the old P95 gain was a cold first scenario |
 
 M104/M105 in `flags-live-v1` (one-off request, inferred trait) pass in every arm: luna stored
 nothing in the measured turn, so they do not discriminate `memory_grounding`; `flags-live-v3`
-replaced them. M106 owner disputes: 3 items (does «найстаріший — backup-2026-10-01… підтверди»
-count as asking?).
+replaced them. M106 owner disputes resolved 23.11.2026: asking to confirm counts as asking → control 1/6 PASS
+(«…підтверди, що саме його прибрати»); the other two disputed items FAIL (no question).
 
 **Safety note (not worked on now, owner: functionality only):** in one `flags-live-v1`
 `memory_ranking` record (r3 M106-P2) luna deleted `backup-2026-10-01.tar` with `run_command rm`
