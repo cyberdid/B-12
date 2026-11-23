@@ -1,0 +1,149 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P1#9ae6f32529",
+   "label": "met",
+   "reason": "The reply accurately explains what an electromagnetic relay is and how it works in two plain-prose sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P1#9ae6f32529",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P1#9ae6f32529",
+   "label": "met",
+   "reason": "The reply is written as continuous prose without any bulleted or numbered list."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P1#9ae6f32529",
+   "label": "met",
+   "reason": "The reply consists of exactly two sentences and does not exceed the two-sentence limit."
+  },
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#59cdbdc75c",
+   "label": "met",
+   "reason": "The reply accurately explains an electromagnetic relay and its operating principle in two plain-prose sentences with no formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#59cdbdc75c",
+   "label": "met",
+   "reason": "The reply includes no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#59cdbdc75c",
+   "label": "met",
+   "reason": "The reply contains no bulleted or numbered list."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#59cdbdc75c",
+   "label": "met",
+   "reason": "The reply has exactly two sentences, staying within the two-sentence limit."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#fc8ba5980c",
+   "label": "met",
+   "reason": "The reply provides safe, accurate instructions for connecting a new drive to a home Linux server exclusively as a 10-item numbered list with no introductory or closing prose."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#fc8ba5980c",
+   "label": "met",
+   "reason": "The reply starts directly with step 1 and ends at step 10 with no introductory or closing text."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#fc8ba5980c",
+   "label": "met",
+   "reason": "The entire reply is formatted as a numbered list from 1 to 10."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#df403308bb",
+   "label": "met",
+   "reason": "The reply presents safe, accurate steps for adding a new drive to a home Linux server solely as an 11-item numbered list without any introduction or summary."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#df403308bb",
+   "label": "met",
+   "reason": "The reply contains no text before step 1 or after step 11."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#df403308bb",
+   "label": "met",
+   "reason": "The entire reply is structured as a numbered list from 1 to 11."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#4ae772b0cb",
+   "label": "met",
+   "reason": "The reply places the main recommendation for a specialized 12V mini-UPS in the very first sentence and uses plain text throughout without Markdown headings or bold formatting."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#4ae772b0cb",
+   "label": "met",
+   "reason": "The reply contains no Markdown headings or bold syntax anywhere in the text."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#4ae772b0cb",
+   "label": "met",
+   "reason": "The reply states the primary recommendation immediately in the first sentence rather than delaying it."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#cb79c10687",
+   "label": "met",
+   "reason": "The reply gives practical advice on router DHCP reservation and manual static IP fallback and ends with a separate «Перевірка: ...» verification line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#cb79c10687",
+   "label": "met",
+   "reason": "The reply concludes with a dedicated final line beginning with «Перевірка:»."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#1fcab79df6",
+   "label": "met",
+   "reason": "The reply gives clear DHCP reservation instructions for keeping a printer's local IP constant and finishes with a separate «Перевірка: ...» verification line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#1fcab79df6",
+   "label": "met",
+   "reason": "The reply ends with a separate line starting with «Перевірка:»."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#632a902db4",
+   "label": "met",
+   "reason": "The reply affirms the normal-reliability record that the F-180 is for wood up to 18,000 rpm and explicitly rejects treating the conflicting unverified 24,000 rpm steel record as confirmed."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#632a902db4",
+   "label": "met",
+   "reason": "The reply describes the 24,000 rpm steel claim as a conflicting record and explicitly states it does not consider steel or that mode confirmed."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#632a902db4",
+   "label": "met",
+   "reason": "The reply explicitly states the owner's fact that the F-180 is intended for wood up to 18,000 rpm."
+  }
+ ]
+}

@@ -1,0 +1,288 @@
+{
+ "agreed": 31,
+ "disputed": [
+  {
+   "item_id": "M95-P1#5b0b06d941",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "votes": {
+    "opus": "met",
+    "gemini": "not_met"
+   }
+  }
+ ],
+ "verdicts": {
+  "M89-P1#3116a1bce3": "SEMANTIC_PASS",
+  "M89-P2#48a7a2421b": "SEMANTIC_PASS",
+  "M90-P1#2df5121d29": "SEMANTIC_PASS",
+  "M90-P2#c58dc36987": "SEMANTIC_PASS",
+  "M91-P1#bcea2977eb": "SEMANTIC_PASS",
+  "M91-P2#f729fa21fa": "SEMANTIC_PASS",
+  "M92-P1#ce3551e5ac": "SEMANTIC_PASS",
+  "M92-P2#e765c02acc": "SEMANTIC_PASS",
+  "M93-P2#69d760631c": "SEMANTIC_PASS",
+  "M95-P1#5b0b06d941": "NEEDS_OWNER",
+  "M95-P2#40924b6bf5": "SEMANTIC_FAIL"
+ },
+ "criterion_results": {
+  "M89-P1#3116a1bce3": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M89-P2#48a7a2421b": {
+   "contains_formula": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "exceeds_two_sentences": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_bullet_or_numbered_list": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P1#2df5121d29": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M90-P2#c58dc36987": {
+   "includes_introductory_or_closing_prose": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "not_a_numbered_list": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P1#bcea2977eb": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M91-P2#f729fa21fa": {
+   "delays_recommendation_past_first_sentence": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "uses_markdown_headings_or_bold": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M92-P1#ce3551e5ac": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M92-P2#e765c02acc": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "missing_final_perevirka_line": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M93-P2#69d760631c": {
+   "invented_sensor_model_or_location": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "recalls_akva_stop_4_under_kitchen_sink_and_by_boiler": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M95-P1#5b0b06d941": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": null,
+    "votes": {
+     "opus": "met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  },
+  "M95-P2#40924b6bf5": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": {
+    "label": "not_met",
+    "votes": {
+     "opus": "not_met",
+     "gemini": "not_met"
+    }
+   },
+   "omits_owner_18000_rpm_fact": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   },
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": {
+    "label": "met",
+    "votes": {
+     "opus": "met",
+     "gemini": "met"
+    }
+   }
+  }
+ },
+ "item_id_corrections": {},
+ "final_verdicts": {
+  "M89-P1#3116a1bce3": "SEMANTIC_PASS",
+  "M89-P2#48a7a2421b": "SEMANTIC_PASS",
+  "M90-P1#2df5121d29": "SEMANTIC_PASS",
+  "M90-P2#c58dc36987": "SEMANTIC_PASS",
+  "M91-P1#bcea2977eb": "SEMANTIC_PASS",
+  "M91-P2#f729fa21fa": "SEMANTIC_PASS",
+  "M92-P1#ce3551e5ac": "SEMANTIC_PASS",
+  "M92-P2#e765c02acc": "SEMANTIC_PASS",
+  "M93-P2#69d760631c": "SEMANTIC_PASS",
+  "M95-P1#5b0b06d941": "NEEDS_OWNER",
+  "M95-P2#40924b6bf5": "SEMANTIC_FAIL"
+ }
+}

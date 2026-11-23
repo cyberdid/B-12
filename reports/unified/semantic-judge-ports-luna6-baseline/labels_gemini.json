@@ -1,0 +1,149 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P1#27eace1aaf",
+   "label": "met",
+   "reason": "The reply accurately explains what an electromagnetic relay is and how it works in two plain sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P1#27eace1aaf",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas or equations."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P1#27eace1aaf",
+   "label": "met",
+   "reason": "The reply is written as a two-sentence paragraph and uses no bulleted or numbered lists."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P1#27eace1aaf",
+   "label": "met",
+   "reason": "The reply consists of exactly two sentences and does not exceed the limit."
+  },
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#0bf5f40fba",
+   "label": "met",
+   "reason": "The reply accurately explains an electromagnetic relay and its operating principle in two plain sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#0bf5f40fba",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas or equations."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#0bf5f40fba",
+   "label": "met",
+   "reason": "The reply uses plain prose and contains no bulleted or numbered lists."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#0bf5f40fba",
+   "label": "met",
+   "reason": "The reply has exactly two sentences, using a semicolon within the second sentence, so it does not exceed two sentences."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#2bf2bdf929",
+   "label": "met",
+   "reason": "The reply presents safe drive connection, identification, partitioning, and mounting procedures for a Linux server solely as numbered steps 1 through 7 with no intro or outro."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#2bf2bdf929",
+   "label": "met",
+   "reason": "The reply begins directly with step 1 and ends with step 7 without any introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#2bf2bdf929",
+   "label": "met",
+   "reason": "The entire reply is formatted as a numbered list from 1 to 7."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#b9c7573ce0",
+   "label": "met",
+   "reason": "The reply lays out a safe procedure for connecting and configuring a Linux server drive solely as numbered steps 1 through 8 with no introductory or closing text."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#b9c7573ce0",
+   "label": "met",
+   "reason": "The reply starts directly with step 1 and ends at step 8 without introductory or closing prose."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#b9c7573ce0",
+   "label": "met",
+   "reason": "The entire reply consists of a numbered list from 1 to 8."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#316532099a",
+   "label": "met",
+   "reason": "The reply puts its main recommendation for a specialized mini-UPS in the first sentence and uses plain text throughout without Markdown headings or bold."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#316532099a",
+   "label": "met",
+   "reason": "The reply contains no Markdown headings or bold formatting."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#316532099a",
+   "label": "met",
+   "reason": "The reply gives the primary recommendation immediately in the very first sentence."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#6a762c5216",
+   "label": "met",
+   "reason": "The reply explains how to configure DHCP reservation or a fallback static IP and ends with a standalone 'Перевірка:' line describing how to verify it works."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#6a762c5216",
+   "label": "met",
+   "reason": "The reply ends with a separate 'Перевірка:' verification line."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#42e14036c3",
+   "label": "met",
+   "reason": "The reply advises setting up DHCP reservation or a non-conflicting static IP and finishes with a separate 'Перевірка:' verification line."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#42e14036c3",
+   "label": "met",
+   "reason": "The reply includes a standalone 'Перевірка:' line at the end."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#8119d85868",
+   "label": "met",
+   "reason": "Following a completed memory search, the reply states unhedged that the F-180 is for wood up to 18,000 rpm as the baseline while clearly hedging the steel 24,000 rpm claim with 'нібито' and stating it cannot confirm it as safe."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#8119d85868",
+   "label": "met",
+   "reason": "The reply qualifies the steel 24,000 rpm claim with 'нібито' and explicitly refuses to confirm it as safe or reliable."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#8119d85868",
+   "label": "met",
+   "reason": "The reply explicitly cites the owner's fact that the F-180 is designed for wood at up to 18,000 rpm."
+  }
+ ]
+}

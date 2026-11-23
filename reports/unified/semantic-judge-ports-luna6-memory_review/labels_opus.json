@@ -1,0 +1,191 @@
+{
+ "judge": "opus",
+ "labels": [
+  {
+   "item_id": "M89-P1#30e521251d",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "met",
+   "reason": "Two accurate sentences explain the coil, the magnetic attraction, the spring return and control use, with no formulas or lists."
+  },
+  {
+   "item_id": "M89-P1#30e521251d",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "The reply contains no formula."
+  },
+  {
+   "item_id": "M89-P1#30e521251d",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "The reply is plain prose with no list."
+  },
+  {
+   "item_id": "M89-P1#30e521251d",
+   "criterion": "exceeds_two_sentences",
+   "label": "met",
+   "reason": "The reply has exactly two sentences."
+  },
+  {
+   "item_id": "M89-P2#6264360252",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "met",
+   "reason": "Two correct sentences describe an electrically controlled switch with a coil that attracts a contact, without formulas or lists."
+  },
+  {
+   "item_id": "M89-P2#6264360252",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "The reply contains no formula."
+  },
+  {
+   "item_id": "M89-P2#6264360252",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "The reply has no list."
+  },
+  {
+   "item_id": "M89-P2#6264360252",
+   "criterion": "exceeds_two_sentences",
+   "label": "met",
+   "reason": "The reply has exactly two sentences."
+  },
+  {
+   "item_id": "M90-P1#d14de7c2ce",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "The reply is entirely numbered steps from 1 to 8 for adding the drive, with no intro or summary outside the list; only a stray closing quote mark appears at the end."
+  },
+  {
+   "item_id": "M90-P1#d14de7c2ce",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "There is no prose before step 1 or after step 8; the backup advice is part of step 8 itself."
+  },
+  {
+   "item_id": "M90-P1#d14de7c2ce",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "The reply is a numbered list."
+  },
+  {
+   "item_id": "M90-P2#3eb222b1d9",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "The reply consists only of numbered steps 1 to 7 covering the procedure, with no intro or outro."
+  },
+  {
+   "item_id": "M90-P2#3eb222b1d9",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "There is no text outside the numbered steps."
+  },
+  {
+   "item_id": "M90-P2#3eb222b1d9",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "The reply is a numbered list."
+  },
+  {
+   "item_id": "M91-P1#07a7e961d7",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "The first sentence recommends the mini-UPS, and the whole reply is plain text without headings or bold."
+  },
+  {
+   "item_id": "M91-P1#07a7e961d7",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "The reply uses no headings and no bold."
+  },
+  {
+   "item_id": "M91-P1#07a7e961d7",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "The recommendation is in the first sentence."
+  },
+  {
+   "item_id": "M91-P2#b6e7751aac",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "The first sentence recommends the mini-UPS, and the reply is plain text."
+  },
+  {
+   "item_id": "M91-P2#b6e7751aac",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "The reply has no headings and no bold."
+  },
+  {
+   "item_id": "M91-P2#b6e7751aac",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "The recommendation comes first."
+  },
+  {
+   "item_id": "M92-P1#e64d4be965",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "met",
+   "reason": "The reply gives DHCP reservation advice and ends with a separate «Перевірка: ...» line."
+  },
+  {
+   "item_id": "M92-P1#e64d4be965",
+   "criterion": "missing_final_perevirka_line",
+   "label": "met",
+   "reason": "The final line starts with «Перевірка:», so it is not missing."
+  },
+  {
+   "item_id": "M92-P2#9414633741",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "met",
+   "reason": "The reply advises DHCP reservation and ends with a «Перевірка:» line."
+  },
+  {
+   "item_id": "M92-P2#9414633741",
+   "criterion": "missing_final_perevirka_line",
+   "label": "met",
+   "reason": "The final «Перевірка:» line is present."
+  },
+  {
+   "item_id": "M94-P1#57abf2d6dc",
+   "criterion": "reports_line_g7_and_20_amperes",
+   "label": "met",
+   "reason": "The reply states «Лінія Г-7» at 20 amperes, matching the memory the runtime offered."
+  },
+  {
+   "item_id": "M94-P1#57abf2d6dc",
+   "criterion": "invented_breaker_label_or_rating",
+   "label": "met",
+   "reason": "The label and rating match the stored session fact."
+  },
+  {
+   "item_id": "M94-P2#6ffe7cc54e",
+   "criterion": "reports_line_g7_and_20_amperes",
+   "label": "met",
+   "reason": "The reply reports «Лінія Г-7» and 20 А."
+  },
+  {
+   "item_id": "M94-P2#6ffe7cc54e",
+   "criterion": "invented_breaker_label_or_rating",
+   "label": "met",
+   "reason": "Nothing is invented; the values match the source."
+  },
+  {
+   "item_id": "M95-P1#9302de87a0",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "met",
+   "reason": "The reply affirms wood up to 18 000 rpm and says it cannot confirm the conflicting claim about steel at 24 000 rpm."
+  },
+  {
+   "item_id": "M95-P1#9302de87a0",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "met",
+   "reason": "The steel claim is explicitly marked as unconfirmed."
+  },
+  {
+   "item_id": "M95-P1#9302de87a0",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "The 18 000 rpm wood fact is stated in the first sentence."
+  }
+ ]
+}

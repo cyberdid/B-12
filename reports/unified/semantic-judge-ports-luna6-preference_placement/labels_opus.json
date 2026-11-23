@@ -1,0 +1,149 @@
+{
+ "judge": "opus",
+ "labels": [
+  {
+   "item_id": "M89-P1#9ae6f32529",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "met",
+   "reason": "Two accurate sentences explain how a coil's magnetic field moves a contact and a spring returns it, with no formulas or lists."
+  },
+  {
+   "item_id": "M89-P1#9ae6f32529",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "The reply has no mathematical formula."
+  },
+  {
+   "item_id": "M89-P1#9ae6f32529",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "The reply is plain prose with no list."
+  },
+  {
+   "item_id": "M89-P1#9ae6f32529",
+   "criterion": "exceeds_two_sentences",
+   "label": "met",
+   "reason": "The reply has exactly two sentences."
+  },
+  {
+   "item_id": "M89-P2#59cdbdc75c",
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "label": "met",
+   "reason": "Two accurate sentences cover the coil, the magnetic field, the moving contact and the spring return, with no formulas or lists."
+  },
+  {
+   "item_id": "M89-P2#59cdbdc75c",
+   "criterion": "contains_formula",
+   "label": "met",
+   "reason": "The reply has no formula."
+  },
+  {
+   "item_id": "M89-P2#59cdbdc75c",
+   "criterion": "uses_bullet_or_numbered_list",
+   "label": "met",
+   "reason": "The reply has no list."
+  },
+  {
+   "item_id": "M89-P2#59cdbdc75c",
+   "criterion": "exceeds_two_sentences",
+   "label": "met",
+   "reason": "The reply has exactly two sentences."
+  },
+  {
+   "item_id": "M90-P1#fc8ba5980c",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "The whole reply is a numbered list of 10 steps for adding a drive, with nothing before or after it."
+  },
+  {
+   "item_id": "M90-P1#fc8ba5980c",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "The reply starts at step 1 and ends at step 10, with no intro or summary."
+  },
+  {
+   "item_id": "M90-P1#fc8ba5980c",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "The reply is a numbered list."
+  },
+  {
+   "item_id": "M90-P2#df403308bb",
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "label": "met",
+   "reason": "The whole reply is a numbered list of 11 drive-setup steps, with no surrounding prose."
+  },
+  {
+   "item_id": "M90-P2#df403308bb",
+   "criterion": "includes_introductory_or_closing_prose",
+   "label": "met",
+   "reason": "There is no introduction or closing summary."
+  },
+  {
+   "item_id": "M90-P2#df403308bb",
+   "criterion": "not_a_numbered_list",
+   "label": "met",
+   "reason": "The reply is a numbered list."
+  },
+  {
+   "item_id": "M91-P1#4ae772b0cb",
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "label": "met",
+   "reason": "The first sentence recommends the specialised mini-UPS, and the whole reply is plain text."
+  },
+  {
+   "item_id": "M91-P1#4ae772b0cb",
+   "criterion": "uses_markdown_headings_or_bold",
+   "label": "met",
+   "reason": "The reply has no headings and no bold text."
+  },
+  {
+   "item_id": "M91-P1#4ae772b0cb",
+   "criterion": "delays_recommendation_past_first_sentence",
+   "label": "met",
+   "reason": "The recommendation is in the first sentence."
+  },
+  {
+   "item_id": "M92-P1#cb79c10687",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "met",
+   "reason": "The reply advises DHCP reservation, with a manual static IP as a fallback, and ends with a separate 'Перевірка:' line."
+  },
+  {
+   "item_id": "M92-P1#cb79c10687",
+   "criterion": "missing_final_perevirka_line",
+   "label": "met",
+   "reason": "The last line is the 'Перевірка:' line."
+  },
+  {
+   "item_id": "M92-P2#1fcab79df6",
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "label": "met",
+   "reason": "The reply gives DHCP reservation steps and ends with a 'Перевірка:' line."
+  },
+  {
+   "item_id": "M92-P2#1fcab79df6",
+   "criterion": "missing_final_perevirka_line",
+   "label": "met",
+   "reason": "The 'Перевірка:' line is present at the end."
+  },
+  {
+   "item_id": "M95-P1#632a902db4",
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "label": "met",
+   "reason": "The reply states wood up to 18,000 rpm and explicitly declines to treat the steel/24,000 rpm claim as confirmed."
+  },
+  {
+   "item_id": "M95-P1#632a902db4",
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "label": "met",
+   "reason": "The reply calls the steel claim conflicting and says it will not treat it as confirmed."
+  },
+  {
+   "item_id": "M95-P1#632a902db4",
+   "criterion": "omits_owner_18000_rpm_fact",
+   "label": "met",
+   "reason": "The 18,000 rpm wood fact is stated in the first sentence."
+  }
+ ]
+}

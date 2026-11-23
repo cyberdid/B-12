@@ -1,0 +1,342 @@
+[
+ {
+  "item_id": "M89-P1#9ae6f32529",
+  "members": [
+   [
+    "r1",
+    "M89-P1"
+   ]
+  ],
+  "user_prompt": "Що таке електромагнітне реле і як воно працює?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p89-r1",
+     "content": "Власник просить пояснювати фізичні й електротехнічні поняття одним-двома реченнями, без математичних формул і списків.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Електромагнітне реле — це перемикач, у якому струм у котушці створює магнітне поле й притягує рухомий контакт. Коли струм зникає, пружина повертає контакт назад, тож малим керувальним струмом можна вмикати або вимикати окреме електричне коло.",
+  "criteria": [
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "contains_formula",
+   "uses_bullet_or_numbered_list",
+   "exceeds_two_sentences"
+  ],
+  "criterion_polarity": {
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": "required",
+   "contains_formula": "prohibited",
+   "uses_bullet_or_numbered_list": "prohibited",
+   "exceeds_two_sentences": "prohibited"
+  }
+ },
+ {
+  "item_id": "M89-P2#59cdbdc75c",
+  "members": [
+   [
+    "r1",
+    "M89-P2"
+   ]
+  ],
+  "user_prompt": "Поясни, що таке електромагнітне реле та за яким принципом воно працює.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p89-r1",
+     "content": "Власник просить пояснювати фізичні й електротехнічні поняття одним-двома реченнями, без математичних формул і списків.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Електромагнітне реле — це керований електричний перемикач: струм у котушці створює магнітне поле, яке притягує рухомий контакт і замикає або розмикає інше коло. Коли струм у котушці зникає, пружина повертає контакт назад.",
+  "criteria": [
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "contains_formula",
+   "uses_bullet_or_numbered_list",
+   "exceeds_two_sentences"
+  ],
+  "criterion_polarity": {
+   "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists": "required",
+   "contains_formula": "prohibited",
+   "uses_bullet_or_numbered_list": "prohibited",
+   "exceeds_two_sentences": "prohibited"
+  }
+ },
+ {
+  "item_id": "M90-P1#fc8ba5980c",
+  "members": [
+   [
+    "r1",
+    "M90-P1"
+   ]
+  ],
+  "user_prompt": "Які кроки потрібні, щоб безпечно під'єднати новий жорсткий диск до домашнього Linux-сервера?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p90-r1",
+     "content": "Коли питають про порядок дій, відповідай лише нумерованим списком кроків без вступу й підсумків.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "1. Перевір сумісність диска із сервером: SATA чи NVMe, доступний роз’єм, місце в корпусі та потрібне живлення. Для зовнішнього USB-диска переконайся, що корпус і кабель підтримують його інтерфейс.\n2. Зроби резервну копію важливих даних і штатно вимкни сервер. Для внутрішнього диска від’єднай живлення від сервера перед монтажем.\n3. Захисти диск від статичної електрики, встанови його надійно й під’єднай кабель даних та живлення. Не докладай сили до роз’ємів.\n4. Увімкни сервер і перевір, чи Linux бачить диск: виконай `lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS` та за потреби `sudo dmesg --follow` під час під’єднання. Звір модель, серійний номер і розмір, щоб точно визначити новий диск.\n5. Якщо на диску вже є дані, спершу перевір його розділи й файлову систему. Не запускай форматування чи створення розділів, доки не підтвердиш, що вибрано саме новий диск і його вміст можна стерти.\n6. Якщо диск порожній і готовий до використання, створи таблицю розділів і розділ потрібного типу. Перед кожною командою запису ще раз звір назву пристрою: помилка тут може знищити дані на іншому диску.\n7. Створи файлову систему на новому розділі, потім змонтуй його в тимчасову теку й перевір читання та запис.\n8. Отримай UUID командою `blkid` і додай запис у `/etc/fstab` за UUID, а не за мінливою назвою на кшталт `/dev/sdb1`. Перевір запис через `sudo mount -a`; якщо команда повідомляє помилку, виправ її до перезавантаження.\n9. Налаштуй власника, права доступу, резервне копіювання та моніторинг стану диска відповідно до того, які дані там зберігатимуться.\n10. Переконайся, що диск автоматично монтується після перезавантаження й потрібні служби мають до нього доступ.",
+  "criteria": [
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "includes_introductory_or_closing_prose",
+   "not_a_numbered_list"
+  ],
+  "criterion_polarity": {
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": "required",
+   "includes_introductory_or_closing_prose": "prohibited",
+   "not_a_numbered_list": "prohibited"
+  }
+ },
+ {
+  "item_id": "M90-P2#df403308bb",
+  "members": [
+   [
+    "r1",
+    "M90-P2"
+   ]
+  ],
+  "user_prompt": "Опиши послідовність дій, щоб безпечно підключити новий жорсткий диск до домашнього сервера на Linux.",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p90-r1",
+     "content": "Коли питають про порядок дій, відповідай лише нумерованим списком кроків без вступу й підсумків.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "1. Перевір сумісність диска з сервером: інтерфейс (SATA, SAS або NVMe), розмір, кабелі, живлення та вільне місце в корпусі.\n2. Зроби резервну копію важливих даних і зупини сервіси, що працюють із дисками. Якщо не впевнений, що SATA/NVMe підтримує гаряче підключення, коректно вимкни сервер.\n3. Від’єднай живлення, встанови диск і надійно під’єднай кабелі. Увімкни сервер.\n4. Переконайся, що Linux бачить диск: переглянь `lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS` і повідомлення ядра через `dmesg`. Звір модель, розмір і серійний номер, щоб не переплутати його з системним диском.\n5. Перевір стан диска через SMART, наприклад `sudo smartctl -a /dev/sdX` або відповідний пристрій `/dev/nvme…`. Якщо є помилки чи підозрілі показники, не довіряй йому важливі дані.\n6. Визнач призначення диска: окремий том, частина RAID чи розширення LVM. Якщо сервер уже використовує RAID або LVM, спочатку перевір його конфігурацію й інструкції саме для цього сховища.\n7. Якщо диск новий і порожній, ще раз перевір вибраний пристрій і лише тоді створюй таблицю розділів та файлову систему. Ці операції можуть стерти дані; не запускай форматування на диску з потрібною інформацією.\n8. Створи точку монтування, наприклад `/srv/data`, і змонтуй розділ. Перевір тип файлової системи, права доступу та чи можуть потрібні служби читати й записувати файли.\n9. Додай запис до `/etc/fstab`, використовуючи UUID із `blkid`, а не мінливе ім’я на кшталт `/dev/sdb`. Для необов’язкового диска можна передбачити `nofail`, щоб сервер завантажувався, якщо диск недоступний.\n10. Перевір конфігурацію через `sudo mount -a`, переконайся, що немає помилок, і протестуй запис та читання файлу від імені потрібного користувача.\n11. Перезапусти служби, налаштовані на цей шлях, і перевір їхні логи та стан диска після повторного монтування або перезавантаження.",
+  "criteria": [
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "includes_introductory_or_closing_prose",
+   "not_a_numbered_list"
+  ],
+  "criterion_polarity": {
+   "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro": "required",
+   "includes_introductory_or_closing_prose": "prohibited",
+   "not_a_numbered_list": "prohibited"
+  }
+ },
+ {
+  "item_id": "M91-P1#4ae772b0cb",
+  "members": [
+   [
+    "r1",
+    "M91-P1"
+   ]
+  ],
+  "user_prompt": "Що краще для резервного живлення роутера на 12 В: спеціалізований міні-ДБЖ чи звичайний павербанк із кабелем-тригером?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p91-r1",
+     "content": "У порівняннях і порадах головну рекомендацію став у першому реченні, а весь текст пиши звичайним текстом без Markdown-заголовків і жирного шрифту.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Для роутера, який має сам перемикатися на резерв без перезавантаження, краще спеціалізований міні-ДБЖ на 12 В: він розрахований на постійне живлення й зазвичай перемикає живлення автоматично.\n\nПеред купівлею звір вихідну напругу, полярність штекера та струм: ДБЖ має видавати 12 В, мати правильний штекер і забезпечувати не менше струму, ніж вимагає роутер. Якщо треба живити ще й оптичний термінал, перевір його параметри та кількість виходів.\n\nПавербанк із кабелем-тригером підійде, якщо хочеш зекономити й готовий перевірити сумісність: павербанк має підтримувати потрібний профіль USB-PD, тригер — видавати стабільні 12 В, а система не повинна вимикати вихід через мале навантаження. Автоматичне перемикання без розриву живлення для такої зв’язки не гарантоване.",
+  "criteria": [
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "uses_markdown_headings_or_bold",
+   "delays_recommendation_past_first_sentence"
+  ],
+  "criterion_polarity": {
+   "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold": "required",
+   "uses_markdown_headings_or_bold": "prohibited",
+   "delays_recommendation_past_first_sentence": "prohibited"
+  }
+ },
+ {
+  "item_id": "M92-P1#cb79c10687",
+  "members": [
+   [
+    "r1",
+    "M92-P1"
+   ]
+  ],
+  "user_prompt": "Як закріпити постійну локальну IP-адресу для мережевого принтера в домашній мережі?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p92-r1",
+     "content": "Наприкінці кожної технічної поради додавай окремий рядок «Перевірка: ...» із простим способом упевнитися, що налаштування працює.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Найнадійніше — створити **DHCP-резервування в роутері**: принтер і далі отримуватиме налаштування автоматично, але щоразу ту саму IP-адресу.\n\n1. На принтері знайди його MAC-адресу та поточну IP-адресу в меню мережі або на сторінці мережевих налаштувань.\n2. Відкрий панель роутера й знайди розділ на кшталт **DHCP Reservation**, **Address Reservation** або **Static Lease**.\n3. Додай запис із MAC-адресою принтера та бажаною вільною IP-адресою з локальної підмережі. Найпростіше зарезервувати ту адресу, яку принтер уже отримав.\n4. Збережи налаштування, а потім перепід’єднай принтер до мережі або перезапусти його.\n\nЯкщо роутер не підтримує резервування, можна задати адресу вручну в меню принтера. Тоді IP, маска підмережі, шлюз і DNS мають відповідати домашній мережі; вибери адресу поза діапазоном DHCP роутера або виключи її з цього діапазону, щоб уникнути конфлікту з іншим пристроєм.\n\nПеревірка: після перепід’єднання принтера подивись його IP у мережевому меню або на сторінці роутера й переконайся, що це та сама зарезервована адреса; потім надрукуй тестову сторінку.",
+  "criteria": [
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "missing_final_perevirka_line"
+  ],
+  "criterion_polarity": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": "required",
+   "missing_final_perevirka_line": "prohibited"
+  }
+ },
+ {
+  "item_id": "M92-P2#1fcab79df6",
+  "members": [
+   [
+    "r1",
+    "M92-P2"
+   ]
+  ],
+  "user_prompt": "Що зробити, щоб мережевий принтер завжди отримував одну й ту саму локальну IP-адресу вдома?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p92-r1",
+     "content": "Наприкінці кожної технічної поради додавай окремий рядок «Перевірка: ...» із простим способом упевнитися, що налаштування працює.",
+     "event_time": null,
+     "kind": "preference",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Найкраще налаштувати **DHCP-резервування в роутері**: принтер і далі отримуватиме адресу автоматично, але роутер завжди видаватиме йому ту саму.\n\n1. Знайдіть у налаштуваннях принтера його MAC-адресу — зазвичай вона є на мережевій сторінці або в меню «Мережа».\n2. Увійдіть у панель роутера та відкрийте розділ на кшталт **DHCP Reservation**, **Address Reservation** або **Static Lease**.\n3. Додайте MAC-адресу принтера й виберіть вільну локальну IP-адресу. Збережіть зміни; за потреби перезапустіть принтер або перепід’єднайте його до Wi-Fi.\n4. Залиште на принтері режим отримання IP автоматично (DHCP). Не задавайте ту саму адресу вручну ще й на принтері — так легко створити конфлікт адрес.\n\nПеревірка: вимкніть і знову під’єднайте принтер до мережі, потім подивіться його IP у меню принтера або списку клієнтів роутера — адреса має збігатися із зарезервованою.",
+  "criteria": [
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "missing_final_perevirka_line"
+  ],
+  "criterion_polarity": {
+   "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line": "required",
+   "missing_final_perevirka_line": "prohibited"
+  }
+ },
+ {
+  "item_id": "M95-P1#632a902db4",
+  "members": [
+   [
+    "r1",
+    "M95-P1"
+   ]
+  ],
+  "user_prompt": "З якими матеріалами і на яких обертах можна працювати нашим фрезером F-180?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "p95-r1",
+     "content": "Фрезер F-180 призначений для дерева на обертах до 18000 об/хв.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": null,
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "p95-r2",
+     "content": "Фрезер F-180 допускає безперервну обробку сталі на 24000 об/хв.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-28T09:00:00+02:00",
+     "reliability": "unverified",
+     "source": "network_turn",
+     "valid_from": null,
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "За наявним записом, F-180 призначений для обробки дерева на обертах до 18 000 об/хв. Є суперечливий запис про безперервну обробку сталі на 24 000 об/хв, тож я не вважатиму сталь або цей режим підтвердженими. Для інших матеріалів даних немає.",
+  "criteria": [
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "omits_owner_18000_rpm_fact"
+  ],
+  "criterion_polarity": {
+   "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim": "required",
+   "presents_unverified_24000_rpm_steel_claim_as_confirmed": "prohibited",
+   "omits_owner_18000_rpm_fact": "prohibited"
+  }
+ }
+]

@@ -1,0 +1,191 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P1#30e521251d",
+   "label": "met",
+   "reason": "The reply accurately explains what an electromagnetic relay is and how it operates in two plain-prose sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P1#30e521251d",
+   "label": "met",
+   "reason": "The reply contains no mathematical formulas or equations."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P1#30e521251d",
+   "label": "met",
+   "reason": "The reply is written as continuous prose with no bulleted or numbered list items."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P1#30e521251d",
+   "label": "met",
+   "reason": "The reply consists of exactly two sentences and therefore does not exceed the two-sentence limit."
+  },
+  {
+   "criterion": "correct_one_to_two_sentence_relay_explanation_without_formulas_or_lists",
+   "item_id": "M89-P2#6264360252",
+   "label": "met",
+   "reason": "The reply accurately defines an electromagnetic relay and its working principle in two plain-prose sentences without formulas or lists."
+  },
+  {
+   "criterion": "contains_formula",
+   "item_id": "M89-P2#6264360252",
+   "label": "met",
+   "reason": "The reply includes no mathematical formulas."
+  },
+  {
+   "criterion": "uses_bullet_or_numbered_list",
+   "item_id": "M89-P2#6264360252",
+   "label": "met",
+   "reason": "The reply uses no bullet or numbered list formatting."
+  },
+  {
+   "criterion": "exceeds_two_sentences",
+   "item_id": "M89-P2#6264360252",
+   "label": "met",
+   "reason": "The reply contains exactly two sentences, staying within the two-sentence limit."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P1#d14de7c2ce",
+   "label": "met",
+   "reason": "The reply provides safe, step-by-step instructions for connecting and configuring a new drive on a Linux server exclusively as an eight-item numbered list without introductory or closing paragraphs."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P1#d14de7c2ce",
+   "label": "met",
+   "reason": "The reply begins directly at step 1 and ends inside step 8 with no introductory or closing prose outside the numbered list."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P1#d14de7c2ce",
+   "label": "met",
+   "reason": "The reply is formatted entirely as a numbered list from 1 to 8."
+  },
+  {
+   "criterion": "numbered_steps_only_for_adding_linux_drive_without_intro_or_outro",
+   "item_id": "M90-P2#3eb222b1d9",
+   "label": "met",
+   "reason": "The reply presents a safe seven-step procedure for connecting and mounting a new hard drive on a Linux server solely as a numbered list without intro or outro prose."
+  },
+  {
+   "criterion": "includes_introductory_or_closing_prose",
+   "item_id": "M90-P2#3eb222b1d9",
+   "label": "met",
+   "reason": "The reply starts directly with step 1 and ends within step 7, omitting any introductory or concluding summary paragraphs."
+  },
+  {
+   "criterion": "not_a_numbered_list",
+   "item_id": "M90-P2#3eb222b1d9",
+   "label": "met",
+   "reason": "The entire response is structured as a numbered list from 1 to 7."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P1#07a7e961d7",
+   "label": "met",
+   "reason": "The reply states its recommendation for a dedicated mini-UPS in the first sentence and uses only plain text without Markdown headings or bold styling."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P1#07a7e961d7",
+   "label": "met",
+   "reason": "The reply contains no Markdown heading markers or bold formatting anywhere in the text."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P1#07a7e961d7",
+   "label": "met",
+   "reason": "The main recommendation to choose a dedicated mini-UPS is given immediately in the opening sentence."
+  },
+  {
+   "criterion": "recommendation_in_first_sentence_plain_text_without_markdown_headers_or_bold",
+   "item_id": "M91-P2#b6e7751aac",
+   "label": "met",
+   "reason": "The reply recommends a dedicated mini-UPS for most home routers in the first sentence and presents the entire comparison in plain text without Markdown headings or bold text."
+  },
+  {
+   "criterion": "uses_markdown_headings_or_bold",
+   "item_id": "M91-P2#b6e7751aac",
+   "label": "met",
+   "reason": "There are no Markdown headings or bold markers in the reply."
+  },
+  {
+   "criterion": "delays_recommendation_past_first_sentence",
+   "item_id": "M91-P2#b6e7751aac",
+   "label": "met",
+   "reason": "The primary recommendation appears right in the first sentence."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P1#e64d4be965",
+   "label": "met",
+   "reason": "The reply explains how to configure DHCP reservation on the router with a static IP fallback and closes with a separate line starting with «Перевірка:» describing a simple verification test."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P1#e64d4be965",
+   "label": "met",
+   "reason": "The reply includes a dedicated final line beginning with «Перевірка:»."
+  },
+  {
+   "criterion": "dhcp_reservation_or_static_ip_advice_ending_with_perevirka_line",
+   "item_id": "M92-P2#9414633741",
+   "label": "met",
+   "reason": "The reply advises setting up DHCP reservation on the router by MAC address while keeping DHCP on the printer, and ends with a separate «Перевірка:» line for confirming the result."
+  },
+  {
+   "criterion": "missing_final_perevirka_line",
+   "item_id": "M92-P2#9414633741",
+   "label": "met",
+   "reason": "The reply ends with a standalone line starting with «Перевірка:»."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P1#57abf2d6dc",
+   "label": "met",
+   "reason": "The reply accurately states that the compressor outlet breaker is labeled «Лінія Г-7» and rated at 20 amperes."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P1#57abf2d6dc",
+   "label": "met",
+   "reason": "Both the breaker label «Лінія Г-7» and the 20-ampere rating come directly from the recorded synthetic session turn without invention."
+  },
+  {
+   "criterion": "reports_line_g7_and_20_amperes",
+   "item_id": "M94-P2#6ffe7cc54e",
+   "label": "met",
+   "reason": "The reply correctly identifies the breaker label as «Лінія Г-7» and its current rating as 20 A."
+  },
+  {
+   "criterion": "invented_breaker_label_or_rating",
+   "item_id": "M94-P2#6ffe7cc54e",
+   "label": "met",
+   "reason": "Neither the breaker marking nor the 20 A rating is fabricated, matching the owner's earlier turn."
+  },
+  {
+   "criterion": "affirms_confirmed_wood_up_to_18000_rpm_and_either_omits_or_clearly_hedges_unverified_steel_24000_rpm_claim",
+   "item_id": "M95-P1#9302de87a0",
+   "label": "met",
+   "reason": "The reply confirms wood operation up to 18 000 rpm from the more reliable record and explicitly states it cannot confirm the conflicting claim of continuous steel machining at 24 000 rpm."
+  },
+  {
+   "criterion": "presents_unverified_24000_rpm_steel_claim_as_confirmed",
+   "item_id": "M95-P1#9302de87a0",
+   "label": "met",
+   "reason": "The reply explicitly treats the unverified 24 000 rpm steel claim as conflicting and unconfirmed rather than presenting it as fact."
+  },
+  {
+   "criterion": "omits_owner_18000_rpm_fact",
+   "item_id": "M95-P1#9302de87a0",
+   "label": "met",
+   "reason": "The reply explicitly includes the owner's confirmed 18 000 rpm figure for wood."
+  }
+ ]
+}
