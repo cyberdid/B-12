@@ -11,7 +11,7 @@ from pathlib import Path, PurePosixPath
 DECISIONS = {"ACT", "NO_TOOL", "ASK", "DEFER", "SILENT", "INCONCLUSIVE"}
 RISKS = {"read_only", "synthetic_mutation", "permission_sensitive"}
 SPLITS = {"dev", "validation", "locked_test", "longitudinal_holdout"}
-FAMILY_ID = re.compile(r"(?:C|M)\d{2}\Z")
+FAMILY_ID = re.compile(r"(?:C|M)\d{2,3}\Z")  # M100+ since 23.11.2026 (M01-M99 used)
 
 
 def _relative_path(value, name):
@@ -46,7 +46,7 @@ def _validate_cases(cases):
             raise ValueError("each case must be an object")
         family = case.get("family_id")
         if not isinstance(family, str) or not FAMILY_ID.fullmatch(family):
-            raise ValueError("family_id must match Cnn or Mnn")
+            raise ValueError("family_id must match Cnn(n) or Mnn(n)")
         if family in seen:
             raise ValueError(f"duplicate family_id: {family}")
         seen.add(family)

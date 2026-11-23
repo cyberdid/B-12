@@ -72,9 +72,10 @@ def finalize(
     if adjudication is not None:
         adjudicated = []
         for item in sorted({d["item_id"] for d in result["disputed"]}):
-            key = item if item in adjudication else item[:3]
+            family = item.split("-", 1)[0]  # M97-P1#hash -> M97; also M100-P1#hash -> M100
+            key = item if item in adjudication else family
             if key not in adjudication:
-                raise ValueError(f"no adjudication for disputed family {item[:3]}")
+                raise ValueError(f"no adjudication for disputed family {family}")
             verdict, reason = adjudication[key]
             adjudicated.append(
                 {"item_id": item, "before": final[item], "verdict": verdict, "by": reason}

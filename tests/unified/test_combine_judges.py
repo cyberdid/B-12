@@ -136,3 +136,14 @@ def test_a_phantom_item_id_next_to_the_labelled_real_item_is_dropped():
     fixes = repair_ids(sheet, labels)
     assert fixes == [("M36-P2#phantom", "dropped_phantom")]
     assert labels == [{"item_id": "M36-P2#real", "criterion": "c1", "label": "met"}]
+
+
+def test_adjudication_by_family_works_for_three_digit_families():
+    """M100+ ids: the family is the part before the first dash, not the first three characters."""
+    sheet = [{"item_id": "M100-P1#aaa", "criteria": ["c1"], "members": [["r1", "M100-P1"]]}]
+    a = [{"item_id": "M100-P1#aaa", "criterion": "c1", "label": "met"}]
+    b = [{"item_id": "M100-P1#aaa", "criterion": "c1", "label": "not_met"}]
+    result = finalize(sheet, {"a": a, "b": b}, adjudication={"M100": ["SEMANTIC_PASS", "owner"]})
+    assert result["final_verdicts"] == {"M100-P1#aaa": "SEMANTIC_PASS"}
+    with pytest.raises(ValueError, match="family M100"):
+        finalize(sheet, {"a": a, "b": b}, adjudication={"M10": ["SEMANTIC_PASS", "wrong"]})
