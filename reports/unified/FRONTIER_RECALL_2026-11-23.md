@@ -75,3 +75,27 @@ exercised memory/session tools, which luna called normally.
 
 M92 (ports-live-v1): passed on gpt-6-luna in the 23.11 diagnostic
 (`LUNA6_PORTS_DIAGNOSTIC_2026-11-23.md`) — recorded as working; gemma = model limit.
+
+## 4. Acceptance on gemma4:12b (Colab L4, Ollama 0.33.3, revision `6114515d`), runtime `f43add9`
+
+Orchestrator queue on Colab, 3 repeats, judges Codex + Gemini (no disputes).
+
+| Set / family | control | `recall_as_of` |
+|---|---|---|
+| `asof-live-v1` M97 (=M96, answer oracle) | 0.00 | **1.00** |
+| `asof-live-v1` M98 | 1.00 | 1.00 |
+| `asof-live-v1` M99 | 1.00 | 1.00 |
+| `asof-live-v1` mean | 0.667 | **1.000** (+0.333 [0.0, 1.0]) |
+| `ports-live-v1` mean (M89–M96) | 0.167 | 0.167 (+0.000) |
+
+`ports-live-v1` M96 shows no change only because its frozen oracle requires a
+`memory_search(as_of=2026-10…)` call; by answer, gemma named the October address in **0/6**
+records without the flag and **6/6** with it (that is why M97 exists). No other ports family
+moved (M90 0.83, M91 0.50, rest 0.00 in both arms) — `recall_as_of` does not disturb answers
+that name no period.
+
+Verdict (owner's rule): `recall_as_of` works on the frontier model (1.00) and on gemma4:12b
+(1.00 on M97–M99). Turning it on by default is the owner's decision.
+
+Bench incident: the orchestrator hung 27 min after bootstrap (an embed-server subshell held the
+SSH channel); fixed in `72da8e2`, not yet in `eval-run`.

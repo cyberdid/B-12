@@ -1,0 +1,896 @@
+[
+ {
+  "item_id": "M98-P1#e095e1f139",
+  "members": [
+   [
+    "r1",
+    "M98-P1"
+   ],
+   [
+    "r2",
+    "M98-P1"
+   ],
+   [
+    "r3",
+    "M98-P1"
+   ]
+  ],
+  "user_prompt": "Хто постачав нам фанеру у вересні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r1",
+     "content": "Постачальник фанери — ТОВ «Ліс-Пром».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-07-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-07-01",
+     "valid_to": "2026-09-30"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r2",
+     "content": "Постачальник фанери — ФОП Гнатюк.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-01",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o1",
+     "content": "Постачальник фарби — ТОВ «Колір-Плюс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o2",
+     "content": "Постачальник клею — ФОП Мельник.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o3",
+     "content": "Постачальник метизів — ТОВ «Кріп-Сервіс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o4",
+     "content": "Постачальник лаку — ТОВ «Лак-Майстер».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o5",
+     "content": "Постачальник шліфшкурки — ФОП Дорош.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o6",
+     "content": "Постачальник кромки — ТОВ «Кромка-Юа».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o7",
+     "content": "Постачальник фурнітури — ТОВ «Фурна».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:07:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o8",
+     "content": "Постачальник ДСП — ТОВ «Плита-Центр».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:08:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 4,
+  "assistant_reply": "У вересні фанеру постачало ТОВ «Ліс-Пром».",
+  "criteria": [
+   "names_lis_prom_as_september_plywood_supplier",
+   "names_gnatiuk_as_september_supplier",
+   "names_other_material_supplier",
+   "invented_supplier"
+  ],
+  "criterion_polarity": {
+   "names_lis_prom_as_september_plywood_supplier": "required",
+   "names_gnatiuk_as_september_supplier": "prohibited",
+   "names_other_material_supplier": "prohibited",
+   "invented_supplier": "prohibited"
+  }
+ },
+ {
+  "item_id": "M98-P2#2740c5caa2",
+  "members": [
+   [
+    "r1",
+    "M98-P2"
+   ],
+   [
+    "r3",
+    "M98-P2"
+   ]
+  ],
+  "user_prompt": "Від кого ми брали фанеру у вересні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r1",
+     "content": "Постачальник фанери — ТОВ «Ліс-Пром».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-07-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-07-01",
+     "valid_to": "2026-09-30"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r2",
+     "content": "Постачальник фанери — ФОП Гнатюк.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-01",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o1",
+     "content": "Постачальник фарби — ТОВ «Колір-Плюс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o2",
+     "content": "Постачальник клею — ФОП Мельник.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o3",
+     "content": "Постачальник метизів — ТОВ «Кріп-Сервіс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o4",
+     "content": "Постачальник лаку — ТОВ «Лак-Майстер».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o5",
+     "content": "Постачальник шліфшкурки — ФОП Дорош.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o6",
+     "content": "Постачальник кромки — ТОВ «Кромка-Юа».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o7",
+     "content": "Постачальник фурнітури — ТОВ «Фурна».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:07:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o8",
+     "content": "Постачальник ДСП — ТОВ «Плита-Центр».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:08:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "У вересні ми брали фанеру у ТОВ «Ліс-Пром».",
+  "criteria": [
+   "names_lis_prom_as_september_plywood_supplier",
+   "names_gnatiuk_as_september_supplier",
+   "names_other_material_supplier",
+   "invented_supplier"
+  ],
+  "criterion_polarity": {
+   "names_lis_prom_as_september_plywood_supplier": "required",
+   "names_gnatiuk_as_september_supplier": "prohibited",
+   "names_other_material_supplier": "prohibited",
+   "invented_supplier": "prohibited"
+  }
+ },
+ {
+  "item_id": "M98-P2#b19faa20e5",
+  "members": [
+   [
+    "r2",
+    "M98-P2"
+   ]
+  ],
+  "user_prompt": "Від кого ми брали фанеру у вересні?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r1",
+     "content": "Постачальник фанери — ТОВ «Ліс-Пром».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-07-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-07-01",
+     "valid_to": "2026-09-30"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-r2",
+     "content": "Постачальник фанери — ФОП Гнатюк.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-01",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o1",
+     "content": "Постачальник фарби — ТОВ «Колір-Плюс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o2",
+     "content": "Постачальник клею — ФОП Мельник.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o3",
+     "content": "Постачальник метизів — ТОВ «Кріп-Сервіс».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o4",
+     "content": "Постачальник лаку — ТОВ «Лак-Майстер».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o5",
+     "content": "Постачальник шліфшкурки — ФОП Дорош.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o6",
+     "content": "Постачальник кромки — ТОВ «Кромка-Юа».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o7",
+     "content": "Постачальник фурнітури — ТОВ «Фурна».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:07:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a98-o8",
+     "content": "Постачальник ДСП — ТОВ «Плита-Центр».",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-10-10T10:08:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-10-10",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 2,
+  "assistant_reply": "У вересні постачальником фанери було ТОВ «Ліс-Пром».",
+  "criteria": [
+   "names_lis_prom_as_september_plywood_supplier",
+   "names_gnatiuk_as_september_supplier",
+   "names_other_material_supplier",
+   "invented_supplier"
+  ],
+  "criterion_polarity": {
+   "names_lis_prom_as_september_plywood_supplier": "required",
+   "names_gnatiuk_as_september_supplier": "prohibited",
+   "names_other_material_supplier": "prohibited",
+   "invented_supplier": "prohibited"
+  }
+ },
+ {
+  "item_id": "M99-P1#7af3d81de4",
+  "members": [
+   [
+    "r1",
+    "M99-P1"
+   ],
+   [
+    "r3",
+    "M99-P1"
+   ]
+  ],
+  "user_prompt": "Де працювала майстерня 10 листопада?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r1",
+     "content": "Адреса майстерні (основний цех) — вул. Вишнева, 14.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r2",
+     "content": "Адреса майстерні (тимчасовий переїзд на час ремонту) — вул. Тополина, 8.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r3",
+     "content": "Адреса майстерні (основний цех після ремонту) — вул. Заводська, 22.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-16",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w1",
+     "content": "Адреса складу №1 — вул. Лугова, 3.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w2",
+     "content": "Адреса складу №2 — вул. Річна, 17.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w3",
+     "content": "Адреса складу №3 — вул. Польова, 40.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w4",
+     "content": "Адреса складу №4 — вул. Гірська, 6.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w5",
+     "content": "Адреса складу №5 — вул. Озерна, 21.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w6",
+     "content": "Адреса складу №6 — вул. Липова, 12.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 6,
+  "assistant_reply": "10 листопада майстерня працювала за тимчасовою адресою — на вулиці Тополина, 8.",
+  "criteria": [
+   "reports_topolyna_8_on_november_10",
+   "reports_vyshneva_or_zavodska_for_november_10",
+   "reports_warehouse_as_workshop",
+   "invented_address"
+  ],
+  "criterion_polarity": {
+   "reports_topolyna_8_on_november_10": "required",
+   "reports_vyshneva_or_zavodska_for_november_10": "prohibited",
+   "reports_warehouse_as_workshop": "prohibited",
+   "invented_address": "prohibited"
+  }
+ },
+ {
+  "item_id": "M99-P1#9d50e68b19",
+  "members": [
+   [
+    "r2",
+    "M99-P1"
+   ]
+  ],
+  "user_prompt": "Де працювала майстерня 10 листопада?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r1",
+     "content": "Адреса майстерні (основний цех) — вул. Вишнева, 14.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r2",
+     "content": "Адреса майстерні (тимчасовий переїзд на час ремонту) — вул. Тополина, 8.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r3",
+     "content": "Адреса майстерні (основний цех після ремонту) — вул. Заводська, 22.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-16",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w1",
+     "content": "Адреса складу №1 — вул. Лугова, 3.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w2",
+     "content": "Адреса складу №2 — вул. Річна, 17.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w3",
+     "content": "Адреса складу №3 — вул. Польова, 40.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w4",
+     "content": "Адреса складу №4 — вул. Гірська, 6.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w5",
+     "content": "Адреса складу №5 — вул. Озерна, 21.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w6",
+     "content": "Адреса складу №6 — вул. Липова, 12.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 6,
+  "assistant_reply": "10 листопада майстерня працювала за тимчасовою адресою — на вулиці Тополина, 8. Це був період ремонту основного цеху.",
+  "criteria": [
+   "reports_topolyna_8_on_november_10",
+   "reports_vyshneva_or_zavodska_for_november_10",
+   "reports_warehouse_as_workshop",
+   "invented_address"
+  ],
+  "criterion_polarity": {
+   "reports_topolyna_8_on_november_10": "required",
+   "reports_vyshneva_or_zavodska_for_november_10": "prohibited",
+   "reports_warehouse_as_workshop": "prohibited",
+   "invented_address": "prohibited"
+  }
+ },
+ {
+  "item_id": "M99-P2#e27d3e5188",
+  "members": [
+   [
+    "r1",
+    "M99-P2"
+   ],
+   [
+    "r2",
+    "M99-P2"
+   ],
+   [
+    "r3",
+    "M99-P2"
+   ]
+  ],
+  "user_prompt": "За якою адресою була майстерня 10 листопада?",
+  "synthetic_facts": {
+   "memory": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r1",
+     "content": "Адреса майстерні (основний цех) — вул. Вишнева, 14.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-09-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-09-01",
+     "valid_to": "2026-10-31"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r2",
+     "content": "Адреса майстерні (тимчасовий переїзд на час ремонту) — вул. Тополина, 8.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-01T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-01",
+     "valid_to": "2026-11-15"
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-r3",
+     "content": "Адреса майстерні (основний цех після ремонту) — вул. Заводська, 22.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-16T10:00:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-16",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w1",
+     "content": "Адреса складу №1 — вул. Лугова, 3.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:01:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w2",
+     "content": "Адреса складу №2 — вул. Річна, 17.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:02:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w3",
+     "content": "Адреса складу №3 — вул. Польова, 40.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:03:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w4",
+     "content": "Адреса складу №4 — вул. Гірська, 6.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:04:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w5",
+     "content": "Адреса складу №5 — вул. Озерна, 21.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:05:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    },
+    {
+     "actor": "synthetic-owner",
+     "alias": "a99-w6",
+     "content": "Адреса складу №6 — вул. Липова, 12.",
+     "event_time": null,
+     "kind": "fact",
+     "recorded_at": "2026-11-20T11:06:00+02:00",
+     "reliability": "normal",
+     "source": "synthetic_owner_statement",
+     "valid_from": "2026-11-05",
+     "valid_to": null
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 6,
+  "assistant_reply": "10 листопада майстерня знаходилася за адресою: вул. Тополина, 8. Це був тимчасовий переїзд на час ремонту.",
+  "criteria": [
+   "reports_topolyna_8_on_november_10",
+   "reports_vyshneva_or_zavodska_for_november_10",
+   "reports_warehouse_as_workshop",
+   "invented_address"
+  ],
+  "criterion_polarity": {
+   "reports_topolyna_8_on_november_10": "required",
+   "reports_vyshneva_or_zavodska_for_november_10": "prohibited",
+   "reports_warehouse_as_workshop": "prohibited",
+   "invented_address": "prohibited"
+  }
+ }
+]
