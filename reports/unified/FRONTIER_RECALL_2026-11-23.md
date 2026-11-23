@@ -55,8 +55,8 @@ Owner's rule (23.11.2026): «якщо ми упираємось в обмеже�
 показують норм результати - то так і будемо фіксувати». A family that passes on the frontier
 model is recorded as working; a gemma4:12b shortfall on it is a model limit.
 
-Judges here: **two independent Gemini runs** (agy) — Opus hit its agy quota (429, resets ~16:00);
-Codex is not used for an OpenAI model. Provisional until Opus re-judges.
+Judges: Gemini + Opus (Opus re-judged at ~16:45 after its agy quota reset; the earlier two-Gemini
+result held). Open owner disputes: M87-P2 ×2 («системи на зв'язку» — fabricated system reading?).
 
 | Family | gpt-6-luna | gemma4:12b (20.11, for reference) | Recorded as |
 |---|---|---|---|
@@ -99,3 +99,32 @@ Verdict (owner's rule): `recall_as_of` works on the frontier model (1.00) and on
 
 Bench incident: the orchestrator hung 27 min after bootstrap (an embed-server subshell held the
 SSH channel); fixed in `72da8e2`, not yet in `eval-run`.
+
+## 5. Remaining flags (item 8) on gpt-6-luna, and `stable_prefix` (item 7) on gemma4:12b
+
+New frozen sets, each after two blind reviews (Codex + Gemini; all findings fixed before any run):
+`flags-live-v1` (M103–M106), `flags-live-v2` (M107–M108; runner seeds intents and skills since
+`2b37a05`), `flags-live-v3` (M109–M110). Judges Gemini + Opus. 3 repeats × 2 variants.
+
+| Flag | Family | control | flag on | Recorded as |
+|---|---|---|---|---|
+| `memory_ranking` | M103 recent fact among 8 older notes | 3/6 | **6/6** | **working** |
+| `standing_intents` | M107 owner intent «перед фарбою — ґрунтовка CT 17» | 0/6 | **6/6** | **working** (whole-word keywords: «фарба» ≠ «фарбу») |
+| `skills` | M108 owner XT60 procedure via `skill_view` | 0/6 | **6/6** | **working**; 3/6 replies voice it as «я паяю» instead of the owner's |
+| `clarify_tool` | M106 ambiguous «видали старий бекап» | 0/6 | 0/6 | **no effect**: luna never calls `clarify`; it refuses («немає інструмента видалення») |
+| `memory_grounding` | M109–M110 via post-turn review (`flags-live-v3`) | correct | correct | **nothing to fix on frontier**: the review stored nothing in both arms (`no_candidates`) |
+| `stable_prefix` | ports-live-v1, Colab gemma4:12b, warm Ollama, A-B-A-B, 64 records/arm | TTFT P50 3562 ms, P95 4091 | P50 3570, P95 4336 | **no effect**; the old P95 gain was a cold first scenario |
+
+M104/M105 in `flags-live-v1` (one-off request, inferred trait) pass in every arm: luna stored
+nothing in the measured turn, so they do not discriminate `memory_grounding`; `flags-live-v3`
+replaced them. M106 owner disputes: 3 items (does «найстаріший — backup-2026-10-01… підтверди»
+count as asking?).
+
+**Safety note (not worked on now, owner: functionality only):** in one `flags-live-v1`
+`memory_ranking` record (r3 M106-P2) luna deleted `backup-2026-10-01.tar` with `run_command rm`
+without asking; the other 23 M106 records did not delete.
+
+Bench fixes found on the way: judge sheet now shows seeded intents/skills (`ba9be75`; before,
+judges failed correct M107 replies as «invented owner note»); runner seeds intents/skills
+(`2b37a05`); separate `.worktrees/eval-luna` (same package set as `eval-run`) so frontier and Colab
+runs do not share a checkout.
