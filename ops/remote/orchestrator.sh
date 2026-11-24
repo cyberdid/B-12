@@ -5,6 +5,8 @@
 # Queue: ~/b12-queue/jobs.tsv, one job per line (tab-separated):
 #   name  manifest  out_dir  repeats  arm  model  extra_runner_args
 # A job is done when <out_dir>/pilot.log contains DONE (run_locked_pilot.sh is resumable).
+# A manifest field `cmd:<command>` runs that command instead (same model env and tunnel; its
+# working dir is the repo); DONE is appended to <out_dir>/pilot.log when it exits 0.
 # Log: ~/b12-queue/orchestrator.log. Run as a systemd service (ops/remote/b12-orchestrator.service).
 set -uo pipefail
 # Overridable so the same loop runs on the owner's laptop (CPU sandbox) as well as on a VM.
@@ -122,16 +124,26 @@ run_job() {
   # setsid makes the driver the leader of its own process group (pgid = $driver), so a stop
   # kills the driver and its sandboxes, never this loop (the 20.11.2026 bug).
   cd "$REPO" || return 1
+  local runner=(evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm")
+  if [ "${manifest#cmd:}" != "$manifest" ]; then
+    mkdir -p "$REPO/$out"
+    runner=(bash -c "${manifest#cmd:} && echo DONE >>'$REPO/$out/pilot.log'")
+  fi
   setsid env B12_EVAL_MODEL="$model" B12_EVAL_PROFILE_FILE="$profile" \
     B12_EVAL_OLLAMA_URL=http://127.0.0.1:11435 B12_EVAL_VARIANT=deployed \
     B12_EVAL_EMBED_SOCKET="$SOCK" NO_GPU_WAIT=1 EXTRA_RUNNER_ARGS="--variant deployed $extra" \
-    evals/unified/run_locked_pilot.sh "$manifest" "$out" "$repeats" "$arm" >>"$Q/$name.log" 2>&1 &
+    "${runner[@]}" >>"$Q/$name.log" 2>&1 &
   local driver=$! misses=0 records last_change
   DRIVER_PID="$driver"
-  records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' 2>/dev/null | wc -l)"; last_change=$(date +%s)
+  # Progress: new records for scenario jobs; for a cmd job, its log growing.
+  progress() {
+    { find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' 2>/dev/null | wc -l
+      stat -c %s "$Q/$name.log" 2>/dev/null; } | tr '\n' ' '
+  }
+  records="$(progress)"; last_change=$(date +%s)
   while kill -0 "$driver" 2>/dev/null; do
     interruptible_sleep 30
-    local now_records; now_records="$(find "$REPO/$out" -mindepth 2 -maxdepth 2 -name '*.json' 2>/dev/null | wc -l)"
+    local now_records; now_records="$(progress)"
     if [ "$now_records" != "$records" ]; then records="$now_records"; last_change=$(date +%s); fi
     if [ $(( $(date +%s) - last_change )) -ge 900 ]; then
       log "$name: no new record for 15 min, restarting the driver"

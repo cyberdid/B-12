@@ -727,6 +727,29 @@ async def test_persist_refuses_the_same_call_a_third_time(runtime_factory, tmp_p
     assert [r.status for r in result.tool_results][:2] == ["completed", "completed"]
 
 
+async def test_interactive_turn_refuses_a_looping_call_and_then_asks_for_the_answer(
+    runtime_factory, tmp_path
+):
+    """Regression (gemma4:12b, C58, 19.11.2026): an ordinary turn re-ran the same command 22-24
+    times until the context overflowed; the guard existed only in persist mode."""
+    state, factory = runtime_factory
+    runtime = factory()
+    who = owner(runtime)
+    target = tmp_path / "t3.txt"
+    target.write_text("23.0\n")
+    same = {"tool_calls": [("file_read", {"path": str(target)})]}
+    state["script"] = [same, same, same, same, {"content": "Максимум 23.0"}]
+    result, _ = await run_turn(runtime, who, "Яке значення у файлі?")
+    assert [(r.status, r.error_code) for r in result.tool_results] == [
+        ("completed", None),
+        ("completed", None),
+        ("denied", "repeated_call"),
+        ("denied", "repeated_call"),
+    ]
+    assert state["requests"][-1].get("tools") in (None, [])
+    assert (result.state, body(result.content)) == ("completed", "Максимум 23.0")
+
+
 async def test_persist_stops_when_the_model_repeats_the_same_answer(runtime_factory):
     """Regression: the model repeated 'Я опрацював …' without doing anything new."""
     state, factory = runtime_factory

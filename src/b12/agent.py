@@ -675,6 +675,10 @@ def _drop_unanswered_calls(messages: list[dict]) -> None:
             return
 
 
+# Status checks that may legitimately repeat with the same arguments while waiting.
+_POLLING_TOOLS = frozenset({"current_time", "process_list"})
+
+
 def _call_key(call) -> str:
     """Identity of a step for loop detection: tool name plus canonical arguments."""
     return call.name + "|" + json.dumps(call.arguments, sort_keys=True, ensure_ascii=False)
@@ -2106,18 +2110,28 @@ class Agent:
                     },
                     error_code="use_search",
                 )
-            elif state.get("persist") and seen[key] > 2:
-                # Same call, same arguments, a third time: the model is looping on one step.
+            elif seen[key] > 2 and call.name not in _POLLING_TOOLS:
+                # Same call, same arguments, a third time: the model is looping on one step
+                # (gemma4:12b re-ran one command 22-24 times in an ordinary turn, C58).
                 result = ToolResult(
                     call_id=call.id,
                     name=call.name,
                     status="denied",
                     content={
                         "note": "Цей виклик уже виконано з тими самими аргументами. "
-                        "Перейди до наступного непрочитаного пункту."
+                        + (
+                            "Перейди до наступного непрочитаного пункту."
+                            if state.get("persist")
+                            else "Його результат є вище: використай його і відповідай."
+                        )
                     },
                     error_code="repeated_call",
                 )
+                state["repeat_denials"] = state.get("repeat_denials", 0) + 1
+                if not state.get("persist") and state["repeat_denials"] >= 2:
+                    # Still looping after a refusal: the next request has no tools, so the
+                    # model answers from the results it already has.
+                    state["force_text"] = True
             elif state["calls"] >= max_calls:
                 result = ToolResult(
                     call_id=call.id,
