@@ -18,7 +18,7 @@ import sqlite3
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from types import MappingProxyType
@@ -1320,6 +1320,9 @@ class Agent:
                 request = self._admit(
                     system, history, state, tools, persist, query_prefix=query_prefix
                 )
+                if state.pop("think_next", False):
+                    request = replace(request, think=True)
+                    request = replace(request, fingerprint=request._fingerprint())
 
                 async def delta(text):
                     await emit("text_delta", {"text": text})
@@ -1336,6 +1339,17 @@ class Agent:
                 native = None if reply.tool_calls else _text_call(reply.content)
                 if native is not None:
                     reply = reply.model_copy(update={"content": "", "tool_calls": (native,)})
+                if (
+                    not reply.tool_calls
+                    and not (reply.content or "").strip()
+                    and reply.finish_reason == "length"
+                    and not state.get("think_retried")
+                ):
+                    # The whole output budget went to reasoning the provider hides when it is
+                    # off (gemma4 reasons anyway): ask once more with reasoning allowed, so the
+                    # model can finish it and answer or call a tool. Its text is never read.
+                    state["think_retried"] = state["think_next"] = True
+                    continue
                 if not reply.tool_calls:
                     text = (reply.content or "").strip()
                     if state.get("finalized"):

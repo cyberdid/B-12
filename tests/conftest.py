@@ -251,9 +251,9 @@ async def scripted_ollama(profile_settings):
                         {
                             "message": {"role": "assistant", "content": ""},
                             "done": True,
-                            "done_reason": "stop",
+                            "done_reason": step.get("done_reason", "stop"),
                             "prompt_eval_count": count,
-                            "eval_count": 3,
+                            "eval_count": step.get("eval_count", 3),
                         }
                     )
                 )

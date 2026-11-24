@@ -50,6 +50,7 @@ class AdmittedRequest:
     temperature: float = 0.0
     top_p: float = 1.0
     seed: int = 42
+    think: bool = False  # allow the model's reasoning channel; its text is never read
 
     def __post_init__(self):
         object.__setattr__(self, "messages", freeze(self.messages))
@@ -62,7 +63,7 @@ class AdmittedRequest:
             "messages": thaw(self.messages),
             "tools": thaw(self.tools),
             "stream": True,
-            "think": False,
+            "think": self.think,
             "options": {
                 "num_ctx": self.num_ctx,
                 "num_predict": self.output_reserve,
