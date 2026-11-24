@@ -78,7 +78,16 @@ ensure_colab() {  # $1 = space-separated models
   [ "${B12_ORCH_DRYRUN:-0}" = "1" ] && return 0
   if ! session_alive; then
     ssh -O exit "$SESSION" >/dev/null 2>&1
-    log "creating Colab session"; colab new -s "$SESSION" --gpu L4 >>"$Q/orchestrator.log" 2>&1 || return 1
+    # Colab often answers "Service Unavailable" for L4 (no free GPU of that kind): fall back to
+    # the next type instead of waiting. The GPU used is logged for the run's metadata.
+    local gpu created=""
+    for gpu in ${B12_COLAB_GPUS:-L4 T4 A100}; do
+      log "creating Colab session ($gpu)"
+      if colab new -s "$SESSION" --gpu "$gpu" >>"$Q/orchestrator.log" 2>&1; then
+        created="$gpu"; log "Colab session on $gpu"; break
+      fi
+    done
+    [ -n "$created" ] || return 1
   fi
   if ! ssh -O check "$SESSION" >/dev/null 2>&1; then
     ssh_ready || return 1
