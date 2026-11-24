@@ -255,3 +255,74 @@ async def test_invalidation_during_review_discards_result(scripted_ollama, tmp_p
         assert runtime.skills.list_pending() == []
     finally:
         runtime.close()
+
+
+async def test_scheduler_runs_skill_review_for_idle_consented_actors(scripted_ollama, tmp_path):
+    from b12.autonomy import Scheduler
+
+    state, base = scripted_ollama
+    runtime = _runtime(base, tmp_path, memory_review=False)
+    scheduler = Scheduler(runtime)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        guest = runtime.control.create_actor(owner=False, consent=False)
+        turn_id = _commit(runtime, actor, PROCEDURE)
+        state["script"] = [_reply(_skill(turn_id))]
+        outcomes = await scheduler.review_skills_idle()
+        staged = [o for o in outcomes if o.get("state") == "staged"]
+        assert [o["actor_id"] for o in staged] == [actor.id]
+        assert guest.id not in {o.get("actor_id") for o in staged}
+        assert len(runtime.skills.list_pending()) == 1
+    finally:
+        scheduler.close()
+        runtime.close()
+
+
+async def test_scheduler_skill_review_is_off_without_the_flag(scripted_ollama, tmp_path):
+    from b12.autonomy import Scheduler
+
+    state, base = scripted_ollama
+    runtime = _runtime(base, tmp_path, skill_review=False)
+    scheduler = Scheduler(runtime)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        _commit(runtime, actor, PROCEDURE)
+        assert await scheduler.review_skills_idle() == []
+    finally:
+        scheduler.close()
+        runtime.close()
+
+
+async def test_scheduler_run_calls_skill_review_after_memory_review(
+    scripted_ollama, tmp_path, monkeypatch
+):
+    import asyncio
+
+    from b12.autonomy import Scheduler
+
+    _, base = scripted_ollama
+    runtime = _runtime(base, tmp_path, scheduler_tick_s=0.01)
+    scheduler = Scheduler(runtime)
+    order: list[str] = []
+    stop = asyncio.Event()
+
+    def step(name, last=False):
+        async def run():
+            order.append(name)
+            if last:
+                stop.set()
+            return []
+
+        return run
+
+    monkeypatch.setattr(scheduler, "tick", step("tick"))
+    monkeypatch.setattr(scheduler, "reflect_idle", step("reflect"))
+    monkeypatch.setattr(scheduler, "review_memory_idle", step("memory"))
+    monkeypatch.setattr(scheduler, "review_skills_idle", step("skills"))
+    monkeypatch.setattr(scheduler, "curate_skills_idle", step("curate", last=True))
+    try:
+        await asyncio.wait_for(scheduler.run(stop), timeout=5)
+        assert order == ["tick", "reflect", "memory", "skills", "curate"]
+    finally:
+        scheduler.close()
+        runtime.close()

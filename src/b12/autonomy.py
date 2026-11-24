@@ -885,6 +885,32 @@ class Scheduler:
             outcomes.append({"actor_id": actor_id, **await reviewer.review(actor)})
         return outcomes
 
+    async def review_skills_idle(self) -> list[dict]:
+        """Background skill review (spec 2026-11-24): stage learned procedures for approval."""
+        rt = self.runtime
+        if not (
+            getattr(rt.settings, "skills", False)
+            and getattr(rt.settings, "skill_review", False)
+            and getattr(rt, "skills", None) is not None
+        ):
+            return []
+        from b12.skill_review import SkillReviewer
+
+        reviewer = SkillReviewer(rt)
+        outcomes: list[dict] = []
+        for actor_id in rt.control.actor_ids():
+            actor = rt.control.resolve_actor(actor_id)
+            if not actor.consent:
+                continue
+            if self._busy(actor_id):
+                outcomes.append({"actor_id": actor_id, "state": "skipped", "reason": "actor_busy"})
+                continue
+            if not rt.attention.execution_allowed(actor_id):
+                outcomes.append({"actor_id": actor_id, "state": "skipped", "reason": "owner_stop"})
+                continue
+            outcomes.append({"actor_id": actor_id, **await reviewer.review(actor)})
+        return outcomes
+
     async def curate_skills_idle(self) -> list[dict]:
         """ADR-021: run deterministic skill curation once a week when idle."""
         rt = self.runtime
@@ -914,6 +940,10 @@ class Scheduler:
                 await self.review_memory_idle()
             except Exception:
                 log.exception("idle memory review failed")
+            try:
+                await self.review_skills_idle()
+            except Exception:
+                log.exception("idle skill review failed")
             try:
                 await self.curate_skills_idle()
             except Exception:
