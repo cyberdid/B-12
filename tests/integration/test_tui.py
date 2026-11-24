@@ -639,3 +639,10 @@ def test_model_line_warns_when_part_of_the_model_runs_on_the_cpu():
 
     line = model_line(LOCAL, {"state": "ready", "vram_mb": 6144, "cpu_share": 0.39}).plain
     assert "39% на CPU" in line
+
+
+def test_companion_label_does_not_repeat_capri():
+    from b12.tui.app import _companion_label
+
+    assert _companion_label("CAPRI") == "CAPRI"
+    assert _companion_label("КІБЕРКІТ") == "CAPRI  ·  КІБЕРКІТ"

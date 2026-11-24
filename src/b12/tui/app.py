@@ -278,7 +278,7 @@ class B12App(App):
             if pet.skin_id != "cybercat":
                 had_error = bool(pet.skin_error)
                 pet.set_skin("cybercat")
-                self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
+                self.query_one("#companion-name", Static).update(_companion_label(pet.skin_name))
                 self.query_one("#pet-hint", Static).update(
                     "Pack пошкоджений · повернувся кіберкіт"
                     if had_error
@@ -295,7 +295,7 @@ class B12App(App):
         ids = [option.id for option in options]
         position = ids.index(pet.skin_id) if pet.skin_id in ids else 0
         selected = pet.set_skin(ids[(position + 1) % len(ids)])
-        self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
+        self.query_one("#companion-name", Static).update(_companion_label(pet.skin_name))
         self._prefs["skin"] = pet.skin_id
         save_prefs(self._state_dir, self._prefs)
         self.query_one("#pet-hint", Static).update(
@@ -405,7 +405,7 @@ class B12App(App):
             options = await asyncio.to_thread(pet.available_skins)
             wanted = "capri" if any(o.id == "capri" for o in options) else None
         if wanted and wanted != pet.skin_id and pet.set_skin(wanted):
-            self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
+            self.query_one("#companion-name", Static).update(_companion_label(pet.skin_name))
 
     # ---- local activity -----------------------------------------------------
     def _presentation_busy(self) -> bool:
@@ -1304,6 +1304,11 @@ def _speech_chunks(text: str, limit: int = 4000):
 def _switch_label(switch_id: str | None, value: bool) -> str:
     name = _SWITCH_NAMES.get(switch_id or "", switch_id or "")
     return f"{name}: {'ВКЛ' if value else 'ВИМК'}"
+
+
+def _companion_label(skin_name: str) -> str:
+    """The companion is Capri; the skin name follows unless the skin is Capri herself."""
+    return "CAPRI" if skin_name.strip().upper() == "CAPRI" else f"CAPRI  ·  {skin_name}"
 
 
 def _tool_title(name, summary: str, status: str | None) -> str:
