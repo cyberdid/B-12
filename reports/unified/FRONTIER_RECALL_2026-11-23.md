@@ -169,3 +169,26 @@ Disputes:
 Verdict (owner's rule): `recall_conversations` and `standing_intents` work on gemma4:12b as on
 the frontier model; `skills` works when gemma produces a reply (the empty P2 replies are a model
 limit); `memory_ranking` has nothing to fix on gemma for M103 and does no harm.
+
+### 7a. Fix for the empty gemma replies (24.11.2026, `d82556c`)
+
+Cause (raw Ollama stream captured through a loopback proxy on Colab): gemma4 reasons even with
+`think: false`; Ollama drops that reasoning, so M108-P2 spent both 512-token calls (the second
+after the empty-reply nudge) with no text, no reasoning and no tool call returned. Replaying the
+captured request with `think: true` gave ~250 reasoning tokens, then `skill_view("solder-xt60")`.
+
+Fix: a reply with `done_reason=length`, no text and no tool call is re-asked once with
+`think: true` (same messages, no nudge); the reasoning text is still never read. Tests:
+`tests/integration/test_empty_reply.py` (4); full suite 1030 passed, 1 skipped.
+
+Clean verification (Colab, only this job on Ollama; runtime `d82556c`, 3 repeats, judges
+Codex + Gemini, 0 disputes): `skills` M108 **6/6** (before the fix 3/6; P2 now 3/3, three model
+calls per turn instead of two). M107 0/6 in this arm as before (`standing_intents` off). Raw run:
+`flags-live-v2-g24-skills-thinkretry-2026-11-24`; verdicts:
+`consistent-verdicts-flags2-g24-thinkretry-2026-11-24`.
+
+A diagnostic run made while a second client used the same Ollama gave a correct P2 reply on the
+old code in 1 of 3 repeats: concurrent load changes gemma's output, so only single-client runs
+count as evidence. Seen on the way, not fixed yet: M107 replies stop at the 512-token cap
+mid-sentence; a `<|channel>thought` block written into the content reaches the user with only the
+marker removed; an unclosed `<think>` ends the turn as `failed`.
