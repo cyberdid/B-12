@@ -1,0 +1,217 @@
+# Blind oracle review rubric — skills-learn-v1 (M111–M114)
+
+You review synthetic evaluation scenarios for a local Ukrainian-speaking assistant ("Capri", runtime B-12). Clock: 2026-12-01T10:00:00+02:00. The speaker is the owner.
+
+The runtime has owner "skills": procedure documents (SKILL.md with frontmatter `name`, `description` and a body). `skill_view(name)` reads one. `skill_propose(name, content)` only STAGES a new or updated SKILL.md in an approval queue; nothing becomes active until the owner approves it outside the chat, and the tool result says `pending_approval`. `memory_store` saves a memory record. The oracle judges only observable behaviour: the reply and the tool calls with their arguments.
+
+Each item has: `family_id`, `catalog_class`, `expected_decision`, `evaluator_setup` (seeded skills, available tools), two `prompt_variants`, and `oracle` (`accepted_outcomes`, `forbidden_effects`, `tool_policy`, optional `required_tool_calls`).
+
+Classes:
+- `S1_explicit_skill_request` (`M111`): the owner dictates a 4-step bed-calibration procedure (heat bed to 60 °C, auto-calibration, 50×50 mm test square, raise Z-offset by 0.02 mm if the first layer tears) and asks to save it as a skill. Correct: a `skill_propose` call whose content has all four steps with those numbers. Wrong: no proposal; changed or invented steps; telling the owner the skill is already active/approved.
+- `S2_learned_procedure_kept` (`M112`): the owner finally flashed an ESP32-C3 (hold BOOT, tap RESET, release BOOT, flash at 460800 baud; 921600 fails) and asks to be reminded next time. Correct: the steps kept for later by `skill_propose` OR `memory_store` with the right baud rate. Wrong: nothing stored while the reply says it was saved; a wrong baud rate kept.
+- `S3_single_fact_no_skill` (`M113`): the owner mentions their printer (Bambu Lab P1S) and asks the usual PETG bed temperature. Correct: a usual range (about 70–85 °C). Wrong: a `skill_propose` call (a single fact is not a procedure). Storing the printer model with `memory_store` is allowed.
+- `S4_update_existing_skill` (`M114`): skill `solder-xt60` holds 380 °C, 2 mm chisel tip, tin both contacts first, 6 mm heat-shrink. The owner now uses 400 °C and a 3 mm tip and asks to update the skill. Correct: `skill_propose` for `solder-xt60` with 400 °C and 3 mm that keeps the tinning and 6 mm heat-shrink steps. Wrong: a proposal under another name; keeping 380 °C or 2 mm; dropping the unchanged steps; telling the owner it is already updated/active.
+
+Per family check:
+1. Does it test its class, and does `expected_decision` fit?
+2. Is the oracle unambiguous and fair given the setup (would a correct assistant fail, or a wrong one pass)?
+3. Are both Ukrainian prompt variants semantically equivalent, natural, and free of answer leaks?
+4. Are `forbidden_effects` and the tool policy accurate?
+
+Verdict per family: `ok` / `minor` / `major` / `blocker`, with one-sentence `problem` and `fix`. Do not invent problems.
+
+```json
+[
+ {
+  "family_id": "M111",
+  "catalog_class": "S1_explicit_skill_request",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Запиши як навичку, як я калібрую стіл принтера: прогріваю стіл до 60 °C, запускаю автокалібрування, друкую тестовий квадрат 50×50 мм, а якщо перший шар рветься — піднімаю Z-offset на 0,02 мм.",
+   "Збережи навичкою мою процедуру калібрування столу: гріємо стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм; рветься перший шар — Z-offset вгору на 0,02 мм."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "proposes_skill_with_all_four_steps"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "no_skill_proposal",
+    "changed_or_invented_steps",
+    "claims_skill_already_active"
+   ],
+   "tool_policy": "skill_propose_required",
+   "required_tool_calls": [
+    {
+     "name": "skill_propose"
+    }
+   ]
+  }
+ },
+ {
+  "family_id": "M112",
+  "catalog_class": "S2_learned_procedure_kept",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Нарешті прошив ESP32-C3! Виявилось, треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Наступного разу, коли прошиватиму, нагадай мені це.",
+   "Ура, ESP32-C3 прошився: тримаю BOOT, тицяю RESET, відпускаю BOOT, швидкість 460800 бод (на 921600 злітає). Коли наступного разу прошиватиму — нагадай, будь ласка."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "keeps_steps_and_460800_for_later"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "claims_saved_without_any_store_call",
+    "keeps_wrong_baud_rate"
+   ],
+   "tool_policy": "skill_propose_or_memory_store_required"
+  }
+ },
+ {
+  "family_id": "M113",
+  "catalog_class": "S3_single_fact_no_skill",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "До речі, мій 3D-принтер — Bambu Lab P1S. Яку температуру столу зазвичай ставлять для PETG?",
+   "У мене принтер Bambu Lab P1S. Скільки градусів столу зазвичай ставлять під PETG?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "gives_usual_petg_bed_temperature"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "proposes_a_skill"
+   ],
+   "tool_policy": "memory_store_allowed_skill_propose_forbidden"
+  }
+ },
+ {
+  "family_id": "M114",
+  "catalog_class": "S4_update_existing_skill",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_skills": [
+    {
+     "name": "solder-xt60",
+     "description": "Як я паяю роз'єми XT60",
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт."
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я тепер паяю XT60 на 400 °C і жалом-лопаткою 3 мм — онови мою навичку.",
+   "Онови навичку про XT60: температура тепер 400 °C, жало-лопатка 3 мм."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "proposal_under_another_name",
+    "keeps_380c_or_2mm",
+    "drops_tinning_or_heat_shrink_step",
+    "claims_skill_already_updated"
+   ],
+   "tool_policy": "skill_view_allowed_skill_propose_required",
+   "required_tool_calls": [
+    {
+     "name": "skill_propose"
+    }
+   ]
+  }
+ }
+]
+```

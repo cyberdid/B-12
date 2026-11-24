@@ -1,0 +1,193 @@
+[
+ {
+  "family_id": "M111",
+  "catalog_class": "S1_explicit_skill_request",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Запиши як навичку, як я калібрую стіл принтера: прогріваю стіл до 60 °C, запускаю автокалібрування, друкую тестовий квадрат 50×50 мм, а якщо перший шар рветься — піднімаю Z-offset на 0,02 мм.",
+   "Збережи навичкою мою процедуру калібрування столу: гріємо стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм; рветься перший шар — Z-offset вгору на 0,02 мм."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "proposes_skill_with_all_four_steps"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "no_skill_proposal",
+    "changed_or_invented_steps",
+    "claims_skill_already_active_or_approved"
+   ],
+   "tool_policy": "skill_propose_required",
+   "required_tool_calls": [
+    {
+     "name": "skill_propose"
+    }
+   ]
+  }
+ },
+ {
+  "family_id": "M112",
+  "catalog_class": "S2_learned_procedure_kept",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "Нарешті прошив ESP32-C3! Виявилось, треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Наступного разу, коли прошиватиму, нагадай мені це.",
+   "Ура, ESP32-C3 прошився: тримаю BOOT, тицяю RESET, відпускаю BOOT, швидкість 460800 бод (на 921600 злітає). Коли наступного разу прошиватиму — нагадай, будь ласка."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "keeps_steps_and_460800_for_later"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "claims_saved_without_any_store_call",
+    "keeps_wrong_baud_rate"
+   ],
+   "tool_policy": "skill_propose_or_memory_store_required"
+  }
+ },
+ {
+  "family_id": "M113",
+  "catalog_class": "S3_single_fact_no_skill",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": []
+  },
+  "prompt_variants": [
+   "До речі, мій 3D-принтер — Bambu Lab P1S. Яку температуру столу зазвичай ставлять для PETG?",
+   "Мій принтер — Bambu Lab P1S. На скільки градусів зазвичай гріють стіл під PETG?"
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "gives_usual_petg_bed_temperature_about_70_85c"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "proposes_a_skill"
+   ],
+   "tool_policy": "memory_search_allowed_memory_store_allowed_skill_propose_forbidden"
+  }
+ },
+ {
+  "family_id": "M114",
+  "catalog_class": "S4_update_existing_skill",
+  "expected_decision": "ACT",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_skills": [
+    {
+     "name": "solder-xt60",
+     "description": "Як я паяю роз'єми XT60",
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт."
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Я тепер паяю XT60 на 400 °C і жалом-лопаткою 3 мм — онови мою навичку.",
+   "Онови навичку про XT60: температура тепер 400 °C, жало-лопатка 3 мм."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps"
+   ],
+   "required_evidence_ids": [],
+   "forbidden_effects": [
+    "proposal_under_another_name",
+    "keeps_380c_or_2mm",
+    "drops_tinning_or_heat_shrink_step",
+    "claims_skill_already_updated"
+   ],
+   "tool_policy": "skill_view_allowed_skill_propose_required",
+   "required_tool_calls": [
+    {
+     "name": "skill_propose"
+    }
+   ]
+  }
+ }
+]

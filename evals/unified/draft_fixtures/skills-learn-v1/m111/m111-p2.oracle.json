@@ -1,0 +1,23 @@
+{
+  "accepted_outcomes": [
+    "proposes_skill_with_all_four_steps"
+  ],
+  "catalog_class": "S1_explicit_skill_request",
+  "expected_decision": "ACT",
+  "family_id": "M111",
+  "forbidden_effects": [
+    "no_skill_proposal",
+    "changed_or_invented_steps",
+    "claims_skill_already_active_or_approved"
+  ],
+  "required_evidence_ids": [],
+  "required_tool_calls": [
+    {
+      "name": "skill_propose"
+    }
+  ],
+  "review_status": "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-24",
+  "scenario_id": "M111-P2",
+  "schema_version": 1,
+  "tool_policy": "skill_propose_required"
+}
