@@ -189,6 +189,31 @@ calls per turn instead of two). M107 0/6 in this arm as before (`standing_intent
 
 A diagnostic run made while a second client used the same Ollama gave a correct P2 reply on the
 old code in 1 of 3 repeats: concurrent load changes gemma's output, so only single-client runs
-count as evidence. Seen on the way, not fixed yet: M107 replies stop at the 512-token cap
-mid-sentence; a `<|channel>thought` block written into the content reaches the user with only the
-marker removed; an unclosed `<think>` ends the turn as `failed`.
+count as evidence. Seen on the way (fixed in 7b): M107 replies stop at the 512-token cap
+mid-sentence; a `<|channel>thought` block written into the content would reach the user with only
+the marker removed (found by reading the code and the gemma4 template; no recorded run shows it);
+an unclosed `<think>` ends the turn as `failed` (Bolt profile only; gemma's profile declares no
+inline reasoning).
+
+### 7b. The three remaining gemma findings (24.11.2026, `5b640de`)
+
+- **M107 cut mid-sentence: a bench mismatch, not a model limit.** The eval runner gave gemma
+  `output_tokens=512`; the owner's runtime keeps the 1024 default (`~/.config/b12/config.toml`
+  sets no `output_tokens`). The runner now uses the Settings default.
+- **Reasoning text in replies.** gemma4 writes reasoning as `<|channel>thought …<channel|>`; only
+  the markers were removed. The stream filter now hides that block for every model (so TUI, web
+  and voice never get it), and the final reply drops it as the template's `strip_thinking` does,
+  also when unclosed or when only the channel name is left.
+- **Output ending inside `<think>`** no longer fails the turn: the reasoning is dropped and the
+  empty/length retry can run.
+
+Tests: `tests/unit/test_model_text.py`, `tests/integration/test_ollama_transport.py`; full
+suite 1296 passed, 4 skipped (`tests/e2e/test_cli.py` now expects 19 tools since `skills` is on).
+
+Check on Colab (single client, runtime `5b640de`, every new default on, 3 repeats, judges
+Codex + Gemini): M107 **6/6**, replies 441–580 tokens, none cut (before: 512, cut); M108
+**6/6** (`skill_view` in all 6). No reasoning text in any reply. The six M107 Codex/Gemini
+disputes are the type the owner ruled PASS on 24.11 («Ти вже згадував / знаєш про CT 17»); that
+ruling was applied by Claude (`adjudication.json` names it). Raw run:
+`flags-live-v2-g24-defaults-5b640de-2026-11-24`; judges: `semantic-judge-flags2-g24-defaults`.
+
