@@ -18,7 +18,7 @@ import sqlite3
 import time
 from collections import deque
 from collections.abc import Awaitable, Callable, Mapping
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from types import MappingProxyType
@@ -1321,12 +1321,17 @@ class Agent:
                 query_prefix = "\n\n".join(
                     part for part in (state.get("conversation_note", ""), query_rules) if part
                 )
+                # A retry with reasoning allowed is admitted with it: the template renders extra
+                # markers then, and the provider's prompt count must not exceed the admitted one.
                 request = self._admit(
-                    system, history, state, tools, persist, query_prefix=query_prefix
+                    system,
+                    history,
+                    state,
+                    tools,
+                    persist,
+                    query_prefix=query_prefix,
+                    think=state.pop("think_next", False),
                 )
-                if state.pop("think_next", False):
-                    request = replace(request, think=True)
-                    request = replace(request, fingerprint=request._fingerprint())
 
                 async def delta(text):
                     await emit("text_delta", {"text": text})
@@ -1862,7 +1867,9 @@ class Agent:
             system += "\n" + lang_line
         return system, query_rules
 
-    def _admit(self, system, history, state, tools, persist, *, query_prefix: str = ""):
+    def _admit(
+        self, system, history, state, tools, persist, *, query_prefix: str = "", think=False
+    ):
         """Build the model request. In persist mode, when the request does not fit the context,
         older history shrinks further and the request is built again, instead of ending the turn."""
         ladder = _PERSIST_FIT if persist else ((None, 2),)
@@ -1904,7 +1911,9 @@ class Agent:
                         }
                     )
                 try:
-                    request = self.builder.build(request_system, messages, state["evidence"], tools)
+                    request = self.builder.build(
+                        request_system, messages, state["evidence"], tools, think=think
+                    )
                 except ModelError as exc:
                     if exc.code != "context_overflow" or attempt == len(ladder) - 1:
                         raise

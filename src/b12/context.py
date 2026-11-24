@@ -100,7 +100,8 @@ class AdmittedRequest:
             or self.model_revision != profile.spec.manifest_digest
             or self.template_revision != profile.spec.files["chat_template.jinja"]
             or self.fingerprint != self._fingerprint()
-            or self.input_tokens != profile.count(thaw(self.messages), thaw(self.tools))
+            or self.input_tokens
+            != profile.count(thaw(self.messages), thaw(self.tools), think=self.think)
             or self.input_upper_bound != self.input_tokens + profile.spec.safety_tokens
             or self.output_reserve < 1
             or self.input_upper_bound + self.output_reserve > self.num_ctx
@@ -122,6 +123,8 @@ class ContextBuilder:
         messages: Sequence[dict],
         evidence: Sequence[dict] = (),
         tools: Sequence[dict] = (),
+        *,
+        think: bool = False,
     ) -> AdmittedRequest:
         try:
             if not isinstance(system, str):
@@ -131,16 +134,31 @@ class ContextBuilder:
             _json_value(data)
             data = json.loads(canonical(data))
             for item in data["evidence"]:
-                if not isinstance(item, dict) or set(item) not in (
-                    {"id", "text"},
-                    {"id", "text", "meta"},
-                ) or not isinstance(item["id"], str) or not isinstance(item["text"], str):
+                if (
+                    not isinstance(item, dict)
+                    or set(item)
+                    not in (
+                        {"id", "text"},
+                        {"id", "text", "meta"},
+                    )
+                    or not isinstance(item["id"], str)
+                    or not isinstance(item["text"], str)
+                ):
                     raise ValueError("evidence requires id and text")
                 if "meta" in item:
                     meta = item["meta"]
                     allowed = {
-                        "kind", "event", "recorded", "valid", "state", "applies_when",
-                        "origin", "reliability", "source", "source_refs", "conflicts_with",
+                        "kind",
+                        "event",
+                        "recorded",
+                        "valid",
+                        "state",
+                        "applies_when",
+                        "origin",
+                        "reliability",
+                        "source",
+                        "source_refs",
+                        "conflicts_with",
                     }
                     if not isinstance(meta, dict) or not set(meta) <= allowed:
                         raise ValueError("invalid evidence metadata")
@@ -186,11 +204,14 @@ class ContextBuilder:
             # user message, not into the system text: the system prompt, the tool schemas
             # and earlier turns then stay a byte-identical prefix the provider can reuse
             # from its prompt cache (measured: the cache used to stop where Evidence began).
-            groups[-1].insert(1, {
-                "id": "evidence",
-                "role": "system",
-                "content": EVIDENCE_HEADER + canonical(data["evidence"]).decode(),
-            })
+            groups[-1].insert(
+                1,
+                {
+                    "id": "evidence",
+                    "role": "system",
+                    "content": EVIDENCE_HEADER + canonical(data["evidence"]).decode(),
+                },
+            )
         elif data["evidence"]:
             system += "\n\n" + EVIDENCE_HEADER + canonical(data["evidence"]).decode()
         dropped = []
@@ -201,7 +222,8 @@ class ContextBuilder:
                 for group in groups
                 for message in group
             ]
-            count = self.profile.count(outgoing, data["tools"])
+            # Reasoning on renders extra template markers (gemma4: +5 tokens), so count with it.
+            count = self.profile.count(outgoing, data["tools"], think=think)
             bound = count + self.profile.spec.safety_tokens
             if bound + self.settings.output_tokens <= self.settings.num_ctx:
                 break
@@ -226,6 +248,7 @@ class ContextBuilder:
             temperature=self.settings.temperature,
             top_p=self.settings.top_p,
             seed=self.settings.seed,
+            think=think,
         )
         return replace(request, fingerprint=request._fingerprint())
 

@@ -71,12 +71,12 @@ async def test_a_persist_turn_shrinks_history_until_the_request_fits(runtime_fac
     original = runtime.agent.builder.build
     refusals = []
 
-    def tight(system, messages, evidence=(), tools=()):
+    def tight(system, messages, evidence=(), tools=(), *, think=False):
         total = sum(len(m.get("content") or "") for m in messages)
         if total > 4000:
             refusals.append(total)
             raise ModelError("context_overflow", "test budget")
-        return original(system, messages, evidence, tools)
+        return original(system, messages, evidence, tools, think=think)
 
     runtime.agent.builder.build = tight
     big = tmp_path / "script.sh"

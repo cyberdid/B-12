@@ -72,13 +72,13 @@ class ModelProfile:
                 "profile_invalid", "missing, unsupported or mismatched profile"
             ) from exc
 
-    def count(self, messages: list[dict], tools: list[dict]) -> int:
+    def count(self, messages: list[dict], tools: list[dict], *, think: bool = False) -> int:
         try:
             rendered = self.template.render(
                 messages=messages,
                 tools=tools,
                 add_generation_prompt=True,
-                enable_thinking=False,
+                enable_thinking=think,
                 conversational_mode=False,
                 **self.special_tokens,
             )

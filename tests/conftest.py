@@ -22,6 +22,8 @@ def profile_settings(tmp_path):
         "{% for m in messages %}{{m.role}}:{{m.content}}"
         "{{m.tool_calls | default([]) | tojson}};{% endfor %}"
         "{{tools | tojson}}assistant:"
+        # Like gemma4: reasoning on renders extra markers, so admission must count with it.
+        "{% if enable_thinking %}<|think|>{% endif %}"
     )
     profile = {
         "renderer": "hf-jinja-v1",
@@ -245,7 +247,10 @@ async def scripted_ollama(profile_settings):
                             }
                         )
                     )
-                count = profile.count(body["messages"], body.get("tools", []))
+                # Like Ollama: the template renders the thinking markers when `think` is on.
+                count = profile.count(
+                    body["messages"], body.get("tools", []), think=bool(body.get("think"))
+                )
                 writer.write(
                     frame(
                         {
