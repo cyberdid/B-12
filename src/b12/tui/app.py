@@ -199,9 +199,6 @@ class B12App(App):
         me = await self.client.me()
         self.query_one(NeonHeader).set_connected(True)
         self.set_interval(5, self.check_link)  # the indicator follows the server, even when idle
-        await self.refresh_models()
-        self.set_interval(1.0, self._poll_models)
-        await self._restore_companion()
         self.query_one("#consent", Checkbox).value = bool(me.get("consent"))
         for box in self.query(Checkbox):
             box.label = _switch_label(box.id, box.value)
@@ -217,6 +214,10 @@ class B12App(App):
         self._render_activity()
         self.set_interval(1.0, self._tick_ui)
         self.query_one("#prompt", Input).focus()
+        # Model line and companion last, so sessions and the prompt are ready first.
+        await self.refresh_models()
+        self.set_interval(1.0, self._poll_models)
+        await self._restore_companion()
 
     async def on_unmount(self) -> None:
         self._closing = True
