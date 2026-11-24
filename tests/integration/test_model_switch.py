@@ -279,3 +279,34 @@ async def test_switching_to_cloud_cancels_a_running_warm_up(scripted_ollama, tmp
         assert (await switch.status())["state"] == "ready"
     finally:
         runtime.close()
+
+
+# --- real TUI run on the owner's laptop (24.11.2026) ---
+
+
+async def test_warm_up_loads_with_the_turn_context_and_waits_until_loaded(
+    scripted_ollama, tmp_path
+):
+    """The warm-up used Ollama's default context, so the first turn reloaded the model and timed
+    out on the 8 GB GPU; status said ready before the model was in memory."""
+    state, base = scripted_ollama
+    runtime = open_runtime(base.model_copy(update={"state_dir": tmp_path / "state"}))
+    try:
+        switch = _switch(runtime, tmp_path, base)
+        await switch.warm_up(next(c for c in switch.local_choices() if c.model == "test-model"))
+        (body,) = state["generated"]
+        assert body["options"]["num_ctx"] == base.num_ctx
+        assert (await switch.status())["state"] == "ready" and state["loaded"]
+    finally:
+        runtime.close()
+
+
+async def test_status_reports_the_part_running_on_the_cpu(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["loaded"], state["ps_size"] = True, 10 * 1024**3  # 6 of 10 GB on the GPU
+    runtime = open_runtime(base.model_copy(update={"state_dir": tmp_path / "state"}))
+    try:
+        status = await _switch(runtime, tmp_path, base).status()
+        assert status["cpu_share"] == 0.4
+    finally:
+        runtime.close()

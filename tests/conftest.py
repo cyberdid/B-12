@@ -205,7 +205,14 @@ async def scripted_ollama(profile_settings):
                 await respond(writer, 200, {"template": "{{ .Prompt }}"})
             elif path.endswith("/api/ps"):
                 running = (
-                    [{"name": "test-model", "model": "test-model", "size_vram": 6 * 1024**3}]
+                    [
+                        {
+                            "name": "test-model",
+                            "model": "test-model",
+                            "size": state.get("ps_size", 6 * 1024**3),
+                            "size_vram": 6 * 1024**3,
+                        }
+                    ]
                     if state["loaded"]
                     else []
                 )
@@ -217,6 +224,7 @@ async def scripted_ollama(profile_settings):
                         state["unloads"] += 1
                     await respond(writer, state["unload_status"], {"done_reason": "unload"})
                 else:  # a load (warm-up) request
+                    state.setdefault("generated", []).append(body)
                     state["loaded"] = True
                     await respond(writer, 200, {"done": True, "done_reason": "load"})
             elif path.endswith("/api/pull"):

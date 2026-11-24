@@ -49,6 +49,8 @@ def model_line(choice: dict | None, status: dict | None) -> Text:
             text.append(f" · {int(status['elapsed_s'])} с", "#8f9fc1")
     elif state == "ready" and status.get("vram_mb"):
         text.append(f" · {status['vram_mb'] / 1024:.1f} ГБ", "#8f9fc1")
+        if status.get("cpu_share"):
+            text.append(f" · ⚠ {round(status['cpu_share'] * 100)}% на CPU, повільно", "#ffd58a")
     elif state == "error" and status.get("detail"):
         text.append(f": {status['detail'][:60]}", "#ff7a90")
     if choice.get("warning"):

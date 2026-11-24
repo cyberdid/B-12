@@ -297,11 +297,27 @@ class ModelSwitch:
                         f"({digest[:12]} ≠ {expected[:12]})"
                     )
                 self._set("loading", detail="завантаження у відеопам'ять")
+                # Load with the context the turns use: a different num_ctx makes Ollama reload
+                # the model inside the first turn (on the 8 GB laptop GPU that hit the deadline).
                 response = await client.post(
-                    "api/generate", json={"model": choice.model, "prompt": "", "keep_alive": "30m"}
+                    "api/generate",
+                    json={
+                        "model": choice.model,
+                        "prompt": "",
+                        "keep_alive": "30m",
+                        "options": {"num_ctx": self.base.num_ctx},
+                    },
                 )
                 if response.status_code != 200:
                     raise RuntimeError(f"Ollama HTTP {response.status_code}")
+                # "ready" only once the model is really in memory.
+                for _ in range(600):
+                    running = (await client.get("api/ps")).json().get("models", [])
+                    if any(choice.model in (m.get("name"), m.get("model")) for m in running):
+                        break
+                    await asyncio.sleep(1.0)
+                else:
+                    raise RuntimeError("Ollama did not load the model in 10 minutes")
             self._set("ready")
         except asyncio.CancelledError:
             raise
@@ -311,7 +327,13 @@ class ModelSwitch:
             self._ready.set()  # a waiting turn proceeds, or fails with the error above
 
     async def status(self) -> dict:
-        status = {"id": self.active_id, **self._status, "elapsed_s": None, "vram_mb": None}
+        status = {
+            "id": self.active_id,
+            **self._status,
+            "elapsed_s": None,
+            "vram_mb": None,
+            "cpu_share": None,
+        }
         if self._started is not None and status["state"] in ("loading", "pulling"):
             status["elapsed_s"] = round(time.monotonic() - self._started, 1)
         if self.active_id.startswith("local:") and status["state"] == "ready":
@@ -321,7 +343,10 @@ class ModelSwitch:
                     running = (await client.get("api/ps")).json().get("models", [])
                 for item in running:
                     if item.get("name") == model or item.get("model") == model:
-                        status["vram_mb"] = int(item.get("size_vram", 0)) // (1024 * 1024)
+                        vram, size = int(item.get("size_vram", 0)), int(item.get("size", 0))
+                        status["vram_mb"] = vram // (1024 * 1024)
+                        if size > vram > 0:  # part of the model runs on the CPU: slow
+                            status["cpu_share"] = round(1 - vram / size, 2)
             except (httpx.HTTPError, ValueError):
                 pass
         return status

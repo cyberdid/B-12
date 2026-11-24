@@ -632,3 +632,10 @@ async def test_old_server_without_model_routes_still_works():
         await pilot.press("enter")
         await pilot.pause(0.3)
         assert app.turn is None
+
+
+def test_model_line_warns_when_part_of_the_model_runs_on_the_cpu():
+    from b12.tui.models import model_line
+
+    line = model_line(LOCAL, {"state": "ready", "vram_mb": 6144, "cpu_share": 0.39}).plain
+    assert "39% на CPU" in line
