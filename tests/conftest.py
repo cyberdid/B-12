@@ -228,7 +228,7 @@ async def scripted_ollama(profile_settings):
                     + frames
                 )
                 await writer.drain()
-                state["tags"].append({"name": body.get("model"), "digest": "b" * 64})
+                state["tags"].append({"name": body.get("model"), "digest": "a" * 64})
             elif path.endswith("/api/chat"):
                 state["requests"].append(body)
                 state["loaded"] = True

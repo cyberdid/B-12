@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import signal
 import tempfile
 import time
 from collections.abc import Awaitable, Callable
@@ -79,6 +81,24 @@ class _Invalid(Exception):
     pass
 
 
+class _TooLong(Exception):
+    pass
+
+
+_MAX_ARG_BYTES = 120_000  # one argv string; Linux caps it at 128 KiB
+
+
+async def _kill(process) -> None:
+    """Kill the CLI and everything it started (the CLIs are node programs with children)."""
+    if process.returncode is not None:
+        return
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        process.kill()
+    await process.wait()
+
+
 async def _run(argv: list[str], stdin_text: str, cwd: Path, timeout: float) -> str:
     process = await asyncio.create_subprocess_exec(
         *argv,
@@ -86,14 +106,19 @@ async def _run(argv: list[str], stdin_text: str, cwd: Path, timeout: float) -> s
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
+        start_new_session=True,  # its own process group, so a kill reaches the children
     )
     try:
         out, err = await asyncio.wait_for(process.communicate(stdin_text.encode()), timeout)
     except TimeoutError:
-        process.kill()
+        await _kill(process)
         raise RuntimeError("backend timed out") from None
+    except BaseException:  # cancelled turn or owner stop: never leave the CLI running
+        await asyncio.shield(_kill(process))
+        raise
     if process.returncode != 0:
-        raise RuntimeError(f"backend exit {process.returncode}: {err.decode()[-300:]}")
+        tail = (err.decode(errors="replace") + " " + out.decode(errors="replace")).strip()
+        raise RuntimeError(f"backend exit {process.returncode}: {tail[-300:]}")
     return out.decode()
 
 
@@ -141,10 +166,11 @@ class CliModel:
     async def unload(self, **_) -> bool:
         return True  # nothing is held between calls
 
-    async def _ask(self, system: str, text: str, tmp: Path) -> dict:
+    async def _ask(self, system: str, text: str, tmp: Path, timeout: float) -> dict:
         empty = tmp / "empty"
         empty.mkdir()
         if self.backend == "claude":
+            (tmp / "system.txt").write_text(system, encoding="utf-8")
             out = await self._runner(
                 [
                     "claude",
@@ -153,8 +179,8 @@ class CliModel:
                     self.model,
                     "--tools",
                     "",
-                    "--system-prompt",
-                    system,
+                    "--system-prompt-file",
+                    str(tmp / "system.txt"),
                     "--json-schema",
                     json.dumps(SCHEMA),
                     "--output-format",
@@ -166,7 +192,7 @@ class CliModel:
                 ],
                 text,
                 empty,
-                self.timeout_s,
+                timeout,
             )
             result = json.loads(out)
             if result.get("is_error") or not isinstance(result.get("structured_output"), dict):
@@ -195,7 +221,7 @@ class CliModel:
                 ],
                 f"SYSTEM MESSAGE OF THE RUNTIME:\n{system}\n\n{text}",
                 empty,
-                self.timeout_s,
+                timeout,
             )
             _codex_ok(events)
             return json.loads(out_file.read_text(encoding="utf-8"))
@@ -211,7 +237,9 @@ class CliModel:
         ]
         if self.model:
             argv += ["--model", self.model]
-        out = await self._runner([*argv, "-p", prompt], "", empty, self.timeout_s)
+        if len(prompt.encode()) > _MAX_ARG_BYTES:
+            raise _TooLong("conversation too long for agy (one command-line argument)")
+        out = await self._runner([*argv, "-p", prompt], "", empty, timeout)
         result = json.loads(out)
         if result.get("status") != "SUCCESS" or not result.get("response"):
             raise _Invalid("agy returned no answer")
@@ -229,7 +257,7 @@ class CliModel:
         body = {"messages": _thaw(request.messages), "tools": _thaw(request.tools)}
         system, text = split_messages(body)
         with tempfile.TemporaryDirectory(prefix="b12-cloud-") as tmp:
-            ask = asyncio.create_task(self._ask(system, text, Path(tmp)))
+            ask = asyncio.create_task(self._ask(system, text, Path(tmp), timeout))
             waiters = [ask]
             stop = asyncio.create_task(cancel.wait()) if cancel is not None else None
             if stop is not None:
@@ -241,17 +269,27 @@ class CliModel:
             finally:
                 if stop is not None:
                     stop.cancel()
+                if not ask.done():
+                    # Cancelled, timed out, or this task itself cancelled: kill the CLI before
+                    # its working directory goes away.
+                    ask.cancel()
+                    await asyncio.shield(asyncio.gather(ask, return_exceptions=True))
             if ask not in done:
-                ask.cancel()
                 if cancel is not None and cancel.is_set():
                     raise ModelError("cancelled", "request cancelled")
                 raise ModelError("deadline_exceeded", "cloud model did not answer in time")
             try:
                 structured = ask.result()
+            except _TooLong as exc:
+                raise ModelError("prompt_too_long", str(exc)) from exc
             except _Invalid as exc:
                 raise ModelError("invalid_round", str(exc)[:200]) from exc
             except (json.JSONDecodeError, OSError, RuntimeError) as exc:
-                raise ModelError("transport_error", str(exc)[:200]) from exc
+                message = str(exc)
+                quota = any(w in message.lower() for w in ("usage limit", "quota", "rate limit"))
+                raise ModelError(
+                    "quota_exceeded" if quota else "transport_error", message[:200]
+                ) from exc
         content = structured.get("content") if isinstance(structured, dict) else None
         if not isinstance(content, str):
             raise ModelError("invalid_round", "answer has no content")

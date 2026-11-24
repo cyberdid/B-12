@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
 import shutil
 import time
@@ -22,6 +23,9 @@ import httpx
 from b12.cloud_model import CliModel
 from b12.context import ContextBuilder
 from b12.model import OllamaModel
+from b12.model_errors import ModelError
+
+log = logging.getLogger("b12.models")
 
 CLOUD_CONTEXT = {"num_ctx": 200000, "output_tokens": 16384}
 _MODEL_FIELDS = ("model", "model_profile", "tokenizer_dir", "num_ctx", "output_tokens")
@@ -66,6 +70,31 @@ def _size_warning(model: str) -> str:
     return ""
 
 
+class _Gated:
+    """A local model still downloading or loading: a turn waits for it, or fails readably."""
+
+    def __init__(self, inner, ready: asyncio.Event, failure: Callable[[], str | None]):
+        self.inner, self._ready, self._failure = inner, ready, failure
+
+    async def chat(self, request, *, on_delta=None, cancel=None, deadline=None):
+        if not self._ready.is_set():
+            timeout = None if deadline is None else max(0.0, deadline - time.monotonic())
+            try:
+                await asyncio.wait_for(self._ready.wait(), timeout)
+            except TimeoutError:
+                raise ModelError("deadline_exceeded", "model is still loading") from None
+        failure = self._failure()
+        if failure:
+            raise ModelError("model_unavailable", failure[:200])
+        return await self.inner.chat(request, on_delta=on_delta, cancel=cancel, deadline=deadline)
+
+    async def unload(self, **kwargs) -> bool:
+        return await self.inner.unload(**kwargs)
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+
 class ModelSwitch:
     def __init__(
         self,
@@ -84,6 +113,8 @@ class ModelSwitch:
         self._status = {"state": "ready", "progress": None, "detail": ""}
         self._started: float | None = None
         self._warm: asyncio.Task | None = None
+        self._ready = asyncio.Event()
+        self._ready.set()
         self._profiles: dict[str, tuple[Path, Path, str]] = {}
 
     # ---- catalog ----------------------------------------------------------------
@@ -153,7 +184,7 @@ class ModelSwitch:
             settings = self.base.model_copy(
                 update={"model": choice.model, "model_profile": profile, "tokenizer_dir": tokenizer}
             )
-            model = OllamaModel(settings)
+            model = _Gated(OllamaModel(settings), self._ready, self._failure)
         else:
             settings = self.base.model_copy(update=CLOUD_CONTEXT)
             model = CliModel(choice.backend, choice.model)
@@ -168,15 +199,35 @@ class ModelSwitch:
         self.active_id = choice.id
         self.runtime.control.set_meta("active_model", choice.id)
 
+    def _failure(self) -> str | None:
+        return self._status.get("detail") if self._status.get("state") == "error" else None
+
     async def switch(self, choice_id: str) -> ModelChoice:
         choice = await self._choice(choice_id)
-        async with self.runtime.agent.model_lock:
+        if self._warm is not None and not self._warm.done():
+            self._warm.cancel()  # an earlier download/load must not report against this model
+        self._warm = None
+        agent = self.runtime.agent
+        async with agent.model_lock:
+            old = agent.model
+            if choice.kind == "local":
+                self._ready.clear()
+                self._set("loading", detail="підготовка моделі")
             self._apply(choice)
+            # The outgoing local model leaves the GPU with its KV cache (a purge then only has
+            # the active model to reset). A turn still running keeps it and Ollama reloads it.
+            running = any(
+                not key.startswith(("skill_review-", "memory_review-")) for key in agent.active
+            )
+            if old is not agent.model and not running and hasattr(old, "unload"):
+                try:
+                    await old.unload(timeout_s=10)
+                except (ModelError, OSError) as exc:
+                    log.warning("could not unload the previous model: %s", exc)
         if choice.kind == "local":
-            if self._warm is not None and not self._warm.done():
-                self._warm.cancel()
             self._warm = asyncio.create_task(self.warm_up(choice))
         else:
+            self._ready.set()
             self._set("ready" if self.which(choice.backend) else "unavailable")
         return choice
 
@@ -187,8 +238,14 @@ class ModelSwitch:
             return
         for choice in self.local_choices() + [c for c in CLOUD if self.which(c.backend)]:
             if choice.id == saved:
-                self._apply(choice)
+                try:
+                    self._apply(choice)
+                except Exception as exc:  # a broken profile must never stop the runtime
+                    log.warning("saved model %s cannot be restored: %s", saved, exc)
+                    break
                 return
+        # The saved model is gone or broken: keep the configured one and forget the choice.
+        self.runtime.control.set_meta("active_model", "")
 
     # ---- status -----------------------------------------------------------------
     def _set(self, state: str, **fields) -> None:
@@ -231,6 +288,14 @@ class ModelSwitch:
                                     progress=round(done / total, 3),
                                     detail=item.get("status", ""),
                                 )
+                expected = self._profiles.get(choice.model, (None, None, ""))[2]
+                tags = (await client.get("api/tags")).json().get("models", [])
+                digest = next((t.get("digest") for t in tags if t.get("name") == choice.model), "")
+                if expected and digest and digest != expected:
+                    raise RuntimeError(
+                        "версія моделі в Ollama не збігається з каліброваним профілем "
+                        f"({digest[:12]} ≠ {expected[:12]})"
+                    )
                 self._set("loading", detail="завантаження у відеопам'ять")
                 response = await client.post(
                     "api/generate", json={"model": choice.model, "prompt": "", "keep_alive": "30m"}
@@ -242,6 +307,8 @@ class ModelSwitch:
             raise
         except Exception as exc:  # shown to the owner, never raised into a turn
             self._set("error", detail=str(exc)[:200])
+        finally:
+            self._ready.set()  # a waiting turn proceeds, or fails with the error above
 
     async def status(self) -> dict:
         status = {"id": self.active_id, **self._status, "elapsed_s": None, "vram_mb": None}

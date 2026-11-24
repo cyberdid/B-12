@@ -793,6 +793,7 @@ class Agent:
         self.skills = None  # SkillStore, wired by the application factory
         self.model_lock = asyncio.Lock()
         self.active: dict[str, _Active] = {}
+        self._pinned: dict[str, tuple] = {}  # turn_id -> (model, builder) the turn started with
         self._session_locks: dict[str, asyncio.Lock] = {}
         self._volatile: dict[str, list[dict]] = {}
         self._waiting: dict[str, dict] = {}
@@ -1149,6 +1150,10 @@ class Agent:
             self._tainted.add(context.turn_id)
         active = _Active(actor.id, context.cancel)
         self.active[context.turn_id] = active
+        # A turn keeps the model it started with: the owner may switch models (ADR-023) while
+        # it runs, and the new model applies from the next turn. Kept outside `state`, which is
+        # saved as JSON when the turn waits for the owner.
+        self._pinned.setdefault(context.turn_id, (self.model, self.builder))
         for key, item in list(self.active.items()):
             if key.startswith("skill_review-"):
                 # Background learning yields to any turn instead of holding the model lock.
@@ -1335,13 +1340,14 @@ class Agent:
                     persist,
                     query_prefix=query_prefix,
                     think=state.pop("think_next", False),
+                    builder=self._pinned.get(context.turn_id, (None, None))[1],
                 )
 
                 async def delta(text):
                     await emit("text_delta", {"text": text})
 
                 async with self.model_lock:
-                    reply = await self.model.chat(
+                    reply = await self._pinned.get(context.turn_id, (self.model,))[0].chat(
                         request, on_delta=delta, cancel=context.cancel, deadline=context.deadline
                     )
                 state.setdefault("model_metrics", []).append(dict(reply.metrics))
@@ -1603,6 +1609,7 @@ class Agent:
         finally:
             active.done.set()
             self.active.pop(context.turn_id, None)
+            self._pinned.pop(context.turn_id, None)
             self._revisions.pop(context.turn_id, None)
             self.control.release_turn(context.turn_id)
 
@@ -1872,7 +1879,16 @@ class Agent:
         return system, query_rules
 
     def _admit(
-        self, system, history, state, tools, persist, *, query_prefix: str = "", think=False
+        self,
+        system,
+        history,
+        state,
+        tools,
+        persist,
+        *,
+        query_prefix: str = "",
+        think=False,
+        builder=None,
     ):
         """Build the model request. In persist mode, when the request does not fit the context,
         older history shrinks further and the request is built again, instead of ending the turn."""
@@ -1915,7 +1931,7 @@ class Agent:
                         }
                     )
                 try:
-                    request = self.builder.build(
+                    request = (builder or self.builder).build(
                         request_system, messages, state["evidence"], tools, think=think
                     )
                 except ModelError as exc:
