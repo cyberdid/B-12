@@ -2,12 +2,12 @@
  "families": {
   "M107": {
    "track": "memory",
-   "pass": 0,
+   "pass": 6,
    "partial": 0,
    "fail": 0,
-   "pending": 6,
+   "pending": 0,
    "blocked": 0,
-   "acceptable_rate": null
+   "acceptable_rate": 1.0
   },
   "M108": {
    "track": "memory",
@@ -21,14 +21,14 @@
  },
  "tracks": {
   "memory": {
-   "families_fully_decided": 1,
-   "mean_family_acceptable_rate": 0.0,
+   "families_fully_decided": 2,
+   "mean_family_acceptable_rate": 0.5,
    "cluster_bootstrap_95ci": [
     0.0,
-    0.0
+    1.0
    ]
   }
  },
- "pending_records": 6,
+ "pending_records": 0,
  "excluded_families": []
 }

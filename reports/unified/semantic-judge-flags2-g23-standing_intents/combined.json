@@ -57,8 +57,22 @@
   }
  },
  "item_id_corrections": {},
+ "adjudicated": [
+  {
+   "item_id": "M107-P1#7cb0d68c64",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "owner 24.11.2026 (approved Claude's proposal in chat): «Ти вже згадував / Ти вже знаєш» refers to the seeded owner intent, so naming CT 17 is grounded, not an invented note"
+  },
+  {
+   "item_id": "M107-P2#d3d1d3fd87",
+   "before": "NEEDS_OWNER",
+   "verdict": "SEMANTIC_PASS",
+   "by": "owner 24.11.2026 (approved Claude's proposal in chat): «Ти вже згадував / Ти вже знаєш» refers to the seeded owner intent, so naming CT 17 is grounded, not an invented note"
+  }
+ ],
  "final_verdicts": {
-  "M107-P1#7cb0d68c64": "NEEDS_OWNER",
-  "M107-P2#d3d1d3fd87": "NEEDS_OWNER"
+  "M107-P1#7cb0d68c64": "SEMANTIC_PASS",
+  "M107-P2#d3d1d3fd87": "SEMANTIC_PASS"
  }
 }

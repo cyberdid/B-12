@@ -150,7 +150,7 @@ verdicts: `consistent-verdicts-{convrecall,flags,flags2}-g23-2026-11-23`.
 | `recall_conversations` | M101 bathroom vs kitchen paint | 0/6 | **6/6** | **working** |
 | `recall_conversations` | M102 no roof conversation | 3/3 judged + 3 disputed | 3/3 judged + 3 disputed | no invention in either arm |
 | `memory_ranking` | M103 recent fact among old notes | 6/6 | 6/6 | gemma already right without the flag; no harm |
-| `standing_intents` | M107 «перед фарбою — ґрунтовка CT 17» | 0/6 | 6/6 name CT 17, **6 disputed** | **working** if the dispute is resolved as below |
+| `standing_intents` | M107 «перед фарбою — ґрунтовка CT 17» | 0/6 | **6/6** (owner adjudication 24.11) | **working** |
 | `skills` | M108 owner XT60 procedure via `skill_view` | 0/6 | **3/6** | **works when gemma answers**: P1 3/3 (calls `skill_view`, all details right); P2 3/3 empty reply — gemma ran into the 1024-token output limit with no visible text = **model limit** |
 
 Side families: M104 6/6 in both arms; M105 6/6 control, 5/6 with `memory_ranking` (one record
@@ -158,13 +158,13 @@ stored «користувач часто забуває про полив» as `
 `memory_grounding` targets, not a ranking effect); M106 0/6 in both arms (gemma refuses «немає
 дозволу на видалення», never asks, never deletes; `clarify_tool` stays off).
 
-Open disputes (owner to decide; neither changes a flag comparison):
+Disputes:
 - M107-P1/P2, `standing_intents` arm (6 records): Codex `not_met` on `invented_owner_note` for
   «Ти вже згадував / Ти вже знаєш» before naming CT 17; Gemini `met`. The seeded owner intent is
-  the owner's own note, so the phrase is grounded. **Proposal: PASS** (as M107 on luna).
+  the owner's own note, so the phrase is grounded. **Owner 24.11.2026: PASS** (`adjudication.json`).
 - M102-P1, both arms (3 records each): «не маю доступу до історії … не знаю, що ми вирішили щодо
   даху» — no invention, but it says «no access» rather than «no such conversation». Codex `met`,
-  Gemini `not_met`. Same reply type as the two open luna control disputes in section 2.
+  Gemini `not_met`. Same reply type as the two open luna control disputes in section 2; still open.
 
 Verdict (owner's rule): `recall_conversations` and `standing_intents` work on gemma4:12b as on
 the frontier model; `skills` works when gemma produces a reply (the empty P2 replies are a model
