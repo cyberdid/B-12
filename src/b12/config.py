@@ -117,6 +117,10 @@ class Settings(BaseModel):
     parallel_reads: bool = False
     # ADR-021: procedural skills index and skill_view/skill_propose tools. Off until measured.
     skills: bool = True  # owner 23.11.2026: on after frontier measurements
+    # Background skill review (spec 2026-11-24, owner chose option B): idle pass over finished
+    # turns that stages learned procedures as skill proposals for owner approval. Needs `skills`.
+    # Off until measured.
+    skill_review: bool = False
     # Task H6 (Step 1): local wake-word gating in LiveSession (accept utterances only within 8 s
     # after wake detection; RAM-only 1.5 s ring buffer). Off until Step 2 model approval.
     wake_word: bool = False
@@ -287,6 +291,7 @@ class Settings(BaseModel):
                 "stable_prefix",
                 "parallel_reads",
                 "skills",
+                "skill_review",
                 "wake_word",
                 "annotate_unverified_claims",
             ):
