@@ -115,8 +115,27 @@ class ModelSwitch:
             for m in found
         ]
 
+    async def _downloaded(self) -> set[str] | None:
+        try:
+            async with self._client() as client:
+                tags = (await client.get("api/tags")).json().get("models", [])
+        except (httpx.HTTPError, ValueError):
+            return None  # Ollama not reachable: say nothing rather than guess
+        return {t.get("name") for t in tags}
+
     async def catalog(self) -> list[ModelChoice]:
         local = self.local_choices()
+        downloaded = await self._downloaded()
+        if downloaded is not None:
+            note = "не завантажено: вибір почне завантаження з Ollama"
+            local = [
+                c
+                if c.model in downloaded
+                else ModelChoice(
+                    **{**c.as_dict(), "warning": "; ".join(filter(None, [note, c.warning]))}
+                )
+                for c in local
+            ]
         return local + [c for c in CLOUD if self.which(c.backend)]
 
     async def _choice(self, choice_id: str) -> ModelChoice:

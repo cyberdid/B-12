@@ -134,3 +134,15 @@ async def test_active_model_is_restored_after_restart(scripted_ollama, tmp_path)
         assert isinstance(runtime.agent.model, CliModel)
     finally:
         runtime.close()
+
+
+async def test_a_model_not_downloaded_is_marked_in_the_catalog(scripted_ollama, tmp_path):
+    state, base = scripted_ollama
+    state["tags"][:] = []
+    runtime = open_runtime(base.model_copy(update={"state_dir": tmp_path / "state"}))
+    try:
+        switch = _switch(runtime, tmp_path, base)
+        (local,) = [c for c in await switch.catalog() if c.kind == "local"]
+        assert "не завантажено" in local.warning
+    finally:
+        runtime.close()
