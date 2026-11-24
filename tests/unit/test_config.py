@@ -162,7 +162,7 @@ def test_environment_mapping_is_explicit_and_typed(tmp_path, monkeypatch):
         "stable_prefix": False,
         "parallel_reads": False,
         "skills": True,
-        "skill_review": False,
+        "skill_review": True,
         "wake_word": False,
         "annotate_unverified_claims": False,
         "sudo_access": "off",
