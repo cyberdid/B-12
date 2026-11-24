@@ -598,7 +598,8 @@ def _model_settings(state_dir: Path):
         tokenizer_dir=share / "tokenizers" / tokenizer,
         **extra,
         num_ctx=8192,
-        output_tokens=512,
+        # The owner's runtime keeps the Settings default (config.toml sets no output_tokens);
+        # 512 here cut gemma's longer replies mid-sentence (M107, 23-24.11.2026).
         quiet_start="00:00",
         quiet_end="00:00",
     )

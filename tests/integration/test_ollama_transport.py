@@ -265,16 +265,50 @@ async def test_prompt_count_below_admission_is_accepted_and_logged(wire_server, 
 
 
 async def test_unterminated_inline_thinking_does_not_leak(wire_server):
+    """Output that ends inside reasoning (budget spent) is dropped, not a failed turn."""
     state, settings, request = wire_server
-    state["chunks"] = [delta("<think>secret"), done(request.input_tokens)]
+    state["chunks"] = [
+        delta("Так. <think>secret"),
+        done(request.input_tokens, done_reason="length"),
+    ]
     received = []
 
     async def collect(text):
         received.append(text)
 
-    with pytest.raises(ModelError, match="unterminated_reasoning"):
-        await OllamaModel(settings).chat(request, on_delta=collect)
-    assert received == []
+    reply = await OllamaModel(settings).chat(request, on_delta=collect)
+    assert reply.content.strip() == "Так." and reply.finish_reason == "length"
+    assert "secret" not in "".join(received)
+
+
+async def test_partial_marker_at_the_end_is_ordinary_text(wire_server):
+    state, settings, request = wire_server
+    state["chunks"] = [delta("a <"), done(request.input_tokens)]
+    received = []
+
+    async def collect(text):
+        received.append(text)
+
+    reply = await OllamaModel(settings).chat(request, on_delta=collect)
+    assert reply.content == "".join(received) == "a <"
+
+
+async def test_gemma_reasoning_channel_is_not_streamed(wire_server):
+    state, settings, request = wire_server
+    state["chunks"] = [
+        delta("<|chan"),
+        delta("nel>thought\nсекрет"),
+        delta("<chann"),
+        delta("el|>Раз на 2 дні."),
+        done(request.input_tokens),
+    ]
+    received = []
+
+    async def collect(text):
+        received.append(text)
+
+    reply = await OllamaModel(settings).chat(request, on_delta=collect)
+    assert reply.content == "".join(received) == "Раз на 2 дні."
 
 
 async def test_provider_output_over_reserve_fails(wire_server):

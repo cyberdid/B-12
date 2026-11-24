@@ -164,7 +164,9 @@ async def test_tools_lists_catalog_without_secrets(cli):
     _, run, _ = cli
     code, out, _ = await run("tools")
     tools = {t["name"]: t for t in parse(out)}
-    assert code == 0 and len(tools) == 17 and "run_command" in tools
+    # 19 since `skills` is on by default (owner, 23.11.2026): skill_view and skill_propose.
+    assert code == 0 and len(tools) == 19 and "run_command" in tools
+    assert "skill_view" in tools and "skill_propose" in tools
     assert "web_search" in tools and "memory_supersede" in tools
     assert tools["note_add"]["capability"] == "turn.notes"
     assert tools["shell_exec"]["risk"] == "arbitrary"

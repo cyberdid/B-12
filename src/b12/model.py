@@ -45,42 +45,54 @@ _METRICS = {
 }
 
 
+# gemma4 writes reasoning as `<|channel>thought\n...<channel|>`. Those markers never occur in
+# ordinary text, so this pair is filtered for every model; `<think>` only when the profile says so.
+_CHANNEL_PAIR = ("<|channel>", "<channel|>")
+
+
 class _PublicText:
     """Hold delimiter prefixes across chunks; never buffer hidden reasoning itself."""
 
-    def __init__(self, enabled: bool):
-        self.enabled, self.hidden, self.pending = enabled, False, ""
+    def __init__(self, inline_think: bool):
+        pairs = [("<think>", "</think>"), _CHANNEL_PAIR] if inline_think else [_CHANNEL_PAIR]
+        self.pairs = dict(pairs)
+        self.closer, self.pending = None, ""
 
     def feed(self, text: str) -> str:
-        if not self.enabled:
-            return text
         self.pending += text
         output = []
         while self.pending:
-            marker = "</think>" if self.hidden else "<think>"
-            index = self.pending.find(marker)
-            if index >= 0:
-                if not self.hidden:
+            markers = [self.closer] if self.closer else list(self.pairs)
+            found = [(self.pending.find(m), m) for m in markers if m in self.pending]
+            if found:
+                index, marker = min(found)
+                if self.closer is None:
                     output.append(self.pending[:index])
                 self.pending = self.pending[index + len(marker) :]
-                self.hidden = not self.hidden
+                self.closer = None if self.closer else self.pairs[marker]
                 continue
-            keep = next(
-                (n for n in range(len(marker) - 1, 0, -1) if self.pending.endswith(marker[:n])), 0
+            keep = max(
+                (
+                    n
+                    for m in markers
+                    for n in range(len(m) - 1, 0, -1)
+                    if self.pending.endswith(m[:n])
+                ),
+                default=0,
             )
             safe = self.pending[:-keep] if keep else self.pending
-            if not self.hidden:
+            if self.closer is None:
                 output.append(safe)
             self.pending = self.pending[-keep:] if keep else ""
             break
         return "".join(output)
 
     def finish(self) -> str:
-        if self.hidden or self.pending:
-            # A partial opener is ambiguous. Fail closed instead of leaking its suffix.
-            raise ModelError("unterminated_reasoning", "incomplete reasoning delimiter")
-        return ""
-
+        """Output ended: inside reasoning (the budget ran out) the held text is dropped, not a
+        failed turn; outside it, a held partial marker was ordinary text after all."""
+        tail = "" if self.closer else self.pending
+        self.closer, self.pending = None, ""
+        return tail
 
 
 # Reasoning-channel markers some models leak into content (gemma: "thought\n<channel|>").
@@ -92,11 +104,22 @@ _CHANNEL_RESIDUE = re.compile(
 )
 
 
+# A whole reasoning block, as the gemma4 template's strip_thinking drops it: from the opener
+# to the closer, or to the end when the output budget ran out inside it. Ollama may drop the
+# opener token and leave only the channel name on its own line.
+_REASONING_BLOCK = re.compile(
+    r"<\|channel>.*?(?:<channel\|>\s*|\Z)"
+    r"|(?:^|(?<=\n))[ \t]*(?:thought|analysis|commentary)[ \t]*\n.*?<channel\|>\s*",
+    re.DOTALL,
+)
+
+
 def strip_channel_residue(text: str) -> str:
-    """Remove leaked reasoning-channel markers (and their channel name) from a reply."""
+    """Remove leaked reasoning blocks and stray channel markers from a reply."""
     if "channel" not in text:
         return text
-    return _CHANNEL_RESIDUE.sub("", text).strip()
+    return _CHANNEL_RESIDUE.sub("", _REASONING_BLOCK.sub("", text)).strip()
+
 
 class _Calls:
     """Native object arguments are merged by index/id, never interpreted as JSON fragments."""
@@ -266,6 +289,8 @@ class OllamaModel:
                             raise ModelError("malformed_ndjson", "invalid message")
                         # Never read or copy message.thinking, even into metrics/errors.
                         public = text_filter.feed(message.get("content", ""))
+                        if item["done"]:
+                            public += text_filter.finish()
                         if public:
                             visible = "".join(content) + public
                             if (
@@ -288,7 +313,6 @@ class OllamaModel:
                         if "tool_calls" in message:
                             calls.add(message["tool_calls"])
                         if item["done"]:
-                            text_filter.finish()
                             for key in _METRICS & item.keys():
                                 value = item[key]
                                 if type(value) is not int or value < 0:
