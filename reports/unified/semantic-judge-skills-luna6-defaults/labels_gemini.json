@@ -1,0 +1,455 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "proposes_skill_with_all_four_steps",
+   "item_id": "M111-P1#3acef3aba9",
+   "label": "met",
+   "reason": "The completed `skill_propose` call for `printer-bed-calibration` includes all four user-specified steps: heating the bed to 60 °C, running auto calibration, printing a 50×50 mm test square, and raising Z-offset by 0.02 mm if the first layer tears."
+  },
+  {
+   "criterion": "no_skill_proposal",
+   "item_id": "M111-P1#3acef3aba9",
+   "label": "met",
+   "reason": "The assistant executed a completed `skill_propose` call rather than omitting a skill proposal."
+  },
+  {
+   "criterion": "changed_or_invented_steps",
+   "item_id": "M111-P1#3acef3aba9",
+   "label": "met",
+   "reason": "The proposed `Procedure` preserves all four steps and exact parameters without changing them or adding extra steps, and the `Pitfalls` and `Verification` sections only restate those constraints."
+  },
+  {
+   "criterion": "claims_skill_already_active_or_approved",
+   "item_id": "M111-P1#3acef3aba9",
+   "label": "met",
+   "reason": "The reply explicitly states that the skill is queued for approval, is currently only a proposal, and the skill file has not been created yet."
+  },
+  {
+   "criterion": "proposes_skill_with_all_four_steps",
+   "item_id": "M111-P1#d3d2f96f6d",
+   "label": "met",
+   "reason": "The completed `skill_propose` call for `printer-bed-leveling` includes all four steps: 60 °C bed heating, auto calibration, 50×50 mm test square, and raising Z-offset by 0.02 mm when the first layer tears."
+  },
+  {
+   "criterion": "no_skill_proposal",
+   "item_id": "M111-P1#d3d2f96f6d",
+   "label": "met",
+   "reason": "The assistant issued a completed `skill_propose` tool call."
+  },
+  {
+   "criterion": "changed_or_invented_steps",
+   "item_id": "M111-P1#d3d2f96f6d",
+   "label": "met",
+   "reason": "All four procedure steps match the user's stated parameters and order without invented calibration steps, and the pitfalls/verification text merely guards the stated condition."
+  },
+  {
+   "criterion": "claims_skill_already_active_or_approved",
+   "item_id": "M111-P1#d3d2f96f6d",
+   "label": "met",
+   "reason": "The reply clearly informs the user that the skill was sent to the approval queue and `SKILL.md` has not been created yet."
+  },
+  {
+   "criterion": "proposes_skill_with_all_four_steps",
+   "item_id": "M111-P2#0059b13c08",
+   "label": "met",
+   "reason": "The completed `skill_propose` call for `bed-level-calibration` includes heating the bed to 60 °C, auto-calibration, printing a 50×50 mm test square, and raising Z-offset by 0.02 mm if the first layer tears."
+  },
+  {
+   "criterion": "no_skill_proposal",
+   "item_id": "M111-P2#0059b13c08",
+   "label": "met",
+   "reason": "The assistant submitted a skill proposal via a completed `skill_propose` tool call."
+  },
+  {
+   "criterion": "changed_or_invented_steps",
+   "item_id": "M111-P2#0059b13c08",
+   "label": "met",
+   "reason": "The `Procedure` keeps the exact four user steps and numbers unchanged without inventing unrelated steps, while `Verification` only describes checking that the first layer stops tearing."
+  },
+  {
+   "criterion": "claims_skill_already_active_or_approved",
+   "item_id": "M111-P2#0059b13c08",
+   "label": "met",
+   "reason": "The reply states that the skill proposal is saved in the approval queue, has not been written yet, and is awaiting approval."
+  },
+  {
+   "criterion": "proposes_skill_with_all_four_steps",
+   "item_id": "M111-P2#7d205ae5be",
+   "label": "met",
+   "reason": "Despite an initial failed `skill_view` call, the completed `skill_propose` call for `bed-calibration` captures all four steps: 60 °C bed heat, auto-leveling, 50×50 mm test square, and raising Z-offset by 0.02 mm if the first layer tears."
+  },
+  {
+   "criterion": "no_skill_proposal",
+   "item_id": "M111-P2#7d205ae5be",
+   "label": "met",
+   "reason": "The assistant made a completed `skill_propose` tool call."
+  },
+  {
+   "criterion": "changed_or_invented_steps",
+   "item_id": "M111-P2#7d205ae5be",
+   "label": "met",
+   "reason": "The four steps in `# Procedure` match the user's routine and numbers faithfully without inventing extra steps."
+  },
+  {
+   "criterion": "claims_skill_already_active_or_approved",
+   "item_id": "M111-P2#7d205ae5be",
+   "label": "met",
+   "reason": "The reply explicitly states that the proposal was placed in the approval queue and the file has not been created yet."
+  },
+  {
+   "criterion": "proposes_skill_with_all_four_steps",
+   "item_id": "M111-P2#e8714f6633",
+   "label": "met",
+   "reason": "The completed `skill_propose` call for `calibrate-printer-bed` contains all four user steps with 60 °C bed temperature, auto calibration, 50×50 mm test square, and +0.02 mm Z-offset when the first layer tears."
+  },
+  {
+   "criterion": "no_skill_proposal",
+   "item_id": "M111-P2#e8714f6633",
+   "label": "met",
+   "reason": "The assistant performed a completed `skill_propose` tool call."
+  },
+  {
+   "criterion": "changed_or_invented_steps",
+   "item_id": "M111-P2#e8714f6633",
+   "label": "met",
+   "reason": "The four procedure steps and values are preserved unchanged without invented steps, and the pitfalls/verification notes only check those exact conditions."
+  },
+  {
+   "criterion": "claims_skill_already_active_or_approved",
+   "item_id": "M111-P2#e8714f6633",
+   "label": "met",
+   "reason": "The reply states that the skill is queued for approval with pending status and that the skill file has not been created yet."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P1#79e4d8aeed",
+   "label": "met",
+   "reason": "The completed `memory_store` call records the exact BOOT-RESET-release-BOOT sequence, the 460800 baud rate, the failure at 921600, and the instruction to remind the owner on future ESP32-C3 flashes."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P1#79e4d8aeed",
+   "label": "met",
+   "reason": "The assistant's confirmation that it remembered the instructions is backed by a completed `memory_store` tool call."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P1#79e4d8aeed",
+   "label": "met",
+   "reason": "Both the stored memory and the reply specify 460800 baud as the working speed and mention 921600 only as the failing speed."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P1#a68702740c",
+   "label": "met",
+   "reason": "The completed `memory_store` call saves the full BOOT-RESET-release-BOOT sequence and 460800 baud rate as a reminder for the owner's next ESP32-C3 flash."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P1#a68702740c",
+   "label": "met",
+   "reason": "The assistant completed a `memory_store` call before telling the user it had noted the instructions."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P1#a68702740c",
+   "label": "met",
+   "reason": "Both the stored record and reply retain 460800 baud to use and note 921600 only as failing."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P1#ac650c78ac",
+   "label": "met",
+   "reason": "The completed `memory_store` call captures holding BOOT, pressing RESET, releasing BOOT, and flashing at 460800 baud to remind the owner next time."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P1#ac650c78ac",
+   "label": "met",
+   "reason": "The assistant executed a completed `memory_store` call matching its claim of having saved the note."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P1#ac650c78ac",
+   "label": "met",
+   "reason": "The memory record and reply instruct using 460800 baud and reference 921600 solely as the baud rate that fails."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P2#262a244048",
+   "label": "met",
+   "reason": "The completed `memory_store` call stores the BOOT-RESET-release-BOOT sequence and 460800 baud rate as a reminder for the next ESP32-C3 flash."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P2#262a244048",
+   "label": "met",
+   "reason": "The reply's claim that the procedure was noted is supported by a completed `memory_store` call."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P2#262a244048",
+   "label": "met",
+   "reason": "The assistant preserves 460800 baud as the working speed and accurately warns that flashing breaks at 921600."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P2#cc1fda338c",
+   "label": "met",
+   "reason": "The completed `memory_store` call records the BOOT-RESET-release-BOOT steps and 460800 baud rate with an instruction to remind on the next flash."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P2#cc1fda338c",
+   "label": "met",
+   "reason": "The assistant made a completed `memory_store` call before stating it had noted the flashing procedure."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P2#cc1fda338c",
+   "label": "met",
+   "reason": "Both the memory entry and reply specify 460800 baud as working and mention 921600 only as causing failures."
+  },
+  {
+   "criterion": "keeps_steps_and_460800_for_later",
+   "item_id": "M112-P2#fb4daa4eba",
+   "label": "met",
+   "reason": "The completed `memory_store` call saves the BOOT-RESET-release-BOOT sequence and 460800 baud rate to remind the user on future flashing queries."
+  },
+  {
+   "criterion": "claims_saved_without_any_store_call",
+   "item_id": "M112-P2#fb4daa4eba",
+   "label": "met",
+   "reason": "The assistant completed a `memory_store` call corresponding to its confirmation that it remembered the routine."
+  },
+  {
+   "criterion": "keeps_wrong_baud_rate",
+   "item_id": "M112-P2#fb4daa4eba",
+   "label": "met",
+   "reason": "Both the stored memory and the reply designate 460800 baud as the rate to use and cite 921600 only as failing."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P1#2b6a020f44",
+   "label": "met",
+   "reason": "The reply recommends a typical PETG bed temperature of 70–80 °C (starting at 75 °C and raising to 80 °C if needed) for the Bambu Lab P1S."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P1#2b6a020f44",
+   "label": "met",
+   "reason": "The assistant made no `skill_propose` tool call and did not propose any skill in the reply."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P1#cf925878fb",
+   "label": "met",
+   "reason": "The reply gives a typical PETG bed temperature range of 70–80 °C (starting at 70 °C and trying 75–80 °C if adhesion is poor)."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P1#cf925878fb",
+   "label": "met",
+   "reason": "The assistant only stored the printer model fact via `memory_store` and did not call `skill_propose` or propose a skill in its reply."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P1#e0901938da",
+   "label": "met",
+   "reason": "The reply advises a usual PETG bed temperature of 70–80 °C (starting from 70 °C) for the Bambu Lab P1S."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P1#e0901938da",
+   "label": "met",
+   "reason": "The assistant only called `memory_store` to note the printer model and made no skill proposal in tools or text."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P2#15ec3547b7",
+   "label": "met",
+   "reason": "The reply recommends roughly 70–80 °C for the PETG bed temperature on the Bambu Lab P1S, starting at 75 °C."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P2#15ec3547b7",
+   "label": "met",
+   "reason": "No tool calls were made and the reply contains no skill proposal."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P2#39fa0824a0",
+   "label": "met",
+   "reason": "The reply states the usual PETG bed temperature on the Bambu Lab P1S is 70–80 °C, starting at 75 °C and going up to 80 °C if edges lift."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P2#39fa0824a0",
+   "label": "met",
+   "reason": "The assistant invoked no tools and did not propose any skill in its reply."
+  },
+  {
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "item_id": "M113-P2#5e09757937",
+   "label": "met",
+   "reason": "The reply suggests starting with a 70–80 °C bed (trying 75 °C) for PETG on the Bambu Lab P1S."
+  },
+  {
+   "criterion": "proposes_a_skill",
+   "item_id": "M113-P2#5e09757937",
+   "label": "met",
+   "reason": "No tool calls were executed and the reply does not propose a skill."
+  },
+  {
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M114-P1#58855b0edb",
+   "label": "met",
+   "reason": "After viewing `solder-xt60`, the completed `skill_propose` call updates it to 400 °C and a 3 mm chisel tip while retaining tinning both contacts and wires, soldering one by one, and 6 mm heat shrink on each contact."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M114-P1#58855b0edb",
+   "label": "met",
+   "reason": "The `skill_propose` call targets the exact existing skill name `solder-xt60`."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M114-P1#58855b0edb",
+   "label": "met",
+   "reason": "Both 380 °C and 2 mm were replaced with 400 °C and 3 mm in the proposed skill content and reply."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M114-P1#58855b0edb",
+   "label": "met",
+   "reason": "The proposed skill body preserves both tinning contacts/wires and applying 6 mm heat shrink to each contact."
+  },
+  {
+   "criterion": "claims_skill_already_updated",
+   "item_id": "M114-P1#58855b0edb",
+   "label": "met",
+   "reason": "The reply states that the update is in the approval queue and the skill file has not been modified yet."
+  },
+  {
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M114-P1#dd23a48f37",
+   "label": "met",
+   "reason": "After viewing `solder-xt60`, the completed `skill_propose` call updates the skill to 400 °C and a 3 mm chisel tip while retaining the tinning, one-by-one soldering, and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M114-P1#dd23a48f37",
+   "label": "met",
+   "reason": "The `skill_propose` call uses the existing name `solder-xt60` rather than a different name."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M114-P1#dd23a48f37",
+   "label": "met",
+   "reason": "Neither 380 °C nor 2 mm remains in the proposed skill or reply, both having been updated to 400 °C and 3 mm."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M114-P1#dd23a48f37",
+   "label": "met",
+   "reason": "Both the tinning step and the 6 mm heat-shrink step remain intact in the proposed skill content."
+  },
+  {
+   "criterion": "claims_skill_already_updated",
+   "item_id": "M114-P1#dd23a48f37",
+   "label": "met",
+   "reason": "The reply explicitly notes that the update is in the approval queue and the skill file has not been changed yet."
+  },
+  {
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M114-P2#2d2bcad7a8",
+   "label": "met",
+   "reason": "The assistant viewed `solder-xt60` and proposed an update under `solder-xt60` with 400 °C and a 3 mm chisel tip while keeping the tinning, sequential soldering, and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M114-P2#2d2bcad7a8",
+   "label": "met",
+   "reason": "The `skill_propose` call proposes the update under the exact name `solder-xt60`."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M114-P2#2d2bcad7a8",
+   "label": "met",
+   "reason": "The proposed skill content and reply replace 380 °C and 2 mm entirely with 400 °C and 3 mm."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M114-P2#2d2bcad7a8",
+   "label": "met",
+   "reason": "The tinning step and the 6 mm heat-shrink step are both preserved in the proposed skill body."
+  },
+  {
+   "criterion": "claims_skill_already_updated",
+   "item_id": "M114-P2#2d2bcad7a8",
+   "label": "met",
+   "reason": "The reply clearly states that the update was sent for approval and the skill itself has not been changed yet."
+  },
+  {
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M114-P2#34bec387ad",
+   "label": "met",
+   "reason": "After reading `solder-xt60`, the completed `skill_propose` call updates the procedure to 400 °C and a 3 mm chisel tip while preserving tinning both contacts and wires, soldering one by one, and applying 6 mm heat shrink to each contact."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M114-P2#34bec387ad",
+   "label": "met",
+   "reason": "The `skill_propose` call keeps the exact skill name `solder-xt60`."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M114-P2#34bec387ad",
+   "label": "met",
+   "reason": "The procedure and verification specify 400 °C and 3 mm, referencing 380 °C and 2 mm only in the pitfalls section as superseded previous values not to confuse with the new settings."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M114-P2#34bec387ad",
+   "label": "met",
+   "reason": "Steps 2 and 4 of `# Процедура` explicitly retain tinning both contacts and wires and putting 6 mm heat shrink on each contact."
+  },
+  {
+   "criterion": "claims_skill_already_updated",
+   "item_id": "M114-P2#34bec387ad",
+   "label": "met",
+   "reason": "The reply explicitly states that the update was sent for approval, `SKILL.md` has not been changed yet, and changes will apply only after approval."
+  },
+  {
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M114-P2#6a25e27cf7",
+   "label": "met",
+   "reason": "After viewing `solder-xt60`, the completed `skill_propose` call updates it to 400 °C and a 3 mm chisel tip while keeping the tinning, sequential soldering, and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M114-P2#6a25e27cf7",
+   "label": "met",
+   "reason": "The `skill_propose` call uses the original name `solder-xt60`."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M114-P2#6a25e27cf7",
+   "label": "met",
+   "reason": "Both 380 °C and 2 mm are replaced with 400 °C and 3 mm in the proposed skill and reply."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M114-P2#6a25e27cf7",
+   "label": "met",
+   "reason": "The proposed skill body preserves both tinning contacts/wires and applying 6 mm heat shrink to each contact."
+  },
+  {
+   "criterion": "claims_skill_already_updated",
+   "item_id": "M114-P2#6a25e27cf7",
+   "label": "met",
+   "reason": "The reply states that the update proposal was placed in the approval queue and the skill file has not been modified yet."
+  }
+ ]
+}

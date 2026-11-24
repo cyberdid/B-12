@@ -1,0 +1,1 @@
+{"type":"object","additionalProperties":false,"required":["labels"],"properties":{"labels":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["item_id","criterion","label","reason"],"properties":{"item_id":{"type":"string"},"criterion":{"type":"string"},"label":{"type":"string","enum":["met","not_met","unclear"]},"reason":{"type":"string"}}}}}}

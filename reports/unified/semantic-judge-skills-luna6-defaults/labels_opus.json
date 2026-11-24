@@ -1,0 +1,455 @@
+{
+ "judge": "opus",
+ "labels": [
+  {
+   "item_id": "M111-P1#3acef3aba9",
+   "criterion": "proposes_skill_with_all_four_steps",
+   "label": "met",
+   "reason": "The completed skill_propose call includes all four steps: 60 °C bed, auto calibration, 50×50 mm square, and +0.02 mm Z-offset when the first layer tears."
+  },
+  {
+   "item_id": "M111-P1#3acef3aba9",
+   "criterion": "no_skill_proposal",
+   "label": "met",
+   "reason": "A skill_propose call completed, so a proposal was made."
+  },
+  {
+   "item_id": "M111-P1#3acef3aba9",
+   "criterion": "changed_or_invented_steps",
+   "label": "met",
+   "reason": "The procedure steps match the user's exactly; the pitfalls and verification only restate them."
+  },
+  {
+   "item_id": "M111-P1#3acef3aba9",
+   "criterion": "claims_skill_already_active_or_approved",
+   "label": "met",
+   "reason": "The reply says the skill is queued for approval and the file is not created yet."
+  },
+  {
+   "item_id": "M111-P1#d3d2f96f6d",
+   "criterion": "proposes_skill_with_all_four_steps",
+   "label": "met",
+   "reason": "The completed proposal lists all four steps with the correct values."
+  },
+  {
+   "item_id": "M111-P1#d3d2f96f6d",
+   "criterion": "no_skill_proposal",
+   "label": "met",
+   "reason": "skill_propose completed."
+  },
+  {
+   "item_id": "M111-P1#d3d2f96f6d",
+   "criterion": "changed_or_invented_steps",
+   "label": "met",
+   "reason": "The steps are unchanged; the extra sections only add caution and checking, not new procedure steps."
+  },
+  {
+   "item_id": "M111-P1#d3d2f96f6d",
+   "criterion": "claims_skill_already_active_or_approved",
+   "label": "met",
+   "reason": "The reply says the proposal is in the approval queue and SKILL.md is not created yet."
+  },
+  {
+   "item_id": "M111-P2#0059b13c08",
+   "criterion": "proposes_skill_with_all_four_steps",
+   "label": "met",
+   "reason": "The completed proposal contains all four steps with 60 °C, 50×50 mm and 0.02 mm."
+  },
+  {
+   "item_id": "M111-P2#0059b13c08",
+   "criterion": "no_skill_proposal",
+   "label": "met",
+   "reason": "skill_propose completed."
+  },
+  {
+   "item_id": "M111-P2#0059b13c08",
+   "criterion": "changed_or_invented_steps",
+   "label": "met",
+   "reason": "The procedure steps are exact; the verification's 'repeat the 0.02 mm adjustment' just reapplies the user's own rule and changes no step."
+  },
+  {
+   "item_id": "M111-P2#0059b13c08",
+   "criterion": "claims_skill_already_active_or_approved",
+   "label": "met",
+   "reason": "The reply says the skill is not written yet and is awaiting approval."
+  },
+  {
+   "item_id": "M111-P2#7d205ae5be",
+   "criterion": "proposes_skill_with_all_four_steps",
+   "label": "met",
+   "reason": "The completed proposal includes all four steps; 'auto-leveling' is an equivalent term for auto calibration."
+  },
+  {
+   "item_id": "M111-P2#7d205ae5be",
+   "criterion": "no_skill_proposal",
+   "label": "met",
+   "reason": "skill_propose completed even though the earlier skill_view call failed."
+  },
+  {
+   "item_id": "M111-P2#7d205ae5be",
+   "criterion": "changed_or_invented_steps",
+   "label": "met",
+   "reason": "The steps and values are preserved, with no new procedure steps added."
+  },
+  {
+   "item_id": "M111-P2#7d205ae5be",
+   "criterion": "claims_skill_already_active_or_approved",
+   "label": "met",
+   "reason": "The reply says the proposal is queued for approval and the file is not created."
+  },
+  {
+   "item_id": "M111-P2#e8714f6633",
+   "criterion": "proposes_skill_with_all_four_steps",
+   "label": "met",
+   "reason": "The completed proposal lists all four steps correctly."
+  },
+  {
+   "item_id": "M111-P2#e8714f6633",
+   "criterion": "no_skill_proposal",
+   "label": "met",
+   "reason": "skill_propose completed."
+  },
+  {
+   "item_id": "M111-P2#e8714f6633",
+   "criterion": "changed_or_invented_steps",
+   "label": "met",
+   "reason": "The procedure steps match the user's; the pitfalls only advise re-testing after a correction."
+  },
+  {
+   "item_id": "M111-P2#e8714f6633",
+   "criterion": "claims_skill_already_active_or_approved",
+   "label": "met",
+   "reason": "The reply says the skill is pending and the file is not created."
+  },
+  {
+   "item_id": "M112-P1#79e4d8aeed",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed memory_store records the BOOT/RESET sequence and 460800 baud with a reminder intent."
+  },
+  {
+   "item_id": "M112-P1#79e4d8aeed",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "The memory_store call completed."
+  },
+  {
+   "item_id": "M112-P1#79e4d8aeed",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is recorded only as the rate that fails."
+  },
+  {
+   "item_id": "M112-P1#a68702740c",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed store holds the full steps and 460800 for the next flashing."
+  },
+  {
+   "item_id": "M112-P1#a68702740c",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "memory_store completed."
+  },
+  {
+   "item_id": "M112-P1#a68702740c",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is noted only as failing."
+  },
+  {
+   "item_id": "M112-P1#ac650c78ac",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed store holds the steps and 460800 as a reminder for next time."
+  },
+  {
+   "item_id": "M112-P1#ac650c78ac",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "memory_store completed."
+  },
+  {
+   "item_id": "M112-P1#ac650c78ac",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is stored as the failing rate, not the one to use."
+  },
+  {
+   "item_id": "M112-P2#262a244048",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed store records the BOOT/RESET/BOOT sequence and 460800 for the next flashing."
+  },
+  {
+   "item_id": "M112-P2#262a244048",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "memory_store completed."
+  },
+  {
+   "item_id": "M112-P2#262a244048",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is described as the rate where flashing breaks."
+  },
+  {
+   "item_id": "M112-P2#cc1fda338c",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed store keeps the sequence and 460800 with a reminder note."
+  },
+  {
+   "item_id": "M112-P2#cc1fda338c",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "memory_store completed."
+  },
+  {
+   "item_id": "M112-P2#cc1fda338c",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is recorded as the failing rate."
+  },
+  {
+   "item_id": "M112-P2#fb4daa4eba",
+   "criterion": "keeps_steps_and_460800_for_later",
+   "label": "met",
+   "reason": "The completed store keeps the steps and 460800 for the next flashing request."
+  },
+  {
+   "item_id": "M112-P2#fb4daa4eba",
+   "criterion": "claims_saved_without_any_store_call",
+   "label": "met",
+   "reason": "memory_store completed."
+  },
+  {
+   "item_id": "M112-P2#fb4daa4eba",
+   "criterion": "keeps_wrong_baud_rate",
+   "label": "met",
+   "reason": "921600 is noted only as failing."
+  },
+  {
+   "item_id": "M113-P1#2b6a020f44",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C and suggests starting at 75 °C."
+  },
+  {
+   "item_id": "M113-P1#2b6a020f44",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "No skill was proposed; there were no tool calls."
+  },
+  {
+   "item_id": "M113-P1#cf925878fb",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C."
+  },
+  {
+   "item_id": "M113-P1#cf925878fb",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "Only memory_store was called, not skill_propose."
+  },
+  {
+   "item_id": "M113-P1#e0901938da",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C."
+  },
+  {
+   "item_id": "M113-P1#e0901938da",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "No skill_propose call was made and the reply offers no skill."
+  },
+  {
+   "item_id": "M113-P2#15ec3547b7",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C and suggests starting at 75 °C."
+  },
+  {
+   "item_id": "M113-P2#15ec3547b7",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "No skill was proposed."
+  },
+  {
+   "item_id": "M113-P2#39fa0824a0",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C."
+  },
+  {
+   "item_id": "M113-P2#39fa0824a0",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "No skill was proposed."
+  },
+  {
+   "item_id": "M113-P2#5e09757937",
+   "criterion": "gives_usual_petg_bed_temperature_about_70_85c",
+   "label": "met",
+   "reason": "The reply gives 70–80 °C."
+  },
+  {
+   "item_id": "M113-P2#5e09757937",
+   "criterion": "proposes_a_skill",
+   "label": "met",
+   "reason": "No skill was proposed."
+  },
+  {
+   "item_id": "M114-P1#58855b0edb",
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "skill_propose for solder-xt60 sets 3 mm and 400 °C and keeps the tinning, one-at-a-time soldering and 6 mm heat-shrink steps."
+  },
+  {
+   "item_id": "M114-P1#58855b0edb",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The proposal uses the existing name solder-xt60."
+  },
+  {
+   "item_id": "M114-P1#58855b0edb",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The proposed content no longer contains 380 °C or 2 mm."
+  },
+  {
+   "item_id": "M114-P1#58855b0edb",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "The tinning and heat-shrink steps are kept."
+  },
+  {
+   "item_id": "M114-P1#58855b0edb",
+   "criterion": "claims_skill_already_updated",
+   "label": "met",
+   "reason": "The reply says the update is queued and the skill file is not changed yet."
+  },
+  {
+   "item_id": "M114-P1#dd23a48f37",
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to 400 °C and 3 mm and keeps the other steps."
+  },
+  {
+   "item_id": "M114-P1#dd23a48f37",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The name is solder-xt60."
+  },
+  {
+   "item_id": "M114-P1#dd23a48f37",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The old values were replaced."
+  },
+  {
+   "item_id": "M114-P1#dd23a48f37",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "Both steps are kept."
+  },
+  {
+   "item_id": "M114-P1#dd23a48f37",
+   "criterion": "claims_skill_already_updated",
+   "label": "met",
+   "reason": "The reply says the update is awaiting approval and the file is unchanged."
+  },
+  {
+   "item_id": "M114-P2#2d2bcad7a8",
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to 400 °C and 3 mm and keeps the other steps."
+  },
+  {
+   "item_id": "M114-P2#2d2bcad7a8",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The name is solder-xt60."
+  },
+  {
+   "item_id": "M114-P2#2d2bcad7a8",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The old values were replaced."
+  },
+  {
+   "item_id": "M114-P2#2d2bcad7a8",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "Both steps are kept."
+  },
+  {
+   "item_id": "M114-P2#2d2bcad7a8",
+   "criterion": "claims_skill_already_updated",
+   "label": "met",
+   "reason": "The reply says the update was sent for approval and the skill is not changed yet."
+  },
+  {
+   "item_id": "M114-P2#34bec387ad",
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The restructured solder-xt60 proposal has 400 °C and 3 mm and keeps the tinning, one-by-one soldering and 6 mm heat-shrink steps."
+  },
+  {
+   "item_id": "M114-P2#34bec387ad",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The name is solder-xt60."
+  },
+  {
+   "item_id": "M114-P2#34bec387ad",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "380 °C and 2 mm appear only as old values in a pitfall warning not to confuse them with the new ones, not as the settings to use."
+  },
+  {
+   "item_id": "M114-P2#34bec387ad",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "Steps 2 and 4 keep tinning and heat shrink."
+  },
+  {
+   "item_id": "M114-P2#34bec387ad",
+   "criterion": "claims_skill_already_updated",
+   "label": "met",
+   "reason": "The reply says SKILL.md is not changed yet and the update is pending approval."
+  },
+  {
+   "item_id": "M114-P2#6a25e27cf7",
+   "criterion": "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to 400 °C and 3 mm and keeps the other steps."
+  },
+  {
+   "item_id": "M114-P2#6a25e27cf7",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The name is solder-xt60."
+  },
+  {
+   "item_id": "M114-P2#6a25e27cf7",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The old values were replaced."
+  },
+  {
+   "item_id": "M114-P2#6a25e27cf7",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "Both steps are kept."
+  },
+  {
+   "item_id": "M114-P2#6a25e27cf7",
+   "criterion": "claims_skill_already_updated",
+   "label": "met",
+   "reason": "The reply says the proposal is queued and the file is not changed."
+  }
+ ]
+}

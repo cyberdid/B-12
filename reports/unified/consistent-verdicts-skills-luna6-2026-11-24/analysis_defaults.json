@@ -1,0 +1,52 @@
+{
+ "families": {
+  "M111": {
+   "track": "memory",
+   "pass": 5,
+   "partial": 0,
+   "fail": 1,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 0.8333333333333334
+  },
+  "M112": {
+   "track": "memory",
+   "pass": 6,
+   "partial": 0,
+   "fail": 0,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 1.0
+  },
+  "M113": {
+   "track": "memory",
+   "pass": 6,
+   "partial": 0,
+   "fail": 0,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 1.0
+  },
+  "M114": {
+   "track": "memory",
+   "pass": 5,
+   "partial": 0,
+   "fail": 1,
+   "pending": 0,
+   "blocked": 0,
+   "acceptable_rate": 0.8333333333333334
+  }
+ },
+ "tracks": {
+  "memory": {
+   "families_fully_decided": 4,
+   "mean_family_acceptable_rate": 0.917,
+   "cluster_bootstrap_95ci": [
+    0.833,
+    1.0
+   ]
+  }
+ },
+ "pending_records": 0,
+ "excluded_families": []
+}

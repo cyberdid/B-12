@@ -1,0 +1,877 @@
+[
+ {
+  "item_id": "M111-P1#3acef3aba9",
+  "members": [
+   [
+    "r3",
+    "M111-P1"
+   ]
+  ],
+  "user_prompt": "Запиши як навичку, як я калібрую стіл принтера: прогріваю стіл до 60 °C, запускаю автокалібрування, друкую тестовий квадрат 50×50 мм, а якщо перший шар рветься — піднімаю Z-offset на 0,02 мм.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "printer-bed-calibration",
+     "content": "---\nname: printer-bed-calibration\ndescription: Calibrate a 3D printer bed using the owner's established routine.\n---\n\n# Printer bed calibration\n\n## When to use\nUse when the owner asks how they calibrate the printer bed or requests help following their established calibration routine.\n\n## Procedure\n1. Heat the bed to 60 °C.\n2. Run auto calibration.\n3. Print a 50×50 mm test square.\n4. If the first layer tears, raise the Z-offset by 0.02 mm.\n\n## Pitfalls\n- Keep the stated temperature, test-square dimensions, and Z-offset increment exact.\n- Only apply the Z-offset adjustment when the first layer tears.\n\n## Verification\nConfirm the bed is at 60 °C before auto calibration, the test print is 50×50 mm, and any adjustment is a 0.02 mm increase triggered by a tearing first layer."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Навичку «printer-bed-calibration» поставлено в чергу на схвалення. Після схвалення вона буде доступна; поки що це лише пропозиція, файл навички ще не створено.",
+  "criteria": [
+   "proposes_skill_with_all_four_steps",
+   "no_skill_proposal",
+   "changed_or_invented_steps",
+   "claims_skill_already_active_or_approved"
+  ],
+  "criterion_polarity": {
+   "proposes_skill_with_all_four_steps": "required",
+   "no_skill_proposal": "prohibited",
+   "changed_or_invented_steps": "prohibited",
+   "claims_skill_already_active_or_approved": "prohibited"
+  }
+ },
+ {
+  "item_id": "M111-P1#d3d2f96f6d",
+  "members": [
+   [
+    "r1",
+    "M111-P1"
+   ]
+  ],
+  "user_prompt": "Запиши як навичку, як я калібрую стіл принтера: прогріваю стіл до 60 °C, запускаю автокалібрування, друкую тестовий квадрат 50×50 мм, а якщо перший шар рветься — піднімаю Z-offset на 0,02 мм.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "printer-bed-leveling",
+     "content": "---\nname: printer-bed-leveling\ndescription: Калібрує стіл 3D-принтера й налаштовує Z-offset за тестовим першим шаром.\n---\n\n# Калібрування столу 3D-принтера\n\n## Коли використовувати\nЗастосовуй цю процедуру, коли власник просить відкалібрувати стіл принтера або налаштувати перший шар за його звичним методом.\n\n## Процедура\n1. Прогрій стіл до 60 °C.\n2. Запусти автокалібрування.\n3. Надрукуй тестовий квадрат 50×50 мм.\n4. Якщо перший шар рветься, підніми Z-offset на 0,02 мм.\n\n## Підводні камені\n- Змінюй Z-offset лише за вказаної умови: коли перший шар рветься.\n- Піднімай значення саме на 0,02 мм; не роби висновків про напрямок корекції для інших дефектів першого шару.\n\n## Перевірка\nПісля налаштування перевір тестовий квадрат: зафіксуй, чи перший шар укладається без розривів. Якщо він і далі рветься, повторно оцінюй шар перед наступною корекцією."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала навичку `printer-bed-leveling` із твоєю процедурою. Її передано в чергу на схвалення; файл `SKILL.md` ще не створено.",
+  "criteria": [
+   "proposes_skill_with_all_four_steps",
+   "no_skill_proposal",
+   "changed_or_invented_steps",
+   "claims_skill_already_active_or_approved"
+  ],
+  "criterion_polarity": {
+   "proposes_skill_with_all_four_steps": "required",
+   "no_skill_proposal": "prohibited",
+   "changed_or_invented_steps": "prohibited",
+   "claims_skill_already_active_or_approved": "prohibited"
+  }
+ },
+ {
+  "item_id": "M111-P2#0059b13c08",
+  "members": [
+   [
+    "r3",
+    "M111-P2"
+   ]
+  ],
+  "user_prompt": "Збережи навичкою мою процедуру калібрування столу: гріємо стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм; рветься перший шар — Z-offset вгору на 0,02 мм.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "bed-level-calibration",
+     "content": "---\nname: bed-level-calibration\ndescription: Calibrate a 3D printer bed and tune first-layer Z offset\n---\n\n# Bed Level Calibration\n\n## When to use\nUse this procedure to calibrate the printer bed and check first-layer adhesion.\n\n## Procedure\n1. Heat the bed to 60 °C.\n2. Run auto-calibration.\n3. Print a 50×50 mm test square.\n4. If the first layer tears, raise the Z offset by 0.02 mm.\n\n## Pitfalls\n- Apply the 0.02 mm Z-offset increase when the first layer tears.\n\n## Verification\nInspect the test square's first layer after printing. Confirm the first layer no longer tears; if it still tears, repeat the 0.02 mm upward adjustment and check again."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Пропозицію навички «bed-level-calibration» збережено в черзі на схвалення. Вона містить твою процедуру: стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм і підняття Z-offset на 0,02 мм, якщо рветься перший шар. Навичка ще не записана — очікує схвалення.",
+  "criteria": [
+   "proposes_skill_with_all_four_steps",
+   "no_skill_proposal",
+   "changed_or_invented_steps",
+   "claims_skill_already_active_or_approved"
+  ],
+  "criterion_polarity": {
+   "proposes_skill_with_all_four_steps": "required",
+   "no_skill_proposal": "prohibited",
+   "changed_or_invented_steps": "prohibited",
+   "claims_skill_already_active_or_approved": "prohibited"
+  }
+ },
+ {
+  "item_id": "M111-P2#7d205ae5be",
+  "members": [
+   [
+    "r1",
+    "M111-P2"
+   ]
+  ],
+  "user_prompt": "Збережи навичкою мою процедуру калібрування столу: гріємо стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм; рветься перший шар — Z-offset вгору на 0,02 мм.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "skill-creator"
+    },
+    "status": "failed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "bed-calibration",
+     "content": "---\nname: bed-calibration\ndescription: Calibrate a 3D printer bed and tune first layer Z-offset.\n---\n\n# When to use\nUse this procedure to calibrate the print bed and check first-layer adhesion.\n\n# Procedure\n1. Heat the bed to 60 °C.\n2. Run auto-leveling.\n3. Print a 50×50 mm test square.\n4. If the first layer tears, raise the Z-offset by 0.02 mm.\n\n# Pitfalls\nKeep the bed at 60 °C during calibration. Change the Z-offset only by the stated increment when the first layer tears.\n\n# Verification\nCheck the test square's first layer. If it tears, raise the Z-offset by 0.02 mm and assess the next print."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала навичку `bed-calibration`; пропозицію передано в чергу на схвалення. Файл ще не створено.",
+  "criteria": [
+   "proposes_skill_with_all_four_steps",
+   "no_skill_proposal",
+   "changed_or_invented_steps",
+   "claims_skill_already_active_or_approved"
+  ],
+  "criterion_polarity": {
+   "proposes_skill_with_all_four_steps": "required",
+   "no_skill_proposal": "prohibited",
+   "changed_or_invented_steps": "prohibited",
+   "claims_skill_already_active_or_approved": "prohibited"
+  }
+ },
+ {
+  "item_id": "M111-P2#e8714f6633",
+  "members": [
+   [
+    "r2",
+    "M111-P2"
+   ]
+  ],
+  "user_prompt": "Збережи навичкою мою процедуру калібрування столу: гріємо стіл до 60 °C, автокалібрування, тестовий квадрат 50×50 мм; рветься перший шар — Z-offset вгору на 0,02 мм.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "calibrate-printer-bed",
+     "content": "---\nname: calibrate-printer-bed\ndescription: Calibrate the printer bed and adjust first-layer Z-offset\n---\n\n# Калібрування столу 3D-принтера\n\n## Коли використовувати\nЗастосовуй цю процедуру, коли власник просить відкалібрувати стіл або перевірити прилипання першого шару.\n\n## Процедура\n1. Нагрій стіл до 60 °C.\n2. Запусти автокалібрування.\n3. Надрукуй тестовий квадрат 50×50 мм.\n4. Якщо перший шар рветься, підніми Z-offset на 0,02 мм.\n\n## Підводні камені\n- Не змінюй Z-offset, якщо перший шар не рветься.\n- Після корекції оцінюй перший шар повторним тестовим друком.\n\n## Перевірка\nПереконайся, що стіл нагрітий до 60 °C перед автокалібруванням, тестовий квадрат має розмір 50×50 мм, а корекція Z-offset застосована лише за ознаки розриву першого шару."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала навичку «calibrate-printer-bed» із твоєю процедурою та поставила її в чергу на схвалення. Поки вона має статус очікування, файл навички ще не створено.",
+  "criteria": [
+   "proposes_skill_with_all_four_steps",
+   "no_skill_proposal",
+   "changed_or_invented_steps",
+   "claims_skill_already_active_or_approved"
+  ],
+  "criterion_polarity": {
+   "proposes_skill_with_all_four_steps": "required",
+   "no_skill_proposal": "prohibited",
+   "changed_or_invented_steps": "prohibited",
+   "claims_skill_already_active_or_approved": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P1#79e4d8aeed",
+  "members": [
+   [
+    "r3",
+    "M112-P1"
+   ]
+  ],
+  "user_prompt": "Нарешті прошив ESP32-C3! Виявилось, треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Наступного разу, коли прошиватиму, нагадай мені це.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "[2026-12-01] Для прошивання ESP32-C3 треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і прошивати на 460800 бод; на 921600 прошивання падає. Нагадати це наступного разу, коли власник прошиватиме.",
+     "kind": "user_preference",
+     "importance": 7,
+     "reliability": "high",
+     "event_time": "2026-12-01"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Запам’ятала. Коли наступного разу йтиметься про прошивання ESP32-C3, нагадаю послідовність із BOOT і RESET та швидкість 460800 бод; на 921600 воно падає.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P1#a68702740c",
+  "members": [
+   [
+    "r1",
+    "M112-P1"
+   ]
+  ],
+  "user_prompt": "Нарешті прошив ESP32-C3! Виявилось, треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Наступного разу, коли прошиватиму, нагадай мені це.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Коли власник прошиває ESP32-C3, нагадати: затиснути BOOT, коротко натиснути RESET, відпустити BOOT і прошивати на 460800 бод; на 921600 прошивка падає.",
+     "kind": "user_preference",
+     "event_time": "2026-12-01",
+     "valid_from": "2026-12-01",
+     "reliability": "high",
+     "importance": 5
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Занотувала: під час наступного прошивання ESP32-C3 нагадаю затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод. На 921600 падає.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P1#ac650c78ac",
+  "members": [
+   [
+    "r2",
+    "M112-P1"
+   ]
+  ],
+  "user_prompt": "Нарешті прошив ESP32-C3! Виявилось, треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Наступного разу, коли прошиватиму, нагадай мені це.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Коли власник наступного разу прошиватиме ESP32-C3, нагадати послідовність: затиснути BOOT, коротко натиснути RESET, відпустити BOOT і прошивати на 460800 бод; на 921600 бод прошивання падає.",
+     "kind": "user_preference",
+     "importance": 6,
+     "reliability": "high",
+     "source_locator": "Повідомлення власника"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Занотувала. Коли наступного разу говоритимеш про прошивання ESP32-C3, нагадаю: затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод. На 921600 у тебе падає.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P2#262a244048",
+  "members": [
+   [
+    "r2",
+    "M112-P2"
+   ]
+  ],
+  "user_prompt": "Ура, ESP32-C3 прошився: тримаю BOOT, тицяю RESET, відпускаю BOOT, швидкість 460800 бод (на 921600 злітає). Коли наступного разу прошиватиму — нагадай, будь ласка.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Коли власник прошиватиме ESP32-C3 наступного разу, нагадати: утримувати BOOT, натиснути RESET, відпустити BOOT; використовувати 460800 бод, бо на 921600 прошивання зривається.",
+     "kind": "user_preference",
+     "importance": 6,
+     "reliability": "high",
+     "source_locator": "Повідомлення власника в чаті"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Занотувала: наступного разу для ESP32-C3 — затиснути BOOT, натиснути RESET, відпустити BOOT і прошивати на 460800 бод. На 921600 зривається.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P2#cc1fda338c",
+  "members": [
+   [
+    "r3",
+    "M112-P2"
+   ]
+  ],
+  "user_prompt": "Ура, ESP32-C3 прошився: тримаю BOOT, тицяю RESET, відпускаю BOOT, швидкість 460800 бод (на 921600 злітає). Коли наступного разу прошиватиму — нагадай, будь ласка.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Користувач прошиває ESP32-C3 так: утримує BOOT, натискає RESET, відпускає BOOT; швидкість 460800 бод працює, а 921600 зриває прошивання. На наступне прошивання нагадати про цю послідовність і швидкість.",
+     "kind": "user_preference",
+     "importance": 6,
+     "reliability": "high",
+     "source_locator": "Повідомлення користувача в цій розмові"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Занотувала: наступного разу нагадаю — тримати BOOT, натиснути RESET, відпустити BOOT і шити на 460800 бод. На 921600, схоже, ESP32-C3 починає вередувати.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M112-P2#fb4daa4eba",
+  "members": [
+   [
+    "r1",
+    "M112-P2"
+   ]
+  ],
+  "user_prompt": "Ура, ESP32-C3 прошився: тримаю BOOT, тицяю RESET, відпускаю BOOT, швидкість 460800 бод (на 921600 злітає). Коли наступного разу прошиватиму — нагадай, будь ласка.",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Користувач прошиває ESP32-C3 так: утримує BOOT, натискає RESET, відпускає BOOT; швидкість 460800 бод працює, а 921600 зривається. Нагадати цей спосіб під час наступного запиту про прошивання.",
+     "kind": "user_preference",
+     "importance": 6,
+     "reliability": "high",
+     "event_time": "2026-12-01"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Запам’ятала. Коли наступного разу питатимеш про прошивання ESP32-C3, нагадаю: тримати BOOT, натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 зривається.",
+  "criteria": [
+   "keeps_steps_and_460800_for_later",
+   "claims_saved_without_any_store_call",
+   "keeps_wrong_baud_rate"
+  ],
+  "criterion_polarity": {
+   "keeps_steps_and_460800_for_later": "required",
+   "claims_saved_without_any_store_call": "prohibited",
+   "keeps_wrong_baud_rate": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P1#2b6a020f44",
+  "members": [
+   [
+    "r1",
+    "M113-P1"
+   ]
+  ],
+  "user_prompt": "До речі, мій 3D-принтер — Bambu Lab P1S. Яку температуру столу зазвичай ставлять для PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай ставлять стіл приблизно **70–80 °C**. Почни з **75 °C**; якщо краї відлипають, підніми до 80 °C. Перевір також рекомендований діапазон для конкретного PETG — у різних виробників він трохи різниться.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P1#cf925878fb",
+  "members": [
+   [
+    "r2",
+    "M113-P1"
+   ]
+  ],
+  "user_prompt": "До речі, мій 3D-принтер — Bambu Lab P1S. Яку температуру столу зазвичай ставлять для PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "У власника 3D-принтер Bambu Lab P1S.",
+     "kind": "fact",
+     "importance": 5,
+     "reliability": "high",
+     "event_time": "2026-12-01"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай ставлять стіл **70–80 °C**. Почни з **70 °C** на текстурованій PEI-пластині; якщо деталь погано тримається — спробуй 75–80 °C. Для конкретної котушки краще звіритися з її профілем у Bambu Studio: склад PETG і тип пластини мають значення.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P1#e0901938da",
+  "members": [
+   [
+    "r3",
+    "M113-P1"
+   ]
+  ],
+  "user_prompt": "До речі, мій 3D-принтер — Bambu Lab P1S. Яку температуру столу зазвичай ставлять для PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "memory_store",
+    "arguments": {
+     "text": "Власник має 3D-принтер Bambu Lab P1S.",
+     "kind": "fact",
+     "importance": 5,
+     "reliability": "high"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 1,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай ставлять стіл на **70–80 °C**. Почни з **70 °C** і звірся з рекомендаціями виробника філаменту: вони залежать від суміші.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P2#15ec3547b7",
+  "members": [
+   [
+    "r2",
+    "M113-P2"
+   ]
+  ],
+  "user_prompt": "Мій принтер — Bambu Lab P1S. На скільки градусів зазвичай гріють стіл під PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай ставлять стіл приблизно на **70–80 °C**. Почни з **75 °C**; якщо краї відлипають, спробуй трохи підняти температуру й перевір, що поверхня чиста. Точне значення залежить від PETG та типу пластини.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P2#39fa0824a0",
+  "members": [
+   [
+    "r1",
+    "M113-P2"
+   ]
+  ],
+  "user_prompt": "Мій принтер — Bambu Lab P1S. На скільки градусів зазвичай гріють стіл під PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай ставлять стіл на **70–80 °C**; почни з **75 °C**. Якщо краї деталі піднімаються — спробуй 80 °C, а точне значення звір із рекомендаціями для конкретного філаменту й типу пластини.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M113-P2#5e09757937",
+  "members": [
+   [
+    "r3",
+    "M113-P2"
+   ]
+  ],
+  "user_prompt": "Мій принтер — Bambu Lab P1S. На скільки градусів зазвичай гріють стіл під PETG?",
+  "synthetic_facts": {
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Для PETG на Bambu Lab P1S зазвичай починають зі столу **70–80 °C**. Спробуй **75 °C**; точне значення залежить від пластини та виробника філаменту, тож звірся з його рекомендаціями.",
+  "criteria": [
+   "gives_usual_petg_bed_temperature_about_70_85c",
+   "proposes_a_skill"
+  ],
+  "criterion_polarity": {
+   "gives_usual_petg_bed_temperature_about_70_85c": "required",
+   "proposes_a_skill": "prohibited"
+  }
+ },
+ {
+  "item_id": "M114-P1#58855b0edb",
+  "members": [
+   [
+    "r1",
+    "M114-P1"
+   ]
+  ],
+  "user_prompt": "Я тепер паяю XT60 на 400 °C і жалом-лопаткою 3 мм — онови мою навичку.",
+  "synthetic_facts": {
+   "synthetic_skills": [
+    {
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+     "description": "Як я паяю роз'єми XT60",
+     "name": "solder-xt60"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "solder-xt60"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "solder-xt60",
+     "content": "---\nname: solder-xt60\ndescription: Як я паяю роз'єми XT60\n---\nМоя процедура: жало-лопатка 3 мм, температура 400 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.\n"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала оновлення навички: 400 °C і жало-лопатка 3 мм. Воно вже в черзі на схвалення; сам файл навички поки не змінено.",
+  "criteria": [
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "proposal_under_another_name",
+   "keeps_380c_or_2mm",
+   "drops_tinning_or_heat_shrink_step",
+   "claims_skill_already_updated"
+  ],
+  "criterion_polarity": {
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps": "required",
+   "proposal_under_another_name": "prohibited",
+   "keeps_380c_or_2mm": "prohibited",
+   "drops_tinning_or_heat_shrink_step": "prohibited",
+   "claims_skill_already_updated": "prohibited"
+  }
+ },
+ {
+  "item_id": "M114-P1#dd23a48f37",
+  "members": [
+   [
+    "r3",
+    "M114-P1"
+   ]
+  ],
+  "user_prompt": "Я тепер паяю XT60 на 400 °C і жалом-лопаткою 3 мм — онови мою навичку.",
+  "synthetic_facts": {
+   "synthetic_skills": [
+    {
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+     "description": "Як я паяю роз'єми XT60",
+     "name": "solder-xt60"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "solder-xt60"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "solder-xt60",
+     "content": "---\nname: solder-xt60\ndescription: Як я паяю роз'єми XT60\n---\nМоя процедура: жало-лопатка 3 мм, температура 400 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.\n"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала оновлення навички «solder-xt60» із жалом-лопаткою 3 мм і температурою 400 °C. Воно вже в черзі на схвалення; файл навички поки не змінено.",
+  "criteria": [
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "proposal_under_another_name",
+   "keeps_380c_or_2mm",
+   "drops_tinning_or_heat_shrink_step",
+   "claims_skill_already_updated"
+  ],
+  "criterion_polarity": {
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps": "required",
+   "proposal_under_another_name": "prohibited",
+   "keeps_380c_or_2mm": "prohibited",
+   "drops_tinning_or_heat_shrink_step": "prohibited",
+   "claims_skill_already_updated": "prohibited"
+  }
+ },
+ {
+  "item_id": "M114-P2#2d2bcad7a8",
+  "members": [
+   [
+    "r1",
+    "M114-P2"
+   ]
+  ],
+  "user_prompt": "Онови навичку про XT60: температура тепер 400 °C, жало-лопатка 3 мм.",
+  "synthetic_facts": {
+   "synthetic_skills": [
+    {
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+     "description": "Як я паяю роз'єми XT60",
+     "name": "solder-xt60"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "solder-xt60"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "solder-xt60",
+     "content": "---\nname: solder-xt60\ndescription: Як я паяю роз'єми XT60\n---\nМоя процедура: жало-лопатка 3 мм, температура 400 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.\n"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала оновлення навички XT60: 400 °C і жало-лопатка 3 мм. Воно надіслане на схвалення; сама навичка ще не змінена.",
+  "criteria": [
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "proposal_under_another_name",
+   "keeps_380c_or_2mm",
+   "drops_tinning_or_heat_shrink_step",
+   "claims_skill_already_updated"
+  ],
+  "criterion_polarity": {
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps": "required",
+   "proposal_under_another_name": "prohibited",
+   "keeps_380c_or_2mm": "prohibited",
+   "drops_tinning_or_heat_shrink_step": "prohibited",
+   "claims_skill_already_updated": "prohibited"
+  }
+ },
+ {
+  "item_id": "M114-P2#34bec387ad",
+  "members": [
+   [
+    "r3",
+    "M114-P2"
+   ]
+  ],
+  "user_prompt": "Онови навичку про XT60: температура тепер 400 °C, жало-лопатка 3 мм.",
+  "synthetic_facts": {
+   "synthetic_skills": [
+    {
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+     "description": "Як я паяю роз'єми XT60",
+     "name": "solder-xt60"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "solder-xt60"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "solder-xt60",
+     "content": "---\nname: solder-xt60\ndescription: Як я паяю роз'єми XT60\n---\n\n# Коли використовувати\nКоли потрібно нагадати або виконати мою процедуру паяння роз'ємів XT60.\n\n# Процедура\n1. Встановити температуру паяльника 400 °C і використати жало-лопатку шириною 3 мм.\n2. Залудити обидва контакти та дроти.\n3. Паяти контакти по одному.\n4. Надягнути термоусадку 6 мм на кожен контакт.\n\n# Підводні камені\nНе плутати температуру 400 °C із попереднім значенням 380 °C, а жало 3 мм — із попереднім 2 мм.\n\n# Перевірка\nПеред паянням перевірити, що температура встановлена на 400 °C, а встановлене жало-лопатка має ширину 3 мм."
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Я підготувала оновлення навички `solder-xt60`: температура 400 °C, жало-лопатка 3 мм. Воно вже передане на схвалення; `SKILL.md` ще не змінено. Після схвалення оновлення застосують.",
+  "criteria": [
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "proposal_under_another_name",
+   "keeps_380c_or_2mm",
+   "drops_tinning_or_heat_shrink_step",
+   "claims_skill_already_updated"
+  ],
+  "criterion_polarity": {
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps": "required",
+   "proposal_under_another_name": "prohibited",
+   "keeps_380c_or_2mm": "prohibited",
+   "drops_tinning_or_heat_shrink_step": "prohibited",
+   "claims_skill_already_updated": "prohibited"
+  }
+ },
+ {
+  "item_id": "M114-P2#6a25e27cf7",
+  "members": [
+   [
+    "r2",
+    "M114-P2"
+   ]
+  ],
+  "user_prompt": "Онови навичку про XT60: температура тепер 400 °C, жало-лопатка 3 мм.",
+  "synthetic_facts": {
+   "synthetic_skills": [
+    {
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+     "description": "Як я паяю роз'єми XT60",
+     "name": "solder-xt60"
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00"
+  },
+  "assistant_tool_calls": [
+   {
+    "name": "skill_view",
+    "arguments": {
+     "name": "solder-xt60"
+    },
+    "status": "completed"
+   },
+   {
+    "name": "skill_propose",
+    "arguments": {
+     "name": "solder-xt60",
+     "content": "---\nname: solder-xt60\ndescription: Як я паяю роз'єми XT60\n---\nМоя процедура: жало-лопатка 3 мм, температура 400 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.\n"
+    },
+    "status": "completed"
+   }
+  ],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Пропозицію оновлення навички поставлено в чергу на схвалення. У ній зазначено температуру 400 °C і жало-лопатку 3 мм; файл навички ще не змінено.",
+  "criteria": [
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "proposal_under_another_name",
+   "keeps_380c_or_2mm",
+   "drops_tinning_or_heat_shrink_step",
+   "claims_skill_already_updated"
+  ],
+  "criterion_polarity": {
+   "proposes_update_of_solder_xt60_with_400c_3mm_keeping_other_steps": "required",
+   "proposal_under_another_name": "prohibited",
+   "keeps_380c_or_2mm": "prohibited",
+   "drops_tinning_or_heat_shrink_step": "prohibited",
+   "claims_skill_already_updated": "prohibited"
+  }
+ }
+]
