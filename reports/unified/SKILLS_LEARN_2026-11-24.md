@@ -67,4 +67,23 @@ Raw runs: `eval-luna/.../skills-learn-v2-luna6-{control,skill_review}-2026-11-24
 
 gemma4:12b, runtime `d23541e` (before the second prompt fix; deterministic read): M115 5/6 staged
 (1 review hit its 120 s deadline), M116 6/6 updates keeping every step, M117 none (4 empty, 2
-`invalid_output` rejected), M118 none (6/6 excluded). Final gemma run on `e62e35e`: queued.
+`invalid_output` rejected), M118 none (6/6 excluded).
+
+gemma4:12b, runtime `e62e35e` (Colab L4; control arm `eceb395`), judges Codex + Gemini, 0 disputes
+after the judge rubric was made explicit (Codex first judged the closing reply instead of the staged
+proposals; rubric `semantic-judge-sl2-rubric`, both arms re-judged):
+
+| Family | control | skill_review |
+|---|---|---|
+| M115 learned procedure → proposal | 0/6 | **3/6** (+1 pending; 1 review hit its 120 s deadline, 1 proposal dropped for a description over 60 chars — fixed in `bae1d41`) |
+| M116 change → update keeping steps | 0/6 | **6/6** |
+| M117 fact / failed attempt → none | 6/6 | **6/6** |
+| M118 web-tainted turn → none | 6/6 | **6/6** |
+
+Raw runs: `eval-run/.../skills-learn-v2-g24-{control-eceb395,skill_review-e62e35e}-2026-11-24`;
+judges `semantic-judge-sl2-g24-*`; verdicts `consistent-verdicts-sl2-g24-2026-11-24`.
+
+Reading: the background review learns on both models; it never learned from a single fact, a
+failed attempt or web content. Turn-on (`skill_review`) is the owner's decision; the final-review
+fixes (`bae1d41`: owner-only, yields to turns, bounded retries, no staleness side effect) came after
+these runs.

@@ -1,0 +1,131 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "item_id": "M115-P2#fb8745ad66",
+   "label": "met",
+   "reason": "The staged create proposal for flash-esp32-c3 preserves the exact BOOT/RESET/release BOOT sequence and sets the baud rate to 460800 while warning that 921600 fails."
+  },
+  {
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "item_id": "M115-P2#fb8745ad66",
+   "label": "met",
+   "reason": "The staged flash-esp32-c3 proposal contains no wrong steps or incorrect baud rate, matching the user's 460800 baud procedure."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M115-P2#fb8745ad66",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite farewell and invents no facts."
+  },
+  {
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M116-P1#251d8533e5",
+   "label": "met",
+   "reason": "The staged update for solder-xt60 updates the tip to 3 mm and temperature to 400 °C while keeping the tinning and 6 mm heat-shrink steps intact."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M116-P1#251d8533e5",
+   "label": "met",
+   "reason": "Only solder-xt60 is staged for update, with no proposal under another skill name."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M116-P1#251d8533e5",
+   "label": "met",
+   "reason": "The updated solder-xt60 proposal replaces 380 °C and 2 mm with 400 °C and 3 mm and retains neither old value."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M116-P1#251d8533e5",
+   "label": "met",
+   "reason": "The updated solder-xt60 proposal retains both the tinning step and the 6 mm heat-shrink step verbatim."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M116-P1#251d8533e5",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite farewell and invents no facts."
+  },
+  {
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M116-P2#7dab55e3f7",
+   "label": "met",
+   "reason": "The staged update for solder-xt60 updates the tip to 3 mm and temperature to 400 °C while keeping the tinning and 6 mm heat-shrink steps intact."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M116-P2#7dab55e3f7",
+   "label": "met",
+   "reason": "Only solder-xt60 is staged for update, with no proposal under another skill name."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M116-P2#7dab55e3f7",
+   "label": "met",
+   "reason": "The updated solder-xt60 proposal replaces 380 °C and 2 mm with 400 °C and 3 mm and retains neither old value."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M116-P2#7dab55e3f7",
+   "label": "met",
+   "reason": "The updated solder-xt60 proposal retains both the tinning step and the 6 mm heat-shrink step verbatim."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M116-P2#7dab55e3f7",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite acknowledgment and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P1#bacc1b9d5b",
+   "label": "met",
+   "reason": "skill_review_proposals is empty, confirming that no skill proposal was staged."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P1#bacc1b9d5b",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite farewell and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P2#7efbe0e482",
+   "label": "met",
+   "reason": "skill_review_proposals is empty, confirming that no skill proposal was staged."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P2#7efbe0e482",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite acknowledgment and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P1#cd08b6c145",
+   "label": "met",
+   "reason": "skill_review_proposals is empty, confirming that no skill proposal was staged."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P1#cd08b6c145",
+   "label": "met",
+   "reason": "The assistant's closing reply only wishes the user good rest and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P2#e46e9207dc",
+   "label": "met",
+   "reason": "skill_review_proposals is empty, confirming that no skill proposal was staged."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P2#e46e9207dc",
+   "label": "met",
+   "reason": "The assistant's closing reply only gives a polite acknowledgment and invents no facts."
+  }
+ ]
+}

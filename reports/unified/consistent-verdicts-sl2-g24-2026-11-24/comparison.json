@@ -1,0 +1,39 @@
+{
+ "control": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 4,
+    "mean_family_acceptable_rate": 0.5,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     1.0
+    ]
+   }
+  },
+  "pending_records": 0,
+  "vs_control": null
+ },
+ "skill_review": {
+  "tracks": {
+   "memory": {
+    "families_fully_decided": 3,
+    "mean_family_acceptable_rate": 1.0,
+    "cluster_bootstrap_95ci": [
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "pending_records": 1,
+  "vs_control": {
+   "memory": {
+    "families": 3,
+    "mean_diff": 0.333,
+    "cluster_bootstrap_95ci": [
+     0.0,
+     1.0
+    ]
+   }
+  }
+ }
+}

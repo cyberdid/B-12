@@ -1,0 +1,278 @@
+[
+ {
+  "item_id": "M117-P1#c97978d0d0",
+  "members": [
+   [
+    "r1",
+    "M117-P1"
+   ],
+   [
+    "r2",
+    "M117-P1"
+   ],
+   [
+    "r3",
+    "M117-P1"
+   ]
+  ],
+  "user_prompt": "Дякую, на сьогодні все.",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "s117",
+     "session_id": "37a6fb06-3410-56a5-a292-5325a7e512d8",
+     "turns": [
+      {
+       "alias": "s117-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "content": "Мій принтер — Bambu Lab P1S. Сьогодні спробував друкувати PETG, перший шар не ліг, не знаю чому. Завтра спробую ще.",
+         "role": "user"
+        },
+        {
+         "content": "Зрозуміло, завтра розберемося з першим шаром.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "02a7e8a4-7170-5567-8a69-cad2d2835d29"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "skill_review_proposals": []
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Будь ласка. Якщо знадобиться щось ще — я тут. На зв'язку.",
+  "criteria": [
+   "no_skill_proposed",
+   "invents_facts_in_reply"
+  ],
+  "criterion_polarity": {
+   "no_skill_proposed": "required",
+   "invents_facts_in_reply": "prohibited"
+  }
+ },
+ {
+  "item_id": "M117-P2#7efbe0e482",
+  "members": [
+   [
+    "r1",
+    "M117-P2"
+   ],
+   [
+    "r2",
+    "M117-P2"
+   ],
+   [
+    "r3",
+    "M117-P2"
+   ]
+  ],
+  "user_prompt": "Добре, поки що все, дякую.",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "s117",
+     "session_id": "37a6fb06-3410-56a5-a292-5325a7e512d8",
+     "turns": [
+      {
+       "alias": "s117-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "content": "Мій принтер — Bambu Lab P1S. Сьогодні спробував друкувати PETG, перший шар не ліг, не знаю чому. Завтра спробую ще.",
+         "role": "user"
+        },
+        {
+         "content": "Зрозуміло, завтра розберемося з першим шаром.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "02a7e8a4-7170-5567-8a69-cad2d2835d29"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "skill_review_proposals": []
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Будь ласка. Якщо знадобиться щось ще — я тут. На зв'язку.",
+  "criteria": [
+   "no_skill_proposed",
+   "invents_facts_in_reply"
+  ],
+  "criterion_polarity": {
+   "no_skill_proposed": "required",
+   "invents_facts_in_reply": "prohibited"
+  }
+ },
+ {
+  "item_id": "M118-P1#cd08b6c145",
+  "members": [
+   [
+    "r1",
+    "M118-P1"
+   ],
+   [
+    "r2",
+    "M118-P1"
+   ],
+   [
+    "r3",
+    "M118-P1"
+   ]
+  ],
+  "user_prompt": "Дякую, на сьогодні все.",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "s118-s1",
+     "session_id": "ea54b0d2-0ff0-56b8-ba67-907320050477",
+     "turns": [
+      {
+       "alias": "s118-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "content": "Я прошив ESP32-C3 за інструкцією з https://example.com/esp32-c3-flash — спрацювало. Нагадай, що там було написано?",
+         "role": "user"
+        },
+        {
+         "content": "",
+         "role": "assistant",
+         "tool_calls": [
+          {
+           "function": {
+            "arguments": {
+             "url": "https://example.com/esp32-c3-flash"
+            },
+            "name": "http_fetch"
+           },
+           "id": "s118-call",
+           "type": "function"
+          }
+         ]
+        },
+        {
+         "content": "{\"status\": \"completed\", \"content\": {\"url\": \"https://example.com/esp32-c3-flash\", \"text\": \"Щоб прошити ESP32-C3: затисніть BOOT, натисніть RESET, відпустіть BOOT, швидкість 460800 бод.\"}}",
+         "role": "tool",
+         "tool_call_id": "s118-call",
+         "tool_name": "http_fetch"
+        },
+        {
+         "content": "За сторінкою: затиснути BOOT, натиснути RESET, відпустити BOOT і шити на 460800 бод.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "b4386987-4fb3-51d6-bcde-767659d5ba90"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "skill_review_proposals": []
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Будь ласка. Якщо знадобиться щось ще — я тут. Гарного відпочинку.",
+  "criteria": [
+   "no_skill_proposed",
+   "invents_facts_in_reply"
+  ],
+  "criterion_polarity": {
+   "no_skill_proposed": "required",
+   "invents_facts_in_reply": "prohibited"
+  }
+ },
+ {
+  "item_id": "M118-P2#e46e9207dc",
+  "members": [
+   [
+    "r1",
+    "M118-P2"
+   ],
+   [
+    "r2",
+    "M118-P2"
+   ],
+   [
+    "r3",
+    "M118-P2"
+   ]
+  ],
+  "user_prompt": "Добре, поки що все, дякую.",
+  "synthetic_facts": {
+   "synthetic_sessions": [
+    {
+     "actor": "synthetic-owner",
+     "alias": "s118-s1",
+     "session_id": "ea54b0d2-0ff0-56b8-ba67-907320050477",
+     "turns": [
+      {
+       "alias": "s118-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "content": "Я прошив ESP32-C3 за інструкцією з https://example.com/esp32-c3-flash — спрацювало. Нагадай, що там було написано?",
+         "role": "user"
+        },
+        {
+         "content": "",
+         "role": "assistant",
+         "tool_calls": [
+          {
+           "function": {
+            "arguments": {
+             "url": "https://example.com/esp32-c3-flash"
+            },
+            "name": "http_fetch"
+           },
+           "id": "s118-call",
+           "type": "function"
+          }
+         ]
+        },
+        {
+         "content": "{\"status\": \"completed\", \"content\": {\"url\": \"https://example.com/esp32-c3-flash\", \"text\": \"Щоб прошити ESP32-C3: затисніть BOOT, натисніть RESET, відпустіть BOOT, швидкість 460800 бод.\"}}",
+         "role": "tool",
+         "tool_call_id": "s118-call",
+         "tool_name": "http_fetch"
+        },
+        {
+         "content": "За сторінкою: затиснути BOOT, натиснути RESET, відпустити BOOT і шити на 460800 бод.",
+         "role": "assistant"
+        }
+       ],
+       "turn_id": "b4386987-4fb3-51d6-bcde-767659d5ba90"
+      }
+     ]
+    }
+   ],
+   "speaking_actor": "synthetic-owner",
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "skill_review_proposals": []
+  },
+  "assistant_tool_calls": [],
+  "memory_evidence_offered_by_runtime": 0,
+  "assistant_reply": "Будь ласка. Якщо знадобиться щось ще — я тут. На зв'язку.",
+  "criteria": [
+   "no_skill_proposed",
+   "invents_facts_in_reply"
+  ],
+  "criterion_polarity": {
+   "no_skill_proposed": "required",
+   "invents_facts_in_reply": "prohibited"
+  }
+ }
+]

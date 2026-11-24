@@ -1,0 +1,53 @@
+{
+ "judge": "agy",
+ "labels": [
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P1#c97978d0d0",
+   "label": "met",
+   "reason": "The skill_review_proposals list in synthetic_facts is empty ([]), and neither assistant_tool_calls nor assistant_reply proposes any skill."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P1#c97978d0d0",
+   "label": "met",
+   "reason": "The assistant reply consists solely of a brief polite closing acknowledgment in Ukrainian and introduces no factual claims or invented details."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P2#7efbe0e482",
+   "label": "met",
+   "reason": "The skill_review_proposals list in synthetic_facts is empty ([]), and neither assistant_tool_calls nor assistant_reply proposes any skill."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P2#7efbe0e482",
+   "label": "met",
+   "reason": "The assistant reply contains only a brief closing acknowledgment in Ukrainian with no factual assertions, so it does not invent any facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P1#cd08b6c145",
+   "label": "met",
+   "reason": "The skill_review_proposals list in synthetic_facts is empty ([]), and neither assistant_tool_calls nor assistant_reply proposes any skill."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P1#cd08b6c145",
+   "label": "met",
+   "reason": "The assistant reply offers only a brief farewell in Ukrainian and makes no factual claims, so no facts are invented."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P2#e46e9207dc",
+   "label": "met",
+   "reason": "The skill_review_proposals list in synthetic_facts is empty ([]), and neither assistant_tool_calls nor assistant_reply proposes any skill."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P2#e46e9207dc",
+   "label": "met",
+   "reason": "The assistant reply is purely a brief closing acknowledgment in Ukrainian with no factual assertions or invented content."
+  }
+ ]
+}
