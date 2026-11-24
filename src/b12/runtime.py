@@ -46,6 +46,7 @@ class Runtime:
     skills: SkillStore | None = None
     mcp_servers: list = field(default_factory=list)
     speakers: object = None
+    models: object = None  # ModelSwitch (ADR-023), set by open_runtime
 
     def close(self):
         for server in self.mcp_servers:
@@ -200,7 +201,7 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
     registry.protected_paths = tuple(
         os.path.realpath(path) for path in (settings.state_dir, config_home / "b12")
     )
-    return Runtime(
+    runtime = Runtime(
         settings,
         control,
         memory,
@@ -218,3 +219,9 @@ def open_runtime(settings: Settings, *, model=None) -> Runtime:
         skills=skills_store,
         speakers=speakers,
     )
+    from b12.model_switch import ModelSwitch
+
+    runtime.models = ModelSwitch(runtime)
+    if model is None or isinstance(model, OllamaModel):
+        runtime.models.restore()  # the owner's last model choice survives a restart
+    return runtime

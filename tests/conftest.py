@@ -165,6 +165,9 @@ async def scripted_ollama(profile_settings):
         "unloads": 0,
         "unload_status": 200,
         "chat_started": asyncio.Event(),
+        "tags": [{"name": "test-model", "digest": "a" * 64}],
+        "pull": [],  # NDJSON frames streamed by /api/pull
+        "pulled": [],
     }
     handlers = set()
 
@@ -197,17 +200,35 @@ async def scripted_ollama(profile_settings):
             if path.endswith("/api/version"):
                 await respond(writer, 200, {"version": "test-1"})
             elif path.endswith("/api/tags"):
-                await respond(writer, 200, {"models": [{"name": "test-model", "digest": "a" * 64}]})
+                await respond(writer, 200, {"models": state["tags"]})
             elif path.endswith("/api/show"):
                 await respond(writer, 200, {"template": "{{ .Prompt }}"})
             elif path.endswith("/api/ps"):
-                running = [{"name": "test-model", "model": "test-model"}] if state["loaded"] else []
+                running = (
+                    [{"name": "test-model", "model": "test-model", "size_vram": 6 * 1024**3}]
+                    if state["loaded"]
+                    else []
+                )
                 await respond(writer, 200, {"models": running})
             elif path.endswith("/api/generate"):
-                if state["unload_status"] == 200 and body.get("keep_alive") == 0:
-                    state["loaded"] = False
-                    state["unloads"] += 1
-                await respond(writer, state["unload_status"], {"done_reason": "unload"})
+                if body.get("keep_alive") == 0:
+                    if state["unload_status"] == 200:
+                        state["loaded"] = False
+                        state["unloads"] += 1
+                    await respond(writer, state["unload_status"], {"done_reason": "unload"})
+                else:  # a load (warm-up) request
+                    state["loaded"] = True
+                    await respond(writer, 200, {"done": True, "done_reason": "load"})
+            elif path.endswith("/api/pull"):
+                state["pulled"].append(body.get("model"))
+                frames = b"".join(frame(f) for f in [*state["pull"], {"status": "success"}])
+                writer.write(
+                    f"HTTP/1.1 200 OK\r\nContent-Length: {len(frames)}\r\n"
+                    "Connection: close\r\n\r\n".encode()
+                    + frames
+                )
+                await writer.drain()
+                state["tags"].append({"name": body.get("model"), "digest": "b" * 64})
             elif path.endswith("/api/chat"):
                 state["requests"].append(body)
                 state["loaded"] = True
