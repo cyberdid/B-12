@@ -116,9 +116,23 @@ def _evidence(item, record):
             )
             return "PASS" if recorded else "FAIL"
         if value in ("skill_proposal_staged", "no_skill_proposal"):
-            ticks = (record.get("seed_report") or {}).get("skill_review_tick") or []
-            staged = any(isinstance(t, dict) and t.get("state") == "staged" for t in ticks)
-            return "PASS" if staged == (value == "skill_proposal_staged") else "FAIL"
+            ticks = [
+                t
+                for t in (record.get("seed_report") or {}).get("skill_review_tick") or []
+                if isinstance(t, dict)
+            ]
+            staged = any(t.get("state") == "staged" for t in ticks)
+            if value == "skill_proposal_staged":
+                return "PASS" if staged else "FAIL"
+            if staged:
+                return "FAIL"
+            # "No proposal" counts only when the review ran and found nothing; a review that
+            # was off, timed out or was rejected measured nothing.
+            ran = ticks and all(
+                t.get("state") == "skipped" and t.get("reason") in ("no_candidates", "no_turns")
+                for t in ticks
+            )
+            return "PASS" if ran else "NOT_SCORABLE"
         return "NOT_SCORABLE"
     if kind == "probe":
         # The assistant looked for `value`: any call on that exact path (a failed read counts)

@@ -1149,6 +1149,10 @@ class Agent:
             self._tainted.add(context.turn_id)
         active = _Active(actor.id, context.cancel)
         self.active[context.turn_id] = active
+        for key, item in list(self.active.items()):
+            if key.startswith("skill_review-"):
+                # Background learning yields to any turn instead of holding the model lock.
+                item.cancel.set()
 
         async def emit(kind, data=None):
             state["sequence"] += 1

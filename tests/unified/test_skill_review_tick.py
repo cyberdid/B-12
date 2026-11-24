@@ -72,7 +72,8 @@ async def test_tick_without_the_flag_makes_no_model_call(scripted_ollama, tmp_pa
     )
     assert report["skill_review_tick"] == []
     assert state["requests"] == []
-    assert _evidence("setup:no_skill_proposal", _record(report)) == "PASS"
+    # Nothing was measured with the flag off: neither check may pass.
+    assert _evidence("setup:no_skill_proposal", _record(report)) == "NOT_SCORABLE"
     assert _evidence("setup:skill_proposal_staged", _record(report)) == "FAIL"
     assert _seed_facts(_record(report))["skill_review_proposals"] == []
 
@@ -87,3 +88,19 @@ def test_runner_exposes_the_skill_review_flag():
     assert "skill_review" in run_u2_u3.RUNTIME_FLAGS
     source = open(run_u2_u3.__file__, encoding="utf-8").read()
     assert '"--skill-review"' in source
+
+
+def test_no_proposal_passes_only_when_the_review_ran_and_found_nothing():
+    def rec(*ticks):
+        return {"tool_calls": [], "seed_report": {"skill_review_tick": list(ticks)}}
+
+    ran = {"state": "skipped", "reason": "no_candidates"}
+    excluded = {"state": "skipped", "reason": "no_turns"}
+    timed_out = {"state": "failed", "reason": "deadline_exceeded"}
+    garbage = {"state": "rejected", "reason": "invalid_output"}
+    staged = {"state": "staged", "proposals": []}
+    assert _evidence("setup:no_skill_proposal", rec(ran)) == "PASS"
+    assert _evidence("setup:no_skill_proposal", rec(excluded)) == "PASS"
+    assert _evidence("setup:no_skill_proposal", rec(timed_out)) == "NOT_SCORABLE"
+    assert _evidence("setup:no_skill_proposal", rec(garbage)) == "NOT_SCORABLE"
+    assert _evidence("setup:no_skill_proposal", rec(staged)) == "FAIL"

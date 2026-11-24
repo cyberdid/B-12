@@ -14,13 +14,14 @@ from uuid import uuid4
 from b12.agent import _Active
 from b12.memory_review import MemoryReviewer
 from b12.model_errors import ModelError
-from b12.skills import validate_frontmatter
+from b12.skills import MAX_DESCRIPTION_LEN, validate_frontmatter
 
 _MAX_TURNS = 6
 _MAX_SKILLS = 2
 _KEYS = {"name", "description", "body", "turn_id"}
 _SKILL_TEXT_EACH = 2000  # characters of one skill shown to the review
 _SKILL_TEXT_BUDGET = 6000  # characters of all skills shown to the review
+_MAX_ATTEMPTS = 3  # a batch that keeps failing is skipped, so learning does not stall
 
 PROMPT = (
     "Ти — модуль фонової рецензії навичок Capri. Нижче наведено нещодавні завершені ходи "
@@ -78,20 +79,45 @@ class SkillReviewer(MemoryReviewer):
         """Turns plus the current skills: names for matching, and their text, so an update can
         keep the unchanged steps (gemma4:12b dropped them seeing only the index, M116)."""
         store = self.runtime.skills
+        index = store.index(limit=20)
         sections, budget = [], _SKILL_TEXT_BUDGET
-        for item in store.index(limit=20):
+        for item in index:
             try:
-                text = store.view(item["name"], "")
-            except (ValueError, OSError, UnicodeDecodeError):
+                # show(), not view(): reading for the review is not a use of the skill.
+                text = store.show(item["name"])["content"][:_SKILL_TEXT_EACH]
+            except (KeyError, ValueError, OSError, UnicodeDecodeError):
                 continue
-            text = text[:_SKILL_TEXT_EACH]
             if len(text) > budget:
-                break
+                continue
             budget -= len(text)
             sections.append(f"--- навичка {item['name']} ---\n{text.strip()}")
-        known = "Наявні навички (поточний текст):\n" + "\n\n".join(sections) if sections else ""
-        body = self._format_batch(turns, [])
-        return f"{known}\n\n{body}" if known else body
+        parts = []
+        if index:
+            # Every name is listed, even when its text does not fit the budget.
+            names = "\n".join(f"- {i['name']}: {i['description']}" for i in index)
+            parts.append(f"Наявні навички:\n{names}")
+        if sections:
+            parts.append("Поточний текст навичок:\n" + "\n\n".join(sections))
+        parts.append(self._format_batch(turns, []))
+        return "\n\n".join(parts)
+
+    def _failed_attempt(self, actor_id: str, cursor: int, last_sequence: int) -> bool:
+        """Count a failed batch; after _MAX_ATTEMPTS skip it. True when skipped."""
+        control = self.runtime.control
+        key = f"skill_review_attempts:{actor_id}"
+        seen, _, count = (control.get_meta(key) or "").partition(":")
+        count = int(count) + 1 if seen == str(cursor) and count.isdigit() else 1
+        if count >= _MAX_ATTEMPTS:
+            control.set_meta(f"skill_review:{actor_id}", str(last_sequence))
+            control.set_meta(key, "")
+            return True
+        control.set_meta(key, f"{cursor}:{count}")
+        return False
+
+    def _failure(self, actor_id, cursor, last_sequence, state, reason) -> dict:
+        if self._failed_attempt(actor_id, cursor, last_sequence):
+            return {"state": state, "reason": reason, "gave_up": True}
+        return {"state": state, "reason": reason}
 
     async def review(self, actor, *, cancel=None, timeout_s: float = 120) -> dict:
         rt = self.runtime
@@ -100,6 +126,9 @@ class SkillReviewer(MemoryReviewer):
             return {"state": "skipped", "reason": "skills_off"}
         if not actor.consent:
             return {"state": "skipped", "reason": "consent_required"}
+        if not actor.owner:
+            # Skills are the owner's procedures (skill_propose is owner-only too).
+            return {"state": "skipped", "reason": "owner_only"}
         control, memory, agent = rt.control, rt.memory, rt.agent
         cursor_key = f"skill_review:{actor.id}"
         try:
@@ -144,7 +173,9 @@ class SkillReviewer(MemoryReviewer):
         except ModelError as exc:
             if active.invalidated or memory.deletion_revision(actor) != rev:
                 return {"state": "rejected", "reason": "stale_deletion_revision"}
-            return {"state": "failed", "reason": exc.code}
+            if exc.code == "cancelled":  # an owner turn took over; try again when idle
+                return {"state": "failed", "reason": "cancelled"}
+            return self._failure(actor.id, after_sequence, last_sequence, "failed", exc.code)
         finally:
             active.done.set()
             agent.active.pop(key, None)
@@ -155,7 +186,9 @@ class SkillReviewer(MemoryReviewer):
 
         skills = _parse_skills(reply.content, set(sessions_by_turn))
         if skills is None:
-            return {"state": "rejected", "reason": "invalid_output"}
+            return self._failure(
+                actor.id, after_sequence, last_sequence, "rejected", "invalid_output"
+            )
         if not skills:
             control.set_meta(cursor_key, str(last_sequence))
             return {"state": "skipped", "reason": "no_candidates"}
@@ -165,10 +198,12 @@ class SkillReviewer(MemoryReviewer):
         for item in skills[:_MAX_SKILLS]:
             if item["name"] in pending_names:
                 continue
-            text = (
-                f"---\nname: {item['name']}\ndescription: {item['description']}\n---\n"
-                f"{item['body']}\n"
-            )
+            if not rt.sessions.turn_messages(item["turn_id"], actor.id):
+                continue  # the turn was cleared while the model was answering
+            description = " ".join(item["description"].split())
+            if len(description) > MAX_DESCRIPTION_LEN:
+                description = description[:MAX_DESCRIPTION_LEN].rsplit(" ", 1)[0].rstrip(" ,;:—-")
+            text = f"---\nname: {item['name']}\ndescription: {description}\n---\n{item['body']}\n"
             if validate_frontmatter(text) is None:
                 continue
             try:
