@@ -159,3 +159,11 @@ Current census оновлено до 86/92 not retested, чотирьох fail (
 **Межі:** oracle написані автором і мають `review_status: UNREVIEWED`; незалежного двомовного review немає. `harness_setup` поки лише описує synthetic state і ще не виконується жодним runner, тому корпус не runnable. Моделі, Capri, production memory і мережа для створення корпусу не використовувались. U2/U3 model runs лишаються BLOCKED до review, runner-адаптера та fixture lock.
 
 **Версія v2 після review Codex (18.11):** Codex (read-only, `codex exec`) знайшов спільні дефекти v1: setup лежав у model-visible input, неіснуючий tool `http_request`, не-UUID memory ids; і окремі — C03, C21, C22, C27–C29, M02, M05, M13/M24, M21–M23, а також сценарії без runtime-механізму. Створено [`u2-u3-draft-v2`](../../evals/unified/scenario_sets/u2-u3-draft-v2.json): окремі input/setup/oracle файли, UUID, GoalStore-статуси, точні `ExecArgs` для C21, явний український wrapper подій, M02 без спільних основ слів, M05 «останні три дні», 197 зафіксованих distractors у M30. C24–C26, C30, M28, M29 позначено `BLOCKED` з причиною. v1 збережено як superseded. SHA-256 джерела `979285d9ce5f126fb37b095dca3120ab323d5de1241ba76720ca8456143ec0af`, manifest `7a7313af3ade0a9b0f302e784db0b10d6598c53e998c84dbb449aa065d215681`.
+
+## Фронтір-перша перевірка прапорців — 23–24.11.2026
+
+**Метод:** основні вимірювання — `gpt-6-luna` через `subscription_bridge` (судді Gemini + Opus, без Codex); прийомка — `gemma4:12b` на Colab L4 (судді Codex + Gemini). Нові заморожені сети після двох сліпих рецензій (Codex + Gemini): `asof-live-v1` (M97–M99), `convrecall-live-v1` (M100–M102), `flags-live-v1..v3` (M103–M110). Сети судять відповідь, а не обов'язковий виклик інструмента: M93/M96 у `ports-live-v1` вимагали виклик і тому не могли виміряти runtime-виправлення.
+
+**Висновки та числа:** [FRONTIER_RECALL_2026-11-23.md](../../reports/unified/FRONTIER_RECALL_2026-11-23.md). Виправлення стенду, знайдені по дорозі: аркуш суддів показує засіяні наміри й навички (`ba9be75`), runner засіює їх (`2b37a05`), bootstrap Colab більше не тримає SSH-канал (`72da8e2`).
+
+**Межі:** синтетичні сценарії, 3 повтори × 2 формулювання (n = 6 на сім'ю); суперечки суддів вирішує власник; M102 (відповідь «немає доступу» замість «такої розмови не було») лишається відкритою.

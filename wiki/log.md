@@ -1518,3 +1518,17 @@ Profile asset hashes і local deployment digest перевірено doctor; bac
   - `M96` (`memory_as_of`) — **вузьке місце runtime / pre-recall / опису `as_of`**: обидві моделі провалились **`0%`** (`0/2` `gpt-6-luna`, `0/6` `gemma4:12b`), оскільки автоматичний pre-recall підклав 5 листопадових дистракторів без сигналу про приховані `superseded` факти, й моделі не викликали `memory_search(as_of=...)` (`tools=[]`).
   - `M93` (`session_search`) — часткова проблема **tool-discovery** (`1/2` `gpt-6-luna` через `tools=[]` у `M93-P1` vs `4/6` `gemma4:12b`).
   - `M94` (`memory_review` `2/2`) і `M95` (`memory_taint` `2/2`) підтвердили очікуваний механізм прапорців; затверджені дефолти `0f930c8` у `src/b12/config.py` **не змінюються**.
+
+## [2026-11-23] eval | Фронтір-перша перевірка виправлень пам'яті
+
+- **Вимога власника:** основні тести — на фронтір-моделі (`gpt-6-luna`), `gemma4:12b` — лише прийомка на Colab; недобір gemma при нормальному фронтірі = обмеження моделі.
+- Нові runtime-прапорці `recall_as_of`, `recall_conversations`; нові заморожені сети `asof-live-v1`, `convrecall-live-v1`, `flags-live-v1..v3`. Результати й межі — [FRONTIER_RECALL_2026-11-23.md](../reports/unified/FRONTIER_RECALL_2026-11-23.md), розділи 1–5.
+
+## [2026-11-23] decision | Нові дефолти
+
+- **Рішення власника:** увімкнено за замовчуванням `recall_as_of`, `recall_conversations`, `memory_ranking`, `standing_intents`, `skills` (`65f30ba`). Суперечки суддів M87×2 → PARTIAL, M106: прохання підтвердити видалення = уточнення (`9231c36`).
+
+## [2026-11-24] eval | Прийомка нових дефолтів на gemma4:12b
+
+- 7 прогонів на Colab L4 (`6114515d`), runtime `9231c36`, 120 записів без помилок; судді Codex + Gemini. `recall_conversations` 0/12 → 12/12; `standing_intents` 0/6 → 6/6 (рішення власника щодо суперечки M107); `skills` 0/6 → 3/6 — M108-P2 тричі дав порожню відповідь (два виклики по 512 токенів без видимого тексту); `memory_ranking` без змін (M103 6/6 і без прапорця). Розділ 7 [звіту](../reports/unified/FRONTIER_RECALL_2026-11-23.md); коміти `02c299e`, `305d388`.
+- Причину порожніх відповідей gemma діагностую через сирий потік Ollama (Colab), до того вона не встановлена.
