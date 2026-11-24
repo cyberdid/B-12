@@ -19,16 +19,18 @@ from b12.skills import validate_frontmatter
 _MAX_TURNS = 6
 _MAX_SKILLS = 2
 _KEYS = {"name", "description", "body", "turn_id"}
+_SKILL_TEXT_EACH = 2000  # characters of one skill shown to the review
+_SKILL_TEXT_BUDGET = 6000  # characters of all skills shown to the review
 
 PROMPT = (
     "Ти — модуль фонової рецензії навичок Capri. Нижче наведено нещодавні завершені ходи "
-    "власника (turn_id, репліки user і assistant) та індекс уже наявних навичок. "
+    "власника (turn_id, репліки user і assistant) та поточний текст уже наявних навичок. "
     "Знайди лише процедури, які варто повторювати: щонайменше два кроки, і власник сам їх "
     "описав або підтвердив, що вони спрацювали. Кожну оформи як навичку: кроки з конкретними "
     "налаштуваннями й командами; пастка — це правило і одне речення «чому», прив'язане до кроку; "
     "без дат, номерів інцидентів і цитат. Не є навичкою: разовий факт, невдала чи ще не вдала "
-    "спроба, здогадка, порада без підтвердження власника. Якщо процедура стосується навички з "
-    "індексу, використай ту саму назву й напиши повний оновлений текст, зберігши незмінні "
+    "спроба, здогадка, порада без підтвердження власника. Якщо процедура стосується наявної "
+    "навички, використай ту саму назву й напиши повний оновлений текст, зберігши незмінні "
     "кроки. Назва — латиницею: малі літери, цифри, дефіс; опис — до 60 символів. Якщо не "
     f"впевнений — поверни порожній список. Не більше {_MAX_SKILLS} навичок на пакет. "
     "Відповідай тільки JSON: "
@@ -70,9 +72,23 @@ class SkillReviewer(MemoryReviewer):
     """Reuses the memory review's goal and network-taint exclusions."""
 
     def _format_skill_batch(self, turns: list[dict]) -> str:
+        """Turns plus the current skills: names for matching, and their text, so an update can
+        keep the unchanged steps (gemma4:12b dropped them seeing only the index, M116)."""
+        store = self.runtime.skills
+        sections, budget = [], _SKILL_TEXT_BUDGET
+        for item in store.index(limit=20):
+            try:
+                text = store.view(item["name"], "")
+            except (ValueError, OSError, UnicodeDecodeError):
+                continue
+            text = text[:_SKILL_TEXT_EACH]
+            if len(text) > budget:
+                break
+            budget -= len(text)
+            sections.append(f"--- навичка {item['name']} ---\n{text.strip()}")
+        known = "Наявні навички (поточний текст):\n" + "\n\n".join(sections) if sections else ""
         body = self._format_batch(turns, [])
-        index = self.runtime.skills.render_index(limit=20)
-        return f"{index}\n\n{body}" if index else body
+        return f"{known}\n\n{body}" if known else body
 
     async def review(self, actor, *, cancel=None, timeout_s: float = 120) -> dict:
         rt = self.runtime

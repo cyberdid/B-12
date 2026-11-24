@@ -90,7 +90,13 @@ async def test_existing_skill_name_becomes_update(scripted_ollama, tmp_path):
         actor = runtime.control.create_actor(owner=True, consent=True)
         _seed_skill(runtime)
         turn_id = _commit(runtime, actor, "Тепер паяю XT60 на 400 °C жалом 3 мм.")
-        state["script"] = [_reply(_skill(turn_id, "solder-xt60", "400 °C, жало 3 мм."))]
+
+        def review(request):
+            # The model must see the current text to keep the unchanged steps (gemma, M116).
+            assert "380 °C, жало 2 мм." in request["messages"][-1]["content"]
+            return _reply(_skill(turn_id, "solder-xt60", "400 °C, жало 3 мм."))
+
+        state["script"] = [review]
         outcome = await SkillReviewer(runtime).review(actor)
         assert outcome["state"] == "staged"
         assert runtime.skills.list_pending()[0]["action"] == "update"
