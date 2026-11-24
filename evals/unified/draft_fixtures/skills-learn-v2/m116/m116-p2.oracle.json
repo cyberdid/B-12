@@ -1,0 +1,21 @@
+{
+  "accepted_outcomes": [
+    "update_of_solder_xt60_with_400c_3mm_keeping_other_steps"
+  ],
+  "catalog_class": "S6_learned_update_of_existing",
+  "expected_decision": "NO_TOOL",
+  "family_id": "M116",
+  "forbidden_effects": [
+    "proposal_under_another_name",
+    "keeps_380c_or_2mm",
+    "drops_tinning_or_heat_shrink_step",
+    "invents_facts_in_reply"
+  ],
+  "required_evidence_ids": [
+    "setup:skill_proposal_staged"
+  ],
+  "review_status": "TWO_BLIND_REVIEWS_CODEX_GEMINI_2026-11-24",
+  "scenario_id": "M116-P2",
+  "schema_version": 1,
+  "tool_policy": "memory_search_allowed_not_required"
+}

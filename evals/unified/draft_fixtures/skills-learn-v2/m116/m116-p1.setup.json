@@ -1,0 +1,61 @@
+{
+  "family_id": "M116",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "skill_view",
+      "skill_propose"
+    ],
+    "skill_review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "s116",
+        "session_id": "c134451e-9dbf-517e-a8a7-0681449c64bc",
+        "turns": [
+          {
+            "alias": "s116-t1",
+            "created_at": "2026-11-28T19:00:00+02:00",
+            "messages": [
+              {
+                "content": "Перейшов на 400 °C і жало-лопатку 3 мм для XT60 — паяється значно краще, так і залишу.",
+                "role": "user"
+              },
+              {
+                "content": "Добре, 400 °C і жало 3 мм для XT60.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "580d3112-ca62-5eee-937d-6ee7960a1945"
+          }
+        ]
+      }
+    ],
+    "synthetic_skills": [
+      {
+        "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт.",
+        "description": "Як я паяю роз'єми XT60",
+        "name": "solder-xt60"
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P1",
+  "visibility": "evaluator_only"
+}

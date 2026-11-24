@@ -1,0 +1,54 @@
+{
+  "family_id": "M115",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "skill_view",
+      "skill_propose"
+    ],
+    "skill_review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "s115",
+        "session_id": "5f216fe8-c219-5ad0-8a21-23a081780843",
+        "turns": [
+          {
+            "alias": "s115-t1",
+            "created_at": "2026-11-28T19:00:00+02:00",
+            "messages": [
+              {
+                "content": "Нарешті прошив ESP32-C3! Треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Тепер завжди так робитиму.",
+                "role": "user"
+              },
+              {
+                "content": "Чудово, що вийшло! Отже: BOOT, RESET, відпустити BOOT, 460800 бод.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "4c54c5bf-7a8f-5fcc-ab90-6b887031f5f1"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

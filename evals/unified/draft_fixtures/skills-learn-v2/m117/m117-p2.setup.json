@@ -1,0 +1,54 @@
+{
+  "family_id": "M117",
+  "harness_setup": {
+    "available_tools": [
+      "file_read",
+      "file_list",
+      "file_search",
+      "memory_search",
+      "conversation_search",
+      "system_info",
+      "file_write",
+      "run_command",
+      "memory_store",
+      "memory_forget",
+      "memory_supersede",
+      "note_add",
+      "http_fetch",
+      "web_search",
+      "skill_view",
+      "skill_propose"
+    ],
+    "skill_review_tick": true,
+    "speaking_actor": "synthetic-owner",
+    "synthetic_clock": "2026-12-01T10:00:00+02:00",
+    "synthetic_memory": [],
+    "synthetic_sessions": [
+      {
+        "actor": "synthetic-owner",
+        "alias": "s117",
+        "session_id": "37a6fb06-3410-56a5-a292-5325a7e512d8",
+        "turns": [
+          {
+            "alias": "s117-t1",
+            "created_at": "2026-11-28T19:00:00+02:00",
+            "messages": [
+              {
+                "content": "Мій принтер — Bambu Lab P1S. Сьогодні спробував друкувати PETG, перший шар не ліг, не знаю чому. Завтра спробую ще.",
+                "role": "user"
+              },
+              {
+                "content": "Зрозуміло, завтра розберемося з першим шаром.",
+                "role": "assistant"
+              }
+            ],
+            "turn_id": "02a7e8a4-7170-5567-8a69-cad2d2835d29"
+          }
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "variant_id": "P2",
+  "visibility": "evaluator_only"
+}

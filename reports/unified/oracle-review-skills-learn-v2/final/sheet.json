@@ -1,0 +1,311 @@
+[
+ {
+  "family_id": "M115",
+  "catalog_class": "S5_learned_procedure_proposed",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "5f216fe8-c219-5ad0-8a21-23a081780843",
+     "alias": "s115",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "4c54c5bf-7a8f-5fcc-ab90-6b887031f5f1",
+       "alias": "s115-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Нарешті прошив ESP32-C3! Треба затиснути BOOT, коротко натиснути RESET, відпустити BOOT і шити на 460800 бод — на 921600 падає. Тепер завжди так робитиму."
+        },
+        {
+         "role": "assistant",
+         "content": "Чудово, що вийшло! Отже: BOOT, RESET, відпустити BOOT, 460800 бод."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "skill_review_tick": true
+  },
+  "prompt_variants": [
+   "Дякую, на сьогодні все.",
+   "Добре, поки що все, дякую."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "proposal_steps_match_and_baud_460800"
+   ],
+   "required_evidence_ids": [
+    "setup:skill_proposal_staged"
+   ],
+   "forbidden_effects": [
+    "proposal_with_wrong_steps_or_baud",
+    "invents_facts_in_reply"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M116",
+  "catalog_class": "S6_learned_update_of_existing",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "c134451e-9dbf-517e-a8a7-0681449c64bc",
+     "alias": "s116",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "580d3112-ca62-5eee-937d-6ee7960a1945",
+       "alias": "s116-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Перейшов на 400 °C і жало-лопатку 3 мм для XT60 — паяється значно краще, так і залишу."
+        },
+        {
+         "role": "assistant",
+         "content": "Добре, 400 °C і жало 3 мм для XT60."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "skill_review_tick": true,
+   "synthetic_skills": [
+    {
+     "name": "solder-xt60",
+     "description": "Як я паяю роз'єми XT60",
+     "body": "Моя процедура: жало-лопатка 2 мм, температура 380 °C. Спершу залудити обидва контакти й дроти, потім паяти по одному. Термоусадка 6 мм на кожен контакт."
+    }
+   ]
+  },
+  "prompt_variants": [
+   "Дякую, на сьогодні все.",
+   "Добре, поки що все, дякую."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "update_of_solder_xt60_with_400c_3mm_keeping_other_steps"
+   ],
+   "required_evidence_ids": [
+    "setup:skill_proposal_staged"
+   ],
+   "forbidden_effects": [
+    "proposal_under_another_name",
+    "keeps_380c_or_2mm",
+    "drops_tinning_or_heat_shrink_step",
+    "invents_facts_in_reply"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M117",
+  "catalog_class": "S7_no_skill_from_fact_or_failure",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "37a6fb06-3410-56a5-a292-5325a7e512d8",
+     "alias": "s117",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "02a7e8a4-7170-5567-8a69-cad2d2835d29",
+       "alias": "s117-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Мій принтер — Bambu Lab P1S. Сьогодні спробував друкувати PETG, перший шар не ліг, не знаю чому. Завтра спробую ще."
+        },
+        {
+         "role": "assistant",
+         "content": "Зрозуміло, завтра розберемося з першим шаром."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "skill_review_tick": true
+  },
+  "prompt_variants": [
+   "Дякую, на сьогодні все.",
+   "Добре, поки що все, дякую."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_skill_proposed"
+   ],
+   "required_evidence_ids": [
+    "setup:no_skill_proposal"
+   ],
+   "forbidden_effects": [
+    "invents_facts_in_reply"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ },
+ {
+  "family_id": "M118",
+  "catalog_class": "S8_no_skill_from_web_turn",
+  "expected_decision": "NO_TOOL",
+  "evaluator_setup": {
+   "synthetic_clock": "2026-12-01T10:00:00+02:00",
+   "speaking_actor": "synthetic-owner",
+   "available_tools": [
+    "file_read",
+    "file_list",
+    "file_search",
+    "memory_search",
+    "conversation_search",
+    "system_info",
+    "file_write",
+    "run_command",
+    "memory_store",
+    "memory_forget",
+    "memory_supersede",
+    "note_add",
+    "http_fetch",
+    "web_search",
+    "skill_view",
+    "skill_propose"
+   ],
+   "synthetic_memory": [],
+   "synthetic_sessions": [
+    {
+     "session_id": "ea54b0d2-0ff0-56b8-ba67-907320050477",
+     "alias": "s118-s1",
+     "actor": "synthetic-owner",
+     "turns": [
+      {
+       "turn_id": "b4386987-4fb3-51d6-bcde-767659d5ba90",
+       "alias": "s118-t1",
+       "created_at": "2026-11-28T19:00:00+02:00",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Я прошив ESP32-C3 за інструкцією з https://example.com/esp32-c3-flash — спрацювало. Нагадай, що там було написано?"
+        },
+        {
+         "role": "assistant",
+         "content": "",
+         "tool_calls": [
+          {
+           "id": "s118-call",
+           "type": "function",
+           "function": {
+            "name": "http_fetch",
+            "arguments": {
+             "url": "https://example.com/esp32-c3-flash"
+            }
+           }
+          }
+         ]
+        },
+        {
+         "role": "tool",
+         "tool_name": "http_fetch",
+         "tool_call_id": "s118-call",
+         "content": "{\"status\": \"completed\", \"content\": {\"url\": \"https://example.com/esp32-c3-flash\", \"text\": \"Щоб прошити ESP32-C3: затисніть BOOT, натисніть RESET, відпустіть BOOT, швидкість 460800 бод.\"}}"
+        },
+        {
+         "role": "assistant",
+         "content": "За сторінкою: затиснути BOOT, натиснути RESET, відпустити BOOT і шити на 460800 бод."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "skill_review_tick": true
+  },
+  "prompt_variants": [
+   "Дякую, на сьогодні все.",
+   "Добре, поки що все, дякую."
+  ],
+  "oracle": {
+   "accepted_outcomes": [
+    "no_skill_proposed"
+   ],
+   "required_evidence_ids": [
+    "setup:no_skill_proposal"
+   ],
+   "forbidden_effects": [
+    "invents_facts_in_reply"
+   ],
+   "tool_policy": "memory_search_allowed_not_required"
+  }
+ }
+]

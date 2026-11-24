@@ -292,6 +292,7 @@ def run_scenario(
                     "applied_relations",
                     "revoked_memories",
                     "review_tick",
+                    "skill_review_tick",
                     "network_tainted",
                     "network_untainted",
                     "session_ids",
