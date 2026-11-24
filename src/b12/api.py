@@ -10,6 +10,7 @@ disconnect cancels the turn.
 import asyncio
 import json
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated
 
@@ -20,6 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from b12.auth import GUEST_CAPABILITIES, Caller, bearer, owner_capabilities, owner_token
 from b12.config import Settings
 from b12.control import ControlError
+from b12.model_errors import ModelError
 
 MAX_BODY = 64 * 1024
 MAX_VOICE_BODY = 1024 * 1024
@@ -73,6 +75,16 @@ class GuestBody(_Body):
 class ConsentBody(_Body):
     actor_id: str | None = None
     consent: bool
+
+
+class ModelBody(_Body):
+    id: str = Field(min_length=1, max_length=200)
+
+
+class TurnFeedbackBody(_Body):
+    turn_id: str = Field(min_length=1, max_length=100)
+    session_id: str = Field(min_length=1, max_length=100)
+    note: str = Field(default="", max_length=4000)
 
 
 class ApprovalBody(_Body):
@@ -705,6 +717,53 @@ def create_app(
         except ControlError:
             raise HTTPException(404, "actor_not_found") from None
         return {"actor_id": target, "consent": body.consent}
+
+    @app.get("/api/models")
+    async def models_list(request: Request, who: Identity):
+        """ADR-023: the models the owner can switch to, and the active one."""
+        require_owner(who)
+        models = runtime_of(request).models
+        choices = await models.catalog()
+        return {
+            "active": models.active_id,
+            "previous": models.previous_id,
+            "choices": [c.as_dict() for c in choices],
+        }
+
+    @app.post("/api/models/active")
+    async def models_switch(request: Request, body: ModelBody, who: Identity):
+        """Switch between turns: waits for a running model call to finish."""
+        require_owner(who)
+        models = runtime_of(request).models
+        try:
+            choice = await models.switch(body.id)
+        except KeyError:
+            raise HTTPException(404, "model_not_found") from None
+        except ModelError as exc:
+            raise HTTPException(409, exc.code) from None
+        return {"active": models.active_id, "choice": choice.as_dict()}
+
+    @app.get("/api/models/status")
+    async def models_status(request: Request, who: Identity):
+        require_owner(who)
+        return await runtime_of(request).models.status()
+
+    @app.post("/api/feedback")
+    async def turn_feedback(request: Request, body: TurnFeedbackBody, who: Identity):
+        """The owner marks a bad turn; the log becomes new evaluation scenarios."""
+        require_owner(who)
+        runtime = runtime_of(request)
+        entry = {
+            "at": datetime.now(UTC).isoformat(),
+            "turn_id": body.turn_id,
+            "session_id": body.session_id,
+            "note": body.note,
+            "model_id": runtime.models.active_id,
+        }
+        path = runtime.settings.state_dir / "feedback.jsonl"
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        return entry
 
     @app.get("/api/voice/status")
     async def voice_status(request: Request, who: Identity):

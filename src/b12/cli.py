@@ -750,6 +750,19 @@ async def cmd_intent(args, settings) -> int:
         runtime.close()
 
 
+async def cmd_feedback(args, settings) -> int:
+    """Turns the owner marked as bad in the TUI (F10), oldest first."""
+    runtime = open_or_fail(settings)
+    try:
+        require_owner(runtime)
+        path = runtime.settings.state_dir / "feedback.jsonl"
+        lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+        emit_json([json.loads(line) for line in lines if line.strip()])
+        return 0
+    finally:
+        runtime.close()
+
+
 async def cmd_skills(args, settings) -> int:
     runtime = open_or_fail(settings)
     try:
@@ -1375,6 +1388,7 @@ def parser() -> argparse.ArgumentParser:
     intent.add_argument("--days", type=int, default=90, help="термін дії в днях")
     intent.add_argument("--fires", type=int, default=3, help="максимальна кількість спрацювань")
     intent.add_argument("--cooldown", type=int, default=86400, help="інтервал повтору в секундах")
+    sub.add_parser("feedback", help="ходи, позначені власником як помилкові (TUI, F10)")
     skills = sub.add_parser("skills", help="процедурні навички власника (ADR-021)")
     skills.add_argument(
         "action",
@@ -1632,6 +1646,7 @@ def main(argv=None) -> int:
         "schedule": cmd_schedule,
         "intent": cmd_intent,
         "skills": cmd_skills,
+        "feedback": cmd_feedback,
         "quiet": cmd_flag,
         "stop": cmd_flag,
         "autonomy": cmd_autonomy,

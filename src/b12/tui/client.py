@@ -33,6 +33,19 @@ class ApiClient:
         response.raise_for_status()
         return response.json()
 
+    async def models(self) -> dict:
+        return await self._json("GET", "/api/models")
+
+    async def switch_model(self, model_id: str) -> dict:
+        return await self._json("POST", "/api/models/active", json={"id": model_id})
+
+    async def model_status(self) -> dict:
+        return await self._json("GET", "/api/models/status")
+
+    async def feedback(self, turn_id: str, session_id: str, note: str) -> dict:
+        body = {"turn_id": turn_id, "session_id": session_id, "note": note}
+        return await self._json("POST", "/api/feedback", json=body)
+
     async def health(self) -> bool:
         """True when the server answers its health route; any transport failure means offline."""
         try:

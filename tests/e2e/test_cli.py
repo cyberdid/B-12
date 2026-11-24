@@ -251,3 +251,10 @@ async def test_goal_lifecycle_and_autonomy_tick_across_processes(cli):
     assert listed[0]["status"] == "achieved" and listed[0]["consumed_turns"] == 1
     assert parse((await run("quiet", "on"))[1]) == {"quiet": True, "stopped": False}
     assert parse((await run("stop", "on"))[1])["stopped"] is True
+
+
+async def test_feedback_lists_marked_turns(cli):
+    _, run, tmp_path = cli
+    await run("init")
+    code, out, _ = await run("feedback")
+    assert code == 0 and parse(out) == []
