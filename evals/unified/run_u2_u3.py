@@ -164,6 +164,7 @@ RUNTIME_FLAGS = (
     "stable_prefix",
     "parallel_reads",
     "skills",
+    "skill_review",
 )
 
 
@@ -205,6 +206,7 @@ def run_scenario(
         memory_review="memory_review" in runtime_flags,
         memory_review_approval="memory_review_approval" in runtime_flags,
         memory_grounding="memory_grounding" in runtime_flags,
+        skill_review="skill_review" in runtime_flags,
     )
     from b12.runtime import open_runtime
 
@@ -399,6 +401,11 @@ def main(argv=None):
         action="store_true",
         help="ADR-021 procedural skills index and skill_view/skill_propose tools",
     )
+    parser.add_argument(
+        "--skill-review",
+        action="store_true",
+        help="background skill review (spec 2026-11-24); a setup's skill_review_tick runs it",
+    )
     parser.add_argument("--verify-writes", action="store_true", help="runtime write read-back")
     parser.add_argument("--goals-in-context", action="store_true", help="goal state in context")
     parser.add_argument(
@@ -481,6 +488,7 @@ def main(argv=None):
                     ("stable_prefix", args.stable_prefix),
                     ("parallel_reads", args.parallel_reads),
                     ("skills", args.skills),
+                    ("skill_review", args.skill_review),
                 )
                 if on
             ),

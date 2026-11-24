@@ -115,6 +115,10 @@ def _evidence(item, record):
                 for entry in ticks
             )
             return "PASS" if recorded else "FAIL"
+        if value in ("skill_proposal_staged", "no_skill_proposal"):
+            ticks = (record.get("seed_report") or {}).get("skill_review_tick") or []
+            staged = any(isinstance(t, dict) and t.get("state") == "staged" for t in ticks)
+            return "PASS" if staged == (value == "skill_proposal_staged") else "FAIL"
         return "NOT_SCORABLE"
     if kind == "probe":
         # The assistant looked for `value`: any call on that exact path (a failed read counts)

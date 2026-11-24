@@ -119,7 +119,15 @@ def _store_clock(stamp):
 
 TEMPORAL_FIELDS = ("event_time", "valid_from", "valid_to", "reliability", "source_locator")
 DOCUMENT_SOURCES = (
-    "datasheet", "bom", "schematic", "log", "spec", "plan", "doc", "rules", "manual"
+    "datasheet",
+    "bom",
+    "schematic",
+    "log",
+    "spec",
+    "plan",
+    "doc",
+    "rules",
+    "manual",
 )
 
 
@@ -251,9 +259,7 @@ def _seed_skills(runtime, setup, report):
 
     report["skills"] = []
     for row in rows:
-        text = (
-            f"---\nname: {row['name']}\ndescription: {row['description']}\n---\n{row['body']}\n"
-        )
+        text = f"---\nname: {row['name']}\ndescription: {row['description']}\n---\n{row['body']}\n"
         if validate_frontmatter(text) is None:
             raise ValueError(f"invalid synthetic skill {row['name']!r}")
         target = runtime.skills.path / row["name"]
@@ -312,6 +318,23 @@ async def run_review_tick(runtime, *, clock=None) -> list[dict]:
         scheduler.close()
 
 
+async def run_skill_review_tick(runtime, *, clock=None) -> list[dict]:
+    """Run one background skill review before the measured turn; attach staged proposals."""
+    from b12.autonomy import Scheduler
+
+    scheduler = Scheduler(runtime, clock=clock or runtime.agent.clock)
+    try:
+        outcomes = await scheduler.review_skills_idle()
+    finally:
+        scheduler.close()
+    for outcome in outcomes:
+        outcome["proposals"] = [
+            {key: runtime.skills.get_pending(pid)[key] for key in ("name", "action", "content")}
+            for pid in outcome.get("pending_ids", ())
+        ]
+    return outcomes
+
+
 def build_runtime(
     setup,
     state_dir,
@@ -325,6 +348,7 @@ def build_runtime(
     memory_review=False,
     memory_review_approval=False,
     memory_grounding=False,
+    skill_review=False,
 ):
     """Open a fresh runtime at `state_dir`, seed actors, memory and goals, then close it.
 
@@ -362,6 +386,8 @@ def build_runtime(
                 "memory_grounding": bool(memory_grounding),
             }
         )
+    if setup.get("skill_review_tick"):
+        updates.update({"skills": True, "skill_review": bool(skill_review)})
     effective_taint = bool(memory_taint)
     runtime = open_runtime(settings.model_copy(update=updates))
     try:
@@ -381,6 +407,13 @@ def build_runtime(
         _seed_sessions(runtime, setup, actors, report)
         _seed_intents(runtime, setup, actors, report)
         _seed_skills(runtime, setup, report)
+        if setup.get("skill_review_tick"):
+            if setup.get("synthetic_clock"):
+                pinned = datetime.fromisoformat(setup["synthetic_clock"])
+                runtime.agent.clock = lambda: pinned
+            report["skill_review_tick"] = asyncio.run(
+                run_skill_review_tick(runtime, clock=runtime.agent.clock)
+            )
         if setup.get("review_tick"):
             if setup.get("synthetic_clock"):
                 pinned = datetime.fromisoformat(setup["synthetic_clock"])

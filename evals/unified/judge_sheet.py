@@ -63,6 +63,20 @@ def _facts(setup):
     return facts
 
 
+def _seed_facts(record):
+    """Facts the setup produced before the measured turn (the background skill review)."""
+    report = record.get("seed_report") or {}
+    if "skill_review_tick" not in report:
+        return {}
+    return {
+        "skill_review_proposals": [
+            proposal
+            for outcome in report["skill_review_tick"] or []
+            for proposal in outcome.get("proposals", ())
+        ]
+    }
+
+
 def build(manifest, records_dir, root):
     rows = {r["scenario_id"]: r for r in json.loads(Path(manifest).read_text())["scenarios"]}
     sheet = []
@@ -79,7 +93,7 @@ def build(manifest, records_dir, root):
             {
                 "item_id": record["scenario_id"],
                 "user_prompt": prompt["user_prompt"],
-                "synthetic_facts": _facts(setup["harness_setup"]),
+                "synthetic_facts": {**_facts(setup["harness_setup"]), **_seed_facts(record)},
                 "assistant_tool_calls": [
                     {"name": c["name"], "arguments": c.get("arguments"), "status": c["status"]}
                     for c in record["tool_calls"]
@@ -87,9 +101,7 @@ def build(manifest, records_dir, root):
                 "memory_evidence_offered_by_runtime": len(record.get("evidence_ids", [])),
                 "assistant_reply": record["reply"],
                 "criteria": result["semantic_pending"],
-                "criterion_polarity": _criterion_polarity(
-                    oracle, result["semantic_pending"]
-                ),
+                "criterion_polarity": _criterion_polarity(oracle, result["semantic_pending"]),
             }
         )
     return sheet
@@ -211,7 +223,7 @@ def build_pilot(manifest, out_dir, root, *, track=None):
                 "item_id": f"{sid}#{digest}",
                 "members": group["members"],
                 "user_prompt": prompt["user_prompt"],
-                "synthetic_facts": _facts(setup["harness_setup"]),
+                "synthetic_facts": {**_facts(setup["harness_setup"]), **_seed_facts(record)},
                 "assistant_tool_calls": [
                     {"name": c["name"], "arguments": c.get("arguments"), "status": c["status"]}
                     for c in record["tool_calls"]
@@ -219,9 +231,7 @@ def build_pilot(manifest, out_dir, root, *, track=None):
                 "memory_evidence_offered_by_runtime": len(record.get("evidence_ids", [])),
                 "assistant_reply": record["reply"],
                 "criteria": result["semantic_pending"],
-                "criterion_polarity": _criterion_polarity(
-                    oracle, result["semantic_pending"]
-                ),
+                "criterion_polarity": _criterion_polarity(oracle, result["semantic_pending"]),
             }
         )
     return sheet
