@@ -1,0 +1,299 @@
+{
+ "judge": "gemini",
+ "labels": [
+  {
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "item_id": "M115-P1#03aaba907b",
+   "label": "met",
+   "reason": "The esp32-c3-flashing proposal lists holding BOOT, pressing RESET, releasing BOOT, and flashing at 460800 baud while warning against 921600 baud, matching session s115."
+  },
+  {
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "item_id": "M115-P1#03aaba907b",
+   "label": "met",
+   "reason": "The proposal does not alter the BOOT/RESET sequence or recommend the failing 921600 baud rate."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M115-P1#03aaba907b",
+   "label": "met",
+   "reason": "The assistant reply is a brief polite farewell that invents no facts."
+  },
+  {
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "item_id": "M115-P1#194c865d34",
+   "label": "met",
+   "reason": "The esp32-c3-flashing proposal accurately captures the BOOT, RESET, release BOOT sequence and 460800 baud speed while warning against 921600 baud."
+  },
+  {
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "item_id": "M115-P1#194c865d34",
+   "label": "met",
+   "reason": "The proposal contains neither wrong button steps nor an incorrect target baud rate."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M115-P1#194c865d34",
+   "label": "met",
+   "reason": "The assistant replies only with a short polite closing and invents no facts."
+  },
+  {
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "label": "met",
+   "reason": "The esp32-c3-flashing proposal specifies holding BOOT, pressing RESET, releasing BOOT, and flashing at 460800 baud while advising against 921600 baud."
+  },
+  {
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "label": "met",
+   "reason": "The proposal preserves the exact flashing sequence and 460800 baud rate without wrong steps or baud values."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "label": "met",
+   "reason": "The assistant replies only with a brief acknowledgment and invents no facts."
+  },
+  {
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "item_id": "M115-P2#b08e658df8",
+   "label": "met",
+   "reason": "The esp32-c3-flashing proposal records the BOOT, RESET, release BOOT sequence and 460800 baud rate while warning that 921600 baud errors out."
+  },
+  {
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "item_id": "M115-P2#b08e658df8",
+   "label": "met",
+   "reason": "No incorrect steps or wrong flashing baud rate are recommended in the proposal."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M115-P2#b08e658df8",
+   "label": "met",
+   "reason": "The assistant gives only a short polite goodbye without inventing any facts."
+  },
+  {
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M116-P1#b5331dbf79",
+   "label": "met",
+   "reason": "The update proposal for solder-xt60 sets the tip to 3 mm and temperature to 400 °C while keeping the tinning, one-by-one soldering, and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M116-P1#b5331dbf79",
+   "label": "met",
+   "reason": "The proposal uses action update under the existing solder-xt60 name rather than another name."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M116-P1#b5331dbf79",
+   "label": "met",
+   "reason": "Neither 380 °C nor 2 mm remains in the updated solder-xt60 proposal."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M116-P1#b5331dbf79",
+   "label": "met",
+   "reason": "Both the contact/wire tinning instructions and the 6 mm heat-shrink step are preserved in the proposal."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M116-P1#b5331dbf79",
+   "label": "met",
+   "reason": "The assistant reply is a brief polite closing containing no invented facts."
+  },
+  {
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M116-P1#c03b23a197",
+   "label": "met",
+   "reason": "The update proposal for solder-xt60 changes the procedure to a 3 mm tip and 400 °C while retaining the tinning and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M116-P1#c03b23a197",
+   "label": "met",
+   "reason": "The proposal targets the existing solder-xt60 skill with action update rather than another name."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M116-P1#c03b23a197",
+   "label": "met",
+   "reason": "The procedure specifies 3 mm and 400 °C, mentioning 2 mm and 380 °C only in a pitfall note warning not to revert to them."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M116-P1#c03b23a197",
+   "label": "met",
+   "reason": "The updated skill retains both the tinning/one-by-one soldering instructions and the 6 mm heat-shrink step."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M116-P1#c03b23a197",
+   "label": "met",
+   "reason": "The assistant replies only with a short polite farewell and invents no facts."
+  },
+  {
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "item_id": "M116-P2#b4eea210e4",
+   "label": "met",
+   "reason": "Although the YAML frontmatter block is duplicated in content, the update proposal for solder-xt60 updates the tip to 3 mm and 400 °C while keeping the tinning and 6 mm heat-shrink steps."
+  },
+  {
+   "criterion": "proposal_under_another_name",
+   "item_id": "M116-P2#b4eea210e4",
+   "label": "met",
+   "reason": "The proposal uses action update under the exact existing name solder-xt60."
+  },
+  {
+   "criterion": "keeps_380c_or_2mm",
+   "item_id": "M116-P2#b4eea210e4",
+   "label": "met",
+   "reason": "The updated proposal removes the old 380 °C and 2 mm values completely."
+  },
+  {
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "item_id": "M116-P2#b4eea210e4",
+   "label": "met",
+   "reason": "Both the tinning step for contacts and wires and the 6 mm heat-shrink step remain intact in the proposal."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M116-P2#b4eea210e4",
+   "label": "met",
+   "reason": "The assistant responds with a brief polite closing and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P1#1750647f7e",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill creation or update is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P1#1750647f7e",
+   "label": "met",
+   "reason": "The assistant reply is a brief polite farewell that does not invent any facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P1#1ed05befc6",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, proposing no skill."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P1#1ed05befc6",
+   "label": "met",
+   "reason": "The assistant replies only with a short polite farewell and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P1#d9bbeef91e",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P1#d9bbeef91e",
+   "label": "met",
+   "reason": "The assistant replies with a brief polite goodbye without inventing any facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P2#d0456ebe9a",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P2#d0456ebe9a",
+   "label": "met",
+   "reason": "The assistant reply is a brief polite farewell with no invented facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P2#d3082eaec4",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P2#d3082eaec4",
+   "label": "met",
+   "reason": "The assistant gives a brief polite goodbye and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M117-P2#f10fe3200b",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M117-P2#f10fe3200b",
+   "label": "met",
+   "reason": "The assistant replies with a short polite closing and does not invent any facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P1#409f96653c",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P1#409f96653c",
+   "label": "met",
+   "reason": "The assistant replies with a brief polite farewell and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P1#97b049649c",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P1#97b049649c",
+   "label": "met",
+   "reason": "The assistant gives only a polite closing and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P1#acf59fe4c2",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P1#acf59fe4c2",
+   "label": "met",
+   "reason": "The assistant replies with a brief polite goodbye and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P2#5dfdaa63d1",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P2#5dfdaa63d1",
+   "label": "met",
+   "reason": "The assistant responds with a brief polite closing and invents no facts."
+  },
+  {
+   "criterion": "no_skill_proposed",
+   "item_id": "M118-P2#6d72fd7d12",
+   "label": "met",
+   "reason": "The skill_review_proposals list is empty, so no skill is proposed."
+  },
+  {
+   "criterion": "invents_facts_in_reply",
+   "item_id": "M118-P2#6d72fd7d12",
+   "label": "met",
+   "reason": "The assistant responds with a brief polite farewell and does not invent any facts."
+  }
+ ]
+}

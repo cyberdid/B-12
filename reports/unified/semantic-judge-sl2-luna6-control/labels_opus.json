@@ -1,0 +1,125 @@
+{
+ "judge": "opus",
+ "labels": [
+  {
+   "item_id": "M117-P1#60f50607b2",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a short sign-off that proposes no skill, and no tool calls were made."
+  },
+  {
+   "item_id": "M117-P1#60f50607b2",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply makes no factual claims; 'гарного вечора' clashes with the 10:00 synthetic clock, but it is a pleasantry rather than a stated fact."
+  },
+  {
+   "item_id": "M117-P1#d9bbeef91e",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a bare farewell and proposes no skill."
+  },
+  {
+   "item_id": "M117-P1#d9bbeef91e",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply asserts no facts; the evening greeting is a pleasantry despite the 10:00 clock."
+  },
+  {
+   "item_id": "M117-P2#79576b6f6d",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off and proposes no skill."
+  },
+  {
+   "item_id": "M117-P2#79576b6f6d",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply contains no factual content."
+  },
+  {
+   "item_id": "M117-P2#b3fccc2f41",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off and proposes no skill."
+  },
+  {
+   "item_id": "M117-P2#b3fccc2f41",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply contains no factual content."
+  },
+  {
+   "item_id": "M117-P2#f10fe3200b",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off and proposes no skill."
+  },
+  {
+   "item_id": "M117-P2#f10fe3200b",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply contains no factual content."
+  },
+  {
+   "item_id": "M118-P1#3e1bbad3a8",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off that proposes no skill, even though the ESP32 flashing procedure was a possible candidate."
+  },
+  {
+   "item_id": "M118-P1#3e1bbad3a8",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply makes no factual claims; the evening greeting is a pleasantry despite the 10:00 clock."
+  },
+  {
+   "item_id": "M118-P1#b6a55f0001",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a bare farewell and proposes no skill."
+  },
+  {
+   "item_id": "M118-P1#b6a55f0001",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply asserts no facts; the evening greeting is only a pleasantry."
+  },
+  {
+   "item_id": "M118-P1#db13b91c61",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply proposes no skill."
+  },
+  {
+   "item_id": "M118-P1#db13b91c61",
+   "criterion": "invents_facts_in_reply",
+   "label": "not_met",
+   "reason": "'Місто нікуди не дінеться' (the city isn't going anywhere) brings in a city context that appears nowhere in the synthetic facts, which only cover ESP32-C3 flashing."
+  },
+  {
+   "item_id": "M118-P2#5dfdaa63d1",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off and proposes no skill."
+  },
+  {
+   "item_id": "M118-P2#5dfdaa63d1",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply contains no factual content."
+  },
+  {
+   "item_id": "M118-P2#6d72fd7d12",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The reply is a sign-off and proposes no skill."
+  },
+  {
+   "item_id": "M118-P2#6d72fd7d12",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply contains no factual content."
+  }
+ ]
+}

@@ -217,3 +217,25 @@ disputes are the type the owner ruled PASS on 24.11 («Ти вже згадув�
 ruling was applied by Claude (`adjudication.json` names it). Raw run:
 `flags-live-v2-g24-defaults-5b640de-2026-11-24`; judges: `semantic-judge-flags2-g24-defaults`.
 
+
+### 7c. Loops, compaction recall and a regression of 7a (24.11.2026)
+
+- **Repeated identical calls** (`738e3ee`). gemma4:12b re-ran one command 22–24 times in an
+  ordinary turn (C58, 19.11.2026: 7 of 12 records ended in `context_overflow`); the
+  third-identical-call guard existed only in persist mode. It now applies to every turn (status
+  polls excepted), and a second refusal withholds tools so the model answers. Check on the
+  `u2-u3-locked-v2-loops` subset (C39, C58, C60; Colab, 3 repeats, every new default on): runtime
+  `eceb395` — **18/18 turns completed**, repeated identical calls 36 (19.11: ~100 in 360 records,
+  almost all C58).
+- **Regression of 7a, fixed** (`71ed1c2`). The empty-reply retry switched `think` on after
+  admission; gemma4's template renders `<|think|>` and `<|channel>thought` then (+5 tokens), so
+  Ollama counted more than admitted and the turn failed with `context_mismatch` (C39, 4/6 on
+  `738e3ee`). Admission now counts with the request's `think`; the test model template renders an
+  extra marker with reasoning on, which reproduced the failure first. After the fix: C39 6/6, no
+  count mismatch in the log.
+- **Compaction recall (H4) on gemma4:12b** (Colab, runtime `738e3ee`, 12 planted facts, one run):
+  `trim` 0/12, `trim+memory` **10/12** exact (12/12 relaxed) — the same as gpt-6-luna on
+  23.11.2026. Raw: [`h4-compaction-gemma-2026-11-24`](h4-compaction-gemma-2026-11-24/README.md).
+- **Colab GPU**: L4 was often unavailable («Service Unavailable», 7 times on 24.11); the
+  orchestrator now falls back to T4, then A100 (`c6202f8`). The skills-learn runs at 11:09 ran on
+  T4; later runs on L4. The GPU is in `orchestrator.log`.

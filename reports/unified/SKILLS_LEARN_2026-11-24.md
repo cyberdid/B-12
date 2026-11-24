@@ -28,4 +28,43 @@ the procedural self-improvement loop is not closed. Raw run:
 `eval-luna/.../skills-learn-v1-luna6-defaults-2026-11-24`; judges:
 `semantic-judge-skills-luna6-defaults`; verdicts: `consistent-verdicts-skills-luna6-2026-11-24`.
 
-gemma4:12b acceptance: queued after the loop and compaction checks.
+gemma4:12b (Colab, runtime `eceb395`, same flags, 3 repeats; deterministic read of the records,
+not judged): M111 **0/6** `skill_propose` — 3 replies claim «зафіксувала як навичку» with no call,
+3 store a memory instead; M112 3/6 `memory_store`, 3/6 claim a note with no call; M113 6/6 no
+skill; M114 3/6 update of `solder-xt60` (every P2). The in-turn path is a gemma limit (owner's
+rule); the background review below is what learns on gemma.
+
+## Background skill review (`skills-learn-v2`, M115–M118)
+
+Owner chose option B (spec `docs/superpowers/specs/2026-11-24-skill-review-design.md`, plan
+`docs/superpowers/plans/2026-11-24-skill-review.md`). `SkillReviewer` (`src/b12/skill_review.py`)
+runs idle after the memory review, stages proposals in the ADR-021 queue, flag `skill_review`
+(off). Set frozen after two blind reviews ([review](oracle-review-skills-learn-v2/README.md)): one
+earlier owner session per family, `skill_review_tick` runs one review before the measured turn.
+
+Two prompt fixes came out of the runs (both tested, both in the ledger):
+- `d23541e` — the review saw only the skills index, so gemma's M116 updates dropped the tinning
+  and heat-shrink steps (6/6); it now sees the current skill text (2000 chars each, 6000 total).
+- `e62e35e` — gpt-6-luna returned an empty list for M115 (6/6) although, asked why, it said the
+  procedure met every rule; an explicit rule now says a listed procedure the owner says worked or
+  will repeat is a skill, and the text must be Ukrainian (2 of 3 probe proposals were English).
+
+gpt-6-luna, runtime `e62e35e` (control arm `eceb395`; the review is off there), judges Gemini +
+Opus (`claude -p`): skill_review arm 49/49 criteria agreed; control 19/20 (one open dispute:
+M118 closing reply «місто нікуди не дінеться», Gemini `met` vs Opus `not_met` on
+`invents_facts_in_reply` — not about skills).
+
+| Family | control | skill_review |
+|---|---|---|
+| M115 learned procedure → proposal | 0/6 | **6/6** |
+| M116 change → update keeping steps | 0/6 | **5/6** |
+| M117 fact / failed attempt → none | 6/6 | **6/6** |
+| M118 web-tainted turn → none | 5/6 + 1 open | **6/6** |
+
+Raw runs: `eval-luna/.../skills-learn-v2-luna6-{control,skill_review}-2026-11-24` (earlier arms on
+`eceb395` and `d23541e` kept as `_superseded-*`); judges `semantic-judge-sl2-luna6-*`; verdicts
+`consistent-verdicts-sl2-luna6-2026-11-24`.
+
+gemma4:12b, runtime `d23541e` (before the second prompt fix; deterministic read): M115 5/6 staged
+(1 review hit its 120 s deadline), M116 6/6 updates keeping every step, M117 none (4 empty, 2
+`invalid_output` rejected), M118 none (6/6 excluded). Final gemma run on `e62e35e`: queued.

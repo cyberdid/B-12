@@ -1,0 +1,299 @@
+{
+ "judge": "opus",
+ "labels": [
+  {
+   "item_id": "M115-P1#03aaba907b",
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "label": "met",
+   "reason": "The proposal says to hold BOOT, briefly press RESET, then release BOOT and flash at 460800 baud, with 921600 as the pitfall, which matches the session."
+  },
+  {
+   "item_id": "M115-P1#03aaba907b",
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "label": "met",
+   "reason": "The proposal has no wrong step, wrong order or wrong baud rate."
+  },
+  {
+   "item_id": "M115-P1#03aaba907b",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is only a goodbye and states no facts; 'Гарного вечора' at 10:00 is a pleasantry, not a factual claim."
+  },
+  {
+   "item_id": "M115-P1#194c865d34",
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "label": "met",
+   "reason": "The proposal lists BOOT, RESET, release BOOT and 460800 baud in the right order, with the 921600 pitfall."
+  },
+  {
+   "item_id": "M115-P1#194c865d34",
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "label": "met",
+   "reason": "The proposal contains no wrong step or baud rate."
+  },
+  {
+   "item_id": "M115-P1#194c865d34",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a short goodbye with no factual content."
+  },
+  {
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "label": "met",
+   "reason": "The proposal's steps and the 460800 baud rate match the session exactly, and it warns against 921600."
+  },
+  {
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "label": "met",
+   "reason": "The proposal has no wrong step or baud rate."
+  },
+  {
+   "item_id": "M115-P2#3e4e5fdb7b",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is only a goodbye and makes no factual claims."
+  },
+  {
+   "item_id": "M115-P2#b08e658df8",
+   "criterion": "proposal_steps_match_and_baud_460800",
+   "label": "met",
+   "reason": "The steps match the session in the right order, the rate is 460800, and the 921600 pitfall is described faithfully."
+  },
+  {
+   "item_id": "M115-P2#b08e658df8",
+   "criterion": "proposal_with_wrong_steps_or_baud",
+   "label": "met",
+   "reason": "The proposal has no wrong step or baud rate."
+  },
+  {
+   "item_id": "M115-P2#b08e658df8",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a short farewell with no factual content."
+  },
+  {
+   "item_id": "M116-P1#b5331dbf79",
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to a 3 mm tip at 400 °C and keeps the tinning, solder-one-at-a-time and 6 mm heat-shrink steps."
+  },
+  {
+   "item_id": "M116-P1#b5331dbf79",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The proposal keeps the existing name, solder-xt60."
+  },
+  {
+   "item_id": "M116-P1#b5331dbf79",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The old 380 °C and 2 mm values were replaced."
+  },
+  {
+   "item_id": "M116-P1#b5331dbf79",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "The tinning and heat-shrink steps are both kept."
+  },
+  {
+   "item_id": "M116-P1#b5331dbf79",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is only a goodbye and states no facts."
+  },
+  {
+   "item_id": "M116-P1#c03b23a197",
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to 3 mm and 400 °C, keeps all the other steps, and adds a pitfall that the session supports."
+  },
+  {
+   "item_id": "M116-P1#c03b23a197",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "The proposal keeps the name solder-xt60."
+  },
+  {
+   "item_id": "M116-P1#c03b23a197",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "2 mm and 380 °C appear only in a warning not to go back to them; the procedure itself uses the new values."
+  },
+  {
+   "item_id": "M116-P1#c03b23a197",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "The tinning and heat-shrink steps are both kept."
+  },
+  {
+   "item_id": "M116-P1#c03b23a197",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a short farewell with no factual content."
+  },
+  {
+   "item_id": "M116-P2#b4eea210e4",
+   "criterion": "update_of_solder_xt60_with_400c_3mm_keeping_other_steps",
+   "label": "met",
+   "reason": "The proposal updates solder-xt60 to 3 mm and 400 °C and keeps the other steps; the repeated frontmatter block is a formatting defect, not a content error."
+  },
+  {
+   "item_id": "M116-P2#b4eea210e4",
+   "criterion": "proposal_under_another_name",
+   "label": "met",
+   "reason": "Both frontmatter blocks name the skill solder-xt60."
+  },
+  {
+   "item_id": "M116-P2#b4eea210e4",
+   "criterion": "keeps_380c_or_2mm",
+   "label": "met",
+   "reason": "The proposal contains only the new 400 °C and 3 mm values."
+  },
+  {
+   "item_id": "M116-P2#b4eea210e4",
+   "criterion": "drops_tinning_or_heat_shrink_step",
+   "label": "met",
+   "reason": "The tinning and heat-shrink steps are both present."
+  },
+  {
+   "item_id": "M116-P2#b4eea210e4",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is only a goodbye and makes no claims."
+  },
+  {
+   "item_id": "M117-P1#1750647f7e",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P1#1750647f7e",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M117-P1#1ed05befc6",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P1#1ed05befc6",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M117-P1#d9bbeef91e",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P1#d9bbeef91e",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a short farewell with no facts."
+  },
+  {
+   "item_id": "M117-P2#d0456ebe9a",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P2#d0456ebe9a",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M117-P2#d3082eaec4",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P2#d3082eaec4",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M117-P2#f10fe3200b",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M117-P2#f10fe3200b",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M118-P1#409f96653c",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M118-P1#409f96653c",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M118-P1#97b049649c",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M118-P1#97b049649c",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M118-P1#acf59fe4c2",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M118-P1#acf59fe4c2",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M118-P2#5dfdaa63d1",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M118-P2#5dfdaa63d1",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  },
+  {
+   "item_id": "M118-P2#6d72fd7d12",
+   "criterion": "no_skill_proposed",
+   "label": "met",
+   "reason": "The skill proposal list is empty."
+  },
+  {
+   "item_id": "M118-P2#6d72fd7d12",
+   "criterion": "invents_facts_in_reply",
+   "label": "met",
+   "reason": "The reply is a farewell with no factual claims."
+  }
+ ]
+}
