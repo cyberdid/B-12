@@ -84,7 +84,7 @@ ensure_colab() {  # $1 = space-separated models
     for gpu in ${B12_COLAB_GPUS:-L4 T4 A100}; do
       log "creating Colab session ($gpu)"
       if colab new -s "$SESSION" --gpu "$gpu" >>"$Q/orchestrator.log" 2>&1; then
-        created="$gpu"; log "Colab session on $gpu"; break
+        created="$gpu"; log "Colab session on $gpu"; echo "$gpu" >"$Q/session_gpu"; break
       fi
     done
     [ -n "$created" ] || return 1
@@ -130,6 +130,8 @@ run_job() {
   local name="$1" manifest="$2" out="$3" repeats="$4" arm="$5" model="$6" extra="$7" profile
   profile="$(profile_for "$model")" || { log "$name: no profile for $model"; return 1; }
   log "$name: running ($model, profile $profile)"
+  mkdir -p "$REPO/$out"  # the GPU decides gemma's exact output: record it for comparisons
+  echo "$(date -Is) gpu=$(cat "$Q/session_gpu" 2>/dev/null || echo unknown)" >>"$REPO/$out/pilot.log"
   # setsid makes the driver the leader of its own process group (pgid = $driver), so a stop
   # kills the driver and its sandboxes, never this loop (the 20.11.2026 bug).
   cd "$REPO" || return 1

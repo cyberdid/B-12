@@ -61,6 +61,16 @@ def summarize(run_dir: Path, rows: dict, root: Path) -> dict[str, dict]:
     return result
 
 
+def run_gpu(run_dir: Path) -> str | None:
+    """The Colab GPU the orchestrator recorded for a run (pilot.log `gpu=` line)."""
+    try:
+        lines = (Path(run_dir) / "pilot.log").read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    found = [line.split("gpu=", 1)[1].split()[0] for line in lines if "gpu=" in line]
+    return found[-1] if found else None
+
+
 def compare(manifest: Path, run_dir: Path, baseline: Path | None, root: Path = ROOT):
     rows = {r["scenario_id"]: r for r in json.loads(Path(manifest).read_text())["scenarios"]}
     now = summarize(run_dir, rows, root)
@@ -82,6 +92,13 @@ def main(argv=None) -> int:
     parser.add_argument("--manifest", type=Path, default=MANIFEST)
     args = parser.parse_args(argv)
     rows, regressions = compare(args.manifest, args.run_dir, args.baseline)
+    if args.baseline is not None:
+        now_gpu, base_gpu = run_gpu(args.run_dir), run_gpu(args.baseline)
+        if now_gpu != base_gpu:
+            print(
+                f"WARNING: GPU differs (run {now_gpu}, baseline {base_gpu}); gemma's output can "
+                "change with the GPU — compare runs on the same GPU"
+            )
     flagged = {r["scenario_id"] for r in regressions}
     for row in rows:
         mark = "REGRESSION" if row["scenario_id"] in flagged else "ok"

@@ -59,3 +59,13 @@ def test_report_without_baseline_flags_only_failures(tmp_path):
     )
     assert [r["scenario_id"] for r in regressions] == ["C39-P1"]
     assert len(rows) == 2
+
+
+def test_report_warns_when_the_runs_used_different_gpus(tmp_path, capsys):
+    for name, gpu in (("base", "L4"), ("run", "T4")):
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "pilot.log").write_text(f"2026-11-24T13:00:00+02:00 gpu={gpu}\n")
+        _write(tmp_path / name, "M100-P1")
+    assert regression_report.run_gpu(tmp_path / "run") == "T4"
+    regression_report.main([str(tmp_path / "run"), "--baseline", str(tmp_path / "base")])
+    assert "GPU" in capsys.readouterr().out
