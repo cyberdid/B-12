@@ -22,6 +22,7 @@ from textual.widgets import Button, Checkbox, Collapsible, Footer, Input, Markdo
 from b12.tui.activity import ActivityStore
 from b12.tui.chrome import NeonHeader, Welcome
 from b12.tui.client import ApiClient
+from b12.tui.models import FeedbackScreen, ModelPicker, load_prefs, model_line, save_prefs
 from b12.tui.pet import CyberCat
 from b12.tui.theme import CSS
 from b12.tui.voice import MAX_RECORD_SECONDS, PttRecorder, VoiceError, VoicePlayer
@@ -66,6 +67,10 @@ class B12App(App):
         Binding("f7", "ptt", "Мікрофон"),
         Binding("f8", "toggle_motion", "Анімації"),
         Binding("f9", "cycle_skin", "Персонаж"),
+        Binding("f3", "pick_model", "Модель"),
+        Binding("f4", "previous_model", "Попередня модель", show=False),
+        Binding("ctrl+o", "toggle_details", "Деталі", priority=True),
+        Binding("f10", "mark_turn", "Позначити хід", show=False),
         Binding("ctrl+q", "quit", "Вихід"),
     ]
 
@@ -90,6 +95,14 @@ class B12App(App):
         self.preview_mode = preview_mode
         self._closing = False
         self._activity_store = ActivityStore(state_dir) if state_dir and not preview_mode else None
+        self._state_dir = state_dir if not preview_mode else None
+        self._prefs = load_prefs(self._state_dir)
+        self._models: dict = {}  # /api/models: active, previous, choices
+        self._model_status: dict = {}
+        self._model_ticks = 0
+        self._previous_model: str | None = None
+        self.details = False  # Ctrl+O: every tool call expanded
+        self.last_turn: tuple[str, str] | None = None  # (turn_id, session_id) for F10
         self._activity = deque(maxlen=100)
         self._activity_cursor = 0
         self._activity_lock = asyncio.Lock()
@@ -186,6 +199,9 @@ class B12App(App):
         me = await self.client.me()
         self.query_one(NeonHeader).set_connected(True)
         self.set_interval(5, self.check_link)  # the indicator follows the server, even when idle
+        await self.refresh_models()
+        self.set_interval(1.0, self._poll_models)
+        await self._restore_companion()
         self.query_one("#consent", Checkbox).value = bool(me.get("consent"))
         for box in self.query(Checkbox):
             box.label = _switch_label(box.id, box.value)
@@ -279,9 +295,116 @@ class B12App(App):
         position = ids.index(pet.skin_id) if pet.skin_id in ids else 0
         selected = pet.set_skin(ids[(position + 1) % len(ids)])
         self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
+        self._prefs["skin"] = pet.skin_id
+        save_prefs(self._state_dir, self._prefs)
         self.query_one("#pet-hint", Static).update(
             "мишка · клік · Ctrl+K · F9" if selected else "Pack недоступний · кіберкіт поруч"
         )
+
+    # ---- models (ADR-023) ------------------------------------------------------
+    def _active_choice(self) -> dict | None:
+        active = self._models.get("active")
+        return next((c for c in self._models.get("choices", []) if c.get("id") == active), None)
+
+    def _show_model(self) -> None:
+        header = self.query_one(NeonHeader)
+        header.set_model(model_line(self._active_choice(), self._model_status) or None)
+
+    async def refresh_models(self) -> None:
+        """Older servers have no model routes: the header then keeps its subtitle."""
+        try:
+            self._models = await self.client.models()
+            self._model_status = await self.client.model_status()
+        except (AttributeError, httpx.HTTPError, ValueError):
+            self._models, self._model_status = {}, {}
+        self._show_model()
+
+    async def _poll_models(self) -> None:
+        if not self._models or self._closing:
+            return
+        self._model_ticks += 1
+        loading = self._model_status.get("state") in ("loading", "pulling")
+        if not loading and self._model_ticks % 10:
+            return
+        try:
+            self._model_status = await self.client.model_status()
+        except (AttributeError, httpx.HTTPError, ValueError):
+            return
+        self._show_model()
+
+    async def switch_model(self, model_id: str) -> None:
+        before = self._models.get("active")
+        try:
+            await self.client.switch_model(model_id)
+        except (AttributeError, httpx.HTTPError, ValueError) as error:
+            await self.add_state(f"МОДЕЛЬ НЕ ЗМІНЕНО: {escape(str(error))}")
+            return
+        if before and before != model_id:
+            self._previous_model = before
+        await self.refresh_models()
+        choice = self._active_choice() or {"label": model_id, "location": ""}
+        await self.add_state(f"МОДЕЛЬ: {choice.get('label')} · {choice.get('location')}")
+
+    async def action_pick_model(self) -> None:
+        if not self._models:
+            await self.refresh_models()
+        if not self._models:
+            await self.add_state("Сервер не підтримує перемикання моделей")
+            return
+
+        def chosen(choice_id: str | None) -> None:
+            if choice_id and choice_id != self._models.get("active"):
+                self.run_worker(self.switch_model(choice_id), exclusive=False)
+
+        self.push_screen(
+            ModelPicker(self._models.get("choices", []), self._models.get("active")), chosen
+        )
+
+    async def action_previous_model(self) -> None:
+        target = self._previous_model or self._models.get("previous")
+        if target:
+            await self.switch_model(target)
+
+    # ---- tool details, feedback, companion -----------------------------------------
+    def action_toggle_details(self) -> None:
+        self.details = not self.details
+        for node in self.query("#chat Collapsible"):
+            node.collapsed = not self.details
+
+    async def action_mark_turn(self) -> None:
+        if self.last_turn is None:
+            await self.add_state("Ще немає ходу, який можна позначити")
+            return
+        turn_id, session_id = self.last_turn
+
+        def noted(note: str | None) -> None:
+            if note is not None:
+                self.run_worker(self._send_feedback(turn_id, session_id, note), exclusive=False)
+
+        self.push_screen(FeedbackScreen(), noted)
+
+    async def _send_feedback(self, turn_id: str, session_id: str, note: str) -> None:
+        try:
+            await self.client.feedback(turn_id, session_id, note)
+        except (AttributeError, httpx.HTTPError, ValueError) as error:
+            await self.add_state(f"НЕ ЗБЕРЕЖЕНО: {escape(str(error))}")
+            return
+        await self.add_state("ХІД ПОЗНАЧЕНО: стане сценарієм для перевірки")
+
+    async def _restore_companion(self) -> None:
+        """The owner's last companion; Capri by default when its local pack exists."""
+        if self._state_dir is None:
+            return
+        pets = list(self.query(CyberCat))
+        if not pets:
+            return
+        pet = pets[0]
+        wanted = self._prefs.get("skin")
+        if not wanted:
+            options = await asyncio.to_thread(pet.available_skins)
+            wanted = "capri" if any(o.id == "capri" for o in options) else None
+        if wanted and wanted != pet.skin_id and pet.set_skin(wanted):
+            self.query_one("#companion-name", Static).update(f"CAPRI  ·  {pet.skin_name}")
 
     # ---- local activity -----------------------------------------------------
     def _presentation_busy(self) -> bool:
@@ -840,6 +963,14 @@ class B12App(App):
     async def submit_prompt(self) -> None:
         prompt = self.query_one("#prompt", Input)
         text = prompt.value.strip()
+        if text == "/model" or text.startswith("/model "):
+            prompt.value = ""
+            target = text[len("/model") :].strip()
+            if target:
+                await self.switch_model(target)
+            else:
+                await self.action_pick_model()
+            return
         if not text or self.turn is not None or self.waiting_turn is not None:
             return
         await self._stop_speech()
@@ -931,6 +1062,8 @@ class B12App(App):
                 self.query_one(NeonHeader).set_connected(True)
                 self._pet_phase("thinking")
                 self.turn.turn_id = event.get("turn_id")
+                if self.turn.turn_id and self.current:
+                    self.last_turn = (self.turn.turn_id, self.current)
             elif kind == "text_delta":
                 self._pet_phase("speaking")
                 if md is None:
@@ -952,7 +1085,9 @@ class B12App(App):
                     self.turn.failure_events += 1
                 node = self.turn.tools.get(event.get("call_id"))
                 if node is not None:
-                    node.title = escape(f"$ {event.get('name')}  → {event.get('status')}")
+                    node.title = _tool_title(
+                        event.get("name"), getattr(node, "summary", ""), event.get("status")
+                    )
             elif kind == "approval_pending":
                 self.turn.approval_ids.add(
                     str(event.get("operation_id") or event.get("call_id") or self.turn.event_count)
@@ -992,7 +1127,12 @@ class B12App(App):
         for outcome in result.get("tool_results") or []:
             node = self.turn.tools.get(outcome.get("call_id")) if self.turn else None
             if node is not None:
-                node.query_one(Static).update(_pretty(outcome.get("content")))
+                # The body, not the title (CollapsibleTitle is a Static too): arguments + result.
+                arguments = getattr(node, "arguments_text", "")
+                output = _pretty(outcome.get("content"))
+                node.query_one(".tool-body", Static).update(
+                    f"{arguments}\n→ {output}" if arguments else output
+                )
         if result.get("content") and not (self.turn and self.turn.shown):
             await self.add_assistant(result["content"])
         state = result.get("state", "")
@@ -1067,11 +1207,13 @@ class B12App(App):
     async def add_tool(self, event: dict) -> Collapsible:
         chat = self.query_one("#chat", VerticalScroll)
         summary = _summary(event.get("arguments") or {})
+        arguments = _pretty(event.get("arguments"))
         node = Collapsible(
-            Static(_pretty(event.get("arguments"))),
-            title=escape(f"$ {event.get('name')}  {summary}".rstrip()),
-            collapsed=True,
+            Static(arguments, classes="tool-body"),
+            title=_tool_title(event.get("name"), summary, None),
+            collapsed=not self.details,
         )
+        node.summary, node.arguments_text = summary, arguments
         await chat.mount(node)
         return node
 
@@ -1084,9 +1226,9 @@ class B12App(App):
         status = outcome.get("status", "completed")
         await chat.mount(
             Collapsible(
-                Static(_pretty(outcome.get("content"))),
-                title=escape(f"$ {message.get('tool_name')}  → {status}"),
-                collapsed=True,
+                Static(_pretty(outcome.get("content")), classes="tool-body"),
+                title=_tool_title(message.get("tool_name"), "", status),
+                collapsed=not self.details,
             )
         )
 
@@ -1161,6 +1303,14 @@ def _speech_chunks(text: str, limit: int = 4000):
 def _switch_label(switch_id: str | None, value: bool) -> str:
     name = _SWITCH_NAMES.get(switch_id or "", switch_id or "")
     return f"{name}: {'ВКЛ' if value else 'ВИМК'}"
+
+
+def _tool_title(name, summary: str, status: str | None) -> str:
+    """One compact line per tool call; Ctrl+O shows the details."""
+    glyph = {None: "…", "completed": "✓", "approval_pending": "⏸", "clarify_pending": "?"}.get(
+        status, "✗"
+    )
+    return escape(f"● {name}  {summary}".rstrip() + f"  {glyph}")
 
 
 def _summary(arguments: dict) -> str:

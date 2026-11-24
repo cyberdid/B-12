@@ -473,3 +473,162 @@ async def test_api_client_reports_a_stopped_server_as_offline_instead_of_raising
         assert await client.health() is False
     finally:
         await client.close()
+
+
+# ---- model switching, compact tool calls, Capri, failure log (24.11.2026) ----
+
+LOCAL = {
+    "id": "local:gemma4:12b",
+    "label": "gemma4:12b",
+    "kind": "local",
+    "backend": "ollama",
+    "model": "gemma4:12b",
+    "location": "ноутбук",
+    "warning": "",
+}
+CLOUD = {
+    "id": "codex:gpt-6-luna",
+    "label": "gpt-6-luna · Codex",
+    "kind": "cloud",
+    "backend": "codex",
+    "model": "gpt-6-luna",
+    "location": "хмара",
+    "warning": "",
+}
+
+
+class ModelClient(FakeClient):
+    def __init__(self, events, status=None):
+        super().__init__(events)
+        self.active = LOCAL["id"]
+        self.switched = []
+        self.marked = []
+        self.status = status or {"state": "ready", "progress": None, "vram_mb": 6144}
+
+    async def models(self):
+        return {"active": self.active, "previous": None, "choices": [LOCAL, CLOUD]}
+
+    async def switch_model(self, model_id):
+        self.switched.append(model_id)
+        self.active = model_id
+        return {"active": model_id}
+
+    async def model_status(self):
+        return {"id": self.active, **self.status}
+
+    async def feedback(self, turn_id, session_id, note):
+        self.marked.append((turn_id, session_id, note))
+        return {"turn_id": turn_id}
+
+
+def _header(app):
+    from b12.tui.chrome import NeonHeader
+
+    return str(app.query_one(NeonHeader).render())
+
+
+async def test_header_shows_the_active_local_model():
+    app = B12App(ModelClient(STREAM))
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        assert "◆ gemma4:12b · ноутбук · готова" in _header(app)
+
+
+async def test_loading_shows_a_progress_bar():
+    status = {"state": "pulling", "progress": 0.43, "elapsed_s": 12.0, "detail": "pulling"}
+    app = B12App(ModelClient(STREAM, status=status))
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        assert "43%" in _header(app) and "▓" in _header(app)
+
+
+async def test_picker_switches_to_a_cloud_model_and_f4_goes_back():
+    client = ModelClient(STREAM)
+    app = B12App(client)
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        await pilot.press("f3")
+        await pilot.pause(0.2)
+        from b12.tui.models import ModelPicker
+
+        assert isinstance(app.screen, ModelPicker)
+        await app.screen.choose(CLOUD["id"])
+        await pilot.pause(0.3)
+        assert client.switched == [CLOUD["id"]]
+        assert "☁ gpt-6-luna · Codex · хмара" in _header(app)
+        await pilot.press("f4")
+        await pilot.pause(0.3)
+        assert client.switched == [CLOUD["id"], LOCAL["id"]]
+
+
+async def test_slash_model_switches_without_sending_a_chat():
+    client = ModelClient(STREAM)
+    app = B12App(client)
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        app.query_one("#prompt").value = "/model codex:gpt-6-luna"
+        await pilot.press("enter")
+        await pilot.pause(0.3)
+        assert client.switched == ["codex:gpt-6-luna"] and client.sent == []
+
+
+async def test_ctrl_o_expands_and_collapses_every_tool_call():
+    from textual.widgets import Collapsible
+
+    app = B12App(ModelClient(STREAM))
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        app.query_one("#prompt").value = "перелічи"
+        await pilot.press("enter")
+        await pilot.pause(0.4)
+        calls = list(app.query("#chat Collapsible"))
+        assert calls and all(c.collapsed for c in calls)
+        assert "file_list" in str(calls[0].title) and "✓" in str(calls[0].title)
+        from textual.widgets._collapsible import CollapsibleTitle
+
+        shown = str(calls[0].query_one(CollapsibleTitle).render())
+        assert "file_list" in shown and "entries" not in shown  # the result stays in the body
+        body = str(calls[0].query_one(".tool-body").render())
+        assert '"/x"' in body and "a.py/" in body  # details: arguments and result
+        await pilot.press("ctrl+o")
+        await pilot.pause(0.1)
+        assert all(not c.collapsed for c in app.query("#chat Collapsible"))
+        await pilot.press("ctrl+o")
+        await pilot.pause(0.1)
+        assert all(c.collapsed for c in app.query(Collapsible))
+
+
+async def test_f10_marks_the_last_turn_with_a_note():
+    client = ModelClient(STREAM)
+    app = B12App(client)
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        app.query_one("#prompt").value = "перелічи"
+        await pilot.press("enter")
+        await pilot.pause(0.4)
+        await pilot.press("f10")
+        await pilot.pause(0.2)
+        from b12.tui.models import FeedbackScreen
+
+        assert isinstance(app.screen, FeedbackScreen)
+        await app.screen.submit("вигадала файл")
+        await pilot.pause(0.2)
+        assert client.marked == [("t-1", "s-2", "вигадала файл")]
+
+
+async def test_the_chosen_companion_is_remembered(tmp_path, monkeypatch):
+    from b12.tui.models import load_prefs, save_prefs
+
+    save_prefs(tmp_path, {"skin": "capri"})
+    assert load_prefs(tmp_path) == {"skin": "capri"}
+    assert load_prefs(tmp_path / "missing") == {}
+
+
+async def test_old_server_without_model_routes_still_works():
+    app = B12App(FakeClient(STREAM))  # no models()/model_status()
+    async with app.run_test() as pilot:
+        await pilot.pause(0.2)
+        app.query_one("#prompt").value = "привіт"
+        await pilot.press("enter")
+        await pilot.pause(0.3)
+        assert app.turn is None

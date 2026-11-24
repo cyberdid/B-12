@@ -185,10 +185,19 @@ class SkinOption:
     manifest_path: Path | None = None
 
 
+def _default_capri_dir() -> str | None:
+    """B12_TUI_CAPRI_DIR, else the local pack folder the desktop companion uses too."""
+    configured = os.environ.get("B12_TUI_CAPRI_DIR")
+    if configured:
+        return configured
+    default = Path.home() / ".local/share/b12/skins"
+    return str(default) if default.is_dir() else None
+
+
 def available_skins(capri_dir: Path | str | None = None) -> tuple[SkinOption, ...]:
     """Discover at most 32 local packs; bad files are ignored, never downloaded."""
     options = [SkinOption("cybercat", "КІБЕРКІТ")]
-    configured = capri_dir if capri_dir is not None else os.environ.get("B12_TUI_CAPRI_DIR")
+    configured = capri_dir if capri_dir is not None else _default_capri_dir()
     if not configured:
         return tuple(options)
     try:
@@ -378,9 +387,7 @@ class PortraitRenderer:
 
     def refresh_skins(self) -> tuple[SkinOption, ...]:
         self.skin_options = available_skins(self.capri_dir)
-        configured = (
-            self.capri_dir if self.capri_dir is not None else os.environ.get("B12_TUI_CAPRI_DIR")
-        )
+        configured = self.capri_dir if self.capri_dir is not None else _default_capri_dir()
         self.skin_error = "skin_pack_invalid" if configured and len(self.skin_options) == 1 else ""
         return self.skin_options
 
