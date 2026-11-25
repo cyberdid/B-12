@@ -310,3 +310,17 @@ async def test_status_reports_the_part_running_on_the_cpu(scripted_ollama, tmp_p
         assert status["cpu_share"] == 0.4
     finally:
         runtime.close()
+
+
+async def test_a_failed_restore_leaves_a_notice_for_the_owner(scripted_ollama, tmp_path):
+    from b12.model_switch import ModelSwitch
+
+    _, base = scripted_ollama
+    runtime = open_runtime(base.model_copy(update={"state_dir": tmp_path / "state"}))
+    try:
+        runtime.control.set_meta("active_model", "codex:gpt-6-luna")
+        switch = ModelSwitch(runtime, share=_share(tmp_path, base), which=_which())
+        switch.restore()  # codex is not installed here
+        assert "gpt-6-luna" in switch.notice
+    finally:
+        runtime.close()

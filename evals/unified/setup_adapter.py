@@ -407,18 +407,18 @@ def build_runtime(
         _seed_sessions(runtime, setup, actors, report)
         _seed_intents(runtime, setup, actors, report)
         _seed_skills(runtime, setup, report)
-        if setup.get("skill_review_tick"):
+        if setup.get("review_tick"):
+            if setup.get("synthetic_clock"):
+                pinned = datetime.fromisoformat(setup["synthetic_clock"])
+                runtime.agent.clock = lambda: pinned
+            report["review_tick"] = asyncio.run(run_review_tick(runtime, clock=runtime.agent.clock))
+        if setup.get("skill_review_tick"):  # after the memory review, as the scheduler runs them
             if setup.get("synthetic_clock"):
                 pinned = datetime.fromisoformat(setup["synthetic_clock"])
                 runtime.agent.clock = lambda: pinned
             report["skill_review_tick"] = asyncio.run(
                 run_skill_review_tick(runtime, clock=runtime.agent.clock)
             )
-        if setup.get("review_tick"):
-            if setup.get("synthetic_clock"):
-                pinned = datetime.fromisoformat(setup["synthetic_clock"])
-                runtime.agent.clock = lambda: pinned
-            report["review_tick"] = asyncio.run(run_review_tick(runtime, clock=runtime.agent.clock))
     finally:
         runtime.close()
     json.dumps(report)  # must stay serializable for the evaluator record

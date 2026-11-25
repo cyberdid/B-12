@@ -109,6 +109,7 @@ class ModelSwitch:
         self.which = which
         self.active_id = f"local:{self.base.model}"
         self.previous_id: str | None = None
+        self.notice = ""  # shown once in the TUI, e.g. when the saved model could not be restored
         self.on_status: Callable[[dict], None] | None = None
         self._status = {"state": "ready", "progress": None, "detail": ""}
         self._started: float | None = None
@@ -241,11 +242,12 @@ class ModelSwitch:
                 try:
                     self._apply(choice)
                 except Exception as exc:  # a broken profile must never stop the runtime
-                    log.warning("saved model %s cannot be restored: %s", saved, exc)
+                    log.warning("saved model %s cannot be restored: %s", saved, type(exc).__name__)
                     break
                 return
         # The saved model is gone or broken: keep the configured one and forget the choice.
         self.runtime.control.set_meta("active_model", "")
+        self.notice = f"Збережену модель {saved} не вдалося відновити — працює {self.active_id}"
 
     # ---- status -----------------------------------------------------------------
     def _set(self, state: str, **fields) -> None:

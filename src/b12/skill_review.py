@@ -221,6 +221,13 @@ class SkillReviewer(MemoryReviewer):
             names.append(item["name"])
             pending_names.add(item["name"])
         control.set_meta(cursor_key, str(last_sequence))
+        not_staged = len(skills) - len(names)  # over the batch cap, pending already, or invalid
         if not pending_ids:
-            return {"state": "skipped", "reason": "duplicate"}
-        return {"state": "staged", "pending_ids": pending_ids, "names": names, "count": len(names)}
+            return {"state": "skipped", "reason": "duplicate", "not_staged": not_staged}
+        return {
+            "state": "staged",
+            "pending_ids": pending_ids,
+            "names": names,
+            "count": len(names),
+            "not_staged": not_staged,
+        }

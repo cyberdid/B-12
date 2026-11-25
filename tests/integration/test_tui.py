@@ -646,3 +646,17 @@ def test_companion_label_does_not_repeat_capri():
 
     assert _companion_label("CAPRI") == "CAPRI"
     assert _companion_label("КІБЕРКІТ") == "CAPRI  ·  КІБЕРКІТ"
+
+
+async def test_a_model_notice_is_shown_once():
+    class NoticeClient(ModelClient):
+        async def models(self):
+            return {**await super().models(), "notice": "збережену модель не відновлено"}
+
+    app = B12App(NoticeClient(STREAM))
+    async with app.run_test() as pilot:
+        await pilot.pause(0.3)
+        await app.refresh_models()
+        await pilot.pause(0.2)
+        texts = [str(w.render()) for w in app.query("#chat Static")]
+        assert sum("збережену модель не відновлено" in t for t in texts) == 1

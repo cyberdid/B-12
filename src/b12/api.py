@@ -724,10 +724,12 @@ def create_app(
         require_owner(who)
         models = runtime_of(request).models
         choices = await models.catalog()
+        notice, models.notice = models.notice, ""  # shown once
         return {
             "active": models.active_id,
             "previous": models.previous_id,
             "choices": [c.as_dict() for c in choices],
+            "notice": notice,
         }
 
     @app.post("/api/models/active")

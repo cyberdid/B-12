@@ -173,10 +173,12 @@ async def test_pending_name_is_not_staged_twice(scripted_ollama, tmp_path):
         assert (await SkillReviewer(runtime).review(actor))["state"] == "staged"
         second = _commit(runtime, actor, PROCEDURE)
         state["script"] = [_reply(_skill(second))]
-        assert await SkillReviewer(runtime).review(actor) == {
-            "state": "skipped",
-            "reason": "duplicate",
-        }
+        outcome = await SkillReviewer(runtime).review(actor)
+        assert (outcome["state"], outcome["reason"], outcome["not_staged"]) == (
+            "skipped",
+            "duplicate",
+            1,
+        )
         assert len(runtime.skills.list_pending()) == 1
     finally:
         runtime.close()
@@ -508,5 +510,22 @@ async def test_long_description_is_shortened_and_kept_on_one_line(scripted_ollam
         assert [line for line in content.splitlines() if line.startswith("name:")] == [
             "name: flash-esp32c3"
         ]
+    finally:
+        runtime.close()
+
+
+async def test_items_that_are_not_staged_are_counted(scripted_ollama, tmp_path):
+    from b12.skill_review import SkillReviewer
+
+    state, base = scripted_ollama
+    runtime = _runtime(base, tmp_path)
+    try:
+        actor = runtime.control.create_actor(owner=True, consent=True)
+        turn_id = _commit(runtime, actor, PROCEDURE)
+        state["script"] = [
+            _reply(_skill(turn_id, "one"), _skill(turn_id, "two"), _skill(turn_id, "three"))
+        ]
+        outcome = await SkillReviewer(runtime).review(actor)
+        assert outcome["count"] == 2 and outcome["not_staged"] == 1
     finally:
         runtime.close()

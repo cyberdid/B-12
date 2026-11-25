@@ -319,6 +319,10 @@ class B12App(App):
         except (AttributeError, httpx.HTTPError, ValueError):
             self._models, self._model_status = {}, {}
         self._show_model()
+        notice = self._models.get("notice") if isinstance(self._models, dict) else ""
+        if notice and notice != getattr(self, "_last_notice", ""):
+            self._last_notice = notice
+            await self.add_state(notice)
 
     async def _poll_models(self) -> None:
         if not self._models or self._closing:
